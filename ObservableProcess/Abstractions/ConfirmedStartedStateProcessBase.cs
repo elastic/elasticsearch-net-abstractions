@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
+using Elastic.ProcessManagement.Std;
 
-namespace Elastic.ProcessManagement.Functional
+namespace Elastic.ProcessManagement.Abstractions
 {
 	public abstract class ConfirmedStartedStateProcessBase : IDisposable
 	{
@@ -12,38 +12,56 @@ namespace Elastic.ProcessManagement.Functional
 		private readonly object _lock = new object();
 		private readonly ManualResetEvent _completedHandle = new ManualResetEvent(false);
 		private readonly ManualResetEvent _startedHandle = new ManualResetEvent(false);
-		private readonly IConsoleOutHandler _handler;
+		private readonly IConsoleOutWriter _writer;
 		private readonly IObservableProcess _process;
 
 		private bool _started;
 		private CompositeDisposable _disposables = new CompositeDisposable();
 
-
 		protected ConfirmedStartedStateProcessBase(
 			IObservableProcess observableProcess,
-			IConsoleOutHandler consoleOutHandler
+			IConsoleOutWriter consoleOutWriter
 			)
 		{
 			this._process = observableProcess ?? throw new ArgumentNullException(nameof(observableProcess));
-			this._handler = consoleOutHandler ?? new ConsoleOutHandler();
+			this._writer = consoleOutWriter ?? new ConsoleOutWriter();
 		}
 
+		/// <summary>
+		/// A human readable string that can be used to identify the process in exception messages
+		/// </summary>
 		protected abstract string PrintableName { get; }
+
+		/// <summary>
+		/// Handle the messages coming out of your process, return true to signal the process was confirmed to be in started state.
+		/// </summary>
+		/// <returns>Return true to signal you've confirmed the process has really started</returns>
 		protected abstract bool HandleMessage(ConsoleOut message);
 
-		public virtual void Start(TimeSpan waitForStarted = default(TimeSpan), bool subscribeToMessagesAfterStartedConfirmation = false)
+		/// <summary>
+		/// Start the observable process and monitor its std out and error for a functional started message
+		/// </summary>
+		/// <param name="waitTimeout">How long we want to wait for the started confirmation before bailing</param>
+		/// <param name="subscribeToMessagesAfterStartedConfirmation">
+		/// By default we no longer subscribe after we recieve the started confirmation. Set this to true to
+		/// keep receiving the console out messages wrapped in <see cref="ConsoleOut"/>. This boolean has no effect on the running state.
+		/// The process will keep running until it either decides to stop or <see cref="Stop"/> is called.
+		/// </param>
+		/// <exception cref="EarlyExitException">an exception that indicates a problem early in the pipeline</exception>
+		public virtual void Start(TimeSpan waitTimeout = default(TimeSpan), bool subscribeToMessagesAfterStartedConfirmation = false)
 		{
-			var timeout = waitForStarted == default(TimeSpan) ? TimeSpan.FromMinutes(2) : waitForStarted;
+			var timeout = waitTimeout == default(TimeSpan) ? TimeSpan.FromMinutes(2) : waitTimeout;
 			this.Stop();
 			lock (_lock)
 			{
 				this._startedHandle.Reset();
+				this._completedHandle.Reset();
 
-				var observable = this._process.Start().Publish();
+				var observable = this._process.Publish();
 				if (subscribeToMessagesAfterStartedConfirmation)
 				{
 					//subscribe to all messages and write them to console
-					this._disposables.Add(observable.Subscribe(this._handler.Write, delegate { }, delegate { }));
+					this._disposables.Add(observable.Subscribe(c=>this._writer.Write(c, finishLine: true), delegate { }, delegate { }));
 				}
 
 				//subscribe as long we are not in started state and attempt to read console
@@ -58,13 +76,18 @@ namespace Elastic.ProcessManagement.Functional
 				if (this._startedHandle.WaitOne(timeout)) return;
 			}
 			this.Stop();
-			throw new StartupException($"Could not start process within ({timeout}): {PrintableName}");
+			throw new EarlyExitException($"Could not start process within ({timeout}): {PrintableName}");
 		}
 
+		/// <summary>
+		/// Block until the process completes.
+		/// </summary>
+		/// <param name="timeout">The maximum time span we are willing to wait</param>
+		/// <exception cref="EarlyExitException">an exception that indicates a problem early in the pipeline</exception>
 		public void WaitForCompletion(TimeSpan timeout)
 		{
 			if (!this._completedHandle.WaitOne(timeout))
-				throw new StartupException($"Could not run process to completion within ({timeout}): {PrintableName}");
+				throw new EarlyExitException($"Could not run process to completion within ({timeout}): {PrintableName}");
 		}
 
 		public virtual void Stop()
@@ -100,7 +123,6 @@ namespace Elastic.ProcessManagement.Functional
 
 		private void Handle(ConsoleOut message)
 		{
-			this._handler.Handle(message);
 			if (this.HandleMessage(message))
 				this.ConfirmProcessStarted();
 		}

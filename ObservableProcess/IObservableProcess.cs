@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
+using Elastic.ProcessManagement.Std;
 
 namespace Elastic.ProcessManagement
 {
-	public interface IObservableProcess : IDisposable
+	public interface IObservableProcess : IDisposable, IObservable<ConsoleOut>
 	{
-		IObservable<ConsoleOut> Start(TimeSpan waitForStarted = default(TimeSpan));
-		void Stop();
+		IDisposable Subscribe(IConsoleOutWriter writer);
 
 		int? LastExitCode { get; }
 	}
