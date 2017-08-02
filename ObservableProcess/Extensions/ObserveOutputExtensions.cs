@@ -10,7 +10,7 @@ using Elastic.ProcessManagement.Std;
 
 namespace Elastic.ProcessManagement.Extensions
 {
-	internal static class ProcessDataReceivedToObservableExtensions
+	internal static class ObserveOutputExtensions
 	{
 		public static IObservable<ConsoleOut> ObserveErrorOutLineByLine(this Process process)
 		{
@@ -52,14 +52,16 @@ namespace Elastic.ProcessManagement.Extensions
 			return Task.Run(async () => await BufferedRead(reader, observer, ConsoleOut.Out));
 		}
 
-		private static async Task BufferedRead(StreamReader reader, IObserver<ConsoleOut> observer, Func<string, ConsoleOut> map)
+		private static async Task BufferedRead(StreamReader reader, IObserver<ConsoleOut> observer, Func<char[], ConsoleOut> map)
 		{
-			var buffer = new char[256];
 			while (!reader.EndOfStream)
 			{
+				var buffer = new char[256];
 				var read = await reader.ReadAsync(buffer, 0, buffer.Length);
 				if (read > 0)
-					observer.OnNext(map(new string(buffer, 0, read)));
+				{
+					observer.OnNext(map(buffer));
+				}
 				else
 					await Task.Delay(10);
 			}

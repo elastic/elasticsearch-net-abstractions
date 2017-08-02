@@ -5,24 +5,24 @@ namespace Elastic.ProcessManagement.Std
 	public class ConsoleOutColorWriter : ConsoleOutWriter
 	{
 		private readonly object _lock = new object();
-		public override void Write(ConsoleOut consoleOut, bool finishLine = false)
+		public override void Write(ConsoleOut consoleOut)
 		{
-			var data = finishLine ? consoleOut.Data + Environment.NewLine : consoleOut.Data;
 			lock (_lock)
 			{
 				if (consoleOut.Error)
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
-					Console.Error.Write(data);
+					consoleOut.CharsOrString(ErrorCharacters, ErrorLine);
 				}
 				else
 				{
 					Console.ResetColor();
-					Console.Write(data);
+					consoleOut.CharsOrString(OutCharacters, OutLine);
 				}
 				Console.ResetColor();
 			}
 		}
+
 		public override void Write(Exception e)
 		{
 			var ee = e as EarlyExitException;

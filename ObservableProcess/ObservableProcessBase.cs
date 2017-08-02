@@ -1,79 +1,30 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Dynamic;
 using System.IO;
 using System.Reactive;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
-using System.Threading.Tasks;
-using Elastic.ProcessManagement.Extensions;
 using Elastic.ProcessManagement.Std;
 
 namespace Elastic.ProcessManagement
 {
-	public class BufferedObservableProcess : ObservableProcess
-	{
-		public BufferedObservableProcess(ObservableProcessArguments arguments) : base(arguments) { }
-
-		protected override IObservable<ConsoleOut> CreateConsoleOutObservable()
-		{
-			return Observable.Create<ConsoleOut>(observer =>
-			{
-				if (!this.StartProcess(observer))
-					return Disposable.Empty;
-
-				this.Started = true;
-
-				if (this.Process.HasExited)
-				{
-					OnExit(observer);
-					return Disposable.Empty;
-				}
-				//var processExited = Observable.FromEventPattern(h => this.Process.Exited += h, h => this.Process.Exited -= h);
-				//var processError = CreateProcessExitSubscription(processExited, observer);
-
-				var stdOutSubscription = this.Process.ObserveStandardOutBuffered(observer);
-				var stdErrSubscription = this.Process.ObserveErrorOutBuffered(observer);
-
-				Task.WhenAll(stdOutSubscription, stdErrSubscription)
-					.ContinueWith((t) => { OnExit(observer); });
-
-				this.Process.Exited += (o, s) =>
-				{
-					Task.WaitAll(stdOutSubscription, stdErrSubscription);
-					OnExit(observer);
-				};
-
-
-				return Disposable.Empty;
-			});
-		}
-		public override IDisposable Subscribe(IConsoleOutWriter writer) =>
-			this.OutStream.Subscribe(c => writer.Write(c), writer.Write);
-
-	}
-
-
-	public class ObservableProcess : IObservableProcess
+	public abstract class ObservableProcessBase : IObservableProcess
 	{
 		private readonly ObservableProcessArguments _arguments;
 		private readonly ManualResetEvent _completedHandle = new ManualResetEvent(false);
 
-		public ObservableProcess(ObservableProcessArguments arguments)
+		protected ObservableProcessBase(ObservableProcessArguments arguments)
 		{
 			this._arguments = arguments;
 			this.Binary = this._arguments.Binary;
 			this.Process = CreateProcess();
 			this.Start();
 		}
-		public IDisposable Subscribe(IObserver<ConsoleOut> observer)
-		{
-			return this.OutStream.Subscribe(observer);
-		}
-		public virtual IDisposable Subscribe(IConsoleOutWriter writer)
-		{
-			return this.OutStream.Subscribe(c => writer.Write(c, finishLine: true), writer.Write);
-		}
+
+		public IDisposable Subscribe(IObserver<ConsoleOut> observer) => this.OutStream.Subscribe(observer);
+
+		public IDisposable Subscribe(IConsoleOutWriter writer) => this.OutStream.Subscribe(writer.Write, writer.Write, delegate { });
 
 		private readonly object _lock = new object();
 
@@ -81,13 +32,13 @@ namespace Elastic.ProcessManagement
 		protected Process Process { get; }
 		protected bool Started { get; set; }
 
-		public int? LastExitCode { get; private set; }
+		public int? ExitCode { get; private set; }
 
 		protected IObservable<ConsoleOut> OutStream { get; private set; } = Observable.Empty<ConsoleOut>();
 
 		private void Start()
 		{
-			if (this._isDisposed) throw new ObjectDisposedException(nameof(ObservableProcess));
+			if (this._isDisposed) throw new ObjectDisposedException(nameof(ObservableProcessBase));
 			if (this.Started) return;
 			lock (_lock)
 			{
@@ -97,70 +48,50 @@ namespace Elastic.ProcessManagement
 			}
 		}
 
+		protected abstract IObservable<ConsoleOut> CreateConsoleOutObservable();
+
 		protected bool StartProcess(IObserver<ConsoleOut> observer)
 		{
 			try
 			{
 				if (this.Process.Start()) return true;
 
-				observer.OnError(new EarlyExitException($"Failed to start observable process: {this.Binary}"));
+				OnError(observer, new EarlyExitException($"Failed to start observable process: {this.Binary}"));
 				this._completedHandle.Set();
 				return false;
 			}
 			catch (Exception e)
 			{
-				observer.OnError(new EarlyExitException($"Exception while starting observable process: {this.Binary}", e.Message, e));
+				OnError(observer, new EarlyExitException($"Exception while starting observable process: {this.Binary}", e.Message, e));
 				this._completedHandle.Set();
 			}
 			return false;
 		}
 
-		protected virtual IObservable<ConsoleOut> CreateConsoleOutObservable()
-		{
-			return Observable.Create<ConsoleOut>(observer =>
-			{
-				var stdOut = this.Process.ObserveStandardOutLineByLine();
-				var stdErr = this.Process.ObserveErrorOutLineByLine();
-
-				var stdOutSubscription = stdOut.Subscribe(observer);
-				var stdErrSubscription = stdErr.Subscribe(observer);
-
-				var processExited = Observable.FromEventPattern(h => this.Process.Exited += h, h => this.Process.Exited -= h);
-				var processError = CreateProcessExitSubscription(processExited, observer);
-
-				if (!this.StartProcess(observer))
-					return new CompositeDisposable(processError);
-
-				this.Process.BeginOutputReadLine();
-				this.Process.BeginErrorReadLine();
-
-				this.Started = true;
-
-				return new CompositeDisposable(stdOutSubscription, stdErrSubscription, processError);
-
-			});
-		}
-
 		protected IDisposable CreateProcessExitSubscription(IObservable<EventPattern<object>> processExited, IObserver<ConsoleOut> observer)
 		{
-			return processExited.Subscribe(args => { OnExit(observer); }, e => observer.OnCompleted(), observer.OnCompleted);
+			return processExited.Subscribe(args => { OnExit(observer); }, e => OnCompleted(observer), ()=> OnCompleted(observer));
 		}
 
+		protected virtual void OnError(IObserver<ConsoleOut> observer, Exception e) => observer.OnError(e);
+		protected virtual void OnCompleted(IObserver<ConsoleOut> observer) => observer.OnCompleted();
+
 		private readonly object _exitLock = new object();
+
 		protected void OnExit(IObserver<ConsoleOut> observer)
 		{
-			if (!this.Started) return;
+			if (!this.Started || this.ExitCode.HasValue) return;
 			lock (_exitLock)
 			{
-				if (!this.Started) return;
+				if (!this.Started || this.ExitCode.HasValue) return;
 				try
 				{
 					var c = this.Process.ExitCode;
-					this.LastExitCode = c;
+					this.ExitCode = c;
 					var validExitCode = this._arguments.ValidExitCodePredicate?.Invoke(c) ?? c == 0;
 					if (!validExitCode)
-						observer.OnError(new EarlyExitException($"Process '{this._arguments.Binary}' terminated with error code {c}"));
-					else observer.OnCompleted();
+						OnError(observer, new EarlyExitException($"Process '{this._arguments.Binary}' terminated with error code {c}"));
+					else OnCompleted(observer);
 				}
 				finally
 				{
@@ -237,6 +168,7 @@ namespace Elastic.ProcessManagement
 		}
 
 		private bool _isDisposed = false;
+
 		public void Dispose()
 		{
 			this.Stop();

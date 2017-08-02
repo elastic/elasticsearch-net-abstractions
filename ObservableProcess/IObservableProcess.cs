@@ -8,6 +8,6 @@ namespace Elastic.ProcessManagement
 	{
 		IDisposable Subscribe(IConsoleOutWriter writer);
 
-		int? LastExitCode { get; }
+		int? ExitCode { get; }
 	}
 }

@@ -8,7 +8,7 @@ namespace Elastic.ProcessManagement.Abstractions
 {
 	public abstract class ConfirmedStartedStateProcessBase : IDisposable
 	{
-		public int? LastExitCode => this._process?.LastExitCode;
+		public int? LastExitCode => this._process?.ExitCode;
 		private readonly object _lock = new object();
 		private readonly ManualResetEvent _completedHandle = new ManualResetEvent(false);
 		private readonly ManualResetEvent _startedHandle = new ManualResetEvent(false);
@@ -61,7 +61,7 @@ namespace Elastic.ProcessManagement.Abstractions
 				if (subscribeToMessagesAfterStartedConfirmation)
 				{
 					//subscribe to all messages and write them to console
-					this._disposables.Add(observable.Subscribe(c=>this._writer.Write(c, finishLine: true), delegate { }, delegate { }));
+					this._disposables.Add(observable.Subscribe(c=>this._writer.Write(c), delegate { }, delegate { }));
 				}
 
 				//subscribe as long we are not in started state and attempt to read console
