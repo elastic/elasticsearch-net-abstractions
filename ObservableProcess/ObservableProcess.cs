@@ -1,4 +1,7 @@
 using System;
+using System.Diagnostics;
+using System.IO;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
@@ -6,6 +9,26 @@ using Elastic.ProcessManagement.Std;
 
 namespace Elastic.ProcessManagement
 {
+	/// <summary>
+#pragma warning disable 1574
+	/// Wraps around <see cref="Process"/> and turns <see cref="Process.StandardOutput"/> and <see cref="Process.StandardError"/>
+	/// into an observable sequence using <see cref="StreamReader.ReadAsync"/>
+	///
+	/// This reads <see cref="BufferedObservableProcess.BufferSize"/> bytes at a time and returns those as <see cref="CharactersOut"/>
+	///
+	/// You can also quite easily subscribe to whole lines instead using <see cref="SubscribeLines"/> which buffers the characters arrays
+	/// and calls OnNext for every line exposing them as <see cref="LineOut"/>.
+	///
+	/// If all you want to do is redirect output to console consider subscribing to <see cref="Subscribe"/> taking an
+	/// <see cref="IConsoleOutWriter"/> instead.
+	///
+	/// When the process exits it waits for these stream readers to finish up to whatever <see cref="BufferedObservableProcess.WaitForStreamReadersTimeout"/>
+	/// is configured to. This defaults to 5 seconds.
+	///
+	/// This catches all cases where <see cref="EventBasedObservableProcess"/> would fall short to capture all the process output.
+	///
+#pragma warning restore 1574
+	/// </summary>
 	public class ObservableProcess : BufferedObservableProcess
 	{
 		private char[] _bufferStdOut = { };
@@ -28,6 +51,13 @@ namespace Elastic.ProcessManagement
 
 		public override IDisposable Subscribe(IObserver<CharactersOut> observer) => this.OutStream.Subscribe(observer);
 		public IDisposable Subscribe(IObserver<LineOut> observer) => this.OutStream.Select(LineOut.From).Subscribe(observer);
+
+		public IDisposable SubscribeLines(Action<LineOut> onNext, Action<Exception> onError, Action onCompleted) =>
+			this.Subscribe(Observer.Create(onNext, onError, onCompleted));
+		public IDisposable SubscribeLines(Action<LineOut> onNext, Action<Exception> onError) =>
+			this.Subscribe(Observer.Create(onNext, onError));
+		public IDisposable SubscribeLines(Action<LineOut> onNext) =>
+			this.Subscribe(Observer.Create(onNext));
 
 		private void OnNextConsoleOut(ConsoleOut c, IObserver<CharactersOut> observer)
 		{

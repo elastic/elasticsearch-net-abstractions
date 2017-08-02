@@ -30,8 +30,7 @@ namespace ScratchPad
 				process = new ObservableProcess(new ObservableProcessArguments("ipconfig", "/all")
 				{
 				});
-
-				process.Subscribe(Observer.Create<LineOut>(l=>Console.WriteLine(l.Line)));
+				process.SubscribeLines(l => Console.WriteLine(l.Line));
 
 				if (!process.WaitForCompletion(TimeSpan.FromSeconds(2000)))
 					Console.Error.WriteLine("Taking too long");
