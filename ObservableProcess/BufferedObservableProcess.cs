@@ -21,7 +21,7 @@ namespace Elastic.ProcessManagement
 	///
 	/// <see cref="CharactersOut"/> contains the current char[] buffer which could be fed to <see cref="Console.Write"/> directly.
 	///
-	/// Note that there is a subclass <use cref="LineByLineObservableProcess"/> that allows you to subscribe console output per line
+	/// Note that there is a subclass <use cref="ObservableProcess"/> that allows you to subscribe console output per line
 	/// instead whilst still reading the actual process output using asynchronous stream readers.
 	/// </summary>
 	public class BufferedObservableProcess : ObservableProcessBase<CharactersOut>

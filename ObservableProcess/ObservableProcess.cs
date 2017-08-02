@@ -6,15 +6,15 @@ using Elastic.ProcessManagement.Std;
 
 namespace Elastic.ProcessManagement
 {
-	public class LineByLineObservableProcess : BufferedObservableProcess
+	public class ObservableProcess : BufferedObservableProcess
 	{
 		private char[] _bufferStdOut = { };
 		private char[] _bufferStdErr = { };
 		private readonly object _copyLock = new object();
 
-		public LineByLineObservableProcess(string binary, params string[] arguments) : base(binary, arguments) { }
+		public ObservableProcess(string binary, params string[] arguments) : base(binary, arguments) { }
 
-		public LineByLineObservableProcess(ObservableProcessArguments arguments) : base(arguments) { }
+		public ObservableProcess(ObservableProcessArguments arguments) : base(arguments) { }
 
 		protected override IObservable<CharactersOut> CreateConsoleOutObservable()
 		{

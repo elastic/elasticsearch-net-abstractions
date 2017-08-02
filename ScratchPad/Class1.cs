@@ -14,9 +14,7 @@ namespace ScratchPad
 
 			while (true)
 			{
-				var process = new LineByLineObservableProcess(new ObservableProcessArguments("ipconfig", "/all")
-				{
-				});
+				var process = new ObservableProcess("ipconfig", "/all");
 
 				process.Subscribe(new ConsoleOutColorWriter());
 
@@ -29,7 +27,7 @@ namespace ScratchPad
 
 				Console.WriteLine($"- ExitCode:{process.ExitCode} Press Any Key to Quit ---");
 
-				process = new LineByLineObservableProcess(new ObservableProcessArguments("ipconfig", "/all")
+				process = new ObservableProcess(new ObservableProcessArguments("ipconfig", "/all")
 				{
 				});
 

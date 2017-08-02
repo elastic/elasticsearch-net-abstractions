@@ -12,7 +12,7 @@ namespace Elastic.ProcessManagement
 	/// and even though it uses the calling <see cref="Process.WaitForExit()"/> twice technique (once with timeout, once without),
 	/// it still likely to complete before all the buffers have been read. This is especially common for processes that finish within
 	/// a second such e.g `ipconfig /all`. For this reason its marked as obsolete but still included to play around with.
-	/// Use <see cref="BufferedObservableProcess"/> or <see cref="LineByLineObservableProcess"/> instead.
+	/// Use <see cref="BufferedObservableProcess"/> or <see cref="ObservableProcess"/> instead.
 	/// </summary>
 	[Obsolete("Using events can lead to dropped messages, only included for educational purposes. See this class's <summary>")]
 	public class EventBasedObservableProcess: ObservableProcessBase<LineOut>
