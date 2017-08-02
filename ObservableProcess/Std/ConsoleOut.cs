@@ -1,44 +1,41 @@
 using System;
+using System.Linq.Expressions;
 
 namespace Elastic.ProcessManagement.Std
 {
-	public class ConsoleOut
+	public abstract class ConsoleOut
 	{
-		private char[] _characters;
-		public bool Error { get; }
-
-		public string Line { get; }
-
-		private bool IsString { get; }
-
-		private ConsoleOut(bool error, string line)
-		{
-			this.Error = error;
-			this.Line = line;
-			this.IsString = true;
-		}
-		private ConsoleOut(bool error, char[] characters)
-		{
-			this.Error = error;
-			this._characters = characters;
-		}
+		public abstract bool Error { get; }
 
 		public void OutOrErrrorCharacters(Action<char[]> outChararchters, Action<char[]>  errorCharacters)
 		{
-			if (this.Error) errorCharacters(this._characters);
-			else outChararchters(this._characters);
-
+			switch (this)
+			{
+				case CharactersOut c:
+                    if (this.Error) errorCharacters(c.Characters);
+                    else outChararchters(c.Characters);
+					break;
+				default:
+					throw new Exception($"{nameof(ConsoleOut)} is not of type {nameof(CharactersOut)} {nameof(OutOrErrrorCharacters)} not allowed");
+			}
 		}
 		public void CharsOrString(Action<char[]> doCharacters, Action<string> doLine)
 		{
-			if (this.IsString) doLine(this.Line);
-			else doCharacters(this._characters);
+			switch (this)
+			{
+				case CharactersOut c:
+					doCharacters(c.Characters);
+					break;
+				case LineOut l:
+					doLine(l.Line);
+					break;
+			}
 		}
 
-		public static ConsoleOut ErrorOut(string data) => new ConsoleOut(true, data);
-		public static ConsoleOut Out(string data) => new ConsoleOut(false, data);
+		public static LineOut ErrorOut(string data) => new LineOut(true, data);
+		public static LineOut Out(string data) => new LineOut(false, data);
 
-		public static ConsoleOut ErrorOut(char[] characters) => new ConsoleOut(true, characters);
-		public static ConsoleOut Out(char[] characters) => new ConsoleOut(false, characters);
+		public static CharactersOut ErrorOut(char[] characters) => new CharactersOut(true, characters);
+		public static CharactersOut Out(char[] characters) => new CharactersOut(false, characters);
 	}
 }

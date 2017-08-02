@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using System.Threading;
 using Elastic.ProcessManagement;
 using Elastic.ProcessManagement.Std;
@@ -26,27 +27,17 @@ namespace ScratchPad
 				if (!process.WaitForCompletion(TimeSpan.FromSeconds(2000)))
 					Console.Error.WriteLine("Taking too long");
 
-				Console.WriteLine();
+				Console.WriteLine($"- ExitCode:{process.ExitCode} Press Any Key to Quit ---");
 
-				//		    Console.WriteLine("------------");
-				//		    Console.WriteLine("------------");
-				//		    Console.WriteLine("------------");
-				//
-				//			process = new ObservableProcess(new ObservableProcessArguments("ipconfig", "/all")
-				//			{
-				//				SubscribeToLines = false
-				//			});
-				//	        process.Start()
-				//		        .Subscribe(
-				//			        e =>
-				//			        {
-				//				        Console.Write(e.Data);
-				//			        },
-				//			        e => Console.Error.Write(e.Data));
-				//
-				//	        if (!process.WaitForCompletion(TimeSpan.FromSeconds(20)))
-				//		        Console.Error.WriteLine("Taking too long");
-				//
+				process = new LineByLineObservableProcess(new ObservableProcessArguments("ipconfig", "/all")
+				{
+				});
+
+				process.Subscribe(Observer.Create<LineOut>(l=>Console.WriteLine(l.Line)));
+
+				if (!process.WaitForCompletion(TimeSpan.FromSeconds(2000)))
+					Console.Error.WriteLine("Taking too long");
+
 
 				Console.WriteLine($"- ExitCode:{process.ExitCode} Press Any Key to Quit ---");
 				Console.ReadKey();

@@ -1,6 +1,7 @@
 using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Runtime.InteropServices;
 using Elastic.ProcessManagement.Std;
 
 namespace Elastic.ProcessManagement
@@ -11,11 +12,13 @@ namespace Elastic.ProcessManagement
 		private char[] _bufferStdErr = { };
 		private readonly object _copyLock = new object();
 
+		public LineByLineObservableProcess(string binary, params string[] arguments) : base(binary, arguments) { }
+
 		public LineByLineObservableProcess(ObservableProcessArguments arguments) : base(arguments) { }
 
-		protected override IObservable<ConsoleOut> CreateConsoleOutObservable()
+		protected override IObservable<CharactersOut> CreateConsoleOutObservable()
 		{
-			return Observable.Create<ConsoleOut>(observer =>
+			return Observable.Create<CharactersOut>(observer =>
 			{
 				base.CreateConsoleOutObservable()
 					.Subscribe(c => OnNextConsoleOut(c, observer), observer.OnError, observer.OnCompleted);
@@ -23,7 +26,10 @@ namespace Elastic.ProcessManagement
 			});
 		}
 
-		private void OnNextConsoleOut(ConsoleOut c, IObserver<ConsoleOut> observer)
+		public override IDisposable Subscribe(IObserver<CharactersOut> observer) => this.OutStream.Subscribe(observer);
+		public IDisposable Subscribe(IObserver<LineOut> observer) => this.OutStream.Select(LineOut.From).Subscribe(observer);
+
+		private void OnNextConsoleOut(ConsoleOut c, IObserver<CharactersOut> observer)
 		{
 			lock (_copyLock)
 			{
@@ -35,19 +41,19 @@ namespace Elastic.ProcessManagement
 			}
 		}
 
-		protected override void OnCompleted(IObserver<ConsoleOut> observer)
+		protected override void OnCompleted(IObserver<CharactersOut> observer)
 		{
 			Flush(observer); //make sure we flush our buffers before calling OnCompleted
 			base.OnCompleted(observer);
 		}
 
-		protected override void OnError(IObserver<ConsoleOut> observer, Exception e)
+		protected override void OnError(IObserver<CharactersOut> observer, Exception e)
 		{
 			Flush(observer); //make sure we flush our buffers before erroring
 			base.OnError(observer, e);
 		}
 
-		private void Flush(IObserver<ConsoleOut> observer)
+		private void Flush(IObserver<CharactersOut> observer)
 		{
 			YieldNewLinesToOnNext(ref _bufferStdErr, buffer => observer.OnNext(ConsoleOut.ErrorOut(buffer)));
 			YieldNewLinesToOnNext(ref _bufferStdOut, buffer => observer.OnNext(ConsoleOut.Out(buffer)));

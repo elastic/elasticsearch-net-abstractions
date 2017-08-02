@@ -21,10 +21,17 @@ namespace Elastic.ProcessManagement
 		}
 
 		// ReSharper disable UnusedAutoPropertyAccessor.Global
-		public Action OnBeforeStop { get; set; }
-		public TextReader StandardIn { get; set; }
+
+		/// <summary>
+		/// Provide a method that will be called with <see cref="ProcessStartInfo"/> before its set on <see cref="Process.StartInfo"/>
+		/// </summary>
 		public Action<ProcessStartInfo> AlterProcessStartInfo { get; set; }
+
+		/// <summary>
+		/// Provide a method that will validate whether an exit code is valid or not, by default anything not 0 is considered invalid.
+		/// </summary>
 		public Func<int, bool> ValidExitCodePredicate { get; set; }
+
 		// ReSharper enable UnusedAutoPropertyAccessor.Global
 
 	}

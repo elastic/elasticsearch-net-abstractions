@@ -9,10 +9,14 @@ using Elastic.ProcessManagement.Std;
 
 namespace Elastic.ProcessManagement
 {
-	public abstract class ObservableProcessBase : IObservableProcess
+	public abstract class ObservableProcessBase<TConsoleOut> : IObservableProcess<TConsoleOut>
+		where TConsoleOut : ConsoleOut
 	{
 		private readonly ObservableProcessArguments _arguments;
 		private readonly ManualResetEvent _completedHandle = new ManualResetEvent(false);
+
+		protected ObservableProcessBase(string binary, params string[] arguments)
+			: this(new ObservableProcessArguments(binary, arguments)) { }
 
 		protected ObservableProcessBase(ObservableProcessArguments arguments)
 		{
@@ -22,7 +26,7 @@ namespace Elastic.ProcessManagement
 			this.Start();
 		}
 
-		public IDisposable Subscribe(IObserver<ConsoleOut> observer) => this.OutStream.Subscribe(observer);
+		public virtual IDisposable Subscribe(IObserver<TConsoleOut> observer) => this.OutStream.Subscribe(observer);
 
 		public IDisposable Subscribe(IConsoleOutWriter writer) => this.OutStream.Subscribe(writer.Write, writer.Write, delegate { });
 
@@ -34,11 +38,11 @@ namespace Elastic.ProcessManagement
 
 		public int? ExitCode { get; private set; }
 
-		protected IObservable<ConsoleOut> OutStream { get; private set; } = Observable.Empty<ConsoleOut>();
+		protected IObservable<TConsoleOut> OutStream { get; private set; } = Observable.Empty<TConsoleOut>();
 
 		private void Start()
 		{
-			if (this._isDisposed) throw new ObjectDisposedException(nameof(ObservableProcessBase));
+			if (this._isDisposed) throw new ObjectDisposedException(nameof(ObservableProcessBase<TConsoleOut>));
 			if (this.Started) return;
 			lock (_lock)
 			{
@@ -48,37 +52,37 @@ namespace Elastic.ProcessManagement
 			}
 		}
 
-		protected abstract IObservable<ConsoleOut> CreateConsoleOutObservable();
+		protected abstract IObservable<TConsoleOut> CreateConsoleOutObservable();
 
-		protected bool StartProcess(IObserver<ConsoleOut> observer)
+		protected bool StartProcess(IObserver<TConsoleOut> observer)
 		{
 			try
 			{
 				if (this.Process.Start()) return true;
 
-				OnError(observer, new EarlyExitException($"Failed to start observable process: {this.Binary}"));
+				OnError(observer, new CleanExitException($"Failed to start observable process: {this.Binary}"));
 				this._completedHandle.Set();
 				return false;
 			}
 			catch (Exception e)
 			{
-				OnError(observer, new EarlyExitException($"Exception while starting observable process: {this.Binary}", e.Message, e));
+				OnError(observer, new CleanExitException($"Exception while starting observable process: {this.Binary}", e.Message, e));
 				this._completedHandle.Set();
 			}
 			return false;
 		}
 
-		protected IDisposable CreateProcessExitSubscription(IObservable<EventPattern<object>> processExited, IObserver<ConsoleOut> observer)
+		protected IDisposable CreateProcessExitSubscription(IObservable<EventPattern<object>> processExited, IObserver<TConsoleOut> observer)
 		{
 			return processExited.Subscribe(args => { OnExit(observer); }, e => OnCompleted(observer), ()=> OnCompleted(observer));
 		}
 
-		protected virtual void OnError(IObserver<ConsoleOut> observer, Exception e) => observer.OnError(e);
-		protected virtual void OnCompleted(IObserver<ConsoleOut> observer) => observer.OnCompleted();
+		protected virtual void OnError(IObserver<TConsoleOut> observer, Exception e) => observer.OnError(e);
+		protected virtual void OnCompleted(IObserver<TConsoleOut> observer) => observer.OnCompleted();
 
 		private readonly object _exitLock = new object();
 
-		protected void OnExit(IObserver<ConsoleOut> observer)
+		protected void OnExit(IObserver<TConsoleOut> observer)
 		{
 			if (!this.Started || this.ExitCode.HasValue) return;
 			lock (_exitLock)
@@ -90,7 +94,7 @@ namespace Elastic.ProcessManagement
 					this.ExitCode = c;
 					var validExitCode = this._arguments.ValidExitCodePredicate?.Invoke(c) ?? c == 0;
 					if (!validExitCode)
-						OnError(observer, new EarlyExitException($"Process '{this._arguments.Binary}' terminated with error code {c}"));
+						OnError(observer, new CleanExitException($"Process '{this._arguments.Binary}' terminated with error code {c}"));
 					else OnCompleted(observer);
 				}
 				finally
@@ -127,7 +131,7 @@ namespace Elastic.ProcessManagement
 		/// Block until the process completes.
 		/// </summary>
 		/// <param name="timeout">The maximum time span we are willing to wait</param>
-		/// <exception cref="EarlyExitException">an exception that indicates a problem early in the pipeline</exception>
+		/// <exception cref="CleanExitException">an exception that indicates a problem early in the pipeline</exception>
 		public bool WaitForCompletion(TimeSpan timeout)
 		{
 			if (this._completedHandle.WaitOne(timeout)) return true;
@@ -142,7 +146,6 @@ namespace Elastic.ProcessManagement
 				if (this.Process == null) return;
 				if (this.Started)
 				{
-					this._arguments.OnBeforeStop?.Invoke();
 					this.Process?.WaitForExit(10000);
 				}
 

@@ -25,7 +25,7 @@ namespace Elastic.ProcessManagement.Std
 
 		public override void Write(Exception e)
 		{
-			var ee = e as EarlyExitException;
+			var ee = e as CleanExitException;
 			if (ee == null) throw e;
 			lock (_lock)
 			{

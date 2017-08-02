@@ -13,13 +13,13 @@ namespace Elastic.ProcessManagement.Abstractions
 		private readonly ManualResetEvent _completedHandle = new ManualResetEvent(false);
 		private readonly ManualResetEvent _startedHandle = new ManualResetEvent(false);
 		private readonly IConsoleOutWriter _writer;
-		private readonly IObservableProcess _process;
+		private readonly IObservableProcess<CharactersOut> _process;
 
 		private bool _started;
 		private CompositeDisposable _disposables = new CompositeDisposable();
 
 		protected ConfirmedStartedStateProcessBase(
-			IObservableProcess observableProcess,
+			IObservableProcess<CharactersOut> observableProcess,
 			IConsoleOutWriter consoleOutWriter
 			)
 		{
@@ -47,7 +47,7 @@ namespace Elastic.ProcessManagement.Abstractions
 		/// keep receiving the console out messages wrapped in <see cref="ConsoleOut"/>. This boolean has no effect on the running state.
 		/// The process will keep running until it either decides to stop or <see cref="Stop"/> is called.
 		/// </param>
-		/// <exception cref="EarlyExitException">an exception that indicates a problem early in the pipeline</exception>
+		/// <exception cref="CleanExitException">an exception that indicates a problem early in the pipeline</exception>
 		public virtual void Start(TimeSpan waitTimeout = default(TimeSpan), bool subscribeToMessagesAfterStartedConfirmation = false)
 		{
 			var timeout = waitTimeout == default(TimeSpan) ? TimeSpan.FromMinutes(2) : waitTimeout;
@@ -76,18 +76,18 @@ namespace Elastic.ProcessManagement.Abstractions
 				if (this._startedHandle.WaitOne(timeout)) return;
 			}
 			this.Stop();
-			throw new EarlyExitException($"Could not start process within ({timeout}): {PrintableName}");
+			throw new CleanExitException($"Could not start process within ({timeout}): {PrintableName}");
 		}
 
 		/// <summary>
 		/// Block until the process completes.
 		/// </summary>
 		/// <param name="timeout">The maximum time span we are willing to wait</param>
-		/// <exception cref="EarlyExitException">an exception that indicates a problem early in the pipeline</exception>
+		/// <exception cref="CleanExitException">an exception that indicates a problem early in the pipeline</exception>
 		public void WaitForCompletion(TimeSpan timeout)
 		{
 			if (!this._completedHandle.WaitOne(timeout))
-				throw new EarlyExitException($"Could not run process to completion within ({timeout}): {PrintableName}");
+				throw new CleanExitException($"Could not run process to completion within ({timeout}): {PrintableName}");
 		}
 
 		public virtual void Stop()

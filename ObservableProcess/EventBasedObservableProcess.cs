@@ -9,18 +9,21 @@ namespace Elastic.ProcessManagement
 {
 	/// <summary>
 	/// This implementation wraps over <see cref="Process.OutputDataReceived"/> and see <see cref="Process.ErrorDataReceived"/>
-	/// and even though it uses the calling <see cref="Process.WaitForExit()"/> twice technique (once with timeout once without),
+	/// and even though it uses the calling <see cref="Process.WaitForExit()"/> twice technique (once with timeout, once without),
 	/// it still likely to complete before all the buffers have been read. This is especially common for processes that finish within
-	/// a second such e.g `ipconfig /all`. For this reason its marked as obsolete but still included to play around with
+	/// a second such e.g `ipconfig /all`. For this reason its marked as obsolete but still included to play around with.
+	/// Use <see cref="BufferedObservableProcess"/> or <see cref="LineByLineObservableProcess"/> instead.
 	/// </summary>
-	[Obsolete("Included for educational purposes only, see <summary> for more info, please use the PerLineObservableProcess")]
-	public class EventBasedObservableProcess: ObservableProcessBase
+	[Obsolete("Using events can lead to dropped messages, only included for educational purposes. See this class's <summary>")]
+	public class EventBasedObservableProcess: ObservableProcessBase<LineOut>
 	{
+		public EventBasedObservableProcess(string binary, params string[] arguments) : base(binary, arguments) { }
+
 		public EventBasedObservableProcess(ObservableProcessArguments arguments) : base(arguments) { }
 
-		protected override IObservable<ConsoleOut> CreateConsoleOutObservable()
+		protected override IObservable<LineOut> CreateConsoleOutObservable()
 		{
-			return Observable.Create<ConsoleOut>(observer =>
+			return Observable.Create<LineOut>(observer =>
 			{
 				var stdOut = this.Process.ObserveStandardOutLineByLine();
 				var stdErr = this.Process.ObserveErrorOutLineByLine();

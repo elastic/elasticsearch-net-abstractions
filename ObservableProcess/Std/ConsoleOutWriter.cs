@@ -6,8 +6,8 @@ namespace Elastic.ProcessManagement.Std
 	{
 		public virtual void Write(Exception e)
 		{
-			var ee = e as EarlyExitException;
-			if (ee == null) throw ee;
+			var ee = e as CleanExitException;
+			if (ee == null) throw e;
 			Console.WriteLine(e.Message);
 			if (!string.IsNullOrEmpty(ee.HelpText))
 			{
