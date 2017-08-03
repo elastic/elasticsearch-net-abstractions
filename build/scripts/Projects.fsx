@@ -1,31 +1,39 @@
 ﻿#I @"../../packages/build/FAKE/tools"
-#I @"../../packages/build/FSharp.Data/lib/net40"
 #r @"FakeLib.dll"
-#r @"FSharp.Data.dll"
-#r @"System.IO.Compression.FileSystem.dll"
 
 open System
-open System.IO
-open System.Diagnostics
-open System.Net
-
 open Fake
-open FSharp.Data 
 
 [<AutoOpen>]
 module Projects = 
 
-    type private GlobalJson = JsonProvider<"../../global.json">
-    let private globalJson = GlobalJson.Load("../../global.json");
-    type DotNetFrameworkIdentifier = { MSBuild: string; Nuget: string; DefineConstants: string; }
-
     type Project =
         | ObservableProcess
 
-        static member All = seq[ObservableProcess]
-        
+        static member All = [ObservableProcess]
+
+    type ProjectInfo = { name: string; project: Project}
+
     let nameOf project = 
         match project with
         | ObservableProcess -> "ObservableProcess"
-    
+
+    let infoOf project = { name = project |> nameOf; project = project }
+    let projectsStartingWith partial =
+        Project.All 
+        |> Seq.map nameOf 
+        |> Seq.filter (fun s -> s |> toLower |> startsWith (partial |> toLower) && partial |> isNotNullOrEmpty) 
+        |> Seq.toList
+
+    let tryFind partial =
+        let projectsStartingWith = 
+            Project.All 
+            |> Seq.map infoOf
+            |> Seq.filter (fun s -> partial |> isNotNullOrEmpty && s.name |> toLower |> startsWith (partial |> toLower)) 
+            |> Seq.toList
+
+        match projectsStartingWith with 
+        | [i] -> Some i.project
+        | _ -> None
+
 

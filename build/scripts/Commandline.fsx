@@ -1,6 +1,5 @@
 #I @"../../packages/build/FAKE/tools"
 #r @"FakeLib.dll"
-
 #load @"Projects.fsx"
 
 open System
@@ -27,12 +26,11 @@ module Commandline =
     let private arguments = args |> List.filter (fun x -> x <> "skiptests")
 
     let private (|IsAProject|_|) candidate =
-        let projectNames = Project.All |> Seq.map nameOf  
-        let names = projectNames |> Seq.filter (fun s -> s |> toLower |> startsWith (candidate |> toLower)) |> Seq.toList
+        let names = projectsStartingWith candidate 
         match names with 
         | [name] -> Some name
         | [] ->
-            traceError (sprintf "'%s' did not match any of our known projects '%A'" candidate projectNames)
+            traceError (sprintf "'%s' did not match any of our known projects '%A'" candidate (Project.All |> Seq.map nameOf))
             exit 2
             None
         | _ ->
@@ -40,6 +38,18 @@ module Commandline =
             exit 2
             None
         
+    let project = 
+        let p = 
+            match arguments with
+            | [IsAProject project] -> project |> tryFind
+            | IsAProject project::tail -> project |> tryFind
+            | _ ->
+                traceError usage
+                exit 2
+
+        //we'll already have printed an error message and exited before `None` here triggers
+        match p with | Some p -> p | _ -> raise <| ArgumentNullException();
+
     let target = 
         match arguments with
         | [IsAProject project] -> "build"
@@ -61,4 +71,4 @@ module Commandline =
             exit 2
 
         setBuildParam "target" target
-        traceHeader target
+        traceHeader (sprintf "%s - %s" (project |> nameOf) target)

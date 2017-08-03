@@ -36,4 +36,6 @@ module Paths =
         let f = replace @"\" "/" folder
         sprintf "%s/%s/bin/Release" SourceFolder f
 
-    let SolutionFile = sprintf "%s/Elasticsearch.Net.Abstractions.sln" Sourc
+    let SolutionFile = sprintf "%s/Elasticsearch.Net.Abstractions.sln" SourceFolder
+
+    let PackageOutFolder = Output("_packages")

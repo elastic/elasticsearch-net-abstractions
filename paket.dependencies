@@ -1,8 +1,8 @@
 source https://api.nuget.org/v3/index.json
 
-nuget System.Diagnostics.Process 4.3.0
-nuget System.Reactive.Linq 3.1.1
-nuget System.Threading.Thread 4.3.0
+nuget System.Diagnostics.Process >= 4.3.0
+nuget System.Reactive.Linq >= 3.1.1
+nuget System.Threading.Thread >= 4.3.0
 
 group build
     source https://api.nuget.org/v3/index.json

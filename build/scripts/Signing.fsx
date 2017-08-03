@@ -38,12 +38,11 @@ module StrongName =
           trace (sprintf "%s was signed with official key token %s" name t) 
         | (_, t) -> traceFAKE "%s was not signed with the official token: %s but %s" name oficialToken t
         
-    let ValidateDllsInNugetPackage () = 
-        for p in DotNetProject.AllPublishable do
-            for f in DotNetFramework.All do 
-                let name = p.Name
-                let folder = Paths.IncrementalOutputFolder p f
-                let dll = sprintf "%s/%s.dll" folder name
-                match fileExists dll with
-                | true -> validate dll name 
-                | _ -> failwithf "Attemped to verify signature of %s but it was not found!" dll
+    // let ValidateDllsInNugetPackage () = 
+    //     for f in Project.All do 
+    //         let name = nameOf p
+    //         let folder = Paths.IncrementalOutputFolder p f
+    //         let dll = sprintf "%s/%s.dll" folder name
+    //         match fileExists dll with
+    //         | true -> validate dll name 
+    //         | _ -> failwithf "Attemped to verify signature of %s but it was not found!" dll

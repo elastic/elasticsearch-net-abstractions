@@ -1,5 +1,5 @@
-#load @"Commandline.fsx"
 #load @"Projects.fsx"
+#load @"Commandline.fsx"
 #load @"Paths.fsx"
 #load @"Tooling.fsx"
 #load @"Versioning.fsx"
@@ -11,6 +11,7 @@
 open System
 open Fake
 
+open Projects
 open Paths
 open Building
 open Testing
@@ -31,21 +32,26 @@ Target "FullBuild" <| fun _ -> Build.Compile false
     
 Target "Test" Tests.RunUnitTests
 
+Target "ChangeVersion" <| fun _ -> 
+    let newVersion = getBuildParam "version"
+    Versioning.writeVersionIntoGlobalJson Commandline.project newVersion
+
 Target "Version" <| fun _ -> 
-    tracefn "Current Version: %s" (Versioning.CurrentVersion.ToString())
+    for v in Versioning.AllProjectVersions do
+        traceImportant (sprintf "project %s has version %s" (v.Project.name) (v.Informational.ToString()))
 
 Target "Release" <| fun _ -> 
-    Release.NugetPack()   
-    Versioning.ValidateArtifacts()
-    StrongName.ValidateDllsInNugetPackage()
+    Release.CreateNugetPackage Commandline.project
+    Versioning.ValidateArtifacts Commandline.project
 
 // Dependencies
-"Clean" 
-  =?> ("Version", hasBuildParam "version")
-  ==> "Restore"
-  =?> ("FullBuild", Commandline.needsFullBuild)
-  =?> ("Test", (not Commandline.skipTests))
-  ==> "Build"
+"Clean"
+    =?> ("ChangeVersion", hasBuildParam "version")
+    ==> "Version"
+    ==> "Restore"
+    ==> "FullBuild"
+    =?> ("Test", (not Commandline.skipTests))
+    ==> "Build"
 
 "Build"
   ==> "Release"

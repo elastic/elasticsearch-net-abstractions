@@ -8,6 +8,7 @@
 #load @"Versioning.fsx"
 
 open System 
+open System.IO
 open Fake 
 open FSharp.Data 
 
@@ -67,5 +68,6 @@ module Build =
 
     let Clean() =
         CleanDir Paths.BuildOutput
-        DotNetCli.RunCommand (fun p -> { p with TimeOut = TimeSpan.FromMinutes(3.) }) "clean src/Elasticsearch.sln -c Release" |> ignore
+        let cleanCommand = sprintf "clean %s -c Release" Paths.SolutionFile
+        DotNetCli.RunCommand (fun p -> { p with TimeOut = TimeSpan.FromMinutes(3.) }) cleanCommand |> ignore
         //DotNetProject.All |> Seq.iter(fun p -> CleanDir(Paths.BinFolder p.Name))

@@ -79,73 +79,15 @@ module Tooling =
 
     let execProcess proc arguments = execProcessInDirectory proc arguments "."
 
-
     let execProcessAndReturnMessages proc arguments =
         execProcessWithTimeoutAndReturnMessages proc arguments defaultTimeout
-
-    let nugetFile =
-        let targetLocation = "build/tools/nuget/nuget.exe" 
-        if (not (File.Exists targetLocation))
-        then
-            trace (sprintf "Nuget not found at %s. Downloading now" targetLocation)
-            let url = "http://dist.nuget.org/win-x86-commandline/latest/nuget.exe" 
-            Directory.CreateDirectory("build/tools/nuget") |> ignore
-            use webClient = new WebClient()
-            webClient.DownloadFile(url, targetLocation)
-            trace "nuget downloaded"
-        targetLocation 
 
     type BuildTooling(path) =
         member this.Path = path
         member this.Exec arguments = execProcess this.Path arguments
         member this.ExecIn workingDirectory arguments = execProcessInDirectory this.Path arguments workingDirectory
 
-    type DotTraceTool = {
-        Name:string;
-        Download:string;
-        TargetDir:string;
-    }
-
-    let jetBrainsTools = [{ 
-                            DotTraceTool.Name = "JetBrains DotTrace Self-Profile API";
-                            Download = "https://download-cf.jetbrains.com/resharper/JetBrains.Profiler.SelfSdk.2016.3.2.zip";
-                            TargetDir = "dottrace-selfprofile";
-                         };
-                         { 
-                            DotTraceTool.Name = "JetBrains DotTrace Commandline Tools";
-                            Download = "https://download-cf.jetbrains.com/resharper/JetBrains.dotTrace.CommandLineTools.2016.3.20170126.121657.zip";
-                            TargetDir = "dottrace-commandline";
-                         }]
-
-    jetBrainsTools
-    |> Seq.iter(fun t -> 
-        let toolName = Path.GetFileNameWithoutExtension t.Download
-        let buildToolsDirectory = Paths.Build("tools")
-        let targetDir = sprintf "%s/%s" buildToolsDirectory t.TargetDir
-        
-        if (not (Directory.Exists targetDir)) then
-            tracefn "No %s found in %s. Downloading now" t.Name buildToolsDirectory
-            let zipFile = sprintf "%s/%s.zip" buildToolsDirectory toolName
-            use webClient = new WebClient()
-            webClient.DownloadFile(t.Download, zipFile)
-            System.IO.Compression.ZipFile.ExtractToDirectory(zipFile, targetDir)
-            File.Delete zipFile
-            tracefn "%s downloaded" t.Name
-    )
-
-    type ProfilerTooling(path) =
-        let commandLineTool = Paths.CheckedInTool((jetBrainsTools.Item 1).TargetDir)
-        let toolPath = commandLineTool @@ path
-        member this.Exec arguments = execAt Environment.CurrentDirectory toolPath arguments
-
-    let Nuget = new BuildTooling(nugetFile)
-    let GitLink = new BuildTooling(Paths.Tool("gitlink/lib/net45/gitlink.exe"))
-    let Node = new BuildTooling(Paths.Tool("Node.js/node.exe"))
-    let Npm = new BuildTooling(Paths.Tool("Npm/node_modules/npm/cli.js"))
     let XUnit = new BuildTooling(Paths.Tool("xunit.runner.console/tools/xunit.console.exe"))
-    let DotTraceProfiler = new ProfilerTooling("ConsoleProfiler.exe")
-    let DotTraceReporter = new ProfilerTooling("Reporter.exe")
-    let DotTraceSnapshotStats = new ProfilerTooling("SnapshotStat.exe")
 
     //only used to boostrap fake itself
     let Fake = new BuildTooling("FAKE/tools/FAKE.exe")
@@ -162,49 +104,4 @@ module Tooling =
 
     let DotNet = new DotNetTooling("dotnet.exe")
 
-    type MsBuildTooling() =
-        // Exclude DocGenerator from .NET 4.5 build as it depends on a Roslyn library
-        // that is built against .NET 4.5.2
-        let solutionForFramework framework =
-            match framework with
-            | Net45 -> Paths.Source "Elasticsearch.Net45.sln"
-            | _ -> Paths.Source "Elasticsearch.sln"  
-
-        member this.Build (framework:Projects.DotNetFramework) =            
-            let solution = solutionForFramework framework 
-            let identifier = framework.Identifier
-            let setParams defaults =
-                { defaults with
-                    Verbosity = Some(Quiet)
-                    Targets = ["Build"]
-                    Properties =
-                        [
-                            "Optimize", "True"
-                            "Configuration", "Release"
-                            "TargetFrameworkVersion", identifier.MSBuild
-                            "DefineConstants", identifier.DefineConstants
-                        ]
-                 }
-            build setParams solution 
-
-        member this.Rebuild (framework:Projects.DotNetFramework) = 
-            let solution = solutionForFramework framework              
-            let identifier = framework.Identifier               
-            let setParams defaults =
-                { defaults with
-                    Verbosity = Some(Quiet)
-                    Targets = ["Rebuild"]
-                    Properties =
-                        [
-                            "OutputPathBaseDir", Path.GetFullPath "build\\output"
-                            "Optimize", "True"
-                            "Configuration", "Release"
-                            "TargetFrameworkVersion", identifier.MSBuild
-                            "DefineConstants", identifier.DefineConstants
-                        ]
-                 }
-        
-            build setParams solution 
-
-    let MsBuild = new MsBuildTooling()
 

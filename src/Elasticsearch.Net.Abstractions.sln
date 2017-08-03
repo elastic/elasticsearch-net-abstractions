@@ -19,6 +19,7 @@ ProjectSection(SolutionItems) = preProject
 	..\paket.dependencies = ..\paket.dependencies
 	..\global.json = ..\global.json
 	..\build\Versioning.targets = ..\build\Versioning.targets
+	..\build\outputpath.props = ..\build\outputpath.props
 EndProjectSection
 EndProject
 Global

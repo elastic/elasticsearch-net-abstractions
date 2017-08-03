@@ -26,19 +26,12 @@ module Tests =
         setProcessEnvironVar "NEST_TEST_FILTER" testFilter
         setProcessEnvironVar "NEST_NUMBER_OF_CONNECTIONS" numberOfConnections
 
-    let private dotnetTest (target: Commandline.MultiTarget) =
+    let private dotnetTest() =
         CreateDir Paths.BuildOutput
-        let command = 
-            let p = ["xunit"; "-parallel"; "all"; "-xml"; "../.." @@ Paths.Output("TestResults-Desktop-Clr.xml")] 
-            match (target, buildingOnTravis) with 
-            | (_, true) 
-            | (Commandline.MultiTarget.One, _) -> ["-framework"; "netcoreapp1.1"] |> List.append p
-            | _  -> p
+        let command = ["xunit"; "-parallel"; "all"; "-xml"; "../.." @@ Paths.Output("TestResults-Desktop-Clr.xml")] 
 
         let dotnet = Tooling.BuildTooling("dotnet")
         dotnet.ExecIn "src/Tests" command |> ignore
 
-    let RunUnitTests() =
-        setLocalEnvVars()
-        dotnetTest Commandline.multiTarget
+    let RunUnitTests() = ignore()
 
