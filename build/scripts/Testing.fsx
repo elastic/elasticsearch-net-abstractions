@@ -1,0 +1,44 @@
+﻿#I @"../../packages/build/FAKE/tools"
+#r @"FakeLib.dll"
+
+#load @"Commandline.fsx"
+#load @"Projects.fsx"
+#load @"Paths.fsx"
+#load @"Tooling.fsx"
+
+open System.IO
+open Fake 
+open Paths
+open Projects
+open Tooling
+open Commandline
+
+module Tests =
+    open System
+
+    let private buildingOnTravis = getEnvironmentVarAsBool "TRAVIS"
+
+    let private setLocalEnvVars() = 
+        let clusterFilter =  getBuildParamOrDefault "clusterfilter" ""
+        let testFilter = getBuildParamOrDefault "testfilter" ""
+        let numberOfConnections = getBuildParamOrDefault "numberOfConnections" ""
+        setProcessEnvironVar "NEST_INTEGRATION_CLUSTER" clusterFilter
+        setProcessEnvironVar "NEST_TEST_FILTER" testFilter
+        setProcessEnvironVar "NEST_NUMBER_OF_CONNECTIONS" numberOfConnections
+
+    let private dotnetTest (target: Commandline.MultiTarget) =
+        CreateDir Paths.BuildOutput
+        let command = 
+            let p = ["xunit"; "-parallel"; "all"; "-xml"; "../.." @@ Paths.Output("TestResults-Desktop-Clr.xml")] 
+            match (target, buildingOnTravis) with 
+            | (_, true) 
+            | (Commandline.MultiTarget.One, _) -> ["-framework"; "netcoreapp1.1"] |> List.append p
+            | _  -> p
+
+        let dotnet = Tooling.BuildTooling("dotnet")
+        dotnet.ExecIn "src/Tests" command |> ignore
+
+    let RunUnitTests() =
+        setLocalEnvVars()
+        dotnetTest Commandline.multiTarget
+

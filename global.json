@@ -1,0 +1,10 @@
+{
+  "sdk": {
+    "version": "1.0.1"
+  },
+  "versions" : 
+  {
+    "observableprocess": "v1.0.0-alpha1"
+  }
+  
+}

@@ -6,4 +6,5 @@
   <ItemGroup>
     <ProjectReference Include="..\ObservableProcess\ObservableProcess.csproj" />
   </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

@@ -3,9 +3,23 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.0.0
 MinimumVisualStudioVersion = 10.0.0.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{75424265-47F2-4416-9780-939E63E328A7}"
+	ProjectSection(SolutionItems) = preProject
+		..\paket.dependencies = ..\paket.dependencies
+	EndProjectSection
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObservableProcess", "ObservableProcess\ObservableProcess.csproj", "{4BE05F38-DAA3-45E3-A2F5-B7E6408941AD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScratchPad", "ScratchPad\ScratchPad.csproj", "{E7AD2461-309A-4BA7-A6EB-5C1F4F882BC2}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "scripts", "..\build\scripts\scripts.fsproj", "{D6997ADC-E933-418E-831C-DE1A78897493}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{73A4EA23-1EB6-428F-8713-A37C09627DB3}"
+ProjectSection(SolutionItems) = preProject
+	..\paket.dependencies = ..\paket.dependencies
+	..\global.json = ..\global.json
+	..\build\Versioning.targets = ..\build\Versioning.targets
+EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,5 +38,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D6997ADC-E933-418E-831C-DE1A78897493} = {73A4EA23-1EB6-428F-8713-A37C09627DB3}
 	EndGlobalSection
 EndGlobal

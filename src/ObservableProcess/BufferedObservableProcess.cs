@@ -1,7 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Dynamic;
-using System.Globalization;
 using System.IO;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -12,6 +10,7 @@ using Elastic.ProcessManagement.Std;
 namespace Elastic.ProcessManagement
 {
 	/// <summary>
+#pragma warning disable 1574
 	/// This reads <see cref="Process.StandardOutput"/> and <see cref="Process.StandardError"/> using <see cref="StreamReader.ReadAsync"/>.
 	///
 	/// When the process exits it waits for these stream readers to finish up to whatever <see cref="WaitForStreamReadersTimeout"/>
@@ -23,6 +22,7 @@ namespace Elastic.ProcessManagement
 	///
 	/// Note that there is a subclass <use cref="ObservableProcess"/> that allows you to subscribe console output per line
 	/// instead whilst still reading the actual process output using asynchronous stream readers.
+#pragma warning restore 1574
 	/// </summary>
 	public class BufferedObservableProcess : ObservableProcessBase<CharactersOut>
 	{

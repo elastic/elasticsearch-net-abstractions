@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard1.4</TargetFramework>
+    <RootNamespace>Elastic.ProcessManagement</RootNamespace>
+    <Version>$(ObservableProcessCurrentVersion)</Version>
+    <InformationalVersion>$(ObservableProcessCurrentVersion)</InformationalVersion>
+    <AssemblyVersion>$(ObservableProcessCurrentAssemblyVersion)</AssemblyVersion>
+    <FileVersion>$(ObservableProcessCurrentAssemblyFileVersion)</FileVersion>
+  </PropertyGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
+  <Import Project="..\..\build\Versioning.targets" />
+</Project>
