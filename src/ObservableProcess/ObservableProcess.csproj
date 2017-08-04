@@ -2,13 +2,12 @@
   <Import Project="..\..\build\Versioning.targets" />
   <PropertyGroup>
     <AssemblyName>ObservableProcess</AssemblyName>
-    <TargetFramework>netstandard1.4</TargetFramework>
+    <TargetFramework>netstandard1.3</TargetFramework>
     <RootNamespace>Elastic.ProcessManagement</RootNamespace>
     <Version>$(ObservableProcessCurrentVersion)</Version>
     <InformationalVersion>$(ObservableProcessCurrentVersion)</InformationalVersion>
     <AssemblyVersion>$(ObservableProcessCurrentAssemblyVersion)</AssemblyVersion>
     <FileVersion>$(ObservableProcessCurrentAssemblyFileVersion)</FileVersion>
   </PropertyGroup>
-  <Import Project="..\..\build\outputpath.props" />
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

@@ -50,7 +50,6 @@ module Tooling =
             exit exitCode
         ()
 
-
     let execProcessWithTimeout proc arguments timeout workingDir = 
         let args = arguments |> String.concat " "
         ExecProcess (fun info ->
@@ -88,11 +87,6 @@ module Tooling =
         member this.ExecIn workingDirectory arguments = execProcessInDirectory this.Path arguments workingDirectory
 
     let XUnit = new BuildTooling(Paths.Tool("xunit.runner.console/tools/xunit.console.exe"))
-
-    //only used to boostrap fake itself
-    let Fake = new BuildTooling("FAKE/tools/FAKE.exe")
-
-    type DotNetRuntime = | Desktop | Core | Both
 
     type DotNetTooling(exe) =
        member this.Exec arguments =

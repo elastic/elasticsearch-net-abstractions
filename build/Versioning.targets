@@ -6,7 +6,7 @@
     <CurrentAssemblyVersion>0.0.0</CurrentAssemblyVersion>
     <CurrentAssemblyFileVersion>0.0.0.0</CurrentAssemblyFileVersion>
     
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly Condition="$(Configuration) == 'Release'">true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\build\keys\keypair.snk</AssemblyOriginatorKeyFile>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1591,1572,1571,1573,1587,1570</NoWarn>

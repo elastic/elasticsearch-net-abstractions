@@ -13,7 +13,6 @@ namespace ScratchPad
 			while (true)
 			{
 				var process = new ObservableProcess("ipconfig", "/all");
-
 				process.Subscribe(new ConsoleOutColorWriter());
 
 				//process.Subscribe(
@@ -37,7 +36,6 @@ namespace ScratchPad
 				Console.WriteLine($"- ExitCode:{process.ExitCode} Press Any Key to Quit ---");
 				Console.ReadKey();
 			}
-            return 0;
         }
     }
 }

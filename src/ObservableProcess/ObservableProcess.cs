@@ -50,26 +50,38 @@ namespace Elastic.ProcessManagement
 		}
 
 		public override IDisposable Subscribe(IObserver<CharactersOut> observer) => this.OutStream.Subscribe(observer);
+
 		public IDisposable Subscribe(IObserver<LineOut> observer) => this.OutStream.Select(LineOut.From).Subscribe(observer);
 
 		public IDisposable SubscribeLines(Action<LineOut> onNext, Action<Exception> onError, Action onCompleted) =>
 			this.Subscribe(Observer.Create(onNext, onError, onCompleted));
-		public IDisposable SubscribeLines(Action<LineOut> onNext, Action<Exception> onError) =>
-			this.Subscribe(Observer.Create(onNext, onError));
-		public IDisposable SubscribeLines(Action<LineOut> onNext) =>
-			this.Subscribe(Observer.Create(onNext));
 
-		private void OnNextConsoleOut(ConsoleOut c, IObserver<CharactersOut> observer)
+		public IDisposable SubscribeLines(Action<LineOut> onNext, Action<Exception> onError) =>
+			this.Subscribe(Observer.Create(onNext, onError, delegate { }));
+
+		public IDisposable SubscribeLines(Action<LineOut> onNext) =>
+			this.Subscribe(Observer.Create(onNext, delegate { }, delegate { }));
+
+		private void OnNextConsoleOut(CharactersOut c, IObserver<CharactersOut> observer)
 		{
 			lock (_copyLock)
 			{
-				c.OutOrErrrorCharacters(OutCharacters, ErrorCharacters);
-				if (c.Error)
-					YieldNewLinesToOnNext(ref _bufferStdErr, buffer => observer.OnNext(ConsoleOut.ErrorOut(buffer)));
-				else
-					YieldNewLinesToOnNext(ref _bufferStdOut, buffer => observer.OnNext(ConsoleOut.Out(buffer)));
+				if (Flushing) OnNextFlush(c, observer);
+				else OnNextSource(c, observer);
 			}
 		}
+
+		private void OnNextSource(ConsoleOut c, IObserver<CharactersOut> observer)
+		{
+			c.OutOrErrrorCharacters(OutCharacters, ErrorCharacters);
+			if (c.Error)
+				YieldNewLinesToOnNext(ref _bufferStdErr, buffer => observer.OnNext(ConsoleOut.ErrorOut(buffer)));
+			else
+				YieldNewLinesToOnNext(ref _bufferStdOut, buffer => observer.OnNext(ConsoleOut.Out(buffer)));
+		}
+
+		private static void OnNextFlush(CharactersOut c, IObserver<CharactersOut> observer) =>
+			observer.OnNext(c.Error ? ConsoleOut.ErrorOut(c.Characters) : ConsoleOut.Out(c.Characters));
 
 		protected override void OnCompleted(IObserver<CharactersOut> observer)
 		{
@@ -86,7 +98,23 @@ namespace Elastic.ProcessManagement
 		private void Flush(IObserver<CharactersOut> observer)
 		{
 			YieldNewLinesToOnNext(ref _bufferStdErr, buffer => observer.OnNext(ConsoleOut.ErrorOut(buffer)));
+			FlushRemainder(ref _bufferStdErr, buffer => observer.OnNext(ConsoleOut.ErrorOut(buffer)));
 			YieldNewLinesToOnNext(ref _bufferStdOut, buffer => observer.OnNext(ConsoleOut.Out(buffer)));
+			FlushRemainder(ref _bufferStdOut, buffer => observer.OnNext(ConsoleOut.Out(buffer)));
+		}
+
+		private bool Flushing { get; set; }
+		private void FlushRemainder(ref char[] buffer, Action<char[]> onNext)
+		{
+			if (buffer.Length <= 0) return;
+			var endOffSet = FindEndOffSet(buffer, 0) - 1;
+			if (endOffSet <= 0) return;
+			var ret = new char[endOffSet];
+			Array.Copy(buffer, 0, ret, 0, endOffSet);
+			buffer = new char[] {};
+			Flushing = true;
+			onNext(ret);
+			Flushing = false;
 		}
 
 		private static void YieldNewLinesToOnNext(ref char[] buffer, Action<char[]> onNext)

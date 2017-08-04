@@ -97,6 +97,10 @@ namespace Elastic.ProcessManagement
 						OnError(observer, new CleanExitException($"Process '{this._arguments.Binary}' terminated with error code {c}"));
 					else OnCompleted(observer);
 				}
+				catch (Exception e)
+				{
+
+				}
 				finally
 				{
 					this.Stop();
