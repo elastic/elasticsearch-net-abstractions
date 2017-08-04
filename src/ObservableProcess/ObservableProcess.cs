@@ -62,7 +62,7 @@ namespace Elastic.ProcessManagement
 		public IDisposable SubscribeLines(Action<LineOut> onNext) =>
 			this.Subscribe(Observer.Create(onNext, delegate { }, delegate { }));
 
-		private void OnNextConsoleOut(CharactersOut c, IObserver<CharactersOut> observer)
+		protected void OnNextConsoleOut(CharactersOut c, IObserver<CharactersOut> observer)
 		{
 			lock (_copyLock)
 			{

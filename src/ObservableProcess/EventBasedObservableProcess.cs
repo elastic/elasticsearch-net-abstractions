@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using Elastic.ProcessManagement.Extensions;
 using Elastic.ProcessManagement.Std;
 
@@ -14,12 +15,13 @@ namespace Elastic.ProcessManagement
 	/// a second such e.g `ipconfig /all`. For this reason its marked as obsolete but still included to play around with.
 	/// Use <see cref="BufferedObservableProcess"/> or <see cref="ObservableProcess"/> instead.
 	/// </summary>
-	[Obsolete("Using events can lead to dropped messages, only included for educational purposes. See this class's <summary>")]
 	public class EventBasedObservableProcess: ObservableProcessBase<LineOut>
 	{
 		public EventBasedObservableProcess(string binary, params string[] arguments) : base(binary, arguments) { }
 
 		public EventBasedObservableProcess(ObservableProcessArguments arguments) : base(arguments) { }
+
+		public bool SimulateToSlowBeginReadLine { get; set; }
 
 		protected override IObservable<LineOut> CreateConsoleOutObservable()
 		{
@@ -36,6 +38,8 @@ namespace Elastic.ProcessManagement
 
 				if (!this.StartProcess(observer))
 					return new CompositeDisposable(processError);
+
+				if (SimulateToSlowBeginReadLine) Thread.Sleep(1000);
 
 				this.Process.BeginOutputReadLine();
 				this.Process.BeginErrorReadLine();

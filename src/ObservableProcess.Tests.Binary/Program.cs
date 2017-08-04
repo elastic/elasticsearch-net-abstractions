@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace Elastic.ProcessManagement.Tests.Binary
 {
@@ -20,9 +21,17 @@ namespace Elastic.ProcessManagement.Tests.Binary
 			if (testCase == nameof(SingleLine).ToLowerInvariant())
 				return SingleLine();
 
+			if (testCase == nameof(DelayedWriter).ToLowerInvariant())
+				return DelayedWriter();
+
 			return 1;
 		}
-
+		private static int DelayedWriter()
+		{
+			Thread.Sleep(1000);
+			Console.Write(nameof(DelayedWriter));
+			return 20;
+		}
 		private static int SingleLineNoEnter()
 		{
 			Console.Write(nameof(SingleLineNoEnter));

@@ -1,9 +1,13 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace Elastic.ProcessManagement.Tests
 {
 	public abstract class TestsBase
 	{
+		//increase this if you are using the debugger
+		protected static TimeSpan WaitTimeout { get; } = TimeSpan.FromSeconds(5);
+
 		private static string GetWorkingDir()
 		{
 			var directoryInfo = new DirectoryInfo(Directory.GetCurrentDirectory());

@@ -12,7 +12,9 @@ namespace Elastic.ProcessManagement
 		public IEnumerable<string> Args { get; }
 
 		public ObservableProcessArguments(string binary, IEnumerable<string> args)
-			: this(binary, args?.ToArray()) { }
+			: this(binary, args?.ToArray())
+		{
+		}
 
 		public ObservableProcessArguments(string binary, params string[] args)
 		{
@@ -27,10 +29,7 @@ namespace Elastic.ProcessManagement
 		/// </summary>
 		public Action<ProcessStartInfo> AlterProcessStartInfo { get; set; }
 
-		/// <summary>
-		/// Provide a method that will validate whether an exit code is valid or not, by default anything not 0 is considered invalid.
-		/// </summary>
-		public Func<int, bool> ValidExitCodePredicate { get; set; }
+		public TimeSpan? WaitForExit { get; set; } = TimeSpan.FromSeconds(10);
 
 		// ReSharper enable UnusedAutoPropertyAccessor.Global
 

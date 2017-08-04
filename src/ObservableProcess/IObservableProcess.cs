@@ -12,10 +12,15 @@ namespace Elastic.ProcessManagement
 		/// This library ships with <see cref="ConsoleOutWriter"/> and <see cref="ConsoleOutColorWriter"/>.
 		/// </summary>
 		IDisposable Subscribe(IConsoleOutWriter writer);
-		
+
 		/// <summary>
 		/// When the process exits this will indicate its status code.
 		/// </summary>
 		int? ExitCode { get; }
+
+		/// <summary>
+		/// The process id of the started process
+		/// </summary>
+		int? ProcessId { get; }
 	}
 }

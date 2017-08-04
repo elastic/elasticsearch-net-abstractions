@@ -38,6 +38,8 @@ namespace Elastic.ProcessManagement
 
 		public int? ExitCode { get; private set; }
 
+		public int? ProcessId => this.Process?.Id;
+
 		protected IObservable<TConsoleOut> OutStream { get; private set; } = Observable.Empty<TConsoleOut>();
 
 		private void Start()
@@ -92,14 +94,7 @@ namespace Elastic.ProcessManagement
 				{
 					var c = this.Process.ExitCode;
 					this.ExitCode = c;
-					var validExitCode = this._arguments.ValidExitCodePredicate?.Invoke(c) ?? c == 0;
-					if (!validExitCode)
-						OnError(observer, new CleanExitException($"Process '{this._arguments.Binary}' terminated with error code {c}"));
-					else OnCompleted(observer);
-				}
-				catch (Exception e)
-				{
-
+					OnCompleted(observer);
 				}
 				finally
 				{
@@ -148,20 +143,28 @@ namespace Elastic.ProcessManagement
 			try
 			{
 				if (this.Process == null) return;
-				if (this.Started)
+				var wait = this._arguments.WaitForExit;
+				if (this.Started && wait.HasValue)
 				{
-					this.Process?.WaitForExit(10000);
+					this.Process?.WaitForExit((int)wait.Value.TotalMilliseconds);
 				}
 
 				if (this.Started && !this.Process.HasExited)
 					this.Process?.Kill();
 
-				if (this.Started)
+				if (this.Started && wait.HasValue)
 				{
 					this.Process?.WaitForExit();
 				}
 
-				this.Process?.Dispose();
+				try
+				{
+					this.Process?.Dispose();
+				}
+				catch (NullReferenceException)
+				{
+					//the underlying call to .Close() can throw an NRE if you dispose to fast after starting
+				}
 			}
 			catch (InvalidOperationException)
 			{

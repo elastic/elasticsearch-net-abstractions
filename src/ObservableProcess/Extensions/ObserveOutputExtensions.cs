@@ -17,6 +17,7 @@ namespace Elastic.ProcessManagement.Extensions
 			var receivedStdErr =
 				Observable.FromEventPattern<DataReceivedEventHandler, DataReceivedEventArgs>
 					(h => process.ErrorDataReceived += h, h => process.ErrorDataReceived -= h)
+					.Where(e => e.EventArgs.Data != null)
 					.Select(e => ConsoleOut.ErrorOut(e.EventArgs.Data));
 
 			return Observable.Create<LineOut>(observer =>
@@ -31,6 +32,7 @@ namespace Elastic.ProcessManagement.Extensions
 			var receivedStdOut =
 				Observable.FromEventPattern<DataReceivedEventHandler, DataReceivedEventArgs>
 					(h => process.OutputDataReceived += h, h => process.OutputDataReceived -= h)
+					.Where(e => e.EventArgs.Data != null)
 					.Select(e => ConsoleOut.Out(e.EventArgs.Data));
 
 			return Observable.Create<LineOut>(observer =>

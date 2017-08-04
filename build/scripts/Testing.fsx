@@ -1,8 +1,8 @@
 ﻿#I @"../../packages/build/FAKE/tools"
 #r @"FakeLib.dll"
 
-#load @"Commandline.fsx"
 #load @"Projects.fsx"
+#load @"Commandline.fsx"
 #load @"Paths.fsx"
 #load @"Tooling.fsx"
 
