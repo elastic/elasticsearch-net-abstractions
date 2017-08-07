@@ -12,7 +12,7 @@ namespace Elastic.ProcessManagement
 		protected override string PrintableName { get; } = "elasticsearch-node";
 
 		public string Version { get; private set; }
-		public int? ProcessId { get; private set; }
+		public int? JavaProcessId { get; private set; }
 		public int? Port { get; private set; }
 		public bool Started { get; private set; }
 
@@ -33,9 +33,7 @@ namespace Elastic.ProcessManagement
 		}
 
 		public ElasticsearchNode(string binary, params string[] arguments)
-			: this(new ObservableProcess(binary, arguments), new HighlightElasticsearchLineConsoleOutWriter())
-		{
-		}
+			: this(new ObservableProcess(binary, arguments), new HighlightElasticsearchLineConsoleOutWriter()) { }
 
 		public ElasticsearchNode(ObservableProcess process, IConsoleOutWriter writer)
 			: base(ShouldWaitForExit(process), writer is HighlightElasticsearchLineConsoleOutWriter ? null : writer)
@@ -67,9 +65,9 @@ namespace Elastic.ProcessManagement
 			int? pid;
 			int port;
 
-			if (this.ProcessId == null && TryParseNodeInfo(section, message, out version, out pid))
+			if (this.JavaProcessId == null && TryParseNodeInfo(section, message, out version, out pid))
 			{
-				this.ProcessId = pid;
+				this.JavaProcessId = pid;
 				this.Version = version;
 			}
 			else if (TryGetPortNumber(section, message, out port))
@@ -85,10 +83,10 @@ namespace Elastic.ProcessManagement
 
 		protected override void OnBeforeStop()
 		{
-			var esProcess = this.ProcessId == null ? null : Process.GetProcesses().FirstOrDefault(p => p.Id == this.ProcessId.Value);
+			var esProcess = this.JavaProcessId == null ? null : Process.GetProcesses().FirstOrDefault(p => p.Id == this.JavaProcessId.Value);
 			if (esProcess != null)
 			{
-				Console.WriteLine($"Killing elasticsearch PID {this.ProcessId}");
+				Console.WriteLine($"Killing elasticsearch PID {this.JavaProcessId}");
 				esProcess.Kill();
 				esProcess.Dispose();
 			}
