@@ -11,10 +11,11 @@ namespace ScratchPad
 	        var es = @"c:\Data\elasticsearch-5.4.1\bin\elasticsearch.bat";
 	        using (var elasticsearch = new ElasticsearchNode(es))
 	        {
-		        elasticsearch.Start(subscribeToMessagesAfterStartedConfirmation: true);
+		        elasticsearch.Start();
 		        Console.ReadKey();
 	        }
 	        return 0;
         }
     }
+
 }

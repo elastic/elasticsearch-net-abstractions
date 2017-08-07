@@ -25,13 +25,25 @@ namespace Elastic.ProcessManagement.Abstractions
 		private bool _started;
 		private CompositeDisposable _disposables = new CompositeDisposable();
 
+		/// <summary>
+		/// Wheter we want to continue writing to console out after we go in to confirmed started state
+		/// </summary>
+		protected bool ConsoleWriterSubscribesAfterStarted { get; set; }
+
+		/// <summary>
+		/// By default we no longer subscribe after we recieve the started confirmation. Set this to true to
+		/// keep receiving the console out messages wrapped in <see cref="ConsoleOut"/>. This boolean has no effect on the running state.
+		/// The process will keep running until it either decides to stop or <see cref="Stop"/> is called.
+		/// </summary>
+		protected bool SubscribeToMessagesAfterStartedConfirmation { get; set; }
+
 		protected ConfirmedStartedStateProcessBase(
 			TProcess observableProcess,
 			IConsoleOutWriter consoleOutWriter
 			)
 		{
 			this._process = observableProcess ?? throw new ArgumentNullException(nameof(observableProcess));
-			this._writer = consoleOutWriter ?? new ConsoleOutWriter();
+			this._writer = consoleOutWriter;
 		}
 
 		/// <summary>
@@ -49,13 +61,8 @@ namespace Elastic.ProcessManagement.Abstractions
 		/// Start the observable process and monitor its std out and error for a functional started message
 		/// </summary>
 		/// <param name="waitTimeout">How long we want to wait for the started confirmation before bailing</param>
-		/// <param name="subscribeToMessagesAfterStartedConfirmation">
-		/// By default we no longer subscribe after we recieve the started confirmation. Set this to true to
-		/// keep receiving the console out messages wrapped in <see cref="ConsoleOut"/>. This boolean has no effect on the running state.
-		/// The process will keep running until it either decides to stop or <see cref="Stop"/> is called.
-		/// </param>
 		/// <exception cref="CleanExitException">an exception that indicates a problem early in the pipeline</exception>
-		public virtual void Start(TimeSpan waitTimeout = default(TimeSpan), bool subscribeToMessagesAfterStartedConfirmation = false)
+		public virtual void Start(TimeSpan waitTimeout = default(TimeSpan))
 		{
 			var timeout = waitTimeout == default(TimeSpan) ? TimeSpan.FromMinutes(2) : waitTimeout;
 			lock (_lock)
@@ -64,16 +71,16 @@ namespace Elastic.ProcessManagement.Abstractions
 				this._completedHandle.Reset();
 
 				var observable = this._process.Publish();
-				if (subscribeToMessagesAfterStartedConfirmation)
+				if (this._writer != null)
 				{
-					//subscribe to all messages and write them to console
-					this._disposables.Add(observable.Subscribe(this._writer.Write, this._writer.Write, delegate { }));
+					this._disposables.Add(observable
+						.TakeWhile(c=> ConsoleWriterSubscribesAfterStarted || !this._started)
+						.Subscribe(this._writer.Write, this._writer.Write, delegate { })
+					);
 				}
 
-				//subscribe as long we are not in started state and attempt to read console
-				//out for this confirmation
 				this._disposables.Add(observable
-					.TakeWhile(c => !this._started)
+					.TakeWhile(c => SubscribeToMessagesAfterStartedConfirmation || !this._started)
 					.Select(LineOut.From)
 					.Subscribe(this.Handle, delegate { }, delegate { })
 				);
