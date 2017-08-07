@@ -29,7 +29,7 @@ namespace Elastic.ProcessManagement
 	///
 #pragma warning restore 1574
 	/// </summary>
-	public class ObservableProcess : BufferedObservableProcess
+	public class ObservableProcess : BufferedObservableProcess, ISubscribeLines
 	{
 		private char[] _bufferStdOut = { };
 		private char[] _bufferStdErr = { };
@@ -62,7 +62,7 @@ namespace Elastic.ProcessManagement
 		public IDisposable SubscribeLines(Action<LineOut> onNext) =>
 			this.Subscribe(Observer.Create(onNext, delegate { }, delegate { }));
 
-		protected void OnNextConsoleOut(CharactersOut c, IObserver<CharactersOut> observer)
+		private void OnNextConsoleOut(CharactersOut c, IObserver<CharactersOut> observer)
 		{
 			lock (_copyLock)
 			{
@@ -130,6 +130,11 @@ namespace Elastic.ProcessManagement
 		private static void CopyRemainderToGlobalBuffer(ref char[] buffer, int endOfArrayOffset, int newLineOffset)
 		{
 			var remainder = endOfArrayOffset - newLineOffset;
+			if (remainder <= 1) //prevent an array of a single '\0'.
+			{
+				buffer = new char[0];
+				return;
+			}
 			var newBuffer = new char[remainder];
 			Array.Copy(buffer, newLineOffset, newBuffer, 0, remainder);
 			buffer = newBuffer;
@@ -177,7 +182,7 @@ namespace Elastic.ProcessManagement
 		private void OutCharacters(char[] data) => Combine(ref _bufferStdOut, data);
 		private void ErrorCharacters(char[] data) => Combine(ref _bufferStdErr, data);
 
-		public static void Combine(ref char[] first, char[] second)
+		private static void Combine(ref char[] first, char[] second)
 		{
 			var ret = new char[first.Length + second.Length];
 			Array.Copy(first, 0, ret, 0, first.Length);

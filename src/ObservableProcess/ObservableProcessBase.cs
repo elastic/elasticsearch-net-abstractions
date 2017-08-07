@@ -32,9 +32,16 @@ namespace Elastic.ProcessManagement
 
 		private readonly object _lock = new object();
 
-		private string Binary { get; }
 		protected Process Process { get; }
 		protected bool Started { get; set; }
+
+		public string Binary { get; }
+
+		public TimeSpan? WaitForExit
+		{
+			get => this._arguments?.WaitForExit;
+			set => this._arguments.WaitForExit = value;
+		}
 
 		public int? ExitCode { get; private set; }
 
@@ -160,6 +167,7 @@ namespace Elastic.ProcessManagement
 				try
 				{
 					this.Process?.Dispose();
+
 				}
 				catch (NullReferenceException)
 				{

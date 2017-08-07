@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
@@ -6,20 +7,26 @@ using Elastic.ProcessManagement.Std;
 
 namespace Elastic.ProcessManagement.Abstractions
 {
-	public abstract class ConfirmedStartedStateProcessBase : IDisposable
+	/// <summary>
+	/// An abstraction that allows you to wrap an <see cref="IObservableProcess{TConsoleOut}"/>
+	/// and block untill the wrapped process reports on console out its really started and ready.
+	/// It also allows you to optionally give up the subscription after you've signalled the process has started
+	/// </summary>
+	public abstract class ConfirmedStartedStateProcessBase<TProcess> : IDisposable
+		where TProcess : class, IObservableProcess<CharactersOut>, ISubscribeLines
 	{
 		public int? LastExitCode => this._process?.ExitCode;
 		private readonly object _lock = new object();
 		private readonly ManualResetEvent _completedHandle = new ManualResetEvent(false);
 		private readonly ManualResetEvent _startedHandle = new ManualResetEvent(false);
 		private readonly IConsoleOutWriter _writer;
-		private readonly IObservableProcess<CharactersOut> _process;
+		private readonly TProcess _process;
 
 		private bool _started;
 		private CompositeDisposable _disposables = new CompositeDisposable();
 
 		protected ConfirmedStartedStateProcessBase(
-			IObservableProcess<CharactersOut> observableProcess,
+			TProcess observableProcess,
 			IConsoleOutWriter consoleOutWriter
 			)
 		{
@@ -36,7 +43,7 @@ namespace Elastic.ProcessManagement.Abstractions
 		/// Handle the messages coming out of your process, return true to signal the process was confirmed to be in started state.
 		/// </summary>
 		/// <returns>Return true to signal you've confirmed the process has really started</returns>
-		protected abstract bool HandleMessage(ConsoleOut message);
+		protected abstract bool HandleMessage(LineOut message);
 
 		/// <summary>
 		/// Start the observable process and monitor its std out and error for a functional started message
@@ -51,7 +58,6 @@ namespace Elastic.ProcessManagement.Abstractions
 		public virtual void Start(TimeSpan waitTimeout = default(TimeSpan), bool subscribeToMessagesAfterStartedConfirmation = false)
 		{
 			var timeout = waitTimeout == default(TimeSpan) ? TimeSpan.FromMinutes(2) : waitTimeout;
-			this.Stop();
 			lock (_lock)
 			{
 				this._startedHandle.Reset();
@@ -61,13 +67,14 @@ namespace Elastic.ProcessManagement.Abstractions
 				if (subscribeToMessagesAfterStartedConfirmation)
 				{
 					//subscribe to all messages and write them to console
-					this._disposables.Add(observable.Subscribe(c=>this._writer.Write(c), delegate { }, delegate { }));
+					this._disposables.Add(observable.Subscribe(this._writer.Write, this._writer.Write, delegate { }));
 				}
 
 				//subscribe as long we are not in started state and attempt to read console
 				//out for this confirmation
 				this._disposables.Add(observable
 					.TakeWhile(c => !this._started)
+					.Select(LineOut.From)
 					.Subscribe(this.Handle, delegate { }, delegate { })
 				);
 				this._disposables.Add(observable.Subscribe(delegate { }, HandleException, HandleCompleted));
@@ -86,21 +93,31 @@ namespace Elastic.ProcessManagement.Abstractions
 		/// <exception cref="CleanExitException">an exception that indicates a problem early in the pipeline</exception>
 		public void WaitForCompletion(TimeSpan timeout)
 		{
-			if (!this._completedHandle.WaitOne(timeout))
-				throw new CleanExitException($"Could not run process to completion within ({timeout}): {PrintableName}");
+			lock (_lock)
+			{
+				if (!this._completedHandle.WaitOne(timeout))
+					throw new CleanExitException($"Could not run process to completion within ({timeout}): {PrintableName}");
+			}
 		}
 
-		public virtual void Stop()
+		private void Stop()
 		{
 			lock (_lock)
 			{
 				this._completedHandle.Reset();
 				this._startedHandle.Reset();
+				this.OnBeforeStop();
 				this._process?.Dispose();
 				this._disposables?.Dispose();
 				this._disposables = new CompositeDisposable();
 			}
 		}
+
+		protected virtual void OnBeforeStop()
+		{
+
+		}
+
 
 		private void ConfirmProcessStarted()
 		{
@@ -112,6 +129,7 @@ namespace Elastic.ProcessManagement.Abstractions
 		{
 			this._completedHandle.Set();
 			this._startedHandle.Set();
+			if (e is CleanExitException) return;
 			throw e;
 		}
 
@@ -121,7 +139,7 @@ namespace Elastic.ProcessManagement.Abstractions
 			this._completedHandle.Set();
 		}
 
-		private void Handle(ConsoleOut message)
+		private void Handle(LineOut message)
 		{
 			if (this.HandleMessage(message))
 				this.ConfirmProcessStarted();

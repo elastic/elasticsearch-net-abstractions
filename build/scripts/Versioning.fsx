@@ -45,7 +45,7 @@ module Versioning =
         let newGlobalJson = GlobalJson.Root (GlobalJson.Sdk(globalJson.Sdk.Version), versionsNode)
         use tw = new StreamWriter("global.json")
         newGlobalJson.JsonValue.WriteTo(tw, JsonSaveOptions.None)
-        tracefn "Written (%s) to global.json as the current version will use this version from now on as current in the build" (version.ToString())
+        traceImportant <| sprintf "Written (%O) to global.json as the current version will use this version from now on as current in the build" version
 
     type AssemblyVersionInfo = { Informational: SemVerInfo; Assembly: SemVerInfo; AssemblyFile: SemVerInfo; Project: ProjectInfo }
     let VersionInfo project =
@@ -55,10 +55,10 @@ module Versioning =
         match (getBuildParam "target", buildVersion) with
         | ("release", None) -> failwithf "can not run release because no explicit version number was passed on the command line"
         | ("release", Some v) ->
-            if (currentVersion >= v) then failwithf "tried to create release %s but current version is already at %s" (v.ToString()) (currentVersion.ToString())
+            if (currentVersion >= v) then failwithf "tried to create release %O but current version is already at %O" v currentVersion
             { Informational= v; Assembly= assemblyVersionOf v; AssemblyFile = assemblyFileVersionOf v; Project = infoOf project }
         | _ ->
-            tracefn "Not running 'release' target so using version in global.json (%s) as current" (currentVersion.ToString())
+            tracefn "Not running 'release' target so using version in global.json (%O) as current" currentVersion
             { Informational= currentVersion; Assembly= assemblyVersionOf currentVersion; AssemblyFile = assemblyFileVersionOf currentVersion; Project = infoOf project}
 
     let AllProjectVersions = Project.All |> Seq.map VersionInfo

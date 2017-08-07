@@ -15,7 +15,7 @@ namespace Elastic.ProcessManagement
 	/// a second such e.g `ipconfig /all`. For this reason its marked as obsolete but still included to play around with.
 	/// Use <see cref="BufferedObservableProcess"/> or <see cref="ObservableProcess"/> instead.
 	/// </summary>
-	public class EventBasedObservableProcess: ObservableProcessBase<LineOut>
+	public class EventBasedObservableProcess: ObservableProcessBase<LineOut>, ISubscribeLines
 	{
 		public EventBasedObservableProcess(string binary, params string[] arguments) : base(binary, arguments) { }
 

@@ -4,6 +4,12 @@ using Elastic.ProcessManagement.Std;
 
 namespace Elastic.ProcessManagement
 {
+	public interface ISubscribeLines
+	{
+		IDisposable Subscribe(IObserver<LineOut> observer);
+	}
+
+
 	public interface IObservableProcess<out TConsoleOut> : IDisposable, IObservable<TConsoleOut>
 		where TConsoleOut : ConsoleOut
 	{

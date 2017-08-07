@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\Versioning.targets" />
+  <PropertyGroup>
+    <AssemblyName>ElasticsearchNode</AssemblyName>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <RootNamespace>Elastic.ProcessManagement</RootNamespace>
+    <Version>$(ElasticsearchNodeCurrentVersion)</Version>
+    <InformationalVersion>$(ElasticsearchNodeCurrentVersion)</InformationalVersion>
+    <AssemblyVersion>$(ElasticsearchNodeCurrentAssemblyVersion)</AssemblyVersion>
+    <FileVersion>$(ElasticsearchNodeCurrentAssemblyFileVersion)</FileVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ObservableProcess\ObservableProcess.csproj" />
+  </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
+</Project>
