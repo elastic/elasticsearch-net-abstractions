@@ -33,20 +33,5 @@ namespace Elastic.ProcessManagement.Tests
 			seen.Should().NotBeEmpty().And.HaveCount(1, string.Join(Environment.NewLine, seen));
 			seen[0].Should().Be(nameof(SingleLine));
 		}
-
-		[Fact]
-		public void SingleLineSlowReadLine()
-		{
-			var seen = new List<string>();
-			var process = new EventBasedObservableProcess(TestCaseArguments(nameof(SingleLine)))
-			{
-				SimulateToSlowBeginReadLine = true
-			};
-			process.Subscribe(c=>seen.Add(c.Line), e=>throw e);
-			process.WaitForCompletion(WaitTimeout);
-
-			seen.Should().NotBeEmpty().And.HaveCount(1, string.Join(Environment.NewLine, seen));
-			seen[0].Should().Be(nameof(SingleLine));
-		}
 	}
 }

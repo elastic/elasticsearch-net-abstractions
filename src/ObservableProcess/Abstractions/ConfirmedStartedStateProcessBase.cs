@@ -40,7 +40,7 @@ namespace Elastic.ProcessManagement.Abstractions
 		protected ConfirmedStartedStateProcessBase(
 			TProcess observableProcess,
 			IConsoleOutWriter consoleOutWriter
-			)
+		)
 		{
 			this._process = observableProcess ?? throw new ArgumentNullException(nameof(observableProcess));
 			this._writer = consoleOutWriter;
@@ -74,7 +74,7 @@ namespace Elastic.ProcessManagement.Abstractions
 				if (this._writer != null)
 				{
 					this._disposables.Add(observable
-						.TakeWhile(c=> ConsoleWriterSubscribesAfterStarted || !this._started)
+						.TakeWhile(c => ConsoleWriterSubscribesAfterStarted || !this._started)
 						.Subscribe(this._writer.Write, this._writer.Write, delegate { })
 					);
 				}
@@ -122,7 +122,6 @@ namespace Elastic.ProcessManagement.Abstractions
 
 		protected virtual void OnBeforeStop()
 		{
-
 		}
 
 

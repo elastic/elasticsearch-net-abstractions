@@ -81,10 +81,6 @@ namespace Elastic.ProcessManagement
 			return false;
 		}
 
-		protected IDisposable CreateProcessExitSubscription(IObservable<EventPattern<object>> processExited, IObserver<TConsoleOut> observer)
-		{
-			return processExited.Subscribe(args => { OnExit(observer); }, e => OnCompleted(observer), ()=> OnCompleted(observer));
-		}
 
 		protected virtual void OnError(IObserver<TConsoleOut> observer, Exception e) => observer.OnError(e);
 		protected virtual void OnCompleted(IObserver<TConsoleOut> observer) => observer.OnCompleted();
@@ -101,11 +97,11 @@ namespace Elastic.ProcessManagement
 				{
 					var c = this.Process.ExitCode;
 					this.ExitCode = c;
-					OnCompleted(observer);
 				}
 				finally
 				{
 					this.Stop();
+					OnCompleted(observer);
 				}
 			}
 		}
@@ -151,9 +147,11 @@ namespace Elastic.ProcessManagement
 			{
 				if (this.Process == null) return;
 				var wait = this._arguments.WaitForExit;
+				//TODO explain why we do double waitforexit
 				if (this.Started && wait.HasValue)
 				{
 					this.Process?.WaitForExit((int)wait.Value.TotalMilliseconds);
+					this.Process?.WaitForExit();
 				}
 
 				if (this.Started && !this.Process.HasExited)
@@ -173,7 +171,7 @@ namespace Elastic.ProcessManagement
 				{
 					//the underlying call to .Close() can throw an NRE if you dispose to fast after starting
 				}
-			}
+		}
 			catch (InvalidOperationException)
 			{
 			}
