@@ -33,14 +33,16 @@ namespace Elastic.ProcessManagement
 			new Regex(@"\[(?<date>.*?)\]\[(?<level>.*?)\](?:\[(?<section>.*?)\])?(?: \[(?<node>.*?)\])? (?<message>.+)");
 
 		public static bool TryParse(string line,
-			out string date, out string level, out string section, out string node, out string message, out bool started)
+			out string date, out string level, out string section, out string node, out string message, out bool started, out bool matched)
 		{
 			date = level = section = node = message = string.Empty;
 			started = false;
+			matched = true;
 			if (string.IsNullOrEmpty(line)) return false;
 
 			var match = ConsoleLineParser.Match(line);
-			if (!match.Success) return false;
+			matched = match.Success;
+			if (!matched) return false;
 			date = match.Groups["date"].Value.Trim();
 			level = match.Groups["level"].Value.Trim();
 			section = match.Groups["section"].Value.Trim().Replace("org.elasticsearch.", "");

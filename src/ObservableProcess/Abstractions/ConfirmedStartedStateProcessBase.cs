@@ -62,7 +62,7 @@ namespace Elastic.ProcessManagement.Abstractions
 		/// </summary>
 		/// <param name="waitTimeout">How long we want to wait for the started confirmation before bailing</param>
 		/// <exception cref="CleanExitException">an exception that indicates a problem early in the pipeline</exception>
-		public virtual void Start(TimeSpan waitTimeout = default(TimeSpan))
+		public virtual bool Start(TimeSpan waitTimeout = default(TimeSpan))
 		{
 			var timeout = waitTimeout == default(TimeSpan) ? TimeSpan.FromMinutes(2) : waitTimeout;
 			lock (_lock)
@@ -87,7 +87,7 @@ namespace Elastic.ProcessManagement.Abstractions
 				this._disposables.Add(observable.Subscribe(delegate { }, HandleException, HandleCompleted));
 				this._disposables.Add(observable.Connect());
 
-				if (this._startedHandle.WaitOne(timeout)) return;
+				if (this._startedHandle.WaitOne(timeout)) return true;
 			}
 			this.Stop();
 			throw new CleanExitException($"Could not start process within ({timeout}): {PrintableName}");

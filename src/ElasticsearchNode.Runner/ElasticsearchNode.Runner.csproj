@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\Versioning.targets" />
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <RootNamespace>Elastic.Net.Abstractions</RootNamespace>
+    <Version>$(ElasticsearchNodeRunnerCurrentVersion)</Version>
+    <InformationalVersion>$(ElasticsearchNodeRunnerCurrentVersion)</InformationalVersion>
+    <AssemblyVersion>$(ElasticsearchNodeRunnerCurrentAssemblyVersion)</AssemblyVersion>
+    <FileVersion>$(ElasticsearchNodeRunnerCurrentAssemblyFileVersion)</FileVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ElasticsearchNode\ElasticsearchNode.csproj" />
+    <ProjectReference Include="..\ObservableProcess\ObservableProcess.csproj" />
+  </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
+</Project>

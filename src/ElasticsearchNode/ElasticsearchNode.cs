@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using Elastic.ProcessManagement.Abstractions;
 using Elastic.ProcessManagement.Std;
 using static Elastic.ProcessManagement.ElasticsearchConsoleOutParser;
@@ -13,6 +14,7 @@ namespace Elastic.ProcessManagement
 
 		public string Version { get; private set; }
 		public int? JavaProcessId { get; private set; }
+		public int DesiredPort { get; set; } = 9200;
 		public int? Port { get; private set; }
 		public bool Started { get; private set; }
 
@@ -42,24 +44,38 @@ namespace Elastic.ProcessManagement
 			this.WriteToConsoleAfterStarted = true;
 		}
 
+		public bool AssumeStartedOnNotEnoughMasterPing { get; set; }
+		protected bool AssumedStartedStateChecker(string section, string message)
+		{
+			if (AssumeStartedOnNotEnoughMasterPing
+			    && section.Contains("ZenDiscovery")
+			    && message.Contains("not enough master nodes discovered during pinging"))
+				return true;
+			return false;
+		}
+
 		protected override bool HandleMessage(LineOut c)
 		{
 			//already confirmed started so we can early exit unless we want to write the line highlighted to console
 			if (this.Started && !this.Highlight) return false;
 
-			var confirmedStart =
-				TryParse(c.Line, out string date, out string level, out string section, out string node, out string message, out bool started)
+			var parsed =
+				TryParse(c.Line, out string date, out string level, out string section, out string node,
+					out string message, out bool started, out bool matched)
 				&& started;
 
-			if (this.Highlight)
+			if (!started) started = AssumedStartedStateChecker(section, message);
+
+			if (this.Highlight && matched)
 				LineOutElasticsearchHighlighter.Write(c.Error, date, level, section, node, message);
+			else if (this.Highlight)
+				if (c.Error) Console.Error.WriteLine(c.Line);
+				else Console.WriteLine(c.Line);
 
 			//already confirmed started so we can early exit.
 			if (this.Started) return false;
 
-			if (confirmedStart) this.Started = true;
-
-			//if (consoleOut.Error && !this.Started && !string.IsNullOrWhiteSpace(consoleOut.Data)) throw new Exception(consoleOut.Data);
+			if (started) this.Started = true;
 
 			string version;
 			int? pid;
@@ -71,8 +87,13 @@ namespace Elastic.ProcessManagement
 				this.Version = version;
 			}
 			else if (TryGetPortNumber(section, message, out port))
+			{
 				this.Port = port;
-			return confirmedStart;
+				if (this.Port != this.DesiredPort)
+					throw new CleanExitException("Node started on port {}");
+
+			}
+			return started;
 		}
 
 		private static ObservableProcess ShouldWaitForExit(ObservableProcess p)

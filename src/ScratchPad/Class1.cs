@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Reactive;
 using System.Threading;
+using Elastic.Net.Abstractions;
 using Elastic.ProcessManagement;
 using Elastic.ProcessManagement.Std;
 
@@ -18,12 +19,12 @@ namespace ScratchPad
 //				Console.ReadKey();
 //			}
 
-			using (var p = new ObservableProcess("ipconfig", "/all"))
-			{
-				p.Subscribe(c => Console.Write(c.Characters));
-
-				p.WaitForCompletion(TimeSpan.FromSeconds(2));
-			}
+//			using (var p = new ObservableProcess("ipconfig", "/all"))
+//			{
+//				p.Subscribe(c => Console.Write(c.Characters));
+//
+//				p.WaitForCompletion(TimeSpan.FromSeconds(2));
+//			}
 
 //			var handle = new ManualResetEvent(false);
 //
@@ -55,6 +56,14 @@ namespace ScratchPad
 //
 //			handle.WaitOne();
 //
+
+			using (var cluster = new ElasticsearchCluster(new ElasticsearchVersion("5.5.1"), instanceCount: 3))
+			{
+				cluster.Start();
+
+				Console.ReadKey();
+			}
+
 			return 0;
 		}
 

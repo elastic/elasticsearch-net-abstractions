@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp1.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ElasticsearchNode.Runner\ElasticsearchNode.Runner.csproj" />
     <ProjectReference Include="..\ObservableProcess\ObservableProcess.csproj" />
     <ProjectReference Include="..\ElasticsearchNode\ElasticsearchNode.csproj" />
   </ItemGroup>

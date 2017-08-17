@@ -10,6 +10,9 @@ nuget microsoft.net.test.sdk 15.0.0
 nuget xunit.runner.visualstudio 2.2.0
 nuget FluentAssertions
 
+nuget NEST >= 5.0.0
+nuget SemanticVersioning
+
 group build
     source https://api.nuget.org/v3/index.json
     nuget FAKE

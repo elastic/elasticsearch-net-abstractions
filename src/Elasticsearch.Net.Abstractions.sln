@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObservableProcess.Tests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassLibrary", "ElasticsearchNode\ElasticsearchNode.csproj", "{0FCE020D-F4BD-4933-A0AB-27537EFA273E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticsearchNode.Runner", "ElasticsearchNode.Runner\ElasticsearchNode.Runner.csproj", "{F5D3D2D7-CDA1-462A-81FD-A446C4CEB287}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{0FCE020D-F4BD-4933-A0AB-27537EFA273E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0FCE020D-F4BD-4933-A0AB-27537EFA273E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0FCE020D-F4BD-4933-A0AB-27537EFA273E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5D3D2D7-CDA1-462A-81FD-A446C4CEB287}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5D3D2D7-CDA1-462A-81FD-A446C4CEB287}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5D3D2D7-CDA1-462A-81FD-A446C4CEB287}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5D3D2D7-CDA1-462A-81FD-A446C4CEB287}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
