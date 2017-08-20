@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Reactive;
 using System.Threading;
 using Elastic.Net.Abstractions;
+using Elastic.Net.Abstractions.Clusters;
 using Elastic.ProcessManagement;
 using Elastic.ProcessManagement.Std;
 
@@ -55,9 +56,8 @@ namespace ScratchPad
 //			process.BeginErrorReadLine();
 //
 //			handle.WaitOne();
-//
 
-			using (var cluster = new ElasticsearchCluster(new ElasticsearchVersion("5.5.1"), instanceCount: 3))
+			using (var cluster = new ElasticsearchCluster("5.5.1", instanceCount: 1))
 			{
 				cluster.Start();
 

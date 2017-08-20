@@ -25,6 +25,8 @@ namespace Elastic.Net.Abstractions
 				? "https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/zip/elasticsearch"
 				: "https://artifacts.elastic.co/downloads/elasticsearch";
 
+		public static implicit operator ElasticsearchVersion(string version) => new ElasticsearchVersion(version);
+
 		public ElasticsearchVersion(string version) : base(TranslateConfigVersion(version))
 		{
 			this.Version = version;

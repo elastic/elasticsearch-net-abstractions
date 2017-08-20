@@ -10,7 +10,8 @@ namespace Elastic.ProcessManagement.Abstractions
 	/// <summary>
 	/// An abstraction that allows you to wrap an <see cref="IObservableProcess{TConsoleOut}"/>
 	/// and block untill the wrapped process reports on console out its really started and ready.
-	/// It also allows you to optionally give up the subscription after you've signalled the process has started
+	/// It also allows you to optionally give up/dispose the subscription after you've signalled the process has started
+	/// without closing the process.
 	/// </summary>
 	public abstract class ConfirmedStartedStateProcessBase<TProcess> : IDisposable
 		where TProcess : class, IObservableProcess<CharactersOut>, ISubscribeLines
@@ -65,6 +66,7 @@ namespace Elastic.ProcessManagement.Abstractions
 		public virtual bool Start(TimeSpan waitTimeout = default(TimeSpan))
 		{
 			var timeout = waitTimeout == default(TimeSpan) ? TimeSpan.FromMinutes(2) : waitTimeout;
+			this.Stop();
 			lock (_lock)
 			{
 				this._startedHandle.Reset();
@@ -89,7 +91,6 @@ namespace Elastic.ProcessManagement.Abstractions
 
 				if (this._startedHandle.WaitOne(timeout)) return true;
 			}
-			this.Stop();
 			throw new CleanExitException($"Could not start process within ({timeout}): {PrintableName}");
 		}
 
@@ -120,10 +121,7 @@ namespace Elastic.ProcessManagement.Abstractions
 			}
 		}
 
-		protected virtual void OnBeforeStop()
-		{
-		}
-
+		protected virtual void OnBeforeStop() { }
 
 		private void ConfirmProcessStarted()
 		{
