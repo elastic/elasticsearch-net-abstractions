@@ -1,0 +1,20 @@
+type project
+
+id ObservableProcess
+
+licenseUrl http://opensource.org/licenses/MIT
+title
+	ElasticsearchNode, a simple observable that starts and stops elasticsearch.
+summary
+description
+authors Elastic and contributors
+owners Elastic
+licenseUrl https://github.com/elastic/elasticsearch-net-abstractions/blob/master/license.txt</licenseUrl>
+projectUrl https://github.com/elastic/elasticsearch-net-abstractions</projectUrl>
+iconUrl https://raw.githubusercontent.com/elastic/elasticsearch-net-abstractions/master/build/nuget-icon.png</iconUrl>
+releaseNotes See https://github.com/elastic/elasticsearch-net-abstractions/releases/tag/$version$</releaseNotes>
+requireLicenseAcceptance false</requireLicenseAcceptance>
+copyright 2017 Elasticsearch BV
+tags observable,process
+dependencies
+	ObservableNode >= 0.0.0-bad

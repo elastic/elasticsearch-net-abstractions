@@ -29,6 +29,8 @@ module Versioning =
     let private versionOf project =
         match project with
         | ObservableProcess -> globalJson.Versions.Observableprocess.Remove(0, 1)
+        | ElasticsearchNode -> globalJson.Versions.Elasticsearchnode.Remove(0, 1)
+        | ElasticsearchNodeRunner -> globalJson.Versions.ElasticsearchnodeRunner.Remove(0, 1)
 
     let private assemblyVersionOf v = sprintf "%i.0.0" v.Major |> parse
 
@@ -36,11 +38,11 @@ module Versioning =
 
     let writeVersionIntoGlobalJson project version =
         //write it with a leading v in the json, needed for the json type provider to keep things strings
-        let pre v = sprintf "v%s" v
-        let observableProcessVersion = 
-            match project with 
-            | ObservableProcess -> pre version 
-        let versionsNode = GlobalJson.Versions(observableprocess = observableProcessVersion)
+        let pre v = sprintf "v%O" v
+        let observableProcessVersion = match project with | ObservableProcess -> pre version | _ -> pre <| globalJson.Versions.Observableprocess
+        let elasticsearchNodeVersion = match project with | ElasticsearchNode -> pre version | _ -> pre <| globalJson.Versions.Elasticsearchnode
+        let elasticsearchNodeRunnerVersion = match project with | ElasticsearchNodeRunner -> pre version | _ -> pre <| globalJson.Versions.ElasticsearchnodeRunner
+        let versionsNode = GlobalJson.Versions(observableProcessVersion, elasticsearchNodeVersion, elasticsearchNodeRunnerVersion)
 
         let newGlobalJson = GlobalJson.Root (GlobalJson.Sdk(globalJson.Sdk.Version), versionsNode)
         use tw = new StreamWriter("global.json")
@@ -51,8 +53,12 @@ module Versioning =
     let VersionInfo project =
         let currentVersion = versionOf project |> parse
         let bv = getBuildParam "version"
-        let buildVersion = if (isNullOrEmpty bv) then None else Some(parse(bv))
-        match (getBuildParam "target", buildVersion) with
+        let buildVersion = 
+            match (Commandline.project) with 
+            | p when p = project -> if (isNullOrEmpty bv) then None else Some(parse(bv))
+            | _ -> Some(parse(versionOf project))
+        let target =getBuildParam "target" 
+        match (target, buildVersion) with
         | ("release", None) -> failwithf "can not run release because no explicit version number was passed on the command line"
         | ("release", Some v) ->
             if (currentVersion >= v) then failwithf "tried to create release %O but current version is already at %O" v currentVersion

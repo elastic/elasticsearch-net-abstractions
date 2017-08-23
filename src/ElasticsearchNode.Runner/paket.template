@@ -1,0 +1,20 @@
+type project
+
+id ElasticsearchNode.Runner
+
+licenseUrl http://opensource.org/licenses/MIT
+title
+	ElasticsearchNode.Runner - Exposes a more generic Cluster class that is capable of comletely bootstrapping elasticsearch locally
+summary
+description
+authors Elastic and contributors
+owners Elastic
+licenseUrl https://github.com/elastic/elasticsearch-net-abstractions/blob/master/license.txt</licenseUrl>
+projectUrl https://github.com/elastic/elasticsearch-net-abstractions</projectUrl>
+iconUrl https://raw.githubusercontent.com/elastic/elasticsearch-net-abstractions/master/build/nuget-icon.png</iconUrl>
+releaseNotes See https://github.com/elastic/elasticsearch-net-abstractions/releases/tag/$version$</releaseNotes>
+requireLicenseAcceptance false</requireLicenseAcceptance>
+copyright 2017 Elasticsearch BV
+tags observable,process
+dependencies
+	ElasticsearchNode >= 0.0.0-bad

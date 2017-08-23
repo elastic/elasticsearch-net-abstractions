@@ -9,14 +9,18 @@ module Projects =
 
     type Project =
         | ObservableProcess
+        | ElasticsearchNode
+        | ElasticsearchNodeRunner
 
-        static member All = [ObservableProcess]
+        static member All = [ObservableProcess; ElasticsearchNode; ElasticsearchNodeRunner]
 
     type ProjectInfo = { name: string; project: Project}
 
     let nameOf project = 
         match project with
         | ObservableProcess -> "ObservableProcess"
+        | ElasticsearchNode -> "ElasticsearchNode"
+        | ElasticsearchNodeRunner -> "ElasticsearchNode.Runner"
 
     let infoOf project = { name = project |> nameOf; project = project }
     let projectsStartingWith partial =
