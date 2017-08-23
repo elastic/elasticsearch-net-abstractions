@@ -5,6 +5,7 @@ using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Elastic.ProcessManagement.Std;
 
 namespace Elastic.ProcessManagement
@@ -16,7 +17,9 @@ namespace Elastic.ProcessManagement
 		private readonly ManualResetEvent _completedHandle = new ManualResetEvent(false);
 
 		protected ObservableProcessBase(string binary, params string[] arguments)
-			: this(new ObservableProcessArguments(binary, arguments)) { }
+			: this(new ObservableProcessArguments(binary, arguments))
+		{
+		}
 
 		protected ObservableProcessBase(ObservableProcessArguments arguments)
 		{
@@ -136,7 +139,10 @@ namespace Elastic.ProcessManagement
 		/// <exception cref="CleanExitException">an exception that indicates a problem early in the pipeline</exception>
 		public bool WaitForCompletion(TimeSpan timeout)
 		{
-			if (this._completedHandle.WaitOne(timeout)) return true;
+			if (this._completedHandle.WaitOne(timeout))
+			{
+				return true;
+			}
 			this.Stop();
 			return false;
 		}
@@ -146,34 +152,39 @@ namespace Elastic.ProcessManagement
 			try
 			{
 				if (this.Process == null) return;
+
 				var wait = this._arguments.WaitForExit;
-				//TODO explain why we do double waitforexit
-				if (this.Started && wait.HasValue)
+
+				try
 				{
-					this.Process?.WaitForExit((int)wait.Value.TotalMilliseconds);
-					this.Process?.WaitForExit();
+					if (this.Started && wait.HasValue)
+					{
+						this.Process?.WaitForExit((int) wait.Value.TotalMilliseconds);
+						if (!this.HardWaitForExit(TimeSpan.FromSeconds(1)))
+						{
+							this.Process?.Kill();
+							this.Process?.WaitForExit();
+						}
+					}
+					else if (this.Started)
+					{
+						this.Process?.Kill();
+						//this.Process?.WaitForExit();
+						//this.HardWaitForExit(wait ?? TimeSpan.FromSeconds(1));
+					}
 				}
-
-				if (this.Started && !this.Process.HasExited)
-					this.Process?.Kill();
-
-				if (this.Started && wait.HasValue)
+				catch (InvalidOperationException)
 				{
-					this.Process?.WaitForExit();
 				}
 
 				try
 				{
 					this.Process?.Dispose();
-
 				}
 				catch (NullReferenceException)
 				{
-					//the underlying call to .Close() can throw an NRE if you dispose to fast after starting
+					//the underlying call to .Close() can throw an NRE if you dispose too fast after starting
 				}
-		}
-			catch (InvalidOperationException)
-			{
 			}
 			finally
 			{
@@ -181,6 +192,12 @@ namespace Elastic.ProcessManagement
 				//this.OutStream = null;
 				this._completedHandle.Set();
 			}
+		}
+
+		private bool HardWaitForExit(TimeSpan timeSpan)
+		{
+			var task = Task.Run(() => this.Process.WaitForExit());
+			return (Task.WaitAny(task, Task.Delay(timeSpan)) == 0);
 		}
 
 		private bool _isDisposed = false;

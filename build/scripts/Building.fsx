@@ -32,7 +32,7 @@ module Build =
         let props =
             Projects.Project.All
             |> Seq.collect (fun p -> 
-                let name = nameOf p
+                let name = (nameOf p).Replace(".", "")
                 let version = Versioning.VersionInfo p
                 [ 
                     sprintf "%sCurrentVersion" name , (version.Informational.ToString());

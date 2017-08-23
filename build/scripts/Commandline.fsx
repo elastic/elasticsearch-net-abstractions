@@ -38,6 +38,12 @@ module Commandline =
             exit 2
             None
         
+    let private (|IsATarget|_|) (candidate: string) =
+        let isTarget = Fake.TargetHelper.getAllTargetsNames() |> List.exists((=)candidate) 
+        match isTarget with 
+        | true -> Some candidate
+        | _ ->
+            None
     let project = 
         let p = 
             match arguments with
@@ -65,7 +71,7 @@ module Commandline =
         | [IsAProject project] -> ignore()
         | [IsAProject project; "release"; version] -> 
             setBuildParam "version" version
-        | [IsAProject project; t] when target |> isNotNullOrEmpty -> ignore()
+        | [IsAProject project; IsATarget t] when target |> isNotNullOrEmpty -> ignore()
         | _ ->
             traceError usage
             exit 2

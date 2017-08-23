@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq.Expressions;
 using System.Net.Http.Headers;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -22,7 +23,7 @@ namespace Elastic.ProcessManagement.Extensions
 
 			return Observable.Create<LineOut>(observer =>
 			{
-				var cancel = Disposable.Create(process.CancelErrorRead);
+				var cancel = Disposable.Create(()=>{ try { process.CancelErrorRead(); } catch(InvalidOperationException) { } });
 				return new CompositeDisposable(cancel, receivedStdErr.Subscribe(observer));
 			});
 		}
@@ -37,7 +38,7 @@ namespace Elastic.ProcessManagement.Extensions
 
 			return Observable.Create<LineOut>(observer =>
 			{
-				var cancel = Disposable.Create(process.CancelOutputRead);
+				var cancel = Disposable.Create(()=>{ try { process.CancelOutputRead(); } catch(InvalidOperationException) { } });
 				return new CompositeDisposable(cancel, receivedStdOut.Subscribe(observer));
 			});
 		}

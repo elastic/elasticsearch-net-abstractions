@@ -57,7 +57,7 @@ namespace ScratchPad
 //
 //			handle.WaitOne();
 
-			using (var cluster = new ElasticsearchCluster("5.5.1", instanceCount: 1))
+			using (var cluster = new ElasticsearchCluster("5.5.1", instanceCount: 3))
 			{
 				cluster.Start();
 

@@ -11,11 +11,14 @@ namespace Elastic.ProcessManagement.Tests
 		public void DelayedWriterRunsToCompletion()
 		{
 			var seen = new List<string>();
+			Exception ex = null;
 			var process = new ObservableProcess(TestCaseArguments(nameof(DelayedWriter)));
-			var subscription = process.SubscribeLines(c=>seen.Add(c.Line));
+			var subscription = process.SubscribeLines(c=>seen.Add(c.Line), e => ex = e);
 			process.WaitForCompletion(WaitTimeout);
 
 			process.ExitCode.Should().Be(20);
+			ex.Should().BeNull();
+
 			seen.Should().NotBeEmpty().And.HaveCount(1, string.Join(Environment.NewLine, seen));
 			seen[0].Should().Be(nameof(DelayedWriter));
 		}

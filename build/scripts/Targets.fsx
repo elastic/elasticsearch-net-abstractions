@@ -38,7 +38,7 @@ Target "ChangeVersion" <| fun _ ->
 
 Target "Version" <| fun _ -> 
     for v in Versioning.AllProjectVersions do
-        traceImportant (sprintf "project %s has version %s" (v.Project.name) (v.Informational.ToString()))
+        traceImportant (sprintf "project %s has version %s from here on out" (v.Project.name) (v.Informational.ToString()))
 
 Target "Release" <| fun _ -> 
     Release.CreateNugetPackage Commandline.project

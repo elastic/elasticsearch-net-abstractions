@@ -3,7 +3,7 @@
     "version": "1.0.1"
   },
   "versions": {
-    "observableprocess": "v0.0.1",
+    "observableprocess": "v0.0.4",
     "elasticsearchnode": "v0.0.1",
     "elasticsearchnode.runner": "v0.0.1"
   }

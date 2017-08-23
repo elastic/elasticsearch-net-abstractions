@@ -66,7 +66,6 @@ namespace Elastic.ProcessManagement.Abstractions
 		public virtual bool Start(TimeSpan waitTimeout = default(TimeSpan))
 		{
 			var timeout = waitTimeout == default(TimeSpan) ? TimeSpan.FromMinutes(2) : waitTimeout;
-			this.Stop();
 			lock (_lock)
 			{
 				this._startedHandle.Reset();

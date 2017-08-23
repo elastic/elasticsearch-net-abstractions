@@ -38,7 +38,7 @@ module Versioning =
 
     let writeVersionIntoGlobalJson project version =
         //write it with a leading v in the json, needed for the json type provider to keep things strings
-        let pre v = sprintf "v%O" v
+        let pre (v: string) = match (v.StartsWith("v")) with | true -> v | _ -> sprintf "v%s" v
         let observableProcessVersion = match project with | ObservableProcess -> pre version | _ -> pre <| globalJson.Versions.Observableprocess
         let elasticsearchNodeVersion = match project with | ElasticsearchNode -> pre version | _ -> pre <| globalJson.Versions.Elasticsearchnode
         let elasticsearchNodeRunnerVersion = match project with | ElasticsearchNodeRunner -> pre version | _ -> pre <| globalJson.Versions.ElasticsearchnodeRunner
@@ -57,14 +57,15 @@ module Versioning =
             match (Commandline.project) with 
             | p when p = project -> if (isNullOrEmpty bv) then None else Some(parse(bv))
             | _ -> Some(parse(versionOf project))
-        let target =getBuildParam "target" 
-        match (target, buildVersion) with
-        | ("release", None) -> failwithf "can not run release because no explicit version number was passed on the command line"
-        | ("release", Some v) ->
-            if (currentVersion >= v) then failwithf "tried to create release %O but current version is already at %O" v currentVersion
+        let target =getBuildParam "target"
+        let isCurrentProject = project = Commandline.project
+        match (target, buildVersion, isCurrentProject) with
+        | ("release", None, _) -> failwithf "can not run release because no explicit version number was passed on the command line"
+        | ("release", Some v, true) ->
+            if (currentVersion >= v) then failwithf "tried to create release %O for project %O but current version is already at %O" v project currentVersion
             { Informational= v; Assembly= assemblyVersionOf v; AssemblyFile = assemblyFileVersionOf v; Project = infoOf project }
         | _ ->
-            tracefn "Not running 'release' target so using version in global.json (%O) as current" currentVersion
+            tracefn "Not running 'release' target or %O is not the release current release target (%O) so using version in global.json (%O) as current" project (Commandline.project) currentVersion
             { Informational= currentVersion; Assembly= assemblyVersionOf currentVersion; AssemblyFile = assemblyFileVersionOf currentVersion; Project = infoOf project}
 
     let AllProjectVersions = Project.All |> Seq.map VersionInfo
