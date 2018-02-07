@@ -8,5 +8,4 @@
     <NoWarn>CS1701,CS1591</NoWarn>
   </PropertyGroup>
   <Import Project="..\..\build\outputpath.props" />
-  <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

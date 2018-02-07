@@ -11,6 +11,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ObservableProcess\ObservableProcess.csproj" />
+    <PackageReference Include="System.Reactive.Linq" Version="3.1.1" />
   </ItemGroup>
-  <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
