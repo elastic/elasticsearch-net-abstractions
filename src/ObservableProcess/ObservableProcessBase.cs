@@ -23,20 +23,20 @@ namespace Elastic.ProcessManagement
 		{
 		}
 
+		public StreamWriter StandardInput => this.Process.StandardInput;
+
 		protected ObservableProcessBase(ObservableProcessArguments arguments)
 		{
 			this._arguments = arguments;
 			this.NoWrapInThread = arguments.NoWrapInThread;
 			this.Binary = this._arguments.Binary;
 			this.Process = CreateProcess();
-			this.Start();
+			this.CreateObservable();
 		}
 
 		public virtual IDisposable Subscribe(IObserver<TConsoleOut> observer) => this.OutStream.Subscribe(observer);
 
 		public IDisposable Subscribe(IConsoleOutWriter writer) => this.OutStream.Subscribe(writer.Write, writer.Write, delegate { });
-
-		private readonly object _lock = new object();
 
 		protected Process Process { get; }
 		protected bool Started { get; set; }
@@ -55,16 +55,11 @@ namespace Elastic.ProcessManagement
 
 		protected IObservable<TConsoleOut> OutStream { get; private set; } = Observable.Empty<TConsoleOut>();
 
-		private void Start()
+		private void CreateObservable()
 		{
-			if (this._isDisposed) throw new ObjectDisposedException(nameof(ObservableProcessBase<TConsoleOut>));
 			if (this.Started) return;
-			lock (_lock)
-			{
-				if (this.Started) return;
-				this._completedHandle.Reset();
-				this.OutStream = CreateConsoleOutObservable();
-			}
+			this._completedHandle.Reset();
+			this.OutStream = CreateConsoleOutObservable();
 		}
 
 		protected abstract IObservable<TConsoleOut> CreateConsoleOutObservable();
@@ -97,9 +92,6 @@ namespace Elastic.ProcessManagement
 		protected void OnExit(IObserver<TConsoleOut> observer)
 		{
 			if (!this.Started) return;
-			lock (_exitLock)
-			{
-				if (!this.Started) return;
 				int? exitCode = null;
 				try
 				{
@@ -112,7 +104,6 @@ namespace Elastic.ProcessManagement
 						this.Stop(exitCode, observer);
 					}
 				}
-			}
 		}
 
 		private Process CreateProcess()
@@ -126,7 +117,7 @@ namespace Elastic.ProcessManagement
 				UseShellExecute = false,
 				RedirectStandardOutput = true,
 				RedirectStandardError = true,
-				RedirectStandardInput = false
+				RedirectStandardInput = true
 			};
 			this._arguments.AlterProcessStartInfo?.Invoke(processStartInfo);
 
@@ -152,7 +143,6 @@ namespace Elastic.ProcessManagement
 			return false;
 		}
 
-		private readonly object _stopLock = new object();
 		private void Stop(int? exitCode = null, IObserver<TConsoleOut> observer = null)
 		{
 			try
@@ -162,19 +152,16 @@ namespace Elastic.ProcessManagement
 				var wait = this._arguments.WaitForExit;
 				try
 				{
-					lock (_stopLock)
+					if (this.Started && wait.HasValue)
 					{
-						if (this.Started && wait.HasValue)
-						{
-							this.Process?.Kill();
-							var exitted = this.Process?.WaitForExit((int) wait.Value.TotalMilliseconds);
-							if (this.Process != null && !exitted.GetValueOrDefault(false))
-								this.HardWaitForExit(TimeSpan.FromSeconds(10));
-						}
-						else if (this.Started)
-						{
-							this.Process?.Kill();
-						}
+						this.Process?.Kill();
+						var exitted = this.Process?.WaitForExit((int) wait.Value.TotalMilliseconds);
+						if (this.Process != null && !exitted.GetValueOrDefault(false))
+							this.HardWaitForExit(TimeSpan.FromSeconds(10));
+					}
+					else if (this.Started)
+					{
+						this.Process?.Kill();
 					}
 				}
 				//Access denied usually means the program is already terminating.

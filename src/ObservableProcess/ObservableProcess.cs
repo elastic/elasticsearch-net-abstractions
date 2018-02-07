@@ -75,9 +75,15 @@ namespace Elastic.ProcessManagement
 		{
 			c.OutOrErrrorCharacters(OutCharacters, ErrorCharacters);
 			if (c.Error)
+			{
 				YieldNewLinesToOnNext(ref _bufferStdErr, buffer => observer.OnNext(ConsoleOut.ErrorOut(buffer)));
+				FlushRemainder(ref _bufferStdErr, buffer => observer.OnNext(ConsoleOut.ErrorOut(buffer)));
+			}
 			else
+			{
 				YieldNewLinesToOnNext(ref _bufferStdOut, buffer => observer.OnNext(ConsoleOut.Out(buffer)));
+				FlushRemainder(ref _bufferStdOut, buffer => observer.OnNext(ConsoleOut.Out(buffer)));
+			}
 		}
 
 		private static void OnNextFlush(CharactersOut c, IObserver<CharactersOut> observer) =>
@@ -99,6 +105,7 @@ namespace Elastic.ProcessManagement
 		{
 			YieldNewLinesToOnNext(ref _bufferStdErr, buffer => observer.OnNext(ConsoleOut.ErrorOut(buffer)));
 			FlushRemainder(ref _bufferStdErr, buffer => observer.OnNext(ConsoleOut.ErrorOut(buffer)));
+
 			YieldNewLinesToOnNext(ref _bufferStdOut, buffer => observer.OnNext(ConsoleOut.Out(buffer)));
 			FlushRemainder(ref _bufferStdOut, buffer => observer.OnNext(ConsoleOut.Out(buffer)));
 		}
@@ -107,7 +114,7 @@ namespace Elastic.ProcessManagement
 		private void FlushRemainder(ref char[] buffer, Action<char[]> onNext)
 		{
 			if (buffer.Length <= 0) return;
-			var endOffSet = FindEndOffSet(buffer, 0) - 1;
+			var endOffSet = FindEndOffSet(buffer, 0);
 			if (endOffSet <= 0) return;
 			var ret = new char[endOffSet];
 			Array.Copy(buffer, 0, ret, 0, endOffSet);
@@ -151,7 +158,7 @@ namespace Elastic.ProcessManagement
 			{
 				var ch = buffer[i];
 				if (ch != '\0') continue;
-				zeroByteOffset = i + 1;
+				zeroByteOffset = i;
 				break;
 			}
 			return zeroByteOffset;
