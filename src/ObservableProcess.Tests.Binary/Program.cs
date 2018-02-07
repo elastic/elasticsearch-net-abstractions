@@ -28,7 +28,7 @@ namespace Elastic.ProcessManagement.Tests.Binary
 		}
 		private static int DelayedWriter()
 		{
-			Thread.Sleep(1000);
+			Thread.Sleep(3000);
 			Console.Write(nameof(DelayedWriter));
 			return 20;
 		}

@@ -45,31 +45,35 @@ namespace Elastic.ProcessManagement
 		{
 			return Observable.Create<CharactersOut>(observer =>
 			{
-				if (!this.StartProcess(observer))
-					return Disposable.Empty;
-
-				this.Started = true;
-
-				if (this.Process.HasExited)
+				Task.Run(() =>
 				{
-					OnExit(observer);
-					return Disposable.Empty;
-				}
-				var stdOutSubscription = this.Process.ObserveStandardOutBuffered(observer, BufferSize);
-				var stdErrSubscription = this.Process.ObserveErrorOutBuffered(observer, BufferSize);
+					if (!this.StartProcess(observer)) return;
 
-				Task.WhenAll(stdOutSubscription, stdErrSubscription)
-					.ContinueWith((t) => { OnExit(observer); });
+					this.Started = true;
 
-				this.Process.Exited += (o, s) =>
-				{
-					if (!Task.WaitAll(new [] { stdOutSubscription, stdErrSubscription }, WaitForStreamReadersTimeout))
-						OnError(observer, new CleanExitException(
-							$"Waited {WaitForStreamReadersTimeout} unsuccesfully for stdout/err subscriptions to complete after the the process exited"
-						));
+					if (this.Process.HasExited)
+					{
+						OnExit(observer);
+						return;
+					}
 
-					OnExit(observer);
-				};
+					var stdOutSubscription = this.Process.ObserveStandardOutBuffered(observer, BufferSize);
+					var stdErrSubscription = this.Process.ObserveErrorOutBuffered(observer, BufferSize);
+
+					this.Process.Exited += (o, s) =>
+					{
+						if (!Task.WaitAll(new[] {stdOutSubscription, stdErrSubscription}, WaitForStreamReadersTimeout))
+							OnError(observer, new CleanExitException(
+								$"Waited {WaitForStreamReadersTimeout} unsuccesfully for stdout/err subscriptions to complete after the the process exited"
+							));
+
+						OnExit(observer);
+					};
+
+					Task.WhenAll(stdOutSubscription, stdErrSubscription)
+						.ContinueWith((t) => { OnExit(observer); });
+				});
+
 
 				return Disposable.Empty;
 			});

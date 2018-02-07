@@ -46,13 +46,13 @@ namespace Elastic.ProcessManagement.Extensions
 		public static Task ObserveErrorOutBuffered(this Process process, IObserver<CharactersOut> observer, int bufferSize)
 		{
 			var reader = process.StandardError;
-			return Task.Run(async () => await BufferedRead(reader, observer, bufferSize, ConsoleOut.ErrorOut));
+			return BufferedRead(reader, observer, bufferSize, ConsoleOut.ErrorOut);
 		}
 
 		public static Task ObserveStandardOutBuffered(this Process process, IObserver<CharactersOut> observer, int bufferSize)
 		{
 			var reader = process.StandardOutput;
-			return Task.Run(async () => await BufferedRead(reader, observer, bufferSize, ConsoleOut.Out));
+			return BufferedRead(reader, observer, bufferSize, ConsoleOut.Out);
 		}
 
 		private static async Task BufferedRead(StreamReader r, IObserver<CharactersOut> o, int b, Func<char[], CharactersOut> m)

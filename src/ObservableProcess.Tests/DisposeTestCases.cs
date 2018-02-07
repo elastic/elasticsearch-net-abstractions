@@ -31,7 +31,6 @@ namespace Elastic.ProcessManagement.Tests
 			var process = new ObservableProcess(args);
 			process.SubscribeLines(c=>seen.Add(c.Line));
 			process.Dispose();
-			process.WaitForCompletion(WaitTimeout);
 
 			//disposing the process itself will stop the underlying Process
 			process.ExitCode.Should().NotHaveValue();
@@ -46,9 +45,8 @@ namespace Elastic.ProcessManagement.Tests
 			var process = new ObservableProcess(args);
 			process.SubscribeLines(c=>seen.Add(c.Line));
 			process.Dispose();
-			process.WaitForCompletion(WaitTimeout);
 
-			process.ExitCode.Should().Be(-1);
+			process.ExitCode.Should().NotHaveValue();
 			seen.Should().BeEmpty(string.Join(Environment.NewLine, seen));
 		}
 		[Fact]
@@ -61,7 +59,9 @@ namespace Elastic.ProcessManagement.Tests
 			process.WaitForCompletion(WaitTimeout);
 
 			//disposing the subscription did not kill the process
+			//so we should see the exit code
 			process.ExitCode.Should().Be(20);
+			//but because we subscribed instantly we see no output
 			seen.Should().BeEmpty(string.Join(Environment.NewLine, seen));
 		}
 

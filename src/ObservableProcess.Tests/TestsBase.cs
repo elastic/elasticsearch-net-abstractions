@@ -1,10 +1,13 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 
 namespace Elastic.ProcessManagement.Tests
 {
 	public abstract class TestsBase
 	{
+		private static string _observableprocessTestsBinary = "ObservableProcess.Tests.Binary";
+
 		//increase this if you are using the debugger
 		protected static TimeSpan WaitTimeout { get; } = TimeSpan.FromSeconds(5);
 
@@ -20,17 +23,32 @@ namespace Elastic.ProcessManagement.Tests
 				? "./.."
 				: @"../../../..";
 
-			var binaryFolder = Path.Combine(Path.GetFullPath(root), "ObservableProcess.Tests.Binary");
+			var binaryFolder = Path.Combine(Path.GetFullPath(root), _observableprocessTestsBinary);
 			return binaryFolder;
 		}
 
 		protected ObservableProcessArguments TestCaseArguments(string testcase) =>
-			new ObservableProcessArguments("dotnet", "run", testcase)
+			new ObservableProcessArguments("dotnet", GetDll(), testcase)
 			{
 				AlterProcessStartInfo = p =>
 				{
 					p.WorkingDirectory = GetWorkingDir();
 				}
 			};
+
+		private static string GetDll()
+		{
+			var dll = Path.Combine("bin", GetRunningConfiguration(), "netcoreapp1.1", _observableprocessTestsBinary + ".dll");
+			var fullPath = Path.Combine(GetWorkingDir(), dll);
+			if (!File.Exists(fullPath)) throw new Exception($"Can not find {fullPath}");
+
+			return dll;
+		}
+
+		private static string GetRunningConfiguration()
+		{
+			var l = typeof(TestsBase).GetTypeInfo().Assembly.Location;
+			return new DirectoryInfo(l).Parent?.Parent?.Name;
+		}
 	}
 }
