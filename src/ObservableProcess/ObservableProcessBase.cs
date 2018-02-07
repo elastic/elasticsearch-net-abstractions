@@ -16,6 +16,7 @@ namespace Elastic.ProcessManagement
 	{
 		private readonly ObservableProcessArguments _arguments;
 		private readonly ManualResetEvent _completedHandle = new ManualResetEvent(false);
+		protected bool NoWrapInThread { get; }
 
 		protected ObservableProcessBase(string binary, params string[] arguments)
 			: this(new ObservableProcessArguments(binary, arguments))
@@ -25,6 +26,7 @@ namespace Elastic.ProcessManagement
 		protected ObservableProcessBase(ObservableProcessArguments arguments)
 		{
 			this._arguments = arguments;
+			this.NoWrapInThread = arguments.NoWrapInThread;
 			this.Binary = this._arguments.Binary;
 			this.Process = CreateProcess();
 			this.Start();

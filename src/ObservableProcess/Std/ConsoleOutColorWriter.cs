@@ -25,8 +25,7 @@ namespace Elastic.ProcessManagement.Std
 
 		public override void Write(Exception e)
 		{
-			var ee = e as CleanExitException;
-			if (ee == null) throw e;
+			if (!(e is CleanExitException ee)) throw e;
 			lock (_lock)
 			{
 				Console.ForegroundColor = ConsoleColor.Red;
