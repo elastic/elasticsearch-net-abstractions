@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\build\Versioning.targets" />
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
@@ -11,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ElasticsearchNode\ElasticsearchNode.csproj" />
     <ProjectReference Include="..\ObservableProcess\ObservableProcess.csproj" />
+    <PackageReference Include="NEST" Version="5.5.0" />
+    <PackageReference Include="SemanticVersioning" Version="0.8.0" />
   </ItemGroup>
-  <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

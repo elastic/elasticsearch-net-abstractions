@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Elastic.ProcessManagement.Extensions;
 using Elastic.ProcessManagement.Std;
 
@@ -21,27 +22,35 @@ namespace Elastic.ProcessManagement
 
 		protected override IObservable<LineOut> CreateConsoleOutObservable()
 		{
-			return Observable.Create<LineOut>(observer =>
+			if (this.NoWrapInThread)
+				return Observable.Create<LineOut>(observer => KickOff(observer));
+
+			return Observable.Create<LineOut>(async observer =>
 			{
-				var stdOut = this.Process.ObserveStandardOutLineByLine();
-				var stdErr = this.Process.ObserveErrorOutLineByLine();
-
-				var stdOutSubscription = stdOut.Subscribe(observer);
-				var stdErrSubscription = stdErr.Subscribe(observer);
-
-				var processExited = Observable.FromEventPattern(h => this.Process.Exited += h, h => this.Process.Exited -= h);
-				var processError = CreateProcessExitSubscription(processExited, observer);
-
-				if (!this.StartProcess(observer))
-					return new CompositeDisposable(processError);
-
-				this.Process.BeginOutputReadLine();
-				this.Process.BeginErrorReadLine();
-
-				this.Started = true;
-
-				return new CompositeDisposable(stdOutSubscription, stdErrSubscription, processError);
+				var disposable = await Task.Run(() => KickOff(observer));
+				return disposable;
 			});
+		}
+
+		private CompositeDisposable KickOff(IObserver<LineOut> observer)
+		{
+			var stdOut = this.Process.ObserveStandardOutLineByLine();
+			var stdErr = this.Process.ObserveErrorOutLineByLine();
+
+			var stdOutSubscription = stdOut.Subscribe(observer);
+			var stdErrSubscription = stdErr.Subscribe(observer);
+
+			var processExited = Observable.FromEventPattern(h => this.Process.Exited += h, h => this.Process.Exited -= h);
+			var processError = CreateProcessExitSubscription(processExited, observer);
+
+			if (!this.StartProcess(observer))
+				return new CompositeDisposable(processError);
+
+			this.Process.BeginOutputReadLine();
+			this.Process.BeginErrorReadLine();
+
+			this.Started = true;
+			return new CompositeDisposable(stdOutSubscription, stdErrSubscription, processError);
 		}
 
 		private IDisposable CreateProcessExitSubscription(IObservable<EventPattern<object>> processExited, IObserver<LineOut> observer) =>

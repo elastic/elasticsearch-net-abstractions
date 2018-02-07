@@ -43,36 +43,47 @@ namespace Elastic.ProcessManagement
 
 		protected override IObservable<CharactersOut> CreateConsoleOutObservable()
 		{
-			return Observable.Create<CharactersOut>(observer =>
+			if (this.NoWrapInThread)
+				return Observable.Create<CharactersOut>(observer =>
+				{
+					KickOff(observer);
+					return Disposable.Empty;
+				});
+
+			return Observable.Create<CharactersOut>(async observer =>
 			{
-				if (!this.StartProcess(observer))
-					return Disposable.Empty;
-
-				this.Started = true;
-
-				if (this.Process.HasExited)
-				{
-					OnExit(observer);
-					return Disposable.Empty;
-				}
-				var stdOutSubscription = this.Process.ObserveStandardOutBuffered(observer, BufferSize);
-				var stdErrSubscription = this.Process.ObserveErrorOutBuffered(observer, BufferSize);
-
-				Task.WhenAll(stdOutSubscription, stdErrSubscription)
-					.ContinueWith((t) => { OnExit(observer); });
-
-				this.Process.Exited += (o, s) =>
-				{
-					if (!Task.WaitAll(new [] { stdOutSubscription, stdErrSubscription }, WaitForStreamReadersTimeout))
-						OnError(observer, new CleanExitException(
-							$"Waited {WaitForStreamReadersTimeout} unsuccesfully for stdout/err subscriptions to complete after the the process exited"
-						));
-
-					OnExit(observer);
-				};
-
+				await Task.Run(() => KickOff(observer));
 				return Disposable.Empty;
 			});
+		}
+
+		private void KickOff(IObserver<CharactersOut> observer)
+		{
+			if (!this.StartProcess(observer)) return;
+
+			this.Started = true;
+
+			if (this.Process.HasExited)
+			{
+				OnExit(observer);
+				return;
+			}
+
+			var stdOutSubscription = this.Process.ObserveStandardOutBuffered(observer, BufferSize);
+			var stdErrSubscription = this.Process.ObserveErrorOutBuffered(observer, BufferSize);
+
+			this.Process.Exited += (o, s) =>
+			{
+				if (!Task.WaitAll(new[] {stdOutSubscription, stdErrSubscription}, WaitForStreamReadersTimeout))
+					OnError(observer, new CleanExitException(
+						$"Waited {WaitForStreamReadersTimeout} unsuccesfully for stdout/err subscriptions to complete after the the process exited"
+					));
+
+				OnExit(observer);
+			};
+
+			Task.WhenAll(stdOutSubscription, stdErrSubscription)
+				.ContinueWith((t) => { OnExit(observer); });
 		}
 	}
 }

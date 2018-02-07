@@ -21,6 +21,17 @@ namespace Elastic.ProcessManagement.Tests
 			seen.Should().NotBeEmpty().And.HaveCount(1, string.Join(Environment.NewLine, seen));
 			seen[0].Should().Be(nameof(SingleLineNoEnter));
 		}
+		[Fact]
+		public void TwoWrites()
+		{
+			var seen = new List<string>();
+			var process = new ObservableProcess(TestCaseArguments(nameof(TwoWrites)));
+			process.SubscribeLines(c=>seen.Add(c.Line));
+			process.WaitForCompletion(WaitTimeout);
+
+			seen.Should().NotBeEmpty().And.HaveCount(1, string.Join(Environment.NewLine, seen));
+			seen[0].Should().Be($"{nameof(TwoWrites)}{nameof(TwoWrites)}");
+		}
 
 		[Fact]
 		public void SingleLine()

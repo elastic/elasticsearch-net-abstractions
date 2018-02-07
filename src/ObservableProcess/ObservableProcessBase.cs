@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Dynamic;
 using System.IO;
@@ -15,25 +16,27 @@ namespace Elastic.ProcessManagement
 	{
 		private readonly ObservableProcessArguments _arguments;
 		private readonly ManualResetEvent _completedHandle = new ManualResetEvent(false);
+		protected bool NoWrapInThread { get; }
 
 		protected ObservableProcessBase(string binary, params string[] arguments)
 			: this(new ObservableProcessArguments(binary, arguments))
 		{
 		}
 
+		public StreamWriter StandardInput => this.Process.StandardInput;
+
 		protected ObservableProcessBase(ObservableProcessArguments arguments)
 		{
 			this._arguments = arguments;
+			this.NoWrapInThread = arguments.NoWrapInThread;
 			this.Binary = this._arguments.Binary;
 			this.Process = CreateProcess();
-			this.Start();
+			this.CreateObservable();
 		}
 
 		public virtual IDisposable Subscribe(IObserver<TConsoleOut> observer) => this.OutStream.Subscribe(observer);
 
 		public IDisposable Subscribe(IConsoleOutWriter writer) => this.OutStream.Subscribe(writer.Write, writer.Write, delegate { });
-
-		private readonly object _lock = new object();
 
 		protected Process Process { get; }
 		protected bool Started { get; set; }
@@ -52,16 +55,11 @@ namespace Elastic.ProcessManagement
 
 		protected IObservable<TConsoleOut> OutStream { get; private set; } = Observable.Empty<TConsoleOut>();
 
-		private void Start()
+		private void CreateObservable()
 		{
-			if (this._isDisposed) throw new ObjectDisposedException(nameof(ObservableProcessBase<TConsoleOut>));
 			if (this.Started) return;
-			lock (_lock)
-			{
-				if (this.Started) return;
-				this._completedHandle.Reset();
-				this.OutStream = CreateConsoleOutObservable();
-			}
+			this._completedHandle.Reset();
+			this.OutStream = CreateConsoleOutObservable();
 		}
 
 		protected abstract IObservable<TConsoleOut> CreateConsoleOutObservable();
@@ -81,6 +79,7 @@ namespace Elastic.ProcessManagement
 				OnError(observer, new CleanExitException($"Exception while starting observable process: {this.Binary}", e.Message, e));
 				this._completedHandle.Set();
 			}
+
 			return false;
 		}
 
@@ -92,21 +91,19 @@ namespace Elastic.ProcessManagement
 
 		protected void OnExit(IObserver<TConsoleOut> observer)
 		{
-			if (!this.Started || this.ExitCode.HasValue) return;
-			lock (_exitLock)
-			{
-				if (!this.Started || this.ExitCode.HasValue) return;
+			if (!this.Started) return;
+				int? exitCode = null;
 				try
 				{
-					var c = this.Process.ExitCode;
-					this.ExitCode = c;
+					exitCode = this.Process.ExitCode;
 				}
 				finally
 				{
-					this.Stop();
-					OnCompleted(observer);
+					if (!_isDisposing)
+					{
+						this.Stop(exitCode, observer);
+					}
 				}
-			}
 		}
 
 		private Process CreateProcess()
@@ -120,7 +117,7 @@ namespace Elastic.ProcessManagement
 				UseShellExecute = false,
 				RedirectStandardOutput = true,
 				RedirectStandardError = true,
-				RedirectStandardInput = false
+				RedirectStandardInput = true
 			};
 			this._arguments.AlterProcessStartInfo?.Invoke(processStartInfo);
 
@@ -140,56 +137,51 @@ namespace Elastic.ProcessManagement
 		public bool WaitForCompletion(TimeSpan timeout)
 		{
 			if (this._completedHandle.WaitOne(timeout))
-			{
 				return true;
-			}
+
 			this.Stop();
 			return false;
 		}
 
-		private void Stop()
+		private void Stop(int? exitCode = null, IObserver<TConsoleOut> observer = null)
 		{
 			try
 			{
 				if (this.Process == null) return;
 
 				var wait = this._arguments.WaitForExit;
-
 				try
 				{
 					if (this.Started && wait.HasValue)
 					{
-						this.Process?.WaitForExit((int) wait.Value.TotalMilliseconds);
-						if (!this.HardWaitForExit(TimeSpan.FromSeconds(1)))
-						{
-							this.Process?.Kill();
-							this.Process?.WaitForExit();
-						}
+						this.Process?.Kill();
+						var exitted = this.Process?.WaitForExit((int) wait.Value.TotalMilliseconds);
+						if (this.Process != null && !exitted.GetValueOrDefault(false))
+							this.HardWaitForExit(TimeSpan.FromSeconds(10));
 					}
 					else if (this.Started)
 					{
 						this.Process?.Kill();
-						//this.Process?.WaitForExit();
-						//this.HardWaitForExit(wait ?? TimeSpan.FromSeconds(1));
 					}
 				}
-				catch (InvalidOperationException)
-				{
-				}
-
+				//Access denied usually means the program is already terminating.
+				catch (Win32Exception) { }
+				//This usually indiciates the process is already terminated
+				catch (InvalidOperationException) { }
 				try
 				{
 					this.Process?.Dispose();
 				}
-				catch (NullReferenceException)
-				{
-					//the underlying call to .Close() can throw an NRE if you dispose too fast after starting
-				}
+				//the underlying call to .Close() can throw an NRE if you dispose too fast after starting
+				catch (NullReferenceException) { }
 			}
 			finally
 			{
+				if (this.Started && exitCode.HasValue)
+					this.ExitCode = exitCode.Value;
+
 				this.Started = false;
-				//this.OutStream = null;
+				if (observer != null) OnCompleted(observer);
 				this._completedHandle.Set();
 			}
 		}
@@ -200,12 +192,15 @@ namespace Elastic.ProcessManagement
 			return (Task.WaitAny(task, Task.Delay(timeSpan)) == 0);
 		}
 
-		private bool _isDisposed = false;
+		private bool _isDisposed;
+		private bool _isDisposing;
 
 		public void Dispose()
 		{
+			this._isDisposing = true;
 			this.Stop();
 			this._isDisposed = true;
+			this._isDisposing = false;
 		}
 	}
 }
