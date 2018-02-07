@@ -1,6 +1,0 @@
-microsoft.net.test.sdk
-xunit
-dotnet-xunit
-xunit.runner.visualstudio
-FluentAssertions
-System.Reactive.Linq
