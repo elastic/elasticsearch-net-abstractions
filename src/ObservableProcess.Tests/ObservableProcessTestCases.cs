@@ -29,8 +29,9 @@ namespace Elastic.ProcessManagement.Tests
 			process.SubscribeLines(c=>seen.Add(c.Line));
 			process.WaitForCompletion(WaitTimeout);
 
-			seen.Should().NotBeEmpty().And.HaveCount(1, string.Join(Environment.NewLine, seen));
-			seen[0].Should().Be($"{nameof(TwoWrites)}{nameof(TwoWrites)}");
+			seen.Should().NotBeEmpty().And.HaveCount(2, string.Join(Environment.NewLine, seen));
+			seen[0].Should().Be(nameof(TwoWrites));
+			seen[1].Should().Be(nameof(TwoWrites));
 		}
 
 		[Fact]

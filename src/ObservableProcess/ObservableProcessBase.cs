@@ -64,11 +64,18 @@ namespace Elastic.ProcessManagement
 
 		protected abstract IObservable<TConsoleOut> CreateConsoleOutObservable();
 
+		public delegate void ProcessStartedEvent(StreamWriter standardInput);
+
+		public event ProcessStartedEvent ProcessStarted = (s) => { };
 		protected bool StartProcess(IObserver<TConsoleOut> observer)
 		{
 			try
 			{
-				if (this.Process.Start()) return true;
+				if (this.Process.Start())
+				{
+					this.ProcessStarted(this.Process.StandardInput);
+					return true;
+				}
 
 				OnError(observer, new CleanExitException($"Failed to start observable process: {this.Binary}"));
 				this._completedHandle.Set();

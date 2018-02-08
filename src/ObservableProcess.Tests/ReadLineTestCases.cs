@@ -16,8 +16,13 @@ namespace Elastic.ProcessManagement.Tests
 		{
 			var seen = new List<string>();
 			var process = new ObservableProcess(TestCaseArguments(nameof(ReadKeyFirst)));
+			process.ProcessStarted += (standardInput) =>
+			{
+				//this particular program does not output anything and expect user input immediatly
+				//OnNext on the observable is only called on output so we need to write on the started event
+				process.StandardInput.Write("y");
+			};
 			process.SubscribeLines(c=>seen.Add(c.Line));
-			process.StandardInput.Write("y");
 			process.WaitForCompletion(WaitTimeout);
 
 			seen.Should().NotBeEmpty().And.HaveCount(1, string.Join(Environment.NewLine, seen));
@@ -32,8 +37,7 @@ namespace Elastic.ProcessManagement.Tests
 			{
 				var chars = new string(c.Characters);
 				seen.Add(chars);
-				if (chars == "input:")
-					process.StandardInput.Write("y");
+				if (chars == "input:") process.StandardInput.Write("y");
 			});
 			process.WaitForCompletion(WaitTimeout);
 
