@@ -1,18 +1,27 @@
-using Elastic.ProcessManagement.Std;
+using System;
+using ProcNet.Std;
 
-namespace Elastic.ProcessManagement
+namespace Elastic.ManagedNode
 {
-	/// <summary>
-	/// Passing this to <see cref="ElasticsearchNode"/> as <see cref="IConsoleOutWriter"/>
-	/// will cause it to take ownership of writing to the console itself on a line per line basis.
-	/// Where as <see cref="IConsoleOutWriter"/> is always characters based. Therefor this implementation
-	/// itself never actually writes to the console
-	/// </summary>
-	public class HighlightElasticsearchLineConsoleOutWriter : ConsoleOutColorWriter
+	public interface IElasticsearchConsoleOutWriter
 	{
-		public override void Write(ConsoleOut consoleOut)
-		{
+		void Write(LineOut lineOut);
+		void Write(Exception e);
+	}
 
+	public class ElasticsearchConsoleOutWriter : IElasticsearchConsoleOutWriter
+	{
+		public void Write(LineOut lineOut)
+		{
+			var parsed = ElasticsearchConsoleOutParser.TryParse(lineOut.Line, out var date, out var level, out var section, out var node, out var message, out _);
+			if (parsed)
+				LineOutElasticsearchHighlighter.Write(lineOut.Error, date, level, section, node, message);
+			else Console.WriteLine(lineOut.Line);
+		}
+
+		public void Write(Exception e)
+		{
+			Console.Error.WriteLine(e.Message);
 		}
 	}
 }

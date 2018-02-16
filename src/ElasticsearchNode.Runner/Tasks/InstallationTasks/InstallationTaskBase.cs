@@ -1,15 +1,16 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
-using System.Runtime.InteropServices.ComTypes;
-using System.Threading.Tasks;
-using Elastic.ProcessManagement;
+using Elastic.ManagedNode.Configuration;
+using Elastic.Net.Abstractions.Plugins;
+using ProcNet;
+using ProcNet.Std;
 
 namespace Elastic.Net.Abstractions.Tasks.InstallationTasks
 {
 	public abstract class InstallationTaskBase
 	{
-		public abstract void Run(NodeConfiguration config, NodeFileSystem fileSystem);
+		public abstract void Run(NodeConfiguration config, NodeFileSystem fileSystem, ElasticsearchPlugin[] requiredPlugins);
 
 		private static bool IsMono { get; } = Type.GetType("Mono.Runtime") != null;
 		protected string BinarySuffix => IsMono || Path.PathSeparator == '/' ? "" : ".bat";
@@ -34,20 +35,14 @@ namespace Elastic.Net.Abstractions.Tasks.InstallationTasks
 		protected static void ExecuteBinary(string binary, string description, params string[] arguments)
 		{
 			Console.WriteLine($"Preparing to execute: {description} ...");
+
 			var timeout = TimeSpan.FromSeconds(420);
-			using (var p = new ObservableProcess(binary, arguments))
-			{
-				Console.WriteLine($"Executing: {binary} {string.Join(" ", arguments)}");
-				p.Subscribe(c => Console.Write(c.Characters),
-					(e) =>
-					{
-						Console.WriteLine($"Failed executing: {description} {e.Message} {e.StackTrace}");
-						throw e;
-					},
-					() => Console.WriteLine($"Finished executing {description} exit code: {p.ExitCode}"));
-				if (!p.WaitForCompletion(timeout))
-					throw new Exception($"Timeout while executing {description} exceeded {timeout}");
-			}
+			var result = Proc.Start(binary, timeout, new ConsoleOutColorWriter(), arguments);
+
+			if (!result.Completed)
+				throw new Exception($"Timeout while executing {description} exceeded {timeout}");
+
+			Console.WriteLine($"Finished executing {description} exit code: {result.ExitCode}");
 		}
 	}
 }

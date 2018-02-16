@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Elastic.ManagedNode.Configuration;
 
 namespace Elastic.Net.Abstractions.Tasks.AfterNodeStoppedTasks
 {

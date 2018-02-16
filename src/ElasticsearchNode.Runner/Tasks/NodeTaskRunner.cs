@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Elastic.ManagedNode.Configuration;
+using Elastic.Net.Abstractions.Plugins;
 using Elastic.Net.Abstractions.Tasks.AfterNodeStoppedTasks;
 using Elastic.Net.Abstractions.Tasks.BeforeStartNodeTasks;
 using Elastic.Net.Abstractions.Tasks.InstallationTasks;
@@ -46,20 +48,20 @@ namespace Elastic.Net.Abstractions.Tasks
 			new ValidateClusterStateTask()
 		};
 
-		public void Install(InstallationTaskBase[] additionalInstallationTasks)=>
+		public void Install(InstallationTaskBase[] additionalInstallationTasks, ElasticsearchPlugin[] requiredPlugins)=>
 			Itterate(
 				InstallationTasks.Concat(additionalInstallationTasks ?? Enumerable.Empty<InstallationTaskBase>()),
-				(t, n,  fs) => t.Run(n, fs)
+				(t, n,  fs) => t.Run(n, fs, requiredPlugins)
 			);
 
 		public void Dispose() =>
 			Itterate(NodeStoppedTasks, (t, n,  fs) => t.Run(n, fs));
 
-		public void OnBeforeStart(string [] serverSettings) =>
-			Itterate(BeforeStart, (t, n,  fs) => t.Run(n, fs, serverSettings), log: false);
+		public void OnBeforeStart() =>
+			Itterate(BeforeStart, (t, n,  fs) => t.Run(n, fs), log: false);
 
-		public void ValidateAfterStart(IElasticClient client) =>
-			Itterate(ValidationTasks, (t, n,  fs) => t.Validate(client, n), log: false);
+		public void ValidateAfterStart(IElasticClient client, ElasticsearchPlugin[] requiredPlugins) =>
+			Itterate(ValidationTasks, (t, n,  fs) => t.Validate(client, n, requiredPlugins), log: false);
 
 		private IList<string> GetCurrentRunnerLog()
 		{

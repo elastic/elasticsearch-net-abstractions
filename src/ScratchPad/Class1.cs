@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Reactive;
-using System.Threading;
-using Elastic.Net.Abstractions;
+using Elastic.ManagedNode;
+using Elastic.ManagedNode.Configuration;
 using Elastic.Net.Abstractions.Clusters;
-using Elastic.ProcessManagement;
-using Elastic.ProcessManagement.Std;
+using Elasticsearch.Net;
+using ProcNet.Std;
 
 namespace ScratchPad
 {
@@ -57,12 +55,18 @@ namespace ScratchPad
 //
 //			handle.WaitOne();
 
-			using (var cluster = new ElasticsearchCluster("5.5.1", instanceCount: 3))
+			using (var node = new ElasticsearchNode(new NodeConfiguration("5.5.1", "cluster-x", "node-y")))
 			{
-				cluster.Start();
-
-				Console.ReadKey();
+				node.Start(new ElasticsearchConsoleOutWriter());
+				node.WaitForStarted(TimeSpan.FromMinutes(2));
 			}
+
+//			using (var cluster = new ElasticsearchCluster("5.5.1", instanceCount: 3))
+//			{
+//				cluster.Start();
+//
+//				Console.ReadKey();
+//			}
 
 			return 0;
 		}

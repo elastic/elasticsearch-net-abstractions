@@ -1,11 +1,13 @@
 using System;
+using Elastic.ManagedNode.Configuration;
+using Elastic.Net.Abstractions.Plugins;
 using Nest;
 
 namespace Elastic.Net.Abstractions.Tasks.ValidationTasks
 {
 	public class ValidateRunningVersion : NodeValidationTaskBase
 	{
-		public override void Validate(IElasticClient client, NodeConfiguration configuration)
+		public override void Validate(IElasticClient client, NodeConfiguration configuration, ElasticsearchPlugin[] requiredPlugins)
 		{
 			var alreadyUp = client.RootNodeInfo();
 			if (!alreadyUp.IsValid) return;

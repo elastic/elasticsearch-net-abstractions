@@ -8,7 +8,7 @@ using System.Xml.Linq;
 using SemVer;
 using Version = SemVer.Version;
 
-namespace Elastic.Net.Abstractions
+namespace Elastic.ManagedNode.Configuration
 {
 	public class ElasticsearchVersion : Version
 	{
