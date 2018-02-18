@@ -16,16 +16,17 @@ namespace Elastic.Net.Abstractions.Clusters
 	{
 		private readonly string _uniqueSuffix = Guid.NewGuid().ToString("N").Substring(0, 6);
 		private readonly string _clusterName;
-		private readonly string[] _clusterSettings;
 
 		public string ClusterMoniker => "default";
 		public string ClusterName => this._clusterName ?? $"{this.ClusterMoniker}-cluster-{_uniqueSuffix}";
-		protected ClusterBase(ElasticsearchVersion version, int instanceCount = 1, string clusterName = null, string[] clusterSettings = null)
+
+		protected ClusterBase(ElasticsearchVersion version, int instanceCount = 1, string clusterName = null, Dictionary<string, string> clusterSettings = null)
 		{
 			this._clusterName = clusterName;
-			this._clusterSettings = clusterSettings;
+			clusterSettings = DefaultClusterSettings(instanceCount, clusterSettings);
+
 			var nodes = Enumerable.Range(9200, instanceCount)
-				.Select(p=> new NodeConfiguration(version, ClusterName, null, AdditonalNodeSettings(p), p))
+				.Select(p=> new NodeConfiguration(version, ClusterName, null, CreateNodeSpecificClusterSettings(p, clusterSettings), p))
 				.Select(n => new ElasticsearchNode(n)
 				{
 					AssumeStartedOnNotEnoughMasterPing = instanceCount > 1
@@ -37,10 +38,26 @@ namespace Elastic.Net.Abstractions.Clusters
 		}
 
 		public ReadOnlyCollection<ElasticsearchNode> Nodes { get; }
-
 		public virtual ElasticsearchPlugin[] RequiredPlugins { get; }
 
-		protected virtual Dictionary<string, string> ClusterSettings(int instanceCount) => null;
+		private static Dictionary<string, string> DefaultClusterSettings(int instanceCount, Dictionary<string, string> clusterSettings) =>
+			new Dictionary<string, string>(clusterSettings ?? new Dictionary<string, string>())
+            {
+                {"node.max_local_storage_nodes", $"{instanceCount}" },
+                {"discovery.zen.minimum_master_nodes", Quorum(instanceCount).ToString() }
+            };
+
+		protected static int Quorum(int instanceCount) => Math.Max(1, (int) Math.Floor((double) instanceCount / 2) + 1);
+
+		private Dictionary<string, string> CreateNodeSpecificClusterSettings(int port, Dictionary<string, string> clusterSettings)
+		{
+			var nodeSettings = AdditonalNodeSettings(port);
+			if (nodeSettings == null || nodeSettings.Count == 0) return clusterSettings;
+			var n = new Dictionary<string, string>(clusterSettings);
+			foreach (var kv in nodeSettings) n[kv.Key] = kv.Value;
+			return n;
+
+		}
 
 		protected virtual Dictionary<string, string> AdditonalNodeSettings(int port) => null;
 

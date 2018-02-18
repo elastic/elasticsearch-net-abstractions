@@ -8,6 +8,7 @@
     <InformationalVersion>$(ElasticsearchNodeRunnerCurrentVersion)</InformationalVersion>
     <AssemblyVersion>$(ElasticsearchNodeRunnerCurrentAssemblyVersion)</AssemblyVersion>
     <FileVersion>$(ElasticsearchNodeRunnerCurrentAssemblyFileVersion)</FileVersion>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ElasticsearchNode\ElasticsearchNode.csproj" />
