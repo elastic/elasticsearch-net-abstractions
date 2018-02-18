@@ -18,7 +18,6 @@ namespace Elastic.ManagedNode.Configuration
 		private static readonly ConcurrentDictionary<string, string> SnapshotVersions = new ConcurrentDictionary<string, string>();
 		private static readonly string SonaTypeUrl = "https://oss.sonatype.org/content/repositories/snapshots/org/elasticsearch/distribution/zip/elasticsearch";
 
-
 		private string RootUrl => this.IsSnapshot
 			? SonaTypeUrl
 			: Range.IsSatisfied("<5.0.0", this.Version)

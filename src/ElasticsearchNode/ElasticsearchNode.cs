@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using Elastic.ManagedNode.Configuration;
 using ProcNet;
@@ -51,6 +52,8 @@ namespace Elastic.ManagedNode
 		public void Start(IElasticsearchConsoleOutWriter writer)
 		{
 			this._writer = writer;
+			writer.Write(ConsoleOut.Out($"Elasticsearch: {this.Binary}"));
+			writer.Write(ConsoleOut.Out($"Settings: {string.Join(" ", this.NodeConfiguration.CommandLineArguments)}"));
 			this.SubscribeLines(l => writer?.Write(l), e => writer?.Write(e), delegate {});
 		}
 

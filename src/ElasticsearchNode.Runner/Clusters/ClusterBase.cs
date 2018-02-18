@@ -14,10 +14,16 @@ namespace Elastic.Net.Abstractions.Clusters
 {
 	public abstract class ClusterBase : IDisposable
 	{
+		private readonly string _uniqueSuffix = Guid.NewGuid().ToString("N").Substring(0, 6);
+		private readonly string _clusterName;
+
+		public string ClusterMoniker => "default";
+		public string ClusterName => this._clusterName ?? $"{this.ClusterMoniker}-cluster-{_uniqueSuffix}";
 		protected ClusterBase(ElasticsearchVersion version, int instanceCount = 1, string clusterName = null, string[] additionalSettings = null)
 		{
+			this._clusterName = clusterName;
 			var nodes = Enumerable.Range(9200, instanceCount)
-				.Select(p=> new NodeConfiguration(version, clusterName, null, AdditonalNodeSettings(p), p))
+				.Select(p=> new NodeConfiguration(version, clusterName, this.ClusterName, AdditonalNodeSettings(p), p))
 				.Select(n => new ElasticsearchNode(n)
 				{
 					AssumeStartedOnNotEnoughMasterPing = instanceCount > 1
@@ -69,20 +75,23 @@ namespace Elastic.Net.Abstractions.Clusters
 		{
 		}
 
-		public void Start(TimeSpan waitTimeout = default(TimeSpan))
+		public void Start(IElasticsearchConsoleOutWriter writer)
 		{
+			writer = writer ?? new ElasticsearchConsoleOutWriter();
 			this.TaskRunner.Install(this.AdditionalInstallationTasks, this.RequiredPlugins);
 			this.TaskRunner.OnBeforeStart();
 
+			//foreach (var node in this.Nodes)
 			foreach (var node in this.Nodes)
 			{
-				var started = node.WaitForStarted(waitTimeout);
+				node.Start(writer);
+				var started = node.WaitForStarted(TimeSpan.FromSeconds(120));
 				if (!started)
 					throw new Exception($"failed to start cluster node {node.DesiredPort}");
 			}
 
 			this.Started = true;
-			this.TaskRunner.ValidateAfterStart(this.Client, this.RequiredPlugins);
+			this.TaskRunner.ValidateAfterStart(this.Client, this.RequiredPlugins ?? new ElasticsearchPlugin[]{});
 //			if (this.Node.Port != this.Node.)
 //				throw new Exception($"The cluster that was started of type {this.GetType().Name} runs on {this.Node.Port} but this cluster wants {this.DesiredPort}");
 			this.SeedNode();

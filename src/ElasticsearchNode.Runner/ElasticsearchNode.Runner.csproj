@@ -11,7 +11,8 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ElasticsearchNode\ElasticsearchNode.csproj" />
-    <ProjectReference Include="..\..\..\..\proc\src\Proc\Proc.csproj" />
+    <!--<ProjectReference Include="..\..\..\..\proc\src\Proc\Proc.csproj" />-->
+    <PackageReference Include="Proc" Version="0.1.3" />
     <PackageReference Include="NEST" Version="5.5.0" />
     <PackageReference Include="SemanticVersioning" Version="0.8.0" />
   </ItemGroup>

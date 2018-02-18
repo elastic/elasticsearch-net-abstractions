@@ -55,18 +55,18 @@ namespace ScratchPad
 //
 //			handle.WaitOne();
 
-			using (var node = new ElasticsearchNode(new NodeConfiguration("5.5.1", "cluster-x", "node-y")))
-			{
-				node.Start(new ElasticsearchConsoleOutWriter());
-				node.WaitForStarted(TimeSpan.FromMinutes(2));
-			}
-
-//			using (var cluster = new ElasticsearchCluster("5.5.1", instanceCount: 3))
+//			using (var node = new ElasticsearchNode(new NodeConfiguration("5.5.1", "cluster-x", "node-y")))
 //			{
-//				cluster.Start();
-//
-//				Console.ReadKey();
+//				node.Start(new ElasticsearchConsoleOutWriter());
+//				node.WaitForStarted(TimeSpan.FromMinutes(2));
 //			}
+
+			using (var cluster = new ElasticsearchCluster("5.5.1", instanceCount: 2))
+			{
+				cluster.Start(new ElasticsearchConsoleOutWriter());
+
+				Console.ReadKey();
+			}
 
 			return 0;
 		}
