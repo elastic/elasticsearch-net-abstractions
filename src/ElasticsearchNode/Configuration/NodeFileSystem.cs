@@ -2,7 +2,7 @@
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace Elastic.Net.Abstractions
+namespace Elastic.ManagedNode.Configuration
 {
 	public class NodeFileSystem
 	{

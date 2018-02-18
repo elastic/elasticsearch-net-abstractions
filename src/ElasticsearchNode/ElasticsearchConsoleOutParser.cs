@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
-namespace Elastic.ProcessManagement
+namespace Elastic.ManagedNode
 {
 	public static class ElasticsearchConsoleOutParser
 	{
@@ -33,16 +33,14 @@ namespace Elastic.ProcessManagement
 			new Regex(@"\[(?<date>.*?)\]\[(?<level>.*?)\](?:\[(?<section>.*?)\])?(?: \[(?<node>.*?)\])? (?<message>.+)");
 
 		public static bool TryParse(string line,
-			out string date, out string level, out string section, out string node, out string message, out bool started, out bool matched)
+			out string date, out string level, out string section, out string node, out string message, out bool started)
 		{
 			date = level = section = node = message = string.Empty;
 			started = false;
-			matched = true;
 			if (string.IsNullOrEmpty(line)) return false;
 
 			var match = ConsoleLineParser.Match(line);
-			matched = match.Success;
-			if (!matched) return false;
+			if (!match.Success) return false;
 			date = match.Groups["date"].Value.Trim();
 			level = match.Groups["level"].Value.Trim();
 			section = match.Groups["section"].Value.Trim().Replace("org.elasticsearch.", "");

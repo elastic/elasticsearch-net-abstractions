@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Elastic.ManagedNode;
+using Elastic.ManagedNode.Configuration;
+using Elastic.Net.Abstractions.Plugins;
 using Elastic.Net.Abstractions.Tasks;
 using Elastic.Net.Abstractions.Tasks.InstallationTasks;
-using Elastic.ProcessManagement;
 using Elasticsearch.Net;
 using Nest;
 
@@ -12,32 +14,31 @@ namespace Elastic.Net.Abstractions.Clusters
 {
 	public abstract class ClusterBase : IDisposable
 	{
+		private readonly string _uniqueSuffix = Guid.NewGuid().ToString("N").Substring(0, 6);
+		private readonly string _clusterName;
+
+		public string ClusterMoniker => "default";
+		public string ClusterName => this._clusterName ?? $"{this.ClusterMoniker}-cluster-{_uniqueSuffix}";
 		protected ClusterBase(ElasticsearchVersion version, int instanceCount = 1, string clusterName = null, string[] additionalSettings = null)
 		{
-			var n = new NodeConfiguration(version, clusterName, null);
-			this.NodeConfiguration = n;
-
-			var nodeSettings = n.CreateSettings(additionalSettings);
-			this.NodeSettings = nodeSettings;
-			var fs = this.NodeConfiguration.FileSystem;
+			this._clusterName = clusterName;
 			var nodes = Enumerable.Range(9200, instanceCount)
-				.Select(p => new ElasticsearchNode(fs.Binary, n.CreateSettings(nodeSettings, NodeSpecificSettings(p)))
+				.Select(p=> new NodeConfiguration(version, clusterName, this.ClusterName, AdditonalNodeSettings(p), p))
+				.Select(n => new ElasticsearchNode(n)
 				{
-					DesiredPort = p,
 					AssumeStartedOnNotEnoughMasterPing = instanceCount > 1
 				})
 				.ToList();
 			this.Nodes = new ReadOnlyCollection<ElasticsearchNode>(nodes);
-			this.TaskRunner = new NodeTaskRunner(this.NodeConfiguration);
-		}
-
-		protected virtual IEnumerable<string> NodeSpecificSettings(int port)
-		{
-			yield return $"http.port={port}";
+			var config = this.Nodes.First().NodeConfiguration;
+			this.TaskRunner = new NodeTaskRunner(config);
 		}
 
 		public ReadOnlyCollection<ElasticsearchNode> Nodes { get; }
-		private NodeConfiguration NodeConfiguration { get; }
+
+		public virtual ElasticsearchPlugin[] RequiredPlugins { get; }
+		protected virtual Dictionary<string, string> AdditonalNodeSettings(int port) => null;
+
 		private NodeTaskRunner TaskRunner { get; }
 		private bool Started { get; set; }
 
@@ -74,26 +75,29 @@ namespace Elastic.Net.Abstractions.Clusters
 		{
 		}
 
-		public void Start(TimeSpan waitTimeout = default(TimeSpan))
+		public void Start(IElasticsearchConsoleOutWriter writer)
 		{
-			this.TaskRunner.Install(this.AdditionalInstallationTasks);
-			var nodeSettings = this.NodeConfiguration.CreateSettings(this.NodeSettings);
-			this.TaskRunner.OnBeforeStart(nodeSettings);
+			writer = writer ?? new ElasticsearchConsoleOutWriter();
+			this.TaskRunner.Install(this.AdditionalInstallationTasks, this.RequiredPlugins);
+			this.TaskRunner.OnBeforeStart();
 
+			//foreach (var node in this.Nodes)
 			foreach (var node in this.Nodes)
 			{
-				var started = node.Start(waitTimeout);
+				node.Start(writer);
+				var started = node.WaitForStarted(TimeSpan.FromSeconds(120));
 				if (!started)
-					throw new CleanExitException($"failed to start cluster node {node.DesiredPort}");
+					throw new Exception($"failed to start cluster node {node.DesiredPort}");
 			}
 
 			this.Started = true;
-			this.TaskRunner.ValidateAfterStart(this.Client);
+			this.TaskRunner.ValidateAfterStart(this.Client, this.RequiredPlugins ?? new ElasticsearchPlugin[]{});
 //			if (this.Node.Port != this.Node.)
 //				throw new Exception($"The cluster that was started of type {this.GetType().Name} runs on {this.Node.Port} but this cluster wants {this.DesiredPort}");
 			this.SeedNode();
 
 		}
+
 
 		public void WaitForExit(TimeSpan waitForCompletion)
 		{

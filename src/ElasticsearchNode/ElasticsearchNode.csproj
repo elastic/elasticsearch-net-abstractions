@@ -2,16 +2,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\build\Versioning.targets" />
   <PropertyGroup>
-    <AssemblyName>ElasticsearchNode</AssemblyName>
+    <AssemblyName>ManagedNode</AssemblyName>
     <TargetFramework>netstandard1.3</TargetFramework>
-    <RootNamespace>Elastic.ProcessManagement</RootNamespace>
+    <RootNamespace>Elastic.ManagedNode</RootNamespace>
     <Version>$(ElasticsearchNodeCurrentVersion)</Version>
     <InformationalVersion>$(ElasticsearchNodeCurrentVersion)</InformationalVersion>
     <AssemblyVersion>$(ElasticsearchNodeCurrentAssemblyVersion)</AssemblyVersion>
     <FileVersion>$(ElasticsearchNodeCurrentAssemblyFileVersion)</FileVersion>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ObservableProcess\ObservableProcess.csproj" />
-    <PackageReference Include="System.Reactive.Linq" Version="3.1.1" />
+    <!--<ProjectReference Include="..\..\..\..\proc\src\Proc\Proc.csproj" />-->
+    <PackageReference Include="Proc" Version="0.1.3" />
+    <PackageReference Include="System.Reactive.Linq" Version="4.0.0-preview00001" />
+    <PackageReference Include="SemanticVersioning" Version="0.8.0" />
   </ItemGroup>
 </Project>

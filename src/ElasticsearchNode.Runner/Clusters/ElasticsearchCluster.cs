@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Elastic.ManagedNode.Configuration;
 using Nest;
 
 namespace Elastic.Net.Abstractions.Clusters

@@ -1,51 +1,39 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
-using Elastic.ProcessManagement.Abstractions;
-using Elastic.ProcessManagement.Std;
-using static Elastic.ProcessManagement.ElasticsearchConsoleOutParser;
+using System.Threading;
+using Elastic.ManagedNode.Configuration;
+using ProcNet;
+using ProcNet.Std;
 
-namespace Elastic.ProcessManagement
+namespace Elastic.ManagedNode
 {
-	public class ElasticsearchNode : ConfirmedStartedStateProcessBase<ObservableProcess>
+	public class ElasticsearchNode : ObservableProcess
 	{
-		protected override string PrintableName { get; } = "elasticsearch-node";
-
 		public string Version { get; private set; }
-		public int? JavaProcessId { get; private set; }
 		public int DesiredPort { get; set; } = 9200;
 		public int? Port { get; private set; }
-		public bool Started { get; private set; }
+		public bool NodeStarted { get; private set; }
+		public NodeConfiguration NodeConfiguration { get; }
 
-		private bool Highlight { get; }
 
-		private bool _writeToConsoleAfterStarted;
-		public bool WriteToConsoleAfterStarted
+		private int? JavaProcessId { get; set; }
+		public override int? ProcessId => this.JavaProcessId ?? base.ProcessId;
+		public int? HostProcessId => base.ProcessId;
+
+		public ElasticsearchNode(NodeConfiguration config) : base(StartArgs(config))
 		{
-			get => _writeToConsoleAfterStarted;
-			set
+			this.NodeConfiguration = config;
+		}
+
+		private static StartArguments StartArgs(NodeConfiguration config) =>
+			new StartArguments(config.FileSystem.Binary, config.CommandLineArguments)
 			{
-				if (this.Highlight)
-					this.SubscribeToMessagesAfterStartedConfirmation = value;
-				else
-					this.ConsoleWriterSubscribesAfterStarted = value;
-				_writeToConsoleAfterStarted = value;
-			}
-		}
-
-		public ElasticsearchNode(string binary, params string[] arguments)
-			: this(new ObservableProcess(binary, arguments), new HighlightElasticsearchLineConsoleOutWriter()) { }
-
-		public ElasticsearchNode(ObservableProcess process, IConsoleOutWriter writer)
-			: base(ShouldWaitForExit(process), writer is HighlightElasticsearchLineConsoleOutWriter ? null : writer)
-		{
-			this.Highlight = writer is HighlightElasticsearchLineConsoleOutWriter;
-			this.WriteToConsoleAfterStarted = true;
-		}
+				SendControlCFirst = true
+			};
 
 		public bool AssumeStartedOnNotEnoughMasterPing { get; set; }
-		protected bool AssumedStartedStateChecker(string section, string message)
+
+		private bool AssumedStartedStateChecker(string section, string message)
 		{
 			if (AssumeStartedOnNotEnoughMasterPing
 			    && section.Contains("ZenDiscovery")
@@ -54,64 +42,67 @@ namespace Elastic.ProcessManagement
 			return false;
 		}
 
-		protected override bool HandleMessage(LineOut c)
-		{
-			//already confirmed started so we can early exit unless we want to write the line highlighted to console
-			if (this.Started && !this.Highlight) return false;
 
-			var parsed =
-				TryParse(c.Line, out string date, out string level, out string section, out string node,
-					out string message, out bool started, out bool matched)
-				&& started;
+		private readonly ManualResetEvent _startedHandle = new ManualResetEvent(false);
+		private bool _waitingForStarted;
+		private bool _exitedBeforeStarted;
+
+		private IElasticsearchConsoleOutWriter _writer;
+		public void Start() => this.Start(null);
+		public void Start(IElasticsearchConsoleOutWriter writer)
+		{
+			this._writer = writer;
+			writer.Write(ConsoleOut.Out($"Elasticsearch: {this.Binary}"));
+			writer.Write(ConsoleOut.Out($"Settings: {string.Join(" ", this.NodeConfiguration.CommandLineArguments)}"));
+			this.SubscribeLines(l => writer?.Write(l), e => writer?.Write(e), delegate {});
+		}
+
+		public bool WaitForStarted(TimeSpan timeout)
+		{
+			_waitingForStarted = true;
+			if (this._startedHandle.WaitOne(timeout)) return !_exitedBeforeStarted;
+			_waitingForStarted = false;
+			return false;
+		}
+
+		protected override void OnBeforeSetCompletedHandle()
+		{
+			this._exitedBeforeStarted = _waitingForStarted;
+			this._startedHandle.Set();
+			base.OnBeforeSetCompletedHandle();
+		}
+
+		protected override bool KeepBufferingLines(LineOut c)
+		{
+			//if the node is already started only keep buffering lines while we have a writer;
+			if (this.NodeStarted) return this._writer != null;
+
+			var parsed = ElasticsearchConsoleOutParser.TryParse(c.Line, out _, out _, out var section, out _, out var message, out var started);
 
 			if (!started) started = AssumedStartedStateChecker(section, message);
+			if (started)
+			{
+				this.NodeStarted = true;
+				this._startedHandle.Set();
+			}
 
-			if (this.Highlight && matched)
-				LineOutElasticsearchHighlighter.Write(c.Error, date, level, section, node, message);
-			else if (this.Highlight)
-				if (c.Error) Console.Error.WriteLine(c.Line);
-				else Console.WriteLine(c.Line);
+			if (!parsed) return this._writer != null;
 
-			//already confirmed started so we can early exit.
-			if (this.Started) return false;
-
-			if (started) this.Started = true;
-
-			string version;
-			int? pid;
-			int port;
-
-			if (this.JavaProcessId == null && TryParseNodeInfo(section, message, out version, out pid))
+			if (this.JavaProcessId == null && ElasticsearchConsoleOutParser.TryParseNodeInfo(section, message, out var version, out var pid))
 			{
 				this.JavaProcessId = pid;
 				this.Version = version;
 			}
-			else if (TryGetPortNumber(section, message, out port))
+			else if (ElasticsearchConsoleOutParser.TryGetPortNumber(section, message, out var port))
 			{
 				this.Port = port;
-				if (this.Port != this.DesiredPort)
-					throw new CleanExitException("Node started on port {}");
-
+				if (this.Port != this.DesiredPort) throw new CleanExitException($"Node started on port {port} but {this.DesiredPort} was requested");
 			}
-			return started;
-		}
 
-		private static ObservableProcess ShouldWaitForExit(ObservableProcess p)
-		{
-			p.WaitForExit = p.Binary.EndsWith(".exe") ? (TimeSpan?) TimeSpan.FromSeconds(2) : null;
-			return p;
-		}
-
-		protected override void OnBeforeStop()
-		{
-			var esProcess = this.JavaProcessId == null ? null : Process.GetProcesses().FirstOrDefault(p => p.Id == this.JavaProcessId.Value);
-			if (esProcess != null)
-			{
-				Console.WriteLine($"Killing elasticsearch PID {this.JavaProcessId}");
-				esProcess.Kill();
-				esProcess.Dispose();
-			}
-			base.OnBeforeStop();
+			// if we have a writer always return true
+			if (this._writer != null) return true;
+			//otherwise only keep buffering if we are not started
+			return !started;
 		}
 	}
 }

@@ -1,19 +1,20 @@
 using System;
 using System.IO;
 using System.Linq;
+using Elastic.ManagedNode.Configuration;
 using Elastic.Net.Abstractions.Plugins;
 
 namespace Elastic.Net.Abstractions.Tasks.InstallationTasks
 {
 	public class InstallPlugins : InstallationTaskBase
 	{
-		public override void Run(NodeConfiguration config, NodeFileSystem fileSystem)
+		public override void Run(NodeConfiguration config, NodeFileSystem fileSystem, ElasticsearchPlugin[] requiredPlugins)
 		{
 			var v = config.ElasticsearchVersion;
 			//on 2.x we so not support tests requiring plugins for 2.x since we can not reliably install them
 			if (v.IsSnapshot && v.Major == 2) return;
 			var plugins =
-				from plugin in config.RequiredPlugins
+				from plugin in requiredPlugins
 				let validForCurrentVersion = plugin.IsValid(v)
 				let alreadyInstalled = AlreadyInstalled(plugin, fileSystem)
 				where !alreadyInstalled && validForCurrentVersion

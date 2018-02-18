@@ -8,7 +8,7 @@ using System.Xml.Linq;
 using SemVer;
 using Version = SemVer.Version;
 
-namespace Elastic.Net.Abstractions
+namespace Elastic.ManagedNode.Configuration
 {
 	public class ElasticsearchVersion : Version
 	{
@@ -17,7 +17,6 @@ namespace Elastic.Net.Abstractions
 		private static readonly object _lock = new { };
 		private static readonly ConcurrentDictionary<string, string> SnapshotVersions = new ConcurrentDictionary<string, string>();
 		private static readonly string SonaTypeUrl = "https://oss.sonatype.org/content/repositories/snapshots/org/elasticsearch/distribution/zip/elasticsearch";
-
 
 		private string RootUrl => this.IsSnapshot
 			? SonaTypeUrl
