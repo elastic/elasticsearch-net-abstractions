@@ -16,14 +16,16 @@ namespace Elastic.Net.Abstractions.Clusters
 	{
 		private readonly string _uniqueSuffix = Guid.NewGuid().ToString("N").Substring(0, 6);
 		private readonly string _clusterName;
+		private readonly string[] _clusterSettings;
 
 		public string ClusterMoniker => "default";
 		public string ClusterName => this._clusterName ?? $"{this.ClusterMoniker}-cluster-{_uniqueSuffix}";
-		protected ClusterBase(ElasticsearchVersion version, int instanceCount = 1, string clusterName = null, string[] additionalSettings = null)
+		protected ClusterBase(ElasticsearchVersion version, int instanceCount = 1, string clusterName = null, string[] clusterSettings = null)
 		{
 			this._clusterName = clusterName;
+			this._clusterSettings = clusterSettings;
 			var nodes = Enumerable.Range(9200, instanceCount)
-				.Select(p=> new NodeConfiguration(version, clusterName, this.ClusterName, AdditonalNodeSettings(p), p))
+				.Select(p=> new NodeConfiguration(version, ClusterName, null, AdditonalNodeSettings(p), p))
 				.Select(n => new ElasticsearchNode(n)
 				{
 					AssumeStartedOnNotEnoughMasterPing = instanceCount > 1
@@ -37,6 +39,9 @@ namespace Elastic.Net.Abstractions.Clusters
 		public ReadOnlyCollection<ElasticsearchNode> Nodes { get; }
 
 		public virtual ElasticsearchPlugin[] RequiredPlugins { get; }
+
+		protected virtual Dictionary<string, string> ClusterSettings(int instanceCount) => null;
+
 		protected virtual Dictionary<string, string> AdditonalNodeSettings(int port) => null;
 
 		private NodeTaskRunner TaskRunner { get; }

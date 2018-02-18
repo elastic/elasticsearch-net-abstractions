@@ -1,6 +1,6 @@
 type project
 
-id ObservableProcess
+id Elasticsearch.Managed.Node
 
 licenseUrl http://opensource.org/licenses/MIT
 title

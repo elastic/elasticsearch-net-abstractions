@@ -8,17 +8,15 @@ open Fake
 module Projects = 
 
     type Project =
-        | ObservableProcess
         | ElasticsearchNode
         | ElasticsearchNodeRunner
 
-        static member All = [ObservableProcess; ElasticsearchNode; ElasticsearchNodeRunner]
+        static member All = [ElasticsearchNode; ElasticsearchNodeRunner]
 
     type ProjectInfo = { name: string; project: Project}
 
     let nameOf project = 
         match project with
-        | ObservableProcess -> "ObservableProcess"
         | ElasticsearchNode -> "ElasticsearchNode"
         | ElasticsearchNodeRunner -> "ElasticsearchNode.Runner"
 

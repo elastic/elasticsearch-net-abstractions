@@ -17,11 +17,12 @@ module Tests =
     open System
 
     let private dotnetTest() =
-        CreateDir Paths.BuildOutput
-        let command = ["xunit"; "-parallel"; "none"; "-xml"; "../.." @@ Paths.Output("ObservableProcess.Tests.xml")] 
-
-        let dotnet = Tooling.BuildTooling("dotnet")
-        dotnet.ExecIn "src/ObservableProcess.Tests" command |> ignore
+//        CreateDir Paths.BuildOutput
+//        let command = ["xunit"; "-parallel"; "none"; "-xml"; "../.." @@ Paths.Output("ObservableProcess.Tests.xml")] 
+//
+//        let dotnet = Tooling.BuildTooling("dotnet")
+//        dotnet.ExecIn "src/ObservableProcess.Tests" command |> ignore
+        ignore()
 
     let RunUnitTests() = dotnetTest()
 
