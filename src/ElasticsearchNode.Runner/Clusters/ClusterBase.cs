@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using Elastic.ManagedNode;
 using Elastic.ManagedNode.Configuration;
 using Elastic.Net.Abstractions.Plugins;
@@ -56,7 +57,6 @@ namespace Elastic.Net.Abstractions.Clusters
 			var n = new Dictionary<string, string>(clusterSettings);
 			foreach (var kv in nodeSettings) n[kv.Key] = kv.Value;
 			return n;
-
 		}
 
 		protected virtual Dictionary<string, string> AdditonalNodeSettings(int port) => null;
@@ -107,10 +107,11 @@ namespace Elastic.Net.Abstractions.Clusters
 			foreach (var node in this.Nodes)
 			{
 				node.Start(writer);
-				var started = node.WaitForStarted(TimeSpan.FromSeconds(120));
-				if (!started)
-					throw new Exception($"failed to start cluster node {node.DesiredPort}");
 			}
+
+			var waitHandles = this.Nodes.Select(w => w.StartedHandle).ToArray();
+			if (!WaitHandle.WaitAll(waitHandles, TimeSpan.FromSeconds(120)))
+				throw new Exception($"Not all nodes started on time");
 
 			this.Started = true;
 			this.TaskRunner.ValidateAfterStart(this.Client, this.RequiredPlugins ?? new ElasticsearchPlugin[]{});
@@ -130,8 +131,8 @@ namespace Elastic.Net.Abstractions.Clusters
 		public void Dispose()
 		{
 			this.Started = false;
-			foreach (var node in this.Nodes)
-				node?.Dispose();
+			foreach (var node in this.Nodes) node.SendControlC();
+			foreach (var node in this.Nodes) node?.Dispose();
 			this.TaskRunner?.Dispose();
 		}
 	}

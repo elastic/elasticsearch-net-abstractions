@@ -43,10 +43,6 @@ namespace Elastic.ManagedNode
 		}
 
 
-		private readonly ManualResetEvent _startedHandle = new ManualResetEvent(false);
-		private bool _waitingForStarted;
-		private bool _exitedBeforeStarted;
-
 		private IElasticsearchConsoleOutWriter _writer;
 		public void Start() => this.Start(null);
 		public void Start(IElasticsearchConsoleOutWriter writer)
@@ -57,17 +53,12 @@ namespace Elastic.ManagedNode
 			this.SubscribeLines(l => writer?.Write(l), e => writer?.Write(e), delegate {});
 		}
 
-		public bool WaitForStarted(TimeSpan timeout)
-		{
-			_waitingForStarted = true;
-			if (this._startedHandle.WaitOne(timeout)) return !_exitedBeforeStarted;
-			_waitingForStarted = false;
-			return false;
-		}
+		private readonly ManualResetEvent _startedHandle = new ManualResetEvent(false);
+		public WaitHandle StartedHandle => _startedHandle;
+		public bool WaitForStarted(TimeSpan timeout) => this._startedHandle.WaitOne(timeout);
 
 		protected override void OnBeforeSetCompletedHandle()
 		{
-			this._exitedBeforeStarted = _waitingForStarted;
 			this._startedHandle.Set();
 			base.OnBeforeSetCompletedHandle();
 		}
