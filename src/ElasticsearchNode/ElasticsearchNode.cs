@@ -42,14 +42,14 @@ namespace Elastic.ManagedNode
 			return false;
 		}
 
-
 		private IElasticsearchConsoleOutWriter _writer;
 		public void Start() => this.Start(null);
 		public void Start(IElasticsearchConsoleOutWriter writer)
 		{
 			this._writer = writer;
-			writer.Write(ConsoleOut.Out($"Elasticsearch: {this.Binary}"));
-			writer.Write(ConsoleOut.Out($"Settings: {string.Join(" ", this.NodeConfiguration.CommandLineArguments)}"));
+
+			writer.Write(ConsoleOut.Out($"[{DateTime.UtcNow:yyyy-MM-ddThh:mm:ss,FFF}][INFO ] [\t] Elasticsearch location: [{this.Binary}]"));
+			writer.Write(ConsoleOut.Out($"[{DateTime.UtcNow:yyyy-MM-ddThh:mm:ss,FFF}][INFO ] [\t] Settings: {{{string.Join(" ", this.NodeConfiguration.CommandLineArguments)}}}"));
 			this.SubscribeLines(l => writer?.Write(l), e => writer?.Write(e), delegate {});
 		}
 

@@ -115,8 +115,12 @@ namespace Elastic.Net.Abstractions.Clusters
 
 			this.Started = true;
 			this.TaskRunner.ValidateAfterStart(this.Client, this.RequiredPlugins ?? new ElasticsearchPlugin[]{});
-//			if (this.Node.Port != this.Node.)
-//				throw new Exception($"The cluster that was started of type {this.GetType().Name} runs on {this.Node.Port} but this cluster wants {this.DesiredPort}");
+//			foreach (var node in this.Nodes)
+//			{
+//				if (node.Port != node.DesiredPort)
+//					throw new Exception($"The cluster that was started of type {this.GetType().Name} has a node on port {node.Port} but it should've been {node.DesiredPort}");
+//
+//			}
 			this.SeedNode();
 
 		}

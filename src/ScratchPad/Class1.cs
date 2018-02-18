@@ -18,11 +18,11 @@ namespace ScratchPad
 //				node.WaitForStarted(TimeSpan.FromMinutes(2));
 //			}
 
-			using (var cluster = new ElasticsearchCluster("5.5.1", instanceCount: 2))
+			using (var cluster = new ElasticsearchCluster("5.5.1", instanceCount: 1))
 			{
 				cluster.Start(new ElasticsearchConsoleOutWriter());
 
-				Console.ReadKey();
+				//Console.ReadKey();
 			}
 
 			return 0;
