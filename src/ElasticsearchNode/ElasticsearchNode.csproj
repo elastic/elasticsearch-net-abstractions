@@ -2,9 +2,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\build\Versioning.targets" />
   <PropertyGroup>
-    <AssemblyName>ManagedNode</AssemblyName>
+    <AssemblyName>Elastic.Managed</AssemblyName>
     <TargetFramework>netstandard1.3</TargetFramework>
-    <RootNamespace>Elastic.ManagedNode</RootNamespace>
+    <RootNamespace>Elastic.Managed</RootNamespace>
     <Version>$(ElasticsearchNodeCurrentVersion)</Version>
     <InformationalVersion>$(ElasticsearchNodeCurrentVersion)</InformationalVersion>
     <AssemblyVersion>$(ElasticsearchNodeCurrentAssemblyVersion)</AssemblyVersion>

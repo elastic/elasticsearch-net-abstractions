@@ -1,12 +1,13 @@
 using System;
 using System.IO;
 using Elastic.ManagedNode.Configuration;
+using Elastic.Net.Abstractions.Clusters;
 
 namespace Elastic.Net.Abstractions.Tasks.AfterNodeStoppedTasks
 {
 	public class CleanUpDirectoriesAfterNodeStopped : AfterNodeStoppedTaskBase
 	{
-		public override void Run(NodeConfiguration config, NodeFileSystem fs)
+		public override void Run(EphimeralClusterBase cluster, INodeFileSystem fs)
 		{
 			if (Directory.Exists(fs.DataPath))
 			{
@@ -16,7 +17,7 @@ namespace Elastic.Net.Abstractions.Tasks.AfterNodeStoppedTasks
 
 			if (Directory.Exists(fs.LogsPath))
 			{
-				var files = Directory.GetFiles(fs.LogsPath, config.ClusterName + "*.log");
+				var files = Directory.GetFiles(fs.LogsPath, fs.ClusterName + "*.log");
 				foreach (var f in files)
 				{
 					Console.WriteLine($"attempting to delete log file: {f}");

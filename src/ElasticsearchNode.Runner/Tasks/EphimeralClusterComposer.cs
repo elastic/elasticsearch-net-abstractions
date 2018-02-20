@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Elastic.ManagedNode.Cluster;
 using Elastic.ManagedNode.Configuration;
+using Elastic.Net.Abstractions.Clusters;
 using Elastic.Net.Abstractions.Plugins;
 using Elastic.Net.Abstractions.Tasks.AfterNodeStoppedTasks;
 using Elastic.Net.Abstractions.Tasks.BeforeStartNodeTasks;
@@ -12,15 +14,12 @@ using Nest;
 
 namespace Elastic.Net.Abstractions.Tasks
 {
-	public class NodeTaskRunner : IDisposable
+	public class EphimeralClusterComposer : IClusterComposer
 	{
-		public NodeConfiguration NodeConfiguration { get; }
+		private EphimeralClusterBase Cluster { get; }
 		private static readonly object Lock = new object();
 
-		public NodeTaskRunner(NodeConfiguration nodeConfiguration)
-		{
-			this.NodeConfiguration = nodeConfiguration;
-		}
+		public EphimeralClusterComposer(EphimeralClusterBase cluster) => this.Cluster = cluster;
 
 		private static IEnumerable<InstallationTaskBase> InstallationTasks { get; } = new List<InstallationTaskBase>
 		{
@@ -48,42 +47,38 @@ namespace Elastic.Net.Abstractions.Tasks
 			new ValidateClusterStateTask()
 		};
 
-		public void Install(InstallationTaskBase[] additionalInstallationTasks, ElasticsearchPlugin[] requiredPlugins)=>
-			Itterate(
-				InstallationTasks.Concat(additionalInstallationTasks ?? Enumerable.Empty<InstallationTaskBase>()),
-				(t, n,  fs) => t.Run(n, fs, requiredPlugins)
-			);
+		public void OnStop() => Itterate(NodeStoppedTasks, (t, c, fs) => t.Run(c, fs));
 
-		public void Dispose() =>
-			Itterate(NodeStoppedTasks, (t, n,  fs) => t.Run(n, fs));
+		public void Install()=> Itterate(InstallationTasks, (t, c, fs) => t.Run(c, fs));
 
-		public void OnBeforeStart() =>
-			Itterate(BeforeStart, (t, n,  fs) => t.Run(n, fs), log: false);
+		public void OnBeforeStart() => Itterate(BeforeStart, (t, c, fs) => t.Run(c, fs), log: false);
 
-		public void ValidateAfterStart(IElasticClient client, ElasticsearchPlugin[] requiredPlugins) =>
-			Itterate(ValidationTasks, (t, n,  fs) => t.Validate(client, n, requiredPlugins), log: false);
+		public void ValidateAfterStart() => Itterate(ValidationTasks, (t, c, fs) => t.Validate(c, fs), log: false);
 
 		private IList<string> GetCurrentRunnerLog()
 		{
-			var log = this.NodeConfiguration.FileSystem.TaskRunnerFile;
-			return !File.Exists(log) ? new List<string>() : File.ReadAllLines(log).ToList();
-		}
-		private void LogTasks(IList<string> logs)
-		{
-			var log = this.NodeConfiguration.FileSystem.TaskRunnerFile;
-			File.WriteAllText(log, string.Join(Environment.NewLine, logs));
+			var file = TaskRunnerLogFile;
+			return !File.Exists(file) ? new List<string>() : File.ReadAllLines(file).ToList();
 		}
 
-		private void Itterate<T>(IEnumerable<T> collection, Action<T, NodeConfiguration, NodeFileSystem> act, bool log = true)
+		private string TaskRunnerLogFile => Path.Combine(this.Cluster.FileSystem.LocalFolder, "taskrunner.log");
+
+		private void LogTasks(IEnumerable<string> logs)
 		{
-			lock (NodeTaskRunner.Lock)
+			var file = Path.Combine(this.Cluster.FileSystem.LocalFolder, "taskrunner.log");
+			File.WriteAllText(file, string.Join(Environment.NewLine, logs));
+		}
+
+		private void Itterate<T>(IEnumerable<T> collection, Action<T, EphimeralClusterBase, INodeFileSystem> act, bool log = true)
+		{
+			lock (EphimeralClusterComposer.Lock)
 			{
 				var taskLog = this.GetCurrentRunnerLog();
 				foreach (var task in collection)
 				{
 					var name = task.GetType().Name;
 					if (log && taskLog.Contains(name)) continue;
-					act(task,this.NodeConfiguration, this.NodeConfiguration.FileSystem);
+					act(task, this.Cluster, this.Cluster.FileSystem);
 					if (log) taskLog.Add(name);
 				}
 				if (log) this.LogTasks(taskLog);

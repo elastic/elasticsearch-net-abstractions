@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Elastic.ManagedNode.Configuration;
@@ -15,7 +16,6 @@ namespace Elastic.ManagedNode
 		public bool NodeStarted { get; private set; }
 		public NodeConfiguration NodeConfiguration { get; }
 
-
 		private int? JavaProcessId { get; set; }
 		public override int? ProcessId => this.JavaProcessId ?? base.ProcessId;
 		public int? HostProcessId => base.ProcessId;
@@ -28,8 +28,19 @@ namespace Elastic.ManagedNode
 		private static StartArguments StartArgs(NodeConfiguration config) =>
 			new StartArguments(config.FileSystem.Binary, config.CommandLineArguments)
 			{
-				SendControlCFirst = true
+				SendControlCFirst = true,
+				Environment = EnvVars(config)
 			};
+
+		private static Dictionary<string, string> EnvVars(NodeConfiguration config)
+		{
+			if (config.Version.Major < 6) return null;
+			if (string.IsNullOrWhiteSpace(config.FileSystem.ConfigPath)) return null;
+			return new Dictionary<string, string>
+			{
+				{ "ES_PATH_CONF", config.FileSystem.ConfigPath }
+			};
+		}
 
 		public bool AssumeStartedOnNotEnoughMasterPing { get; set; }
 
@@ -42,9 +53,9 @@ namespace Elastic.ManagedNode
 			return false;
 		}
 
-		private IElasticsearchConsoleOutWriter _writer;
-		public void Start() => this.Start(null);
-		public void Start(IElasticsearchConsoleOutWriter writer)
+		private IConsoleOutWriter _writer;
+		public void Subscribe() => this.Subscribe(new HighlightWriter());
+		public void Subscribe(IConsoleOutWriter writer)
 		{
 			this._writer = writer;
 			var node = this.NodeConfiguration.NodeName;
@@ -68,7 +79,7 @@ namespace Elastic.ManagedNode
 			//if the node is already started only keep buffering lines while we have a writer;
 			if (this.NodeStarted) return this._writer != null;
 
-			var parsed = ElasticsearchConsoleOutParser.TryParse(c.Line, out _, out _, out var section, out _, out var message, out var started);
+			var parsed = LineOutParser.TryParse(c.Line, out _, out _, out var section, out _, out var message, out var started);
 
 			if (!started) started = AssumedStartedStateChecker(section, message);
 			if (started)
@@ -79,12 +90,12 @@ namespace Elastic.ManagedNode
 
 			if (!parsed) return this._writer != null;
 
-			if (this.JavaProcessId == null && ElasticsearchConsoleOutParser.TryParseNodeInfo(section, message, out var version, out var pid))
+			if (this.JavaProcessId == null && LineOutParser.TryParseNodeInfo(section, message, out var version, out var pid))
 			{
 				this.JavaProcessId = pid;
 				this.Version = version;
 			}
-			else if (ElasticsearchConsoleOutParser.TryGetPortNumber(section, message, out var port))
+			else if (LineOutParser.TryGetPortNumber(section, message, out var port))
 			{
 				this.Port = port;
 				if (this.Port != this.DesiredPort) throw new CleanExitException($"Node started on port {port} but {this.DesiredPort} was requested");

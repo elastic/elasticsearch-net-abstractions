@@ -3,40 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace Elastic.ManagedNode
 {
-	public static class ElasticsearchExceptionLogParser
-	{
-		private static readonly Regex CauseRegex = new Regex(@"^(?<cause>.*?Exception:)(?<message>.*?)$");
-
-		public static bool TryParseCause(string line, out string cause, out string message)
-		{
-			cause = message = null;
-			if (string.IsNullOrEmpty(line)) return false;
-			var match = CauseRegex.Match(line);
-			if (!match.Success) return false;
-			cause = match.Groups["cause"].Value.Trim();
-			message = match.Groups["message"].Value.Trim();
-			return true;
-		}
-
-		private static readonly Regex LocRegex = new Regex(@"^(?<at>\s*?at )(?<method>.*?)\((?<file>.*?)\)(?<jar>.*?)$");
-		public static bool TryParseStackTrace(string line, out string at, out string method, out string file, out string jar)
-		{
-			at = method = file = jar = null;
-			if (string.IsNullOrEmpty(line)) return false;
-			var match = LocRegex.Match(line);
-			if (!match.Success) return false;
-			at = match.Groups["at"].Value;
-			method = match.Groups["method"].Value.Trim();
-			file = match.Groups["file"].Value.Trim();
-			jar = match.Groups["jar"].Value.Trim();
-			return true;
-		}
-
-	}
-
-
-
-	public static class ElasticsearchConsoleOutParser
+	public static class LineOutParser
 	{
 /*
 [2016-09-26T11:43:17,314][INFO ][o.e.n.Node               ] [readonly-node-a9c5f4] initializing ...

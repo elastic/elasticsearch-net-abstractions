@@ -1,9 +1,4 @@
-﻿using System;
-using Elastic.ManagedNode;
-using Elastic.ManagedNode.Configuration;
-using Elastic.Net.Abstractions.Clusters;
-using Elasticsearch.Net;
-using ProcNet.Std;
+﻿using Elastic.Net.Abstractions.Clusters;
 
 namespace ScratchPad
 {
@@ -12,13 +7,13 @@ namespace ScratchPad
 		public static int Main()
 		{
 
-//			using (var node = new ElasticsearchNode(new NodeConfiguration("5.5.1", "cluster-x", "node-y")))
+//			using (var node = new ElasticsearchProcess(new NodeConfiguration("5.5.1")))
 //			{
-//				node.Start(new ElasticsearchConsoleOutWriter());
+//				node.Subscribe(new ElasticsearchConsoleOutWriter());
 //				node.WaitForStarted(TimeSpan.FromMinutes(2));
 //			}
 
-			using (var cluster = new ElasticsearchCluster("5.5.1", instanceCount: 2))
+			using (var cluster = new EphimeralCluster("5.5.1", instanceCount: 2))
 			{
 				cluster.Start();
 

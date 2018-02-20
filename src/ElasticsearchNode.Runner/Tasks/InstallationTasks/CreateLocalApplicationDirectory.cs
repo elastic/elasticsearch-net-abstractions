@@ -1,15 +1,16 @@
 using System.IO;
 using Elastic.ManagedNode.Configuration;
+using Elastic.Net.Abstractions.Clusters;
 using Elastic.Net.Abstractions.Plugins;
 
 namespace Elastic.Net.Abstractions.Tasks.InstallationTasks
 {
 	public class CreateLocalApplicationDirectory : InstallationTaskBase
 	{
-		public override void Run(NodeConfiguration config, NodeFileSystem fileSystem, ElasticsearchPlugin[] requiredPlugins)
+		public override void Run(EphimeralClusterBase cluster, INodeFileSystem fs)
 		{
-			if (!Directory.Exists(fileSystem.LocalFolder))
-				Directory.CreateDirectory(fileSystem.LocalFolder);
+			if (!Directory.Exists(fs.LocalFolder))
+				Directory.CreateDirectory(fs.LocalFolder);
 		}
 	}
 }

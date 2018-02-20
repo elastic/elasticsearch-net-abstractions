@@ -2,32 +2,34 @@ using System;
 using System.IO;
 using System.Linq;
 using Elastic.ManagedNode.Configuration;
+using Elastic.Net.Abstractions.Clusters;
 using Elastic.Net.Abstractions.Plugins;
 
 namespace Elastic.Net.Abstractions.Tasks.InstallationTasks
 {
 	public class InstallPlugins : InstallationTaskBase
 	{
-		public override void Run(NodeConfiguration config, NodeFileSystem fileSystem, ElasticsearchPlugin[] requiredPlugins)
+		public override void Run(EphimeralClusterBase cluster, INodeFileSystem fs)
 		{
-			var v = config.ElasticsearchVersion;
+			var v = fs.Version;
+			var requiredPlugins = cluster.RequiredPlugins;
 			//on 2.x we so not support tests requiring plugins for 2.x since we can not reliably install them
 			if (v.IsSnapshot && v.Major == 2) return;
 			var plugins =
 				from plugin in requiredPlugins
 				let validForCurrentVersion = plugin.IsValid(v)
-				let alreadyInstalled = AlreadyInstalled(plugin, fileSystem)
+				let alreadyInstalled = AlreadyInstalled(plugin, fs)
 				where !alreadyInstalled && validForCurrentVersion
 				select plugin;
 
 			foreach (var plugin in plugins)
 			{
-				var installParameter = !v.IsSnapshot ? plugin.Moniker : this.DownloadSnapshotIfNeeded(fileSystem, plugin, v);
-				ExecuteBinary(fileSystem.PluginBinary, $"install elasticsearch plugin: {plugin.Moniker}", "install --batch", installParameter);
+				var installParameter = !v.IsSnapshot ? plugin.Moniker : DownloadSnapshotIfNeeded(fs, plugin, v);
+				ExecuteBinary(fs.PluginBinary, $"install elasticsearch plugin: {plugin.Moniker}", "install --batch", installParameter);
 			}
 		}
 
-		private static bool AlreadyInstalled(ElasticsearchPlugin plugin, NodeFileSystem fileSystem)
+		private static bool AlreadyInstalled(ElasticsearchPlugin plugin, INodeFileSystem fileSystem)
 		{
 			var folder = plugin.Moniker;
 			var pluginFolder = Path.Combine(fileSystem.ElasticsearchHome, "plugins", folder);
@@ -36,7 +38,7 @@ namespace Elastic.Net.Abstractions.Tasks.InstallationTasks
 			return Directory.Exists(pluginFolder);
 		}
 
-		private string DownloadSnapshotIfNeeded(NodeFileSystem fileSystem, ElasticsearchPlugin plugin, ElasticsearchVersion v)
+		private static string DownloadSnapshotIfNeeded(INodeFileSystem fileSystem, ElasticsearchPlugin plugin, ElasticsearchVersion v)
 		{
 			var downloadLocation = Path.Combine(fileSystem.LocalFolder, plugin.SnapshotZip(v));
 			DownloadPluginSnapshot(downloadLocation, plugin, v);

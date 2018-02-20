@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Http;
 using Elastic.ManagedNode.Configuration;
+using Elastic.Net.Abstractions.Clusters;
 using Elastic.Net.Abstractions.Plugins;
 using ProcNet;
 using ProcNet.Std;
@@ -10,7 +11,7 @@ namespace Elastic.Net.Abstractions.Tasks.InstallationTasks
 {
 	public abstract class InstallationTaskBase
 	{
-		public abstract void Run(NodeConfiguration config, NodeFileSystem fileSystem, ElasticsearchPlugin[] requiredPlugins);
+		public abstract void Run(EphimeralClusterBase cluster, INodeFileSystem fs);
 
 		private static bool IsMono { get; } = Type.GetType("Mono.Runtime") != null;
 		protected string BinarySuffix => IsMono || Path.PathSeparator == '/' ? "" : ".bat";
@@ -44,5 +45,6 @@ namespace Elastic.Net.Abstractions.Tasks.InstallationTasks
 
 			Console.WriteLine($"Finished executing {description} exit code: {result.ExitCode}");
 		}
+
 	}
 }

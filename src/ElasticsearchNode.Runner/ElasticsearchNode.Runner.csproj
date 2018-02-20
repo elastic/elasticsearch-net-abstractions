@@ -3,7 +3,8 @@
   <Import Project="..\..\build\Versioning.targets" />
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
-    <RootNamespace>Elastic.Net.Abstractions</RootNamespace>
+    <AssemblyName>Elastic.Managed.Ephimeral</AssemblyName>
+    <RootNamespace>Elastic.Managed.Ephimeral</RootNamespace>
     <Version>$(ElasticsearchNodeRunnerCurrentVersion)</Version>
     <InformationalVersion>$(ElasticsearchNodeRunnerCurrentVersion)</InformationalVersion>
     <AssemblyVersion>$(ElasticsearchNodeRunnerCurrentAssemblyVersion)</AssemblyVersion>

@@ -1,12 +1,13 @@
 ﻿using System;
 using Elastic.ManagedNode.Configuration;
+using Elastic.Net.Abstractions.Clusters;
 using Elastic.Net.Abstractions.Plugins;
 
 namespace Elastic.Net.Abstractions.Tasks.InstallationTasks
 {
 	public class EnsureJavaHomeEnvironmentVariableIsSet : InstallationTaskBase
 	{
-		public override void Run(NodeConfiguration config, NodeFileSystem fileSystem, ElasticsearchPlugin[] requiredPlugins)
+		public override void Run(EphimeralClusterBase cluster, INodeFileSystem fs)
 		{
 			var javaHome = Environment.GetEnvironmentVariable("JAVA_HOME");
 			if (string.IsNullOrWhiteSpace(javaHome))

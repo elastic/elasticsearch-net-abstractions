@@ -2,18 +2,20 @@
 using System.IO;
 using System.IO.Compression;
 using Elastic.ManagedNode.Configuration;
+using Elastic.Net.Abstractions.Clusters;
 using Elastic.Net.Abstractions.Plugins;
 
 namespace Elastic.Net.Abstractions.Tasks.InstallationTasks
 {
 	public class UnzipCurrentElasticsearchDistribution : InstallationTaskBase
 	{
-		public override void Run(NodeConfiguration config, NodeFileSystem fileSystem, ElasticsearchPlugin[] requiredPlugins)
+		public override void Run(EphimeralClusterBase cluster, INodeFileSystem fs)
 		{
-			var v = config.ElasticsearchVersion;
-			if (Directory.Exists(fileSystem.ElasticsearchHome)) return;
+			var v = fs.Version;
+			if (Directory.Exists(fs.ElasticsearchHome)) return;
 			Console.WriteLine($"Unzipping elasticsearch: {v} ...");
-			ZipFile.ExtractToDirectory(fileSystem.ZipDownloadTarget, fileSystem.LocalFolder);
+			var from = Path.Combine(fs.LocalFolder, fs.Version.Zip);
+			ZipFile.ExtractToDirectory(from, fs.LocalFolder);
 		}
 	}
 }

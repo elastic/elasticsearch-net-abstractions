@@ -1,56 +1,16 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Xml.Linq;
-using SemVer;
-using Version = SemVer.Version;
+﻿using Version = SemVer.Version;
 
 namespace Elastic.ManagedNode.Configuration
 {
 	public class ElasticsearchVersion : Version
 	{
-		private static readonly Lazy<string> LatestVersion = new Lazy<string>(ResolveLatestVersion, LazyThreadSafetyMode.ExecutionAndPublication);
-		private static readonly Lazy<string> LatestSnapshot = new Lazy<string>(ResolveLatestSnapshot, LazyThreadSafetyMode.ExecutionAndPublication);
-		private static readonly object _lock = new { };
-		private static readonly ConcurrentDictionary<string, string> SnapshotVersions = new ConcurrentDictionary<string, string>();
-		private static readonly string SonaTypeUrl = "https://oss.sonatype.org/content/repositories/snapshots/org/elasticsearch/distribution/zip/elasticsearch";
+		public static implicit operator ElasticsearchVersion(string version) => ElasticsearchVersionResolver.From(version);
 
-		private string RootUrl => this.IsSnapshot
-			? SonaTypeUrl
-			: Range.IsSatisfied("<5.0.0", this.Version)
-				? "https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/zip/elasticsearch"
-				: "https://artifacts.elastic.co/downloads/elasticsearch";
-
-		public static implicit operator ElasticsearchVersion(string version) => new ElasticsearchVersion(version);
-
-		public ElasticsearchVersion(string version) : base(TranslateConfigVersion(version))
+		public static ElasticsearchVersion From(string version) => ElasticsearchVersionResolver.From(version);
+		internal ElasticsearchVersion(string version, string zip) : base(version)
 		{
 			this.Version = version;
-			if (this.Version.Equals("latest", StringComparison.OrdinalIgnoreCase))
-			{
-				this.Version = LatestVersion.Value;
-				this.Zip = LatestSnapshot.Value;
-			}
-			else if (this.IsSnapshot)
-			{
-				lock (_lock)
-				{
-					string zipLocation;
-					if (SnapshotVersions.TryGetValue(version, out zipLocation))
-						this.Zip = zipLocation;
-					else
-					{
-						zipLocation = ResolveLatestSnapshotFor(version);
-						SnapshotVersions.TryAdd(version, zipLocation);
-						this.Zip = zipLocation;
-					}
-				}
-			}
-
-			this.Zip = this.Zip ?? $"elasticsearch-{this.Version}.zip";
+			this.Zip = zip;
 		}
 
 		private string _downloadUrl;
@@ -59,9 +19,10 @@ namespace Elastic.ManagedNode.Configuration
 			get
 			{
 				if (!string.IsNullOrWhiteSpace(this._downloadUrl)) return this._downloadUrl;
+				var rootUrl = ElasticsearchVersionResolver.RootUrl(this);
                 this._downloadUrl = this.IsSnapshot
-	                ? $"{this.RootUrl}/{this.Version}/{this.Zip}"
-	                : $"{this.RootUrl}/{this.Zip}";
+	                ? $"{rootUrl}/{this.Version}/{this.Zip}"
+	                : $"{rootUrl}/{this.Zip}";
 				return this._downloadUrl;
 
 			}
@@ -76,7 +37,7 @@ namespace Elastic.ManagedNode.Configuration
 		public string FullyQualifiedVersion => this.Zip?.Replace(".zip", "").Replace("elasticsearch-", "");
 
 		/// <summary>
-		/// The folder name to expect to be in the zip distribution
+		/// The folder name to expect inside the zip distribution
 		/// </summary>
 		public string FolderInZip => $"elasticsearch-{this.Version}";
 
@@ -87,57 +48,5 @@ namespace Elastic.ManagedNode.Configuration
 
 		public override string ToString() => this.Version;
 
-		private static string TranslateConfigVersion(string configMoniker) => configMoniker == "latest" ? LatestVersion.Value : configMoniker;
-
-		private static string ResolveLatestSnapshot()
-		{
-			var version = LatestVersion.Value;
-			return ResolveLatestSnapshotFor(version);
-		}
-
-		private static string LoadUrl(string url)
-		{
-			var http = new HttpClient();
-			using (var stream = http.GetStreamAsync(new Uri(url)).GetAwaiter().GetResult())
-			using (var fileStream = new StreamReader(stream))
-				return fileStream.ReadToEnd();
-		}
-
-		private static string ResolveLatestSnapshotFor(string version)
-		{
-			var url = $"{SonaTypeUrl}/{version}/maven-metadata.xml";
-			try
-			{
-				var mavenMetadata = XElement.Parse(LoadUrl(url));
-				var snapshot = mavenMetadata.Descendants("versioning").Descendants("snapshot").FirstOrDefault();
-				var snapshotTimestamp = snapshot.Descendants("timestamp").FirstOrDefault().Value;
-				var snapshotBuildNumber = snapshot.Descendants("buildNumber").FirstOrDefault().Value;
-				var identifier = $"{snapshotTimestamp}-{snapshotBuildNumber}";
-				var zip = $"elasticsearch-{version.Replace("SNAPSHOT", "")}{identifier}.zip";
-				return zip;
-
-			}
-			catch (Exception e)
-			{
-				throw new Exception($"Can not download maven data from {url}", e);
-			}
-		}
-
-		private static string ResolveLatestVersion()
-		{
-			var url = $"{SonaTypeUrl}/maven-metadata.xml";
-			try
-			{
-                var versions = XElement.Parse(LoadUrl(url))
-                    .Descendants("version")
-                    .Select(n => new Version(n.Value))
-                    .OrderByDescending(n => n);
-                return versions.First().ToString();
-			}
-			catch (Exception e)
-			{
-				throw new Exception($"Can not download maven data from {url}", e);
-			}
-		}
 	}
 }

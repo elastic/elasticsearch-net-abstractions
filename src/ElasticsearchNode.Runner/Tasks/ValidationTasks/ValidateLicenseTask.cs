@@ -1,5 +1,7 @@
 using System;
+using System.Linq;
 using Elastic.ManagedNode.Configuration;
+using Elastic.Net.Abstractions.Clusters;
 using Elastic.Net.Abstractions.Plugins;
 using Nest;
 
@@ -7,25 +9,25 @@ namespace Elastic.Net.Abstractions.Tasks.ValidationTasks
 {
 	public class ValidateLicenseTask : NodeValidationTaskBase
 	{
-		public override void Validate(IElasticClient client, NodeConfiguration configuration, ElasticsearchPlugin[] requiredPlugins)
+		public override void Validate(EphimeralClusterBase cluster, INodeFileSystem fs)
 		{
-			if (!configuration.XPackEnabled) return;
+			if (!cluster.Nodes.All(n=>n.NodeConfiguration.XpackEnabled)) return;
 
-			var license = client.GetLicense();
+			var license = cluster.Client.GetLicense();
 			if (license.IsValid && license.License.Status == LicenseStatus.Active) return;
 
 			var exceptionMessageStart = "Server has license plugin installed, ";
 			var licenseFile = Environment.GetEnvironmentVariable("ES_LICENSE_FILE");
 			if (!string.IsNullOrWhiteSpace(licenseFile))
 			{
-				var putLicense = client.PostLicense(new PostLicenseRequest
+				var putLicense = cluster.Client.PostLicense(new PostLicenseRequest
 				{
 					License = License.LoadFromDisk(licenseFile)
 				});
 				if (!putLicense.IsValid)
 					throw new Exception("Server has invalid license and the ES_LICENSE_FILE failed to register\r\n" + putLicense.DebugInformation);
 
-				license = client.GetLicense();
+				license = cluster.Client.GetLicense();
 				if (license.IsValid && license.License.Status == LicenseStatus.Active) return;
 				exceptionMessageStart += " but the installed license is invalid and we attempted to register ES_LICENSE_FILE ";
 			}
