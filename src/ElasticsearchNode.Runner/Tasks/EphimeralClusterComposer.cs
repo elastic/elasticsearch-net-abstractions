@@ -2,17 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Elastic.ManagedNode.Cluster;
-using Elastic.ManagedNode.Configuration;
-using Elastic.Net.Abstractions.Clusters;
-using Elastic.Net.Abstractions.Plugins;
-using Elastic.Net.Abstractions.Tasks.AfterNodeStoppedTasks;
-using Elastic.Net.Abstractions.Tasks.BeforeStartNodeTasks;
-using Elastic.Net.Abstractions.Tasks.InstallationTasks;
-using Elastic.Net.Abstractions.Tasks.ValidationTasks;
-using Nest;
+using Elastic.Managed.Clusters;
+using Elastic.Managed.Ephimeral.Clusters;
+using Elastic.Managed.Ephimeral.Tasks.AfterNodeStoppedTasks;
+using Elastic.Managed.Ephimeral.Tasks.BeforeStartNodeTasks;
+using Elastic.Managed.Ephimeral.Tasks.InstallationTasks;
+using Elastic.Managed.Ephimeral.Tasks.ValidationTasks;
+using Elastic.Managed.FileSystem;
 
-namespace Elastic.Net.Abstractions.Tasks
+namespace Elastic.Managed.Ephimeral.Tasks
 {
 	public class EphimeralClusterComposer : IClusterComposer
 	{

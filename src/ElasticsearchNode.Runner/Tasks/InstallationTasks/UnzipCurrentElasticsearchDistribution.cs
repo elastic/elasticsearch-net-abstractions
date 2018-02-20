@@ -1,11 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
-using Elastic.ManagedNode.Configuration;
-using Elastic.Net.Abstractions.Clusters;
-using Elastic.Net.Abstractions.Plugins;
+using Elastic.Managed.Ephimeral.Clusters;
+using Elastic.Managed.FileSystem;
 
-namespace Elastic.Net.Abstractions.Tasks.InstallationTasks
+namespace Elastic.Managed.Ephimeral.Tasks.InstallationTasks
 {
 	public class UnzipCurrentElasticsearchDistribution : InstallationTaskBase
 	{

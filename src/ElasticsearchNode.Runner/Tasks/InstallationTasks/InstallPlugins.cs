@@ -1,11 +1,12 @@
 using System;
 using System.IO;
 using System.Linq;
-using Elastic.ManagedNode.Configuration;
-using Elastic.Net.Abstractions.Clusters;
-using Elastic.Net.Abstractions.Plugins;
+using Elastic.Managed.Configuration;
+using Elastic.Managed.Ephimeral.Clusters;
+using Elastic.Managed.Ephimeral.Plugins;
+using Elastic.Managed.FileSystem;
 
-namespace Elastic.Net.Abstractions.Tasks.InstallationTasks
+namespace Elastic.Managed.Ephimeral.Tasks.InstallationTasks
 {
 	public class InstallPlugins : InstallationTaskBase
 	{

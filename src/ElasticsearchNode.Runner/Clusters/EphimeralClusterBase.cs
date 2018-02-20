@@ -1,14 +1,14 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using Elastic.ManagedNode.Cluster;
-using Elastic.ManagedNode.Configuration;
-using Elastic.Net.Abstractions.Plugins;
-using Elastic.Net.Abstractions.Tasks;
+using Elastic.Managed.Clusters;
+using Elastic.Managed.Configuration;
+using Elastic.Managed.Ephimeral.Plugins;
+using Elastic.Managed.Ephimeral.Tasks;
+using Elastic.Managed.FileSystem;
 using Elasticsearch.Net;
 using Nest;
 
-namespace Elastic.Net.Abstractions.Clusters
+namespace Elastic.Managed.Ephimeral.Clusters
 {
 	public abstract class EphimeralClusterBase : ClusterBase
 	{

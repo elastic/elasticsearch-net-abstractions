@@ -1,10 +1,10 @@
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using Elastic.ManagedNode.Configuration;
-using Elastic.Net.Abstractions.Clusters;
+using Elastic.Managed.Ephimeral.Clusters;
+using Elastic.Managed.FileSystem;
 
-namespace Elastic.Net.Abstractions.Tasks.BeforeStartNodeTasks
+namespace Elastic.Managed.Ephimeral.Tasks.BeforeStartNodeTasks
 {
 	public class CreateEasyRunClusterBatFile : BeforeStartNodeTaskBase
 	{

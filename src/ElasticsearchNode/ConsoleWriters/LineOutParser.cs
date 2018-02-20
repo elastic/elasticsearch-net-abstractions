@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
-namespace Elastic.ManagedNode
+namespace Elastic.Managed.ConsoleWriters
 {
 	public static class LineOutParser
 	{

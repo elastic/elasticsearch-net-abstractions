@@ -1,6 +1,6 @@
 using System;
 
-namespace Elastic.Net.Abstractions.Plugins
+namespace Elastic.Managed.Ephimeral.Plugins
 {
 	[AttributeUsage(AttributeTargets.Field)]
 	public class MonikerAttribute : Attribute

@@ -1,11 +1,9 @@
 ﻿using System;
-using Elastic.ManagedNode.Configuration;
-using Elastic.Net.Abstractions.Clusters;
-using Elastic.Net.Abstractions.Plugins;
+using Elastic.Managed.Ephimeral.Clusters;
+using Elastic.Managed.FileSystem;
 using Elasticsearch.Net;
-using Nest;
 
-namespace Elastic.Net.Abstractions.Tasks.ValidationTasks
+namespace Elastic.Managed.Ephimeral.Tasks.ValidationTasks
 {
 	public class ValidateClusterStateTask : NodeValidationTaskBase
 	{

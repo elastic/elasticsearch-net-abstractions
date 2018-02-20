@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Elastic.Managed.Configuration;
 
-namespace Elastic.ManagedNode.Configuration
+namespace Elastic.Managed.FileSystem
 {
 	public class NodeFileSystem : INodeFileSystem
 	{

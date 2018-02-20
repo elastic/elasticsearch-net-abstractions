@@ -1,4 +1,4 @@
-﻿using Elastic.Net.Abstractions.Clusters;
+﻿using Elastic.Managed.Ephimeral.Clusters;
 
 namespace ScratchPad
 {

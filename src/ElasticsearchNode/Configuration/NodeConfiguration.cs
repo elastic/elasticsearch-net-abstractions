@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Elastic.Managed.FileSystem;
 
-namespace Elastic.ManagedNode.Configuration
+namespace Elastic.Managed.Configuration
 {
 	public class NodeConfiguration
 	{

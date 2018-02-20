@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
-using Elastic.ManagedNode.Configuration;
+using Elastic.Managed.Configuration;
+using Elastic.Managed.ConsoleWriters;
+using Elastic.Managed.FileSystem;
 
-namespace Elastic.ManagedNode.Cluster
+namespace Elastic.Managed.Clusters
 {
 	public abstract class ClusterBase : IDisposable
 	{

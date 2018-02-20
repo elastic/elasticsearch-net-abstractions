@@ -1,7 +1,7 @@
-using Elastic.ManagedNode.Configuration;
-using Elastic.Net.Abstractions.Clusters;
+using Elastic.Managed.Ephimeral.Clusters;
+using Elastic.Managed.FileSystem;
 
-namespace Elastic.Net.Abstractions.Tasks.AfterNodeStoppedTasks
+namespace Elastic.Managed.Ephimeral.Tasks.AfterNodeStoppedTasks
 {
 	public abstract class AfterNodeStoppedTaskBase
 	{

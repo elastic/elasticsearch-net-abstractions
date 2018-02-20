@@ -1,6 +1,6 @@
 ﻿using Version = SemVer.Version;
 
-namespace Elastic.ManagedNode.Configuration
+namespace Elastic.Managed.Configuration
 {
 	public class ElasticsearchVersion : Version
 	{

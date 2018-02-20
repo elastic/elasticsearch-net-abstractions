@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
-using Elastic.ManagedNode.Configuration;
+using Elastic.Managed.Configuration;
+using Elastic.Managed.ConsoleWriters;
 using ProcNet;
 using ProcNet.Std;
+using IConsoleOutWriter = Elastic.Managed.ConsoleWriters.IConsoleOutWriter;
 
-namespace Elastic.ManagedNode
+namespace Elastic.Managed
 {
 	public class ElasticsearchNode : ObservableProcess
 	{

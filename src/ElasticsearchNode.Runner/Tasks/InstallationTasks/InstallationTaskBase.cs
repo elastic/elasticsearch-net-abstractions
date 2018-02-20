@@ -1,13 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
-using Elastic.ManagedNode.Configuration;
-using Elastic.Net.Abstractions.Clusters;
-using Elastic.Net.Abstractions.Plugins;
+using Elastic.Managed.Ephimeral.Clusters;
+using Elastic.Managed.FileSystem;
 using ProcNet;
 using ProcNet.Std;
 
-namespace Elastic.Net.Abstractions.Tasks.InstallationTasks
+namespace Elastic.Managed.Ephimeral.Tasks.InstallationTasks
 {
 	public abstract class InstallationTaskBase
 	{

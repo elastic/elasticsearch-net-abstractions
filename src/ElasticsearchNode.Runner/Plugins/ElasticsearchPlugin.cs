@@ -1,7 +1,7 @@
 using System;
-using Elastic.ManagedNode.Configuration;
+using Elastic.Managed.Configuration;
 
-namespace Elastic.Net.Abstractions.Plugins
+namespace Elastic.Managed.Ephimeral.Plugins
 {
 	public class ElasticsearchPlugin
 	{

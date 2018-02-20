@@ -1,4 +1,4 @@
-namespace Elastic.Net.Abstractions.Tasks.InstallationTasks
+namespace Elastic.Managed.Ephimeral.Tasks.InstallationTasks
 {
     public static class SecurityRealms
     {

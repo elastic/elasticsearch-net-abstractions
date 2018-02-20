@@ -1,8 +1,7 @@
 using System;
-using System.Linq;
 using ProcNet.Std;
 
-namespace Elastic.ManagedNode
+namespace Elastic.Managed.ConsoleWriters
 {
 	public interface IConsoleOutWriter
 	{

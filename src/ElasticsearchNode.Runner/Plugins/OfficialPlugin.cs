@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 
-namespace Elastic.Net.Abstractions.Plugins
+namespace Elastic.Managed.Ephimeral.Plugins
 {
 	public enum OfficialPlugin
 	{
