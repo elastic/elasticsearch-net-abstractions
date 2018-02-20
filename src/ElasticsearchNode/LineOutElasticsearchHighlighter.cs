@@ -8,7 +8,7 @@ namespace Elastic.ManagedNode
 	public static class LineOutElasticsearchHighlighter
 	{
 		private static readonly object _lock = new object();
-		public static void Write(bool error, string date, string level, string section, string node, string message)
+		public static void Write(bool error, string date, string level, string section, string node, string message, Func<string, ConsoleColor> getNodeColor = null)
 		{
 			lock (_lock)
 			{
@@ -22,12 +22,60 @@ namespace Elastic.ManagedNode
 					WriteSpace(w);
 				}
 
-				WriteBlock(w, ConsoleColor.DarkGreen, node);
+				WriteBlock(w, getNodeColor?.Invoke(node) ?? ConsoleColor.DarkGreen, node);
 				WriteSpace(w);
 
 				var messageColor = error || level == "ERROR" ? ConsoleColor.Red : ConsoleColor.White;
 				WriteMessage(w, messageColor, message);
 
+				Console.ResetColor();
+				w.Flush();
+			}
+		}
+
+		public static void WriteCausedBy(bool error, string cause, string causeMessage)
+		{
+			lock (_lock)
+			{
+				var w = error ? Console.Error : Console.Out;
+				Write(w, ConsoleColor.DarkRed, cause);
+				WriteSpace(w);
+				Write(w, ConsoleColor.Red, causeMessage);
+				w.WriteLine();
+				Console.ResetColor();
+				w.Flush();
+
+			}
+		}
+
+		public static void WriteStackTraceLine(bool error, string at, string method, string file, string jar)
+		{
+			lock (_lock)
+			{
+				var w = error ? Console.Error : Console.Out;
+				Write(w, ConsoleColor.DarkGray, at);
+				Write(w, ConsoleColor.DarkBlue, method);
+				Write(w, ConsoleColor.DarkGray, "(");
+				Write(w, ConsoleColor.Blue, file);
+				Write(w, ConsoleColor.DarkGray, ")");
+				WriteSpace(w);
+				Write(w, ConsoleColor.Gray, jar);
+				w.WriteLine();
+
+				Console.ResetColor();
+				w.Flush();
+
+			}
+		}
+
+
+		public static void Write(bool error, string message)
+		{
+			lock (_lock)
+			{
+				var w = error ? Console.Error : Console.Out;
+				var messageColor = error ? ConsoleColor.Red : ConsoleColor.White;
+				WriteMessage(w, messageColor, message);
 				Console.ResetColor();
 				w.Flush();
 			}
@@ -99,7 +147,15 @@ namespace Elastic.ManagedNode
 			w.Write(b);
 			Console.ForegroundColor = ConsoleColor.DarkGray;
 			w.Write("]");
-
 		}
+		private static void Write(TextWriter w, ConsoleColor color, string block, int? pad = null)
+		{
+			var b = pad != null ? block.PadRight(pad.Value) : block;
+			var original = Console.ForegroundColor;
+			Console.ForegroundColor = color;
+			w.Write(b);
+			Console.ForegroundColor = original;
+		}
+
 	}
 }

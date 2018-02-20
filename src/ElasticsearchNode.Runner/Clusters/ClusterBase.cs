@@ -39,6 +39,7 @@ namespace Elastic.Net.Abstractions.Clusters
 		}
 
 		public ReadOnlyCollection<ElasticsearchNode> Nodes { get; }
+
 		public virtual ElasticsearchPlugin[] RequiredPlugins { get; }
 
 		private static Dictionary<string, string> DefaultClusterSettings(int instanceCount, Dictionary<string, string> clusterSettings) =>
@@ -93,13 +94,11 @@ namespace Elastic.Net.Abstractions.Clusters
 		private string[] NodeSettings { get; } = { };
 		protected virtual InstallationTaskBase[] AdditionalInstallationTasks { get; } = { };
 
-		protected virtual void SeedNode()
-		{
-		}
+		protected virtual void SeedNode() { }
 
-		public void Start(IElasticsearchConsoleOutWriter writer)
+		public void Start(IElasticsearchConsoleOutWriter writer = null)
 		{
-			writer = writer ?? new ElasticsearchConsoleOutWriter();
+			writer = writer ?? new ElasticsearchConsoleOutWriter(this.Nodes.Select(n=>n.NodeConfiguration.NodeName).ToArray());
 			this.TaskRunner.Install(this.AdditionalInstallationTasks, this.RequiredPlugins);
 			this.TaskRunner.OnBeforeStart();
 
@@ -115,14 +114,7 @@ namespace Elastic.Net.Abstractions.Clusters
 
 			this.Started = true;
 			this.TaskRunner.ValidateAfterStart(this.Client, this.RequiredPlugins ?? new ElasticsearchPlugin[]{});
-//			foreach (var node in this.Nodes)
-//			{
-//				if (node.Port != node.DesiredPort)
-//					throw new Exception($"The cluster that was started of type {this.GetType().Name} has a node on port {node.Port} but it should've been {node.DesiredPort}");
-//
-//			}
 			this.SeedNode();
-
 		}
 
 

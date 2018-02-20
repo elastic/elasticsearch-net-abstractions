@@ -3,6 +3,39 @@ using System.Text.RegularExpressions;
 
 namespace Elastic.ManagedNode
 {
+	public static class ElasticsearchExceptionLogParser
+	{
+		private static readonly Regex CauseRegex = new Regex(@"^(?<cause>.*?Exception:)(?<message>.*?)$");
+
+		public static bool TryParseCause(string line, out string cause, out string message)
+		{
+			cause = message = null;
+			if (string.IsNullOrEmpty(line)) return false;
+			var match = CauseRegex.Match(line);
+			if (!match.Success) return false;
+			cause = match.Groups["cause"].Value.Trim();
+			message = match.Groups["message"].Value.Trim();
+			return true;
+		}
+
+		private static readonly Regex LocRegex = new Regex(@"^(?<at>\s*?at )(?<method>.*?)\((?<file>.*?)\)(?<jar>.*?)$");
+		public static bool TryParseStackTrace(string line, out string at, out string method, out string file, out string jar)
+		{
+			at = method = file = jar = null;
+			if (string.IsNullOrEmpty(line)) return false;
+			var match = LocRegex.Match(line);
+			if (!match.Success) return false;
+			at = match.Groups["at"].Value;
+			method = match.Groups["method"].Value.Trim();
+			file = match.Groups["file"].Value.Trim();
+			jar = match.Groups["jar"].Value.Trim();
+			return true;
+		}
+
+	}
+
+
+
 	public static class ElasticsearchConsoleOutParser
 	{
 /*
@@ -29,13 +62,12 @@ namespace Elastic.ManagedNode
 [2016-09-26T11:43:22,179][INFO ][o.e.n.Node               ] [readonly-node-a9c5f4] initialized
 [2016-09-26T11:43:22,180][INFO ][o.e.n.Node               ] [readonly-node-a9c5f4] starting ...
 */
-		private static readonly Regex ConsoleLineParser =
-			new Regex(@"\[(?<date>.*?)\]\[(?<level>.*?)\](?:\[(?<section>.*?)\])?(?: \[(?<node>.*?)\])? (?<message>.+)");
+		private static readonly Regex ConsoleLineParser = new Regex(@"\[(?<date>.*?)\]\[(?<level>.*?)\](?:\[(?<section>.*?)\])(?: \[(?<node>.*?)\])? (?<message>.+)");
 
 		public static bool TryParse(string line,
 			out string date, out string level, out string section, out string node, out string message, out bool started)
 		{
-			date = level = section = node = message = string.Empty;
+			date = level = section = node = message = null;
 			started = false;
 			if (string.IsNullOrEmpty(line)) return false;
 
