@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using Elastic.Managed.Configuration;
 using Elastic.Managed.ConsoleWriters;
-using Elastic.Managed.Ephemeral.Clusters;
 using Elastic.Managed.FileSystem;
 using Nest;
 
@@ -10,7 +9,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 {
 	public class ValidatePluginsTask : NodeValidationTaskBase
 	{
-		public override void Validate(EphemeralClusterBase cluster, INodeFileSystem fs)
+		public override void Validate(EphemeralCluster cluster, INodeFileSystem fs)
 		{
 			var v = fs.Version;
 			if (v.Major == 2)

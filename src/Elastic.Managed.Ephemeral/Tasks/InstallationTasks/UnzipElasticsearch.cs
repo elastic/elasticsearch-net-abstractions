@@ -2,14 +2,13 @@
 using System.IO;
 using System.IO.Compression;
 using Elastic.Managed.ConsoleWriters;
-using Elastic.Managed.Ephemeral.Clusters;
 using Elastic.Managed.FileSystem;
 
 namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 {
 	public class UnzipElasticsearch : InstallationTaskBase
 	{
-		public override void Run(EphemeralClusterBase cluster, INodeFileSystem fs)
+		public override void Run(EphemeralCluster cluster, INodeFileSystem fs)
 		{
 			var v = fs.Version;
 			if (Directory.Exists(fs.ElasticsearchHome)) return;

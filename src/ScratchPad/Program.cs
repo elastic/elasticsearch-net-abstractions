@@ -1,9 +1,4 @@
-﻿using System;
-using Elastic.Managed;
-using Elastic.Managed.Configuration;
-using Elastic.Managed.Ephemeral.Clusters;
-using Elastic.Managed.FileSystem;
-using Elasticsearch.Net;
+﻿using Elastic.Managed.Ephemeral;
 
 namespace ScratchPad
 {
@@ -27,7 +22,7 @@ namespace ScratchPad
 //				Console.ReadKey();
 //			}
 
-			using (var cluster = new EphemeralCluster("6.2.1", instanceCount: 1))
+			using (var cluster = new EphemeralCluster("5.5.4", instanceCount: 1))
 			{
 				cluster.Start();
 

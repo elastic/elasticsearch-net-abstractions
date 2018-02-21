@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using Elastic.Managed.Ephemeral.Clusters;
 using Elastic.Managed.FileSystem;
 using Elastic.Managed.ConsoleWriters;
 
@@ -9,7 +8,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.AfterNodeStoppedTasks
 {
 	public class CleanUpDirectoriesAfterNodeStopped : AfterNodeStoppedTaskBase
 	{
-		public override void Run(EphemeralClusterBase cluster, INodeFileSystem fs)
+		public override void Run(EphemeralCluster cluster, INodeFileSystem fs)
 		{
 			var w = cluster.Writer;
 			DeleteDirectory(w, "cluster data", fs.DataPath);

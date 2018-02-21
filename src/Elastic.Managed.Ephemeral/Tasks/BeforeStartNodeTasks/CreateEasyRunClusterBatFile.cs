@@ -2,14 +2,13 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Elastic.Managed.ConsoleWriters;
-using Elastic.Managed.Ephemeral.Clusters;
 using Elastic.Managed.FileSystem;
 
 namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks
 {
 	public class CreateEasyRunClusterBatFile : BeforeStartNodeTaskBase
 	{
-		public override void Run(EphemeralClusterBase cluster, INodeFileSystem fs)
+		public override void Run(EphemeralCluster cluster, INodeFileSystem fs)
 		{
 			var clusterMoniker = cluster.ClusterMoniker;
 			var v = fs.Version;

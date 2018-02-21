@@ -1,13 +1,12 @@
 using System.IO;
 using Elastic.Managed.ConsoleWriters;
-using Elastic.Managed.Ephemeral.Clusters;
 using Elastic.Managed.FileSystem;
 
 namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 {
 	public class CreateLocalApplicationDirectory : InstallationTaskBase
 	{
-		public override void Run(EphemeralClusterBase cluster, INodeFileSystem fs)
+		public override void Run(EphemeralCluster cluster, INodeFileSystem fs)
 		{
 			if (Directory.Exists(fs.LocalFolder)) return;
 

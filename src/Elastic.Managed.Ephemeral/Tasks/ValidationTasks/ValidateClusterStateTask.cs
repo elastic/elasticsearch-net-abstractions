@@ -1,5 +1,4 @@
 ﻿using System;
-using Elastic.Managed.Ephemeral.Clusters;
 using Elastic.Managed.FileSystem;
 using Elasticsearch.Net;
 
@@ -9,7 +8,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 	{
 		private static TimeSpan ClusterHealthTimeout { get; } = TimeSpan.FromSeconds(20);
 
-		public override void Validate(EphemeralClusterBase cluster, INodeFileSystem fs)
+		public override void Validate(EphemeralCluster cluster, INodeFileSystem fs)
 		{
 			var healthyCluster = cluster.Client.ClusterHealth(g => g
 				.WaitForStatus(WaitForStatus.Yellow)

@@ -1,4 +1,4 @@
-﻿using Elastic.Managed.Clusters;
+﻿using Elastic.Managed;
 using Xunit;
 
 namespace Elastic.Xunit.Xunit

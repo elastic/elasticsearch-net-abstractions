@@ -2,7 +2,6 @@
 using System.IO;
 using System.Net.Http;
 using Elastic.Managed.ConsoleWriters;
-using Elastic.Managed.Ephemeral.Clusters;
 using Elastic.Managed.FileSystem;
 using ProcNet;
 using ProcNet.Std;
@@ -11,7 +10,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 {
 	public abstract class InstallationTaskBase
 	{
-		public abstract void Run(EphemeralClusterBase cluster, INodeFileSystem fs);
+		public abstract void Run(EphemeralCluster cluster, INodeFileSystem fs);
 
 		private static bool IsMono { get; } = Type.GetType("Mono.Runtime") != null;
 		protected string BinarySuffix => IsMono || Path.PathSeparator == '/' ? "" : ".bat";

@@ -1,13 +1,12 @@
 using System;
 using Elastic.Managed.Configuration;
-using Elastic.Managed.Ephemeral.Clusters;
 using Elastic.Managed.FileSystem;
 
 namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 {
 	public class ValidateRunningVersion : NodeValidationTaskBase
 	{
-		public override void Validate(EphemeralClusterBase cluster, INodeFileSystem fileSystem)
+		public override void Validate(EphemeralCluster cluster, INodeFileSystem fileSystem)
 		{
 			var alreadyUp = cluster.Client.RootNodeInfo();
 			if (!alreadyUp.IsValid) return;

@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using Elastic.Managed.Configuration;
 using Elastic.Managed.ConsoleWriters;
-using Elastic.Managed.Ephemeral.Clusters;
 using Elastic.Managed.Ephemeral.Plugins;
 using Elastic.Managed.FileSystem;
 
@@ -11,7 +10,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 {
 	public class InstallPlugins : InstallationTaskBase
 	{
-		public override void Run(EphemeralClusterBase cluster, INodeFileSystem fs)
+		public override void Run(EphemeralCluster cluster, INodeFileSystem fs)
 		{
 			var v = fs.Version;
 			//on 2.x we do not support tests requiring plugins for 2.x since we can not reliably install them

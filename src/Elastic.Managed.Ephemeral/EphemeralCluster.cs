@@ -1,22 +1,19 @@
 using System;
 using System.Linq;
-using Elastic.Managed.Clusters;
 using Elastic.Managed.Configuration;
 using Elastic.Managed.Ephemeral.Plugins;
-using Elastic.Managed.Ephemeral.Tasks;
-using Elastic.Managed.FileSystem;
 using Elasticsearch.Net;
 using Nest;
 
-namespace Elastic.Managed.Ephemeral.Clusters
+namespace Elastic.Managed.Ephemeral
 {
-	public abstract class EphemeralClusterBase : ClusterBase
+	public class EphemeralCluster : ClusterBase
 	{
-		private readonly string _uniqueSuffix = Guid.NewGuid().ToString("N").Substring(0, 6);
-		public string ClusterName => $"ephemeral-cluster-{_uniqueSuffix}";
-
-		protected EphemeralClusterBase(ElasticsearchVersion version, int instanceCount = 1, NodeFeatures nodeFeatures = NodeFeatures.None)
-			: base(new EphemeralFileSystem(version), instanceCount, nodeFeatures) => this.Composer = new EphemeralClusterComposer(this);
+		public EphemeralCluster(ElasticsearchVersion version, int instanceCount = 1, NodeFeatures nodeFeatures = NodeFeatures.None)
+			: base(new EphemeralFileSystem(version), instanceCount, nodeFeatures)
+		{
+			this.Composer = new EphemeralClusterComposer(this);
+		}
 
 		protected override string CreateNodeName(int p)
 		{
@@ -38,7 +35,7 @@ namespace Elastic.Managed.Ephemeral.Clusters
 				{
 					if (this._client != null) return this._client;
 
-					var hosts = this.Nodes.Select(n => new Uri($"http://localhost:{n.DesiredPort}"));
+					var hosts = this.Nodes.Select(n => new Uri($"http://localhost:{n.NodeConfiguration.DesiredPort}"));
 					var settings = new ConnectionSettings(new StaticConnectionPool(hosts));
 					var client = new ElasticClient(CreateConnectionSettings(settings));
 					// ReSharper disable once PossibleMultipleWriteAccessInDoubleCheckLocking
@@ -47,13 +44,12 @@ namespace Elastic.Managed.Ephemeral.Clusters
 				}
 
 				return this._client;
-
 			}
 		}
 
 		public virtual ElasticsearchPluginConfiguration[] RequiredPlugins { get; } = new ElasticsearchPluginConfiguration[0];
 
-		protected abstract ConnectionSettings CreateConnectionSettings(ConnectionSettings connectionSettings);
+		protected virtual ConnectionSettings CreateConnectionSettings(ConnectionSettings connectionSettings) => connectionSettings;
 
 	}
 }

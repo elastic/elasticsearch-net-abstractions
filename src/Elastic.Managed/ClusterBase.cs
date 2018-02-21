@@ -7,7 +7,7 @@ using Elastic.Managed.Configuration;
 using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.FileSystem;
 
-namespace Elastic.Managed.Clusters
+namespace Elastic.Managed
 {
 	public abstract class ClusterBase : IDisposable
 	{

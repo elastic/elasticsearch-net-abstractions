@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
 using Elastic.Managed.Configuration;
+using Elastic.Managed.FileSystem;
 
-namespace Elastic.Managed.FileSystem
+namespace Elastic.Managed.Ephemeral
 {
 	public class EphemeralFileSystem : NodeFileSystem
 	{

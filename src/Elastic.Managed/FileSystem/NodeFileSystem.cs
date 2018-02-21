@@ -7,7 +7,7 @@ namespace Elastic.Managed.FileSystem
 {
 	public class NodeFileSystem : INodeFileSystem
 	{
-		protected const string SubFolder = "ElasticsearchRunner";
+		protected const string SubFolder = "ElasticManaged";
 		public ElasticsearchVersion Version { get; }
 
 		private static bool IsMono { get; } = Type.GetType("Mono.Runtime") != null;

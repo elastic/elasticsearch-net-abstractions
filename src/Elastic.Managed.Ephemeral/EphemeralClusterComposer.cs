@@ -2,22 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Elastic.Managed.Clusters;
-using Elastic.Managed.Ephemeral.Clusters;
 using Elastic.Managed.Ephemeral.Tasks.AfterNodeStoppedTasks;
 using Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks;
 using Elastic.Managed.Ephemeral.Tasks.InstallationTasks;
 using Elastic.Managed.Ephemeral.Tasks.ValidationTasks;
 using Elastic.Managed.FileSystem;
 
-namespace Elastic.Managed.Ephemeral.Tasks
+namespace Elastic.Managed.Ephemeral
 {
 	public class EphemeralClusterComposer : IClusterComposer
 	{
-		private EphemeralClusterBase Cluster { get; }
+		private EphemeralCluster Cluster { get; }
 		private static readonly object Lock = new object();
 
-		public EphemeralClusterComposer(EphemeralClusterBase cluster) => this.Cluster = cluster;
+		public EphemeralClusterComposer(EphemeralCluster cluster) => this.Cluster = cluster;
 
 		private static IEnumerable<InstallationTaskBase> InstallationTasks { get; } = new List<InstallationTaskBase>
 		{
@@ -67,7 +65,7 @@ namespace Elastic.Managed.Ephemeral.Tasks
 			File.WriteAllText(file, string.Join(Environment.NewLine, logs));
 		}
 
-		private void Itterate<T>(IEnumerable<T> collection, Action<T, EphemeralClusterBase, INodeFileSystem> act, bool log = true)
+		private void Itterate<T>(IEnumerable<T> collection, Action<T, EphemeralCluster, INodeFileSystem> act, bool log = true)
 		{
 			lock (EphemeralClusterComposer.Lock)
 			{

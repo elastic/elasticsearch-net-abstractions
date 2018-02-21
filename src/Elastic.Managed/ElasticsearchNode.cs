@@ -12,7 +12,6 @@ namespace Elastic.Managed
 	public class ElasticsearchNode : ObservableProcess
 	{
 		public string Version { get; private set; }
-		public int DesiredPort { get; set; } = 9200;
 		public int? Port { get; private set; }
 		public bool NodeStarted { get; private set; }
 		public NodeConfiguration NodeConfiguration { get; }
@@ -98,7 +97,8 @@ namespace Elastic.Managed
 			else if (LineOutParser.TryGetPortNumber(section, message, out var port))
 			{
 				this.Port = port;
-				if (this.Port != this.DesiredPort) throw new CleanExitException($"Node started on port {port} but {this.DesiredPort} was requested");
+				var dp = this.NodeConfiguration.DesiredPort;
+				if (dp.HasValue && this.Port != dp.Value) throw new CleanExitException($"Node started on port {port} but {dp.Value} was requested");
 			}
 
 			// if we have a writer always return true

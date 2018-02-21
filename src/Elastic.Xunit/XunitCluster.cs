@@ -1,5 +1,4 @@
-﻿using Elastic.Managed.Configuration;
-using Elastic.Managed.Ephemeral.Clusters;
+﻿using Elastic.Managed.Ephemeral;
 using Elastic.Xunit.Configuration;
 
 namespace Elastic.Xunit

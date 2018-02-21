@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Elastic.Managed.Clusters;
+using Elastic.Managed;
 using Elastic.Xunit.Configuration;
 using Xunit.Abstractions;
 using Xunit.Sdk;

@@ -1,4 +1,4 @@
-namespace Elastic.Managed.Clusters
+namespace Elastic.Managed
 {
 	public interface IClusterComposer
 	{
