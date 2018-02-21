@@ -1,4 +1,9 @@
-﻿using Elastic.Managed.Ephimeral.Clusters;
+﻿using System;
+using Elastic.Managed;
+using Elastic.Managed.Configuration;
+using Elastic.Managed.Ephemeral.Clusters;
+using Elastic.Managed.FileSystem;
+using Elasticsearch.Net;
 
 namespace ScratchPad
 {
@@ -13,15 +18,24 @@ namespace ScratchPad
 //				node.WaitForStarted(TimeSpan.FromMinutes(2));
 //			}
 
-			using (var cluster = new EphimeralCluster("5.5.1", instanceCount: 2))
+			using (var node = new ElasticsearchNode("6.0.0-beta2", @"c:\Data\elasticsearch-6.0.0-beta2"))
+			//using (var node = new ElasticsearchNode(new NodeConfiguration("5.5.1")))
+			//using (var node = new ElasticsearchNode(new NodeConfiguration(new EphemeralFileSystem("5.5.1"))))
 			{
-				cluster.Start();
-
-				//Console.ReadKey();
+				node.Subscribe();
+				node.WaitForStarted(TimeSpan.FromMinutes(2));
 			}
+
+//			using (var cluster = new EphemeralCluster("5.5.1", instanceCount: 2))
+//			{
+//				cluster.Start();
+//
+//				//Console.ReadKey();
+//			}
 
 			return 0;
 		}
 
 	}
+
 }
