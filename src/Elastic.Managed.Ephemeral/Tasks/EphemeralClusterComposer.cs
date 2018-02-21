@@ -23,8 +23,8 @@ namespace Elastic.Managed.Ephemeral.Tasks
 		{
 			new CreateLocalApplicationDirectory(),
 			new EnsureJavaHomeEnvironmentVariableIsSet(),
-			new DownloadCurrentElasticsearchDistribution(),
-			new UnzipCurrentElasticsearchDistribution(),
+			new DownloadElasticsearchVersion(),
+			new UnzipElasticsearch(),
 			new CreateEasyRunBatFile(),
 			new InstallPlugins(),
 		};
@@ -45,7 +45,7 @@ namespace Elastic.Managed.Ephemeral.Tasks
 			new ValidateClusterStateTask()
 		};
 
-		public void OnStop() => Itterate(NodeStoppedTasks, (t, c, fs) => t.Run(c, fs));
+		public void OnStop() => Itterate(NodeStoppedTasks, (t, c, fs) => t.Run(c, fs), log: false);
 
 		public void Install()=> Itterate(InstallationTasks, (t, c, fs) => t.Run(c, fs));
 

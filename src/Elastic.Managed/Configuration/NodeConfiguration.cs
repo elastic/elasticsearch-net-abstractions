@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Elastic.Managed.FileSystem;
 
@@ -38,6 +39,9 @@ namespace Elastic.Managed.Configuration
 			if (!string.IsNullOrWhiteSpace(this.FileSystem.ClusterName)) this.Settings.Add($"cluster.name={this.FileSystem.ClusterName}");
 			if (!string.IsNullOrWhiteSpace(this.FileSystem.RepositoryPath)) this.Settings.Add($"path.repo={this.FileSystem.RepositoryPath}");
 			if (!string.IsNullOrWhiteSpace(this.FileSystem.DataPath)) this.Settings.Add($"path.data={this.FileSystem.DataPath}");
+			var logsPathDefault = Path.Combine(this.FileSystem.ElasticsearchHome, "logs");
+			if (logsPathDefault != this.FileSystem.LogsPath)
+				if (!string.IsNullOrWhiteSpace(this.FileSystem.LogsPath)) this.Settings.Add($"path.logs={this.FileSystem.LogsPath}");
 			AddXpackSettings(v, this.Settings);
 		}
 

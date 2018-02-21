@@ -7,6 +7,7 @@ namespace Elastic.Managed.FileSystem
 {
 	public class NodeFileSystem : INodeFileSystem
 	{
+		protected const string SubFolder = "ElasticsearchRunner";
 		public ElasticsearchVersion Version { get; }
 
 		private static bool IsMono { get; } = Type.GetType("Mono.Runtime") != null;
@@ -36,7 +37,7 @@ namespace Elastic.Managed.FileSystem
 		protected static string AppDataFolder(ElasticsearchVersion version)
 		{
 			var appData = GetApplicationDataDirectory();
-			return Path.Combine(appData, "ElasticsearchRunner", version.FullyQualifiedVersion);
+			return Path.Combine(appData, SubFolder, version.FullyQualifiedVersion);
 		}
 
 		protected static string LocalAppDataHome(ElasticsearchVersion version)

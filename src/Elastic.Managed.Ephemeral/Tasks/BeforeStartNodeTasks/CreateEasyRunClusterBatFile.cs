@@ -1,6 +1,7 @@
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.Ephemeral.Clusters;
 using Elastic.Managed.FileSystem;
 
@@ -21,6 +22,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks
 			var badSettings = new[] {"node.name", "cluster.name", "http.port"};
 			var batSettings = string.Join(" ", n.CommandLineArguments.Where(s => !badSettings.Any(s.Contains)));
 			File.WriteAllText(easyRunBat, $@"elasticsearch-{v}\bin\elasticsearch.bat {batSettings}");
+			cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateEasyRunClusterBatFile)}}} created easy run bat for [{clusterMoniker}]: {{{easyRunBat}}}");
 		}
 	}
 }

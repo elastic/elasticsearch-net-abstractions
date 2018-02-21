@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
+using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.Ephemeral.Clusters;
 using Elastic.Managed.FileSystem;
 using ProcNet;
@@ -32,9 +33,9 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 			if (!File.Exists(fileLocation)) File.WriteAllText(fileLocation, contents);
 		}
 
-		protected static void ExecuteBinary(string binary, string description, params string[] arguments)
+		protected static void ExecuteBinary(IConsoleLineWriter writer, string binary, string description, params string[] arguments)
 		{
-			Console.WriteLine($"Preparing to execute: {description} ...");
+			writer?.WriteDiagnostic($"{{{nameof(ExecuteBinary)}}} starting process [{description}] {{{binary}}} {{{string.Join(" ", arguments)}}}");
 
 			var timeout = TimeSpan.FromSeconds(420);
 			var result = Proc.Start(binary, timeout, new ConsoleOutColorWriter(), arguments);
@@ -42,7 +43,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 			if (!result.Completed)
 				throw new Exception($"Timeout while executing {description} exceeded {timeout}");
 
-			Console.WriteLine($"Finished executing {description} exit code: {result.ExitCode}");
+			writer?.WriteDiagnostic($"{{{nameof(ExecuteBinary)}}} finished process [{description}] {{{result.ExitCode}}}");
 		}
 
 	}

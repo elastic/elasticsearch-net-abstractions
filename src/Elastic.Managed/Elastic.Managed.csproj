@@ -9,7 +9,7 @@
     <InformationalVersion>$(ElasticsearchNodeCurrentVersion)</InformationalVersion>
     <AssemblyVersion>$(ElasticsearchNodeCurrentAssemblyVersion)</AssemblyVersion>
     <FileVersion>$(ElasticsearchNodeCurrentAssemblyFileVersion)</FileVersion>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <!--<ProjectReference Include="..\..\..\..\proc\src\Proc\Proc.csproj" />-->

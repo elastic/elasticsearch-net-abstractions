@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using Elastic.Managed.Configuration;
+using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.Ephemeral.Clusters;
 using Elastic.Managed.Ephemeral.Plugins;
 using Elastic.Managed.FileSystem;
@@ -25,8 +26,8 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 
 			foreach (var plugin in plugins)
 			{
-				var installParameter = !v.IsSnapshot ? plugin.Moniker : DownloadSnapshotIfNeeded(fs, plugin, v);
-				ExecuteBinary(fs.PluginBinary, $"install elasticsearch plugin: {plugin.Moniker}", "install --batch", installParameter);
+				var installParameter = !v.IsSnapshot ? plugin.Moniker : DownloadSnapshotIfNeeded(cluster.Writer, fs, plugin, v);
+				ExecuteBinary(cluster.Writer, fs.PluginBinary, $"install elasticsearch plugin: {plugin.Moniker}", "install --batch", installParameter);
 			}
 		}
 
@@ -39,27 +40,28 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 			return Directory.Exists(pluginFolder);
 		}
 
-		private static string DownloadSnapshotIfNeeded(INodeFileSystem fileSystem, ElasticsearchPlugin plugin, ElasticsearchVersion v)
+		private static string DownloadSnapshotIfNeeded(IConsoleLineWriter writer, INodeFileSystem fileSystem, ElasticsearchPlugin plugin, ElasticsearchVersion v)
 		{
 			var downloadLocation = Path.Combine(fileSystem.LocalFolder, plugin.SnapshotZip(v));
-			DownloadPluginSnapshot(downloadLocation, plugin, v);
+			DownloadPluginSnapshot(writer, downloadLocation, plugin, v);
 			//transform downloadLocation to file uri and use that to install from
 			return new Uri(downloadLocation).AbsoluteUri;
 		}
 
-		private static void DownloadPluginSnapshot(string downloadLocation, ElasticsearchPlugin plugin, ElasticsearchVersion v)
+		private static void DownloadPluginSnapshot(IConsoleLineWriter writer, string downloadLocation, ElasticsearchPlugin plugin, ElasticsearchVersion v)
 		{
 			if (File.Exists(downloadLocation)) return;
 			var downloadUrl = plugin.SnapshotDownloadUrl(v);
-			Console.WriteLine($"Download plugin snapshot {plugin.Moniker}: {downloadUrl}");
+			writer?.WriteDiagnostic($"{{{nameof(DownloadPluginSnapshot)}}} downloading [{plugin.Moniker}] from {{{downloadUrl}}}");
 			try
 			{
 				DownloadFile(downloadUrl, downloadLocation);
-				Console.WriteLine($"Downloaded plugin snapshot {plugin.Moniker}");
+				writer?.WriteDiagnostic($"{{{nameof(DownloadPluginSnapshot)}}} downloaded [{plugin.Moniker}] to {{{downloadLocation}}}");
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
-				Console.WriteLine($"Failed downloading plugin snapshot {plugin.Moniker}, {e.Message}");
+				writer?.WriteDiagnostic($"{{{nameof(DownloadPluginSnapshot)}}} download failed! [{plugin.Moniker}] from {{{downloadUrl}}}");
+				throw;
 			}
 		}
 	}

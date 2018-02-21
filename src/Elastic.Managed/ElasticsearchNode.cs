@@ -53,14 +53,14 @@ namespace Elastic.Managed
 			return false;
 		}
 
-		private IConsoleLineWriter _writer;
+		internal IConsoleLineWriter Writer { get; private set; }
 		public void Subscribe() => this.Subscribe(new HighlightWriter());
 		public void Subscribe(IConsoleLineWriter writer)
 		{
-			this._writer = writer;
+			this.Writer = writer;
 			var node = this.NodeConfiguration.DesiredNodeName;
-			writer?.Write(ConsoleOut.Out($"[{DateTime.UtcNow:yyyy-MM-ddThh:mm:ss,fff}][INFO ][Managed Elasticsearch\t] [{node}] Elasticsearch location: [{this.Binary}]"));
-			writer?.Write(ConsoleOut.Out($"[{DateTime.UtcNow:yyyy-MM-ddThh:mm:ss,fff}][INFO ][Managed Elasticsearch\t] [{node}] Settings: {{{string.Join(" ", this.NodeConfiguration.CommandLineArguments)}}}"));
+			writer?.WriteDiagnostic($"Elasticsearch location: [{this.Binary}]", node);
+			writer?.WriteDiagnostic($"Settings: {{{string.Join(" ", this.NodeConfiguration.CommandLineArguments)}}}", node);
 			this.SubscribeLines(l => writer?.Write(l), e => writer?.Write(e), delegate {});
 		}
 
@@ -77,9 +77,9 @@ namespace Elastic.Managed
 		protected override bool KeepBufferingLines(LineOut c)
 		{
 			//if the node is already started only keep buffering lines while we have a writer;
-			if (this.NodeStarted) return this._writer != null;
+			if (this.NodeStarted) return this.Writer != null;
 
-			var parsed = LineOutParser.TryParse(c.Line, out _, out _, out var section, out _, out var message, out var started);
+			var parsed = LineOutParser.TryParse(c?.Line, out _, out _, out var section, out _, out var message, out var started);
 
 			if (!started) started = AssumedStartedStateChecker(section, message);
 			if (started)
@@ -88,7 +88,7 @@ namespace Elastic.Managed
 				this._startedHandle.Set();
 			}
 
-			if (!parsed) return this._writer != null;
+			if (!parsed) return this.Writer != null;
 
 			if (this.JavaProcessId == null && LineOutParser.TryParseNodeInfo(section, message, out var version, out var pid))
 			{
@@ -102,7 +102,7 @@ namespace Elastic.Managed
 			}
 
 			// if we have a writer always return true
-			if (this._writer != null) return true;
+			if (this.Writer != null) return true;
 			//otherwise only keep buffering if we are not started
 			return !started;
 		}

@@ -1,11 +1,12 @@
 using System;
 using System.IO;
+using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.Ephemeral.Clusters;
 using Elastic.Managed.FileSystem;
 
 namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 {
-	public class DownloadCurrentElasticsearchDistribution : InstallationTaskBase
+	public class DownloadElasticsearchVersion : InstallationTaskBase
 	{
 		public override void Run(EphemeralClusterBase cluster, INodeFileSystem fs)
 		{
@@ -13,9 +14,11 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 			var from = v.DownloadUrl;
 			var to = Path.Combine(fs.LocalFolder, fs.Version.Zip);
 			if (File.Exists(to)) return;
+
+			cluster.Writer?.WriteDiagnostic($"{{{nameof(DownloadElasticsearchVersion)}}} downloading Elasticsearch [{v}] from {{{from}}} {{{to}}}");
 			Console.WriteLine($"Download elasticsearch: {v} from {from} to {to}");
 			DownloadFile(from, to);
-			Console.WriteLine($"Downloaded elasticsearch: {v} to {to}");
+			cluster.Writer?.WriteDiagnostic($"{{{nameof(DownloadElasticsearchVersion)}}} downloaded Elasticsearch [{v}] from {{{from}}} {{{to}}}");
 		}
 	}
 }

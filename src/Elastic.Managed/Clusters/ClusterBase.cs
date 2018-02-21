@@ -17,6 +17,7 @@ namespace Elastic.Managed.Clusters
 		public bool Started { get; private set; }
 		//public virtual ElasticsearchPlugin[] RequiredPlugins { get; }
 		public string ClusterMoniker => this.GetType().Name.Replace("Cluster", "");
+		public IConsoleLineWriter Writer { get; private set; }
 
 		protected ClusterBase(ElasticsearchVersion version, int instanceCount = 1, string clusterName = null, NodeFeatures nodeFeatures = NodeFeatures.None)
 			: this(new NodeFileSystem(version, clusterName), instanceCount, nodeFeatures) { }
@@ -69,17 +70,21 @@ namespace Elastic.Managed.Clusters
 
 		public void Start(IConsoleLineWriter writer, TimeSpan waitForStarted)
 		{
+			this.Writer = writer;
 			this.Composer?.Install();
 			this.Composer?.OnBeforeStart();
 			foreach (var node in this.Nodes) node.Subscribe(writer);
 
 			var waitHandles = this.Nodes.Select(w => w.StartedHandle).ToArray();
-			if (!WaitHandle.WaitAll(waitHandles, waitForStarted))
-				throw new Exception($"Not all nodes started on time");
+			if (!WaitHandle.WaitAll(waitHandles, waitForStarted)) throw new Exception($"Not all nodes started on time");
 
-			this.Started = true;
-			this.Composer?.ValidateAfterStart();
-			this.SeedNode();
+			this.Started = this.Nodes.All(n=>n.NodeStarted);
+			if (this.Started)
+			{
+				this.Composer?.ValidateAfterStart();
+				this.SeedNode();
+			}
+			else writer?.WriteError($"{{{this.GetType().Name}.{nameof(Start)}}} cluster did not start succesfully");
 		}
 
 		public void WaitForExit(TimeSpan waitForCompletion)
