@@ -3,7 +3,7 @@ using ProcNet.Std;
 
 namespace Elastic.Managed.ConsoleWriters
 {
-	public class NoColorWriter : IConsoleOutWriter
+	public class NoColorWriter : IConsoleLineWriter
 	{
 		public void Write(LineOut lineOut)
 		{

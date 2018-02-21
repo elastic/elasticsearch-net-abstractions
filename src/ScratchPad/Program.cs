@@ -24,6 +24,7 @@ namespace ScratchPad
 			{
 				node.Subscribe();
 				node.WaitForStarted(TimeSpan.FromMinutes(2));
+				Console.ReadKey();
 			}
 
 //			using (var cluster = new EphemeralCluster("5.5.1", instanceCount: 2))

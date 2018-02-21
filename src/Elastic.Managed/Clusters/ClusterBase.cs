@@ -67,7 +67,7 @@ namespace Elastic.Managed.Clusters
 		public void Start(TimeSpan waitForStarted) =>
 			this.Start(new HighlightWriter(this.Nodes.Select(n => n.NodeConfiguration.DesiredNodeName).ToArray()), waitForStarted);
 
-		public void Start(IConsoleOutWriter writer, TimeSpan waitForStarted)
+		public void Start(IConsoleLineWriter writer, TimeSpan waitForStarted)
 		{
 			this.Composer?.Install();
 			this.Composer?.OnBeforeStart();

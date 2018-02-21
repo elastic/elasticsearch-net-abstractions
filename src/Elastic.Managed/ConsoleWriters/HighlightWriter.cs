@@ -6,7 +6,7 @@ using ProcNet.Std;
 
 namespace Elastic.Managed.ConsoleWriters
 {
-	public class HighlightWriter : IConsoleOutWriter
+	public class HighlightWriter : IConsoleLineWriter
 	{
 		private static readonly ConsoleColor[] AvailableNodeColors =
 		{
@@ -184,6 +184,7 @@ namespace Elastic.Managed.ConsoleWriters
 
 		private static void WriteBlock(TextWriter w, ConsoleColor color, string block, int? pad = null)
 		{
+			if (string.IsNullOrEmpty(block)) return;
 			var b = pad != null ? block.PadRight(pad.Value) : block;
 			Console.ForegroundColor = ConsoleColor.DarkGray;
 			w.Write("[");

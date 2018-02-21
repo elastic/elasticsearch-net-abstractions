@@ -6,7 +6,6 @@ using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.FileSystem;
 using ProcNet;
 using ProcNet.Std;
-using IConsoleOutWriter = Elastic.Managed.ConsoleWriters.IConsoleOutWriter;
 
 namespace Elastic.Managed
 {
@@ -24,10 +23,7 @@ namespace Elastic.Managed
 
 		public ElasticsearchNode(ElasticsearchVersion version, string elasticsearchHome) : this(new NodeConfiguration(new NodeFileSystem(version, elasticsearchHome))) { }
 
-		public ElasticsearchNode(NodeConfiguration config) : base(StartArgs(config))
-		{
-			this.NodeConfiguration = config;
-		}
+		public ElasticsearchNode(NodeConfiguration config) : base(StartArgs(config)) => this.NodeConfiguration = config;
 
 		private static StartArguments StartArgs(NodeConfiguration config) =>
 			new StartArguments(config.FileSystem.Binary, config.CommandLineArguments)
@@ -57,9 +53,9 @@ namespace Elastic.Managed
 			return false;
 		}
 
-		private IConsoleOutWriter _writer;
+		private IConsoleLineWriter _writer;
 		public void Subscribe() => this.Subscribe(new HighlightWriter());
-		public void Subscribe(IConsoleOutWriter writer)
+		public void Subscribe(IConsoleLineWriter writer)
 		{
 			this._writer = writer;
 			var node = this.NodeConfiguration.DesiredNodeName;
