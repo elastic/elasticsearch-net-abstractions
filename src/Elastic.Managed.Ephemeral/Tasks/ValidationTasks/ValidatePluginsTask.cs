@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using Elastic.Managed.Configuration;
+using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.Ephemeral.Clusters;
 using Elastic.Managed.FileSystem;
 using Nest;
@@ -11,9 +13,11 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 		public override void Validate(EphemeralClusterBase cluster, INodeFileSystem fs)
 		{
 			var v = fs.Version;
-			//if the version we are running against is a s snapshot version we do not validate plugins
-			//because we can not reliably install plugins against snapshots
-			if (v.IsSnapshot) return;
+			if (v.Major == 2)
+			{
+				cluster.Writer?.WriteDiagnostic($"{{{nameof(ValidatePluginsTask)}}} skipping validate plugins on {{2.x}} version: [{v}]");
+				return;
+			}
 
 			var supported = cluster.RequiredPlugins.Select(p => p.Moniker).ToList();
 			if (!supported.Any()) return;

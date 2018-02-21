@@ -76,7 +76,11 @@ namespace Elastic.Managed.Clusters
 			foreach (var node in this.Nodes) node.Subscribe(writer);
 
 			var waitHandles = this.Nodes.Select(w => w.StartedHandle).ToArray();
-			if (!WaitHandle.WaitAll(waitHandles, waitForStarted)) throw new Exception($"Not all nodes started on time");
+			if (!WaitHandle.WaitAll(waitHandles, waitForStarted))
+			{
+				writer?.WriteError($"{{{this.GetType().Name}.{nameof(Start)}}} cluster did not start after {waitForStarted}");
+				throw new Exception($"Not all nodes started after waiting {waitForStarted}");
+			}
 
 			this.Started = this.Nodes.All(n=>n.NodeStarted);
 			if (this.Started)

@@ -51,7 +51,7 @@ namespace Elastic.Managed.Ephemeral.Clusters
 			}
 		}
 
-		public virtual ElasticsearchPlugin[] RequiredPlugins { get; } = new ElasticsearchPlugin[0];
+		public virtual ElasticsearchPluginConfiguration[] RequiredPlugins { get; } = new ElasticsearchPluginConfiguration[0];
 
 		protected abstract ConnectionSettings CreateConnectionSettings(ConnectionSettings connectionSettings);
 

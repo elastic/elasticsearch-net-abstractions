@@ -11,7 +11,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 		public override void Run(EphemeralClusterBase cluster, INodeFileSystem fs)
 		{
 			var v = fs.Version;
-			var from = v.DownloadUrl;
+			var from = v.DownloadLocations.ElasticsearchDownloadUrl;
 			var to = Path.Combine(fs.LocalFolder, fs.Version.Zip);
 			if (File.Exists(to)) return;
 

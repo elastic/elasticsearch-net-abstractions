@@ -14,9 +14,13 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 		public override void Run(EphemeralClusterBase cluster, INodeFileSystem fs)
 		{
 			var v = fs.Version;
+			//on 2.x we do not support tests requiring plugins for 2.x since we can not reliably install them
+			if (v.Major == 2)
+			{
+				cluster.Writer?.WriteDiagnostic($"{{{nameof(InstallPlugins)}}} skipping install plugins on {{2.x}} version: [{v}]");
+				return;
+			}
 			var requiredPlugins = cluster.RequiredPlugins;
-			//on 2.x we so not support tests requiring plugins for 2.x since we can not reliably install them
-			if (v.IsSnapshot && v.Major == 2) return;
 			var plugins =
 				from plugin in requiredPlugins
 				let validForCurrentVersion = plugin.IsValid(v)
@@ -26,12 +30,12 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 
 			foreach (var plugin in plugins)
 			{
-				var installParameter = !v.IsSnapshot ? plugin.Moniker : DownloadSnapshotIfNeeded(cluster.Writer, fs, plugin, v);
+				var installParameter = v.ReleaseState == ReleaseState.Released ? plugin.Moniker : UseHttpPluginLocation(cluster.Writer, fs, plugin, v);
 				ExecuteBinary(cluster.Writer, fs.PluginBinary, $"install elasticsearch plugin: {plugin.Moniker}", "install --batch", installParameter);
 			}
 		}
 
-		private static bool AlreadyInstalled(ElasticsearchPlugin plugin, INodeFileSystem fileSystem)
+		private static bool AlreadyInstalled(ElasticsearchPluginConfiguration plugin, INodeFileSystem fileSystem)
 		{
 			var folder = plugin.Moniker;
 			var pluginFolder = Path.Combine(fileSystem.ElasticsearchHome, "plugins", folder);
@@ -40,18 +44,18 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 			return Directory.Exists(pluginFolder);
 		}
 
-		private static string DownloadSnapshotIfNeeded(IConsoleLineWriter writer, INodeFileSystem fileSystem, ElasticsearchPlugin plugin, ElasticsearchVersion v)
+		private static string UseHttpPluginLocation(IConsoleLineWriter writer, INodeFileSystem fileSystem, ElasticsearchPluginConfiguration plugin, ElasticsearchVersion v)
 		{
-			var downloadLocation = Path.Combine(fileSystem.LocalFolder, plugin.SnapshotZip(v));
+			var downloadLocation = Path.Combine(fileSystem.LocalFolder, $"{plugin.Moniker}-{v}.zip");
 			DownloadPluginSnapshot(writer, downloadLocation, plugin, v);
 			//transform downloadLocation to file uri and use that to install from
 			return new Uri(downloadLocation).AbsoluteUri;
 		}
 
-		private static void DownloadPluginSnapshot(IConsoleLineWriter writer, string downloadLocation, ElasticsearchPlugin plugin, ElasticsearchVersion v)
+		private static void DownloadPluginSnapshot(IConsoleLineWriter writer, string downloadLocation, ElasticsearchPluginConfiguration plugin, ElasticsearchVersion v)
 		{
 			if (File.Exists(downloadLocation)) return;
-			var downloadUrl = plugin.SnapshotDownloadUrl(v);
+			var downloadUrl = plugin.DownloadUrl(v);
 			writer?.WriteDiagnostic($"{{{nameof(DownloadPluginSnapshot)}}} downloading [{plugin.Moniker}] from {{{downloadUrl}}}");
 			try
 			{

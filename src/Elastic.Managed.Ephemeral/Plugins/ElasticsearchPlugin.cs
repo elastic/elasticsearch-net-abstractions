@@ -1,29 +1,29 @@
 using System;
-using Elastic.Managed.Configuration;
+using System.Reflection;
 
 namespace Elastic.Managed.Ephemeral.Plugins
 {
-	public class ElasticsearchPlugin
+	public enum ElasticsearchPlugin
 	{
-		public string Moniker { get; }
-		private readonly Func<ElasticsearchVersion, bool> _validForVersion;
-
-		public ElasticsearchPlugin(OfficialPlugin plugin, Func<ElasticsearchVersion, bool> validForVersion = null)
+		[Moniker("delete-by-query")] DeleteByQuery,
+		[Moniker("cloud-azure")] CloudAzure,
+		[Moniker("mapper-attachments")] MapperAttachments,
+		[Moniker("mapper-murmur3")] MapperMurmer3,
+		[Moniker("x-pack")] XPack,
+		[Moniker("ingest-geoip")] IngestGeoIp,
+		[Moniker("ingest-attachment")] IngestAttachment,
+		[Moniker("analysis-kuromoji")] AnalysisKuromoji,
+		[Moniker("analysis-icu")] AnalysisIcu
+	}
+	public static class ElasticsearchPluginExtensions
+	{
+		public static string Moniker(this ElasticsearchPlugin plugin)
 		{
-			this._validForVersion = validForVersion;
-			this.Moniker = plugin.Moniker();
+			var info = typeof(ElasticsearchPlugin).GetField(plugin.ToString());
+			var da = info.GetCustomAttribute<MonikerAttribute>();
+
+			if (da == null) throw new InvalidOperationException($"{plugin} plugin must have a {nameof(MonikerAttribute)}");
+			return da.Moniker;
 		}
-
-		public static implicit operator ElasticsearchPlugin(OfficialPlugin officialPlugin) =>
-			new ElasticsearchPlugin(officialPlugin);
-
-		public bool IsValid(ElasticsearchVersion elasticsearchVersion) =>
-			this._validForVersion?.Invoke(elasticsearchVersion) ?? true;
-
-		public string SnapshotDownloadUrl(ElasticsearchVersion version)  =>
-			$"https://snapshots.elastic.co/downloads/elasticsearch-plugins/{Moniker}/{SnapshotZip(version)}";
-
-		public string SnapshotZip(ElasticsearchVersion version) => $"{Moniker}-{version.Version}.zip";
-
 	}
 }

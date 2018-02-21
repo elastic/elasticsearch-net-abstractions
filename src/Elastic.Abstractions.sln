@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elastic.Managed", "Elastic.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elastic.Managed.Ephemeral", "Elastic.Managed.Ephemeral\Elastic.Managed.Ephemeral.csproj", "{F5D3D2D7-CDA1-462A-81FD-A446C4CEB287}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elastic.Xunit", "Elastic.XUnit\Elastic.Xunit.csproj", "{681C6112-B885-4553-A06C-4CD9C262FC49}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{F5D3D2D7-CDA1-462A-81FD-A446C4CEB287}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5D3D2D7-CDA1-462A-81FD-A446C4CEB287}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5D3D2D7-CDA1-462A-81FD-A446C4CEB287}.Release|Any CPU.Build.0 = Release|Any CPU
+		{681C6112-B885-4553-A06C-4CD9C262FC49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{681C6112-B885-4553-A06C-4CD9C262FC49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{681C6112-B885-4553-A06C-4CD9C262FC49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{681C6112-B885-4553-A06C-4CD9C262FC49}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
