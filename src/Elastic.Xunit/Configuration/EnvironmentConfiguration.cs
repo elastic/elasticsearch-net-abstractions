@@ -20,7 +20,7 @@ namespace Elastic.Xunit.Configuration
 			//if env var NEST_INTEGRATION_VERSION is set assume integration mode
 			//used by the build script FAKE
 			var version = Environment.GetEnvironmentVariable("NEST_INTEGRATION_VERSION");
-			if (!string.IsNullOrEmpty(version)) Mode = TestMode.Integration;
+			Mode = TestMode.Integration;
 
 			this.ElasticsearchVersion = ElasticsearchVersion.From(string.IsNullOrWhiteSpace(version) ? DefaultVersion : version);
 			this.ClusterFilter = Environment.GetEnvironmentVariable("NEST_INTEGRATION_CLUSTER");

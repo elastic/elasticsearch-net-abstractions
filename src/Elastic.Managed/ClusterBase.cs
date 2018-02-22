@@ -36,7 +36,6 @@ namespace Elastic.Managed
 				})
 				.ToList();
 			this.Nodes = new ReadOnlyCollection<ElasticsearchNode>(nodes);
-			//this.TaskRunner = new ClusterTaskRunner(config);
 		}
 
 		protected virtual string CreateNodeName(int i) => null;
@@ -62,7 +61,7 @@ namespace Elastic.Managed
 			return config;
 		}
 
-		protected virtual void SeedNode() { }
+		protected virtual void SeedCluster() { }
 
 		public void Start() => this.Start(TimeSpan.FromMinutes(2));
 		public void Start(TimeSpan waitForStarted) =>
@@ -86,7 +85,7 @@ namespace Elastic.Managed
 			if (this.Started)
 			{
 				this.Composer?.ValidateAfterStart();
-				this.SeedNode();
+				this.SeedCluster();
 			}
 			else writer?.WriteError($"{{{this.GetType().Name}.{nameof(Start)}}} cluster did not start succesfully");
 		}

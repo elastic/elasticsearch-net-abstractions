@@ -1,42 +1,24 @@
-using System;
-using System.Linq;
-using System.Reflection;
 using Elastic.Xunit.Configuration;
+using Xunit;
 using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace Elastic.Xunit.XunitPlumbing
 {
-	public class UnitTestDiscoverer : NestTestDiscoverer
+    /// <summary>
+    /// A unit test
+    /// </summary>
+    [XunitTestCaseDiscoverer("Elastic.Xunit.XunitPlumbing.UnitTestDiscoverer", "Elastic.Xunit")]
+	public class U : FactAttribute { }
+
+	public class UnitTestDiscoverer : ElasticTestDiscoverer
 	{
-		public UnitTestDiscoverer(IMessageSink diagnosticMessageSink)
-			: base(diagnosticMessageSink, TestConfiguration.Configuration.RunUnitTests)
-		{
-		}
+		public UnitTestDiscoverer(IMessageSink diagnosticMessageSink) : base(diagnosticMessageSink) { }
 
 		protected override bool SkipMethod(ITestFrameworkDiscoveryOptions discoveryOptions, ITestMethod testMethod, IAttributeInfo factAttribute)
 		{
-			var classOfMethod = Type.GetType(testMethod.TestClass.Class.Name, true, true);
-			return !TestConfiguration.Configuration.RunUnitTests
-			       || ClassShouldSkipWhenPackageReference(classOfMethod)
-			       || ClassIsIntegrationOnly(classOfMethod)
-			       || SkipWhenNeedingTypedKeys(classOfMethod);
-		}
+			return !TestConfiguration.Configuration.RunUnitTests;
 
-
-		private static bool ClassShouldSkipWhenPackageReference(Type classOfMethod)
-		{
-#if TESTINGNUGETPACKAGE
-			var attributes = classOfMethod.GetAttributes<ProjectReferenceOnlyAttribute>();
-			return (attributes.Any());
-#else
-			return false;
-#endif
-		}
-
-		private static bool ClassIsIntegrationOnly(Type classOfMethod)
-		{
-			var attributes = classOfMethod.GetTypeInfo().GetCustomAttributes<IntegrationOnlyAttribute>();
-			return attributes.Any();
 		}
 	}
 }

@@ -3,52 +3,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Elastic.Xunit.Configuration;
+using SemVer;
+using Xunit;
 using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace Elastic.Xunit.XunitPlumbing
 {
-	public class IntegrationTestDiscoverer : NestTestDiscoverer
+	public abstract class SkipTestAttributeBase : Attribute
 	{
-		private bool RunningOnTeamCity { get; } = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("TEAMCITY_VERSION"));
+		public abstract bool Skip { get; }
+	}
 
-		public IntegrationTestDiscoverer(IMessageSink diagnosticMessageSink)
-			: base(diagnosticMessageSink, TestConfiguration.Configuration.RunIntegrationTests) { }
+    /// <summary> An integration test </summary>
+    [XunitTestCaseDiscoverer("Elastic.Xunit.XunitPlumbing.IntegrationTestDiscoverer", "Elastic.Xunit")]
+	public class I : FactAttribute { }
+
+	public class IntegrationTestDiscoverer : ElasticTestDiscoverer
+	{
+		public IntegrationTestDiscoverer(IMessageSink diagnosticMessageSink) : base(diagnosticMessageSink) { }
 
 		protected override bool SkipMethod(ITestFrameworkDiscoveryOptions discoveryOptions, ITestMethod testMethod, IAttributeInfo factAttribute)
 		{
-			var classOfMethod = Type.GetType(testMethod.TestClass.Class.Name, true, true);
-			var method = classOfMethod.GetMethod(testMethod.Method.Name, BindingFlags.FlattenHierarchy | BindingFlags.NonPublic | BindingFlags.Public)
-				?? testMethod.Method.ToRuntimeMethod();
+			if (!TestConfiguration.Configuration.RunIntegrationTests) return true;
 
-			return TypeSkipVersionAttributeSatisfies(classOfMethod)
-			       || MethodSkipVersionAttributeSatisfies(method)
-			       || SkipWhenRunOnTeamCity(classOfMethod, method)
-			       || SkipWhenNeedingTypedKeys(classOfMethod);
+			//Skip if the version we are testing against is attributed to be skipped do not run the test
+			var skipVersionRange = GetAttribute<SkipVersionAttribute, IList<Range>>(testMethod, nameof(SkipVersionAttribute.Ranges));
+			if (skipVersionRange != null) return TestConfiguration.VersionUnderTestSatisfiedBy(skipVersionRange.ToString());
+
+			var skipTests = GetAttributes<SkipTestAttributeBase, bool>(testMethod, nameof(SkipVersionAttribute.Ranges));
+			return skipTests.Any(skip => skip);
+
 		}
-
-		private bool SkipWhenRunOnTeamCity(Type classOfMethod, MethodInfo info)
-		{
-			if (!this.RunningOnTeamCity) return false;
-
-			var attributes = classOfMethod.GetTypeInfo().GetCustomAttributes<SkipOnTeamCityAttribute>()
-				.Concat(info.GetCustomAttributes<SkipOnTeamCityAttribute>());
-			return attributes.Any();
-		}
-
-		private static bool TypeSkipVersionAttributeSatisfies(Type classOfMethod) =>
-			VersionUnderTestMatchesAttribute(classOfMethod.GetTypeInfo().GetCustomAttributes<SkipVersionAttribute>());
-
-		private static bool MethodSkipVersionAttributeSatisfies(MethodInfo methodInfo) =>
-			VersionUnderTestMatchesAttribute(methodInfo.GetCustomAttributes<SkipVersionAttribute>());
-
-		private static bool VersionUnderTestMatchesAttribute(IEnumerable<SkipVersionAttribute> attributes)
-		{
-			if (!attributes.Any()) return false;
-
-			return attributes
-				.SelectMany(a => a.Ranges)
-				.Any(range => TestConfiguration.VersionUnderTestSatisfiedBy(range.ToString()));
-		}
-
 	}
 }

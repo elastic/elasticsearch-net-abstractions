@@ -16,6 +16,8 @@ namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks
 
 			var easyRunBat = Path.Combine(fs.LocalFolder, $"run-{clusterMoniker}.bat");
 			if (File.Exists(easyRunBat)) return;
+			cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateEasyRunClusterBatFile)}}} node count [{cluster.Nodes.Count}]");
+
 			var n = cluster.Nodes.First().NodeConfiguration;
 
 			var badSettings = new[] {"node.name", "cluster.name", "http.port"};

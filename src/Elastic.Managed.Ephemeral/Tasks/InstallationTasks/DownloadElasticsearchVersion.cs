@@ -15,7 +15,6 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 			if (File.Exists(to)) return;
 
 			cluster.Writer?.WriteDiagnostic($"{{{nameof(DownloadElasticsearchVersion)}}} downloading Elasticsearch [{v}] from {{{from}}} {{{to}}}");
-			Console.WriteLine($"Download elasticsearch: {v} from {from} to {to}");
 			DownloadFile(from, to);
 			cluster.Writer?.WriteDiagnostic($"{{{nameof(DownloadElasticsearchVersion)}}} downloaded Elasticsearch [{v}] from {{{from}}} {{{to}}}");
 		}

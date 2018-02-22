@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
-namespace Elastic.Xunit.Xunit
+namespace Elastic.Xunit.Sdk
 {
 	class TestCollectionRunner : XunitTestCollectionRunner
 	{

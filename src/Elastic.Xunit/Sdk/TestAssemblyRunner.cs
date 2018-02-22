@@ -11,11 +11,11 @@ using Elastic.Xunit.Configuration;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
-namespace Elastic.Xunit.Xunit
+namespace Elastic.Xunit.Sdk
 {
 	internal class TestAssemblyRunner : XunitTestAssemblyRunner
 	{
-		private readonly Dictionary<Type, object> _assemblyFixtureMappings = new Dictionary<Type, object>();
+		private readonly Dictionary<Type, XunitClusterBase> _assemblyFixtureMappings = new Dictionary<Type, XunitClusterBase>();
 		private readonly List<IGrouping<XunitClusterBase, GroupedByCluster>> _grouped;
 		private static readonly object _lock = new object();
 
@@ -37,9 +37,11 @@ namespace Elastic.Xunit.Xunit
 			ITestFrameworkExecutionOptions executionOptions)
 			: base(testAssembly, testCases, diagnosticMessageSink, executionMessageSink, executionOptions)
 		{
+			var tests = OrderTestCollections();
+
 			//bit side effecty, sets up _assemblyFixtureMappings before possibly letting xunit do its regular concurrency thing
-			this._grouped = (from c in OrderTestCollections()
-				let cluster = ClusterFixture(c.Item1)
+			this._grouped = (from c in tests
+				let cluster = ClusterFixture(c.Item2.First().TestMethod.TestClass)
 				let testcase = new GroupedByCluster {Collection = c.Item1, TestCases = c.Item2, Cluster = cluster}
 				group testcase by testcase.Cluster
 				into g
@@ -51,9 +53,10 @@ namespace Elastic.Xunit.Xunit
 		protected override Task<RunSummary> RunTestCollectionAsync(IMessageBus b, ITestCollection c, IEnumerable<IXunitTestCase> t, CancellationTokenSource s)
 		{
 			var aggregator = new ExceptionAggregator(Aggregator);
-			return new TestCollectionRunner(
-				_assemblyFixtureMappings, c, t, DiagnosticMessageSink, b, TestCaseOrderer, aggregator, s
-			).RunAsync();
+			var fixtureObjects = new Dictionary<Type, object>();
+			foreach (var kv in _assemblyFixtureMappings) fixtureObjects.Add(kv.Key, kv.Value);
+			return new TestCollectionRunner(fixtureObjects,c, t, DiagnosticMessageSink, b, TestCaseOrderer, aggregator, s)
+				.RunAsync();
 		}
 
 		protected override async Task<RunSummary> RunTestCollectionsAsync(IMessageBus messageBus,
@@ -88,15 +91,11 @@ namespace Elastic.Xunit.Xunit
 
 		private async Task<RunSummary> IntegrationPipeline(int defaultMaxConcurrency, IMessageBus messageBus, CancellationTokenSource ctx)
 		{
-			var excludedClusters = ParseExcludedClusters(TestConfiguration.Configuration.ClusterFilter);
 			var testFilters = CreateTestFilters(TestConfiguration.Configuration.TestFilter);
 			foreach (var group in this._grouped)
 			{
 				var type = @group.Key?.GetType();
 				var clusterName = type?.Name.Replace("Cluster", "") ?? "UNKNOWN";
-
-				if (excludedClusters.Contains(clusterName, StringComparer.OrdinalIgnoreCase))
-					continue;
 
 				var dop = @group.Key != null && @group.Key.MaxConcurrency > 0 ? @group.Key.MaxConcurrency : defaultMaxConcurrency;
 
@@ -157,59 +156,26 @@ namespace Elastic.Xunit.Xunit
 				.Any(filter => test.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0);
 		}
 
-		private XunitClusterBase ClusterFixture(ITestCollection testCollection)
+		private XunitClusterBase ClusterFixture(ITestClass testMethodTestClass)
 		{
-			var clusterType = GetClusterForCollection(testCollection);
-
-			XunitClusterBase cluster = null;
+			var clusterType = GetClusterForCollection(testMethodTestClass.Class);
 			if (clusterType == null) return null;
-			if (_assemblyFixtureMappings.ContainsKey(clusterType))
-				return _assemblyFixtureMappings[clusterType] as XunitClusterBase;
+
+			if (_assemblyFixtureMappings.TryGetValue(clusterType, out var cluster)) return cluster;
 			Aggregator.Run(() =>
 			{
 				var o = Activator.CreateInstance(clusterType);
-				_assemblyFixtureMappings.Add(clusterType, o);
 				cluster = o as XunitClusterBase;
 			});
+			_assemblyFixtureMappings.Add(clusterType, cluster);
 			return cluster;
 		}
 
-		private static Type GetClusterForCollection(ITestCollection testCollection)
-		{
-			var collectionTypeName = testCollection.DisplayName.Split(' ').Last();
-			var collectionType = Type.GetType(collectionTypeName);
-			var clusterType = collectionType.GetTypeInfo()
-				.ImplementedInterfaces
-				.Where(i => i.GetTypeInfo().IsGenericType && i.GetGenericTypeDefinition() == typeof(IClusterFixture<>))
-				.Select(i => i.GetTypeInfo().GenericTypeArguments.Single())
-				.FirstOrDefault();
-			return clusterType;
-		}
-
-		private IEnumerable<string> ParseExcludedClusters(string clusterFilter)
-		{
-			if (string.IsNullOrWhiteSpace(clusterFilter)) return Enumerable.Empty<string>();
-			var clusters = GetAllClustersFromAssembly();
-
-			var filters = clusterFilter.Split(',').Select(c => c.Trim().ToLowerInvariant()).ToArray();
-
-			var include = filters.Where(f => !f.StartsWith("-")).Select(f => f.ToLowerInvariant()).ToArray();
-			if (include.Any()) return clusters.Where(c => !include.Contains(c));
-
-			var exclude = filters.Where(f => f.StartsWith("-")).Select(f => f.TrimStart('-').ToLowerInvariant()).ToArray();
-			if (exclude.Any()) return exclude;
-
-			return new List<string>();
-		}
-
-		private static IEnumerable<string> GetAllClustersFromAssembly()
-		{
-			var clusters =
-				typeof(ClusterBase).GetTypeInfo().Assembly
-					.GetTypes()
-					.Where(t => typeof(ClusterBase).IsAssignableFrom(t) && t != typeof(ClusterBase))
-					.Select(c => c.Name.Replace("Cluster", "").ToLowerInvariant());
-			return clusters;
-		}
+		private static Type GetClusterForCollection(ITypeInfo testClass) => (
+			from i in testClass.Interfaces
+			where i.IsGenericType
+			from a in i.GetGenericArguments()
+			select a.ToRuntimeType()
+		).FirstOrDefault(type => typeof(XunitClusterBase).IsAssignableFrom(type));
 	}
 }

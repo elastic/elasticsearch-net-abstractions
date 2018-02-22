@@ -7,9 +7,9 @@ using Elastic.Xunit.Configuration;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
-namespace Elastic.Xunit.Xunit
+namespace Elastic.Xunit.Sdk
 {
-	class TestFrameworkExecutor : XunitTestFrameworkExecutor
+	public class TestFrameworkExecutor : XunitTestFrameworkExecutor
 	{
 		public TestFrameworkExecutor(AssemblyName a, ISourceInformationProvider sip, IMessageSink d) : base(a, sip, d) { }
 

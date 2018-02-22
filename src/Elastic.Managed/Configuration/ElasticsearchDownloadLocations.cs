@@ -20,9 +20,9 @@ namespace Elastic.Managed.Configuration
 			{
 				case ReleaseState.Released:
 					var downloadPath = Range.IsSatisfied("<5.0.0", version.Version)
-						? "https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/zip/elasticsearch"
+						? $"https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/zip/elasticsearch/{this.Version}"
 						: $"{ArtifactsHost}/downloads/elasticsearch";
-					this.ElasticsearchDownloadUrl = $"{downloadPath}/{this.Version}/{this.Version.Zip}";
+					this.ElasticsearchDownloadUrl = $"{downloadPath}/{this.Version.Zip}";
 					break;
 				case ReleaseState.Snapshot:
 					this.ElasticsearchDownloadUrl = $"{SonaTypeUrl}/{version}/{this.Version.Zip}";

@@ -4,13 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Elastic.Xunit.Xunit
+namespace Elastic.Xunit.Sdk
 {
-
-	public static class ForEachAsyncExtensions
+	internal static class ForEachAsyncExtensions
 	{
-
-		public static Task ForEachAsync<T>(this IEnumerable<T> source, int dop, Func<T, Task> body)
+		internal static Task ForEachAsync<T>(this IEnumerable<T> source, int dop, Func<T, Task> body)
 		{
 			return Task.WhenAll(
 				from partition in Partitioner.Create(source).GetPartitions(dop)

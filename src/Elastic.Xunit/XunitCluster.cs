@@ -8,7 +8,7 @@ namespace Elastic.Xunit
 		public virtual int MaxConcurrency { get; }
 
 		//todo pipe `instanceCount` to base
-		protected XunitClusterBase() : base(TestConfiguration.Configuration.ElasticsearchVersion, instanceCount: 0) { }
+		protected XunitClusterBase() : base(TestConfiguration.Configuration.ElasticsearchVersion, instanceCount: 1) { }
 
 	}
 }

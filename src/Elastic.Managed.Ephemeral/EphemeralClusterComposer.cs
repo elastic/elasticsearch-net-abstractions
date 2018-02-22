@@ -28,7 +28,8 @@ namespace Elastic.Managed.Ephemeral
 		};
 		private static IEnumerable<BeforeStartNodeTaskBase> BeforeStart { get; } = new List<BeforeStartNodeTaskBase>
 		{
-			new CreateEasyRunClusterBatFile()
+			new CreateEasyRunClusterBatFile(),
+			new CreateEphemeralDirectory()
 		};
 		private static IEnumerable<AfterNodeStoppedTaskBase> NodeStoppedTasks { get; } = new List<AfterNodeStoppedTaskBase>
 		{
