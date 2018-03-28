@@ -20,7 +20,8 @@ namespace Elastic.Managed
 		public override int? ProcessId => this.JavaProcessId ?? base.ProcessId;
 		public int? HostProcessId => base.ProcessId;
 
-		public ElasticsearchNode(ElasticsearchVersion version, string elasticsearchHome) : this(new NodeConfiguration(new NodeFileSystem(version, elasticsearchHome))) { }
+		public ElasticsearchNode(ElasticsearchVersion version, string elasticsearchHome)
+			: this(new NodeConfiguration(new ClusterConfiguration(new NodeFileSystem(version, elasticsearchHome)))) { }
 
 		public ElasticsearchNode(NodeConfiguration config) : base(StartArgs(config)) => this.NodeConfiguration = config;
 
@@ -41,6 +42,10 @@ namespace Elastic.Managed
 			};
 		}
 
+		/// <summary>
+		/// Set this true if you want the node to go into assumed started state as soon as its waiting for more nodes to start doing the election.
+		/// <para>Useful to speed up starting multi node clusters</para>
+		/// </summary>
 		public bool AssumeStartedOnNotEnoughMasterPing { get; set; }
 
 		private bool AssumedStartedStateChecker(string section, string message)

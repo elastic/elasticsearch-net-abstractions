@@ -7,8 +7,6 @@ namespace Elastic.Managed.Ephemeral
 {
 	public class EphemeralFileSystem : NodeFileSystem
 	{
-		private readonly string _uniqueSuffix = Guid.NewGuid().ToString("N").Substring(0, 6);
-		public override string ClusterName => $"ephemeral-cluster-{_uniqueSuffix}";
 
 		public EphemeralFileSystem(ElasticsearchVersion version) : base(version, LocalAppDataHome(version)) { }
 

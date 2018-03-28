@@ -9,7 +9,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 	{
 		public override void Validate(EphemeralCluster cluster, INodeFileSystem fs)
 		{
-			if (!cluster.Nodes.All(n=>n.NodeConfiguration.XpackEnabled)) return;
+			if (!cluster.ClusterConfiguration.XpackEnabled) return;
 
 			var license = cluster.Client.GetLicense();
 			if (license.IsValid && license.License.Status == LicenseStatus.Active) return;

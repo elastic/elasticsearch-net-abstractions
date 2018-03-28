@@ -5,7 +5,6 @@ namespace Elastic.Managed.FileSystem
 	public interface INodeFileSystem
 	{
 		ElasticsearchVersion Version { get; }
-		string ClusterName { get; }
 
 		string Binary { get; }
 		string PluginBinary { get; }
