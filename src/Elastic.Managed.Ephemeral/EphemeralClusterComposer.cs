@@ -10,12 +10,9 @@ using Elastic.Managed.FileSystem;
 
 namespace Elastic.Managed.Ephemeral
 {
-	public class EphemeralClusterComposer : IClusterComposer
+	public static class EphemeralClusterComposer
 	{
-		private EphemeralCluster Cluster { get; }
 		private static readonly object Lock = new object();
-
-		public EphemeralClusterComposer(EphemeralCluster cluster) => this.Cluster = cluster;
 
 		private static IEnumerable<InstallationTaskBase> InstallationTasks { get; } = new List<InstallationTaskBase>
 		{
@@ -26,6 +23,7 @@ namespace Elastic.Managed.Ephemeral
 			new CreateEasyRunBatFile(),
 			new InstallPlugins(),
 		};
+
 		private static IEnumerable<BeforeStartNodeTaskBase> BeforeStart { get; } = new List<BeforeStartNodeTaskBase>
 		{
 			new CreateEasyRunClusterBatFile(),
@@ -44,41 +42,41 @@ namespace Elastic.Managed.Ephemeral
 			new ValidateClusterStateTask()
 		};
 
-		public void OnStop() => Itterate(NodeStoppedTasks, (t, c, fs) => t.Run(c, fs), log: false);
+		public static void OnStop(EphemeralCluster cluster) => Itterate(cluster, NodeStoppedTasks, (t, c, fs) => t.Run(c, fs), log: false);
 
-		public void Install()=> Itterate(InstallationTasks, (t, c, fs) => t.Run(c, fs));
+		public static void Install(EphemeralCluster cluster)=> Itterate(cluster, InstallationTasks, (t, c, fs) => t.Run(c, fs));
 
-		public void OnBeforeStart() => Itterate(BeforeStart, (t, c, fs) => t.Run(c, fs), log: false);
+		public static void OnBeforeStart(EphemeralCluster cluster) => Itterate(cluster, BeforeStart, (t, c, fs) => t.Run(c, fs), log: false);
 
-		public void ValidateAfterStart() => Itterate(ValidationTasks, (t, c, fs) => t.Validate(c, fs), log: false);
+		public static void ValidateAfterStart(EphemeralCluster cluster) => Itterate(cluster, ValidationTasks, (t, c, fs) => t.Validate(c, fs), log: false);
 
-		private IList<string> GetCurrentRunnerLog()
+		private static IList<string> GetCurrentRunnerLog(ClusterBase cluster)
 		{
-			var file = TaskRunnerLogFile;
+			var file = TaskRunnerLogFile(cluster);
 			return !File.Exists(file) ? new List<string>() : File.ReadAllLines(file).ToList();
 		}
 
-		private string TaskRunnerLogFile => Path.Combine(this.Cluster.FileSystem.LocalFolder, "taskrunner.log");
+		private static string TaskRunnerLogFile(ClusterBase cluster) => Path.Combine(cluster.FileSystem.LocalFolder, "taskrunner.log");
 
-		private void LogTasks(IEnumerable<string> logs)
+		private static void LogTasks(ClusterBase cluster, IEnumerable<string> logs)
 		{
-			var file = Path.Combine(this.Cluster.FileSystem.LocalFolder, "taskrunner.log");
+			var file = Path.Combine(cluster.FileSystem.LocalFolder, "taskrunner.log");
 			File.WriteAllText(file, string.Join(Environment.NewLine, logs));
 		}
 
-		private void Itterate<T>(IEnumerable<T> collection, Action<T, EphemeralCluster, INodeFileSystem> act, bool log = true)
+		private static void Itterate<T>(EphemeralCluster cluster, IEnumerable<T> collection, Action<T, EphemeralCluster, INodeFileSystem> act, bool log = true)
 		{
 			lock (EphemeralClusterComposer.Lock)
 			{
-				var taskLog = this.GetCurrentRunnerLog();
+				var taskLog = GetCurrentRunnerLog(cluster);
 				foreach (var task in collection)
 				{
 					var name = task.GetType().Name;
 					if (log && taskLog.Contains(name)) continue;
-					act(task, this.Cluster, this.Cluster.FileSystem);
+					act(task, cluster, cluster.FileSystem);
 					if (log) taskLog.Add(name);
 				}
-				if (log) this.LogTasks(taskLog);
+				if (log) LogTasks(cluster, taskLog);
 			}
 		}
 

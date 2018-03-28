@@ -10,9 +10,9 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 	{
 		public override void Run(EphemeralCluster cluster, INodeFileSystem fs)
 		{
-			var v = fs.Version;
+			var v = cluster.ClusterConfiguration.Version;
 			if (Directory.Exists(fs.ElasticsearchHome)) return;
-			var from = Path.Combine(fs.LocalFolder, fs.Version.Zip);
+			var from = Path.Combine(fs.LocalFolder, v.Zip);
 			cluster.Writer?.WriteDiagnostic($"{{{nameof(UnzipElasticsearch)}}} unzipping version [{v}] {{{from}}}");
 			ZipFile.ExtractToDirectory(from, fs.LocalFolder);
 			cluster.Writer?.WriteDiagnostic($"{{{nameof(UnzipElasticsearch)}}} extracted version [{v}] to {{{fs.LocalFolder}}}");

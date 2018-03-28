@@ -11,67 +11,46 @@ namespace Elastic.Managed
 {
 	public abstract class ClusterBase : IDisposable
 	{
-		public IClusterComposer Composer { get; protected set; }
-		public INodeFileSystem FileSystem { get; }
-		public ReadOnlyCollection<ElasticsearchNode> Nodes { get; }
-		public bool Started { get; private set; }
-		//public virtual ElasticsearchPlugin[] RequiredPlugins { get; }
-		public string ClusterMoniker => this.GetType().Name.Replace("Cluster", "");
-		public IConsoleLineWriter Writer { get; private set; }
-
-		protected ClusterBase(ElasticsearchVersion version, int instanceCount = 1, string clusterName = null, NodeFeatures nodeFeatures = NodeFeatures.None)
-			: this(new NodeFileSystem(version, clusterName), instanceCount, nodeFeatures) { }
-
-		protected ClusterBase(INodeFileSystem fileSystem, int instanceCount = 1, NodeFeatures nodeFeatures = NodeFeatures.None)
+		protected ClusterBase(ClusterConfiguration clusterConfiguration)
 		{
-			this.FileSystem = fileSystem;
-			this._clusterSettings = DefaultClusterSettings(instanceCount);
+			this.ClusterConfiguration = clusterConfiguration;
 
-			var nodes = Enumerable.Range(9200, instanceCount)
-				.Select(p=> new NodeConfiguration(fileSystem, nodeFeatures, CreateNodeName(p), p))
-				.Select(CreateNodeClusterSettings)
+			var nodes = Enumerable.Range(9200, this.ClusterConfiguration.NumberOfNodes)
+				.Select(p => new NodeConfiguration(clusterConfiguration))
 				.Select(n => new ElasticsearchNode(n)
 				{
-					AssumeStartedOnNotEnoughMasterPing = instanceCount > 1
+					AssumeStartedOnNotEnoughMasterPing = this.ClusterConfiguration.NumberOfNodes > 1
 				})
 				.ToList();
 			this.Nodes = new ReadOnlyCollection<ElasticsearchNode>(nodes);
+			this.ClusterMoniker = this.GetType().Name.Replace("Cluster", "");
 		}
 
-		protected virtual string CreateNodeName(int i) => null;
+		/// <summary> A short name to identify the cluster defaults to the <see cref="ClusterBase"/> subclass name with Cluster removed </summary>
+		public virtual string ClusterMoniker { get; }
 
-		protected virtual Dictionary<string, string> AdditonalNodeSettings(int? port) => null;
+		public ClusterConfiguration ClusterConfiguration { get; }
+		public INodeFileSystem FileSystem => this.ClusterConfiguration.FileSystem;
 
-		private static Dictionary<string, string> DefaultClusterSettings(int instanceCount) => new Dictionary<string, string>
+		public ReadOnlyCollection<ElasticsearchNode> Nodes { get; }
+		public bool Started { get; private set; }
+		public IConsoleLineWriter Writer { get; private set; }
+
+		protected virtual void SeedCluster()
 		{
-			{"node.max_local_storage_nodes", $"{instanceCount}"},
-			{"discovery.zen.minimum_master_nodes", Quorum(instanceCount).ToString()}
-		};
-
-		private static int Quorum(int instanceCount) => Math.Max(1, (int) Math.Floor((double) instanceCount / 2) + 1);
-
-		private readonly Dictionary<string, string> _clusterSettings;
-		private NodeConfiguration CreateNodeClusterSettings(NodeConfiguration config)
-		{
-			foreach(var kv in this._clusterSettings) config.Add(kv.Key, kv.Value);
-
-			var nodeSettings = AdditonalNodeSettings(config.DesiredPort);
-			if (nodeSettings == null || nodeSettings.Count == 0) return config;
-			foreach (var kv in nodeSettings) config.Add(kv.Key, kv.Value);
-			return config;
 		}
-
-		protected virtual void SeedCluster() { }
 
 		public void Start() => this.Start(TimeSpan.FromMinutes(2));
+
 		public void Start(TimeSpan waitForStarted) =>
 			this.Start(new HighlightWriter(this.Nodes.Select(n => n.NodeConfiguration.DesiredNodeName).ToArray()), waitForStarted);
 
 		public void Start(IConsoleLineWriter writer, TimeSpan waitForStarted)
 		{
 			this.Writer = writer;
-			this.Composer?.Install();
-			this.Composer?.OnBeforeStart();
+
+			this.OnBeforeStart();
+
 			foreach (var node in this.Nodes) node.Subscribe(writer);
 
 			var waitHandles = this.Nodes.Select(w => w.StartedHandle).ToArray();
@@ -81,10 +60,10 @@ namespace Elastic.Managed
 				throw new Exception($"Not all nodes started after waiting {waitForStarted}");
 			}
 
-			this.Started = this.Nodes.All(n=>n.NodeStarted);
+			this.Started = this.Nodes.All(n => n.NodeStarted);
 			if (this.Started)
 			{
-				this.Composer?.ValidateAfterStart();
+				this.OnAfterStarted();
 				this.SeedCluster();
 			}
 			else writer?.WriteError($"{{{this.GetType().Name}.{nameof(Start)}}} cluster did not start succesfully");
@@ -96,12 +75,18 @@ namespace Elastic.Managed
 				node.WaitForCompletion(waitForCompletion);
 		}
 
+		protected virtual void OnAfterStarted() { }
+
+		protected virtual void OnBeforeStart() { }
+
+		protected virtual void OnDispose() { }
+
 		public void Dispose()
 		{
 			this.Started = false;
 			foreach (var node in this.Nodes) node.SendControlC();
 			foreach (var node in this.Nodes) node?.Dispose();
-			this.Composer.OnStop();
+			this.OnDispose();
 		}
 	}
 }

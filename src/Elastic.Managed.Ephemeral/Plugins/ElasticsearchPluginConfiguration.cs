@@ -7,7 +7,7 @@ namespace Elastic.Managed.Ephemeral.Plugins
 	{
 		private readonly Func<ElasticsearchVersion, bool> _isValid;
 
-		public ElasticsearchPlugin Plugin { get; }
+		private ElasticsearchPlugin Plugin { get; }
 
 		/// <summary>
 		/// The moniker the plugin is known by in Elasticsearch e.g what /_cat/plugins will return for it

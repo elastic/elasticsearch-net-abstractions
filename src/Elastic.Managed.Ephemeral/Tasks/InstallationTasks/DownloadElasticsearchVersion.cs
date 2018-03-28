@@ -9,9 +9,9 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 	{
 		public override void Run(EphemeralCluster cluster, INodeFileSystem fs)
 		{
-			var v = fs.Version;
+			var v = cluster.ClusterConfiguration.Version;
 			var from = v.DownloadLocations.ElasticsearchDownloadUrl;
-			var to = Path.Combine(fs.LocalFolder, fs.Version.Zip);
+			var to = Path.Combine(fs.LocalFolder, v.Zip);
 			if (File.Exists(to)) return;
 
 			cluster.Writer?.WriteDiagnostic($"{{{nameof(DownloadElasticsearchVersion)}}} downloading Elasticsearch [{v}] from {{{from}}} {{{to}}}");
