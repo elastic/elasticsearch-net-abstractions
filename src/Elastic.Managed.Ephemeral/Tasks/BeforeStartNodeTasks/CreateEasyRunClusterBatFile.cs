@@ -11,7 +11,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks
 		public override void Run(EphemeralCluster cluster, INodeFileSystem fs)
 		{
 			var clusterMoniker = cluster.ClusterMoniker;
-			var v = fs.Version;
+			var v = cluster.ClusterConfiguration.Version;
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
 
 			var easyRunBat = Path.Combine(fs.LocalFolder, $"run-{clusterMoniker}.bat");

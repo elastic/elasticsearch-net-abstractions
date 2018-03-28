@@ -20,8 +20,8 @@ namespace Elastic.Managed
 		public override int? ProcessId => this.JavaProcessId ?? base.ProcessId;
 		public int? HostProcessId => base.ProcessId;
 
-		public ElasticsearchNode(ElasticsearchVersion version, string elasticsearchHome)
-			: this(new NodeConfiguration(new ClusterConfiguration(new NodeFileSystem(version, elasticsearchHome)))) { }
+		public ElasticsearchNode(ElasticsearchVersion version, string elasticsearchHome = null)
+			: this(new NodeConfiguration(new ClusterConfiguration(version, fileSystem: (v,s) => new NodeFileSystem(v, elasticsearchHome)))) { }
 
 		public ElasticsearchNode(NodeConfiguration config) : base(StartArgs(config)) => this.NodeConfiguration = config;
 

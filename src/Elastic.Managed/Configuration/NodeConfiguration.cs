@@ -56,11 +56,12 @@ namespace Elastic.Managed.Configuration
 
 	public class ClusterConfiguration
 	{
-		public ClusterConfiguration(INodeFileSystem fileSystem) : this(clusterName: null, fileSystem: fileSystem) {}
-		public ClusterConfiguration(string clusterName, INodeFileSystem fileSystem, int numberOfNodes = 1)
+		public ClusterConfiguration(ElasticsearchVersion version, int numberOfNodes = 1, string clusterName = null, Func<ElasticsearchVersion, string, INodeFileSystem> fileSystem = null)
 		{
 			this.ClusterName = clusterName;
-			this.FileSystem = fileSystem;
+			this.Version = version;
+			fileSystem = fileSystem ?? ((v, s) => new NodeFileSystem(v));
+			this.FileSystem = fileSystem(this.Version, this.ClusterName);
 			this.NumberOfNodes = numberOfNodes;
 			this.Features = ClusterFeatures.None;
 
@@ -79,13 +80,14 @@ namespace Elastic.Managed.Configuration
 		}
 
 		public string ClusterName { get; }
+
+		public ElasticsearchVersion Version { get; }
 		public INodeFileSystem FileSystem { get; }
 		public int NumberOfNodes { get; }
 		public ClusterFeatures Features { get; }
 
 		public NodeSettings ClusterNodeSettings { get; } = new NodeSettings();
 
-		public ElasticsearchVersion Version => this.FileSystem.Version;
 		public bool XpackEnabled => this.Features.HasFlag(ClusterFeatures.XPack);
 		private bool EnableSsl => this.Features.HasFlag(ClusterFeatures.SSL);
 		private bool EnableSecurity => this.Features.HasFlag(ClusterFeatures.Security);
@@ -115,6 +117,8 @@ namespace Elastic.Managed.Configuration
 
 	public class NodeConfiguration
 	{
+		public NodeConfiguration(ElasticsearchVersion version, int? port = null) : this(new ClusterConfiguration(version), port) { }
+
 		public NodeConfiguration(ClusterConfiguration clusterConfiguration, int? port = null)
 		{
 			this.ClusterConfiguration = clusterConfiguration;
@@ -132,7 +136,7 @@ namespace Elastic.Managed.Configuration
 		private NodeSettings Settings { get; }
 
 		public INodeFileSystem FileSystem => this.ClusterConfiguration.FileSystem;
-		public ElasticsearchVersion Version => this.FileSystem.Version;
+		public ElasticsearchVersion Version => this.ClusterConfiguration.Version;
 		public string[] CommandLineArguments => this.Settings.ToCommandLineArguments(this.Version);
 
 		public string AttributeKey(string attribute)

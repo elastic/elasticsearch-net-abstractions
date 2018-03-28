@@ -10,7 +10,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 		{
 			var alreadyUp = cluster.Client.RootNodeInfo();
 			if (!alreadyUp.IsValid) return;
-			var v = fileSystem.Version;
+			var v = cluster.ClusterConfiguration.Version;
 
 			var alreadyUpVersion = ElasticsearchVersion.From(alreadyUp.Version.Number);
 			var alreadyUpSnapshotVersion = ElasticsearchVersion.From(alreadyUp.Version.Number + "-SNAPSHOT");

@@ -8,7 +8,8 @@ namespace Elastic.Managed.FileSystem
 	public class NodeFileSystem : INodeFileSystem
 	{
 		protected const string SubFolder = "ElasticManaged";
-		public ElasticsearchVersion Version { get; }
+
+		protected ElasticsearchVersion Version { get; }
 
 		private static bool IsMono { get; } = Type.GetType("Mono.Runtime") != null;
 		private static string BinarySuffix => IsMono || Path.PathSeparator == '/' ? "" : ".bat";
@@ -24,16 +25,13 @@ namespace Elastic.Managed.FileSystem
 		public virtual string LogsPath => null;
 		public virtual string RepositoryPath => null;
 
-		public virtual string ClusterName { get; }
-
-		public NodeFileSystem(ElasticsearchVersion version, string elasticsearchHome = null, string clusterName = null)
+		public NodeFileSystem(ElasticsearchVersion version, string elasticsearchHome = null)
 		{
 			this.Version = version;
-			this.ClusterName = clusterName;
 			this.LocalFolder = AppDataFolder(version);
 			this.ElasticsearchHome = elasticsearchHome ?? GetEsHomeVariable() ?? throw new ArgumentNullException(nameof(elasticsearchHome));
-
 		}
+
 		protected static string AppDataFolder(ElasticsearchVersion version)
 		{
 			var appData = GetApplicationDataDirectory();
@@ -46,9 +44,9 @@ namespace Elastic.Managed.FileSystem
 			return Path.Combine(localFolder, version.FolderInZip);
 		}
 
-		private static string GetEsHomeVariable() => Environment.GetEnvironmentVariable("ES_HOME");
+		protected static string GetEsHomeVariable() => Environment.GetEnvironmentVariable("ES_HOME");
 
-		private static string GetApplicationDataDirectory() =>
+		protected static string GetApplicationDataDirectory() =>
 			RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? Environment.GetEnvironmentVariable("LocalAppData") : "/tmp";
 	}
 }

@@ -7,8 +7,12 @@ namespace Elastic.Managed.Ephemeral
 {
 	public class EphemeralFileSystem : NodeFileSystem
 	{
+		public EphemeralFileSystem(ElasticsearchVersion version, string clusterName) : base(version, LocalAppDataHome(version))
+		{
+			this.ClusterName = clusterName;
+		}
 
-		public EphemeralFileSystem(ElasticsearchVersion version) : base(version, LocalAppDataHome(version)) { }
+		private string ClusterName { get; }
 
 		public string TempFolder => Path.Combine(Path.GetTempPath(), SubFolder, this.Version.FolderInZip, this.ClusterName);
 

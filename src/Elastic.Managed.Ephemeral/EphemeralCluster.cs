@@ -13,9 +13,8 @@ namespace Elastic.Managed.Ephemeral
 		private static string UniqueishSuffix => Guid.NewGuid().ToString("N").Substring(0, 6);
 		private static string EphemeralClusterName => $"ephemeral-cluster-{UniqueishSuffix}";
 
-		public EphemeralClusterConfiguration(INodeFileSystem fileSystem, int numberOfNodes = 1)
-			: base(EphemeralClusterName, fileSystem, numberOfNodes) { }
-
+		public EphemeralClusterConfiguration(ElasticsearchVersion version, int numberOfNodes = 1)
+			: base(version, numberOfNodes, EphemeralClusterName, (v, s) => new EphemeralFileSystem(v, s)) { }
 
 		public override string CreateNodeName(int? node)
 		{
@@ -26,8 +25,9 @@ namespace Elastic.Managed.Ephemeral
 
 	public class EphemeralCluster : ClusterBase
 	{
-		public EphemeralCluster(ElasticsearchVersion version, int numberOfNodes = 1)
-			: base(new EphemeralClusterConfiguration(new EphemeralFileSystem(version), numberOfNodes)) { }
+		public EphemeralCluster(ElasticsearchVersion version, int numberOfNodes = 1) : this(new EphemeralClusterConfiguration(version, numberOfNodes)) { }
+
+		public EphemeralCluster(EphemeralClusterConfiguration clusterConfiguration) : base(clusterConfiguration) { }
 
 		protected override void OnBeforeStart()
 		{
@@ -53,7 +53,7 @@ namespace Elastic.Managed.Ephemeral
 				{
 					if (this._client != null) return this._client;
 
-					var hosts = this.Nodes.Select(n => new Uri($"http://localhost:{n.NodeConfiguration.DesiredPort}"));
+					var hosts = this.Nodes.Select(n => new Uri($"http://localhost:{n.NodeConfiguration.DesiredPort ?? 9200}"));
 					var settings = new ConnectionSettings(new StaticConnectionPool(hosts));
 					var client = new ElasticClient(CreateConnectionSettings(settings));
 					// ReSharper disable once PossibleMultipleWriteAccessInDoubleCheckLocking

@@ -11,7 +11,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 	{
 		public override void Validate(EphemeralCluster cluster, INodeFileSystem fs)
 		{
-			var v = fs.Version;
+			var v = cluster.ClusterConfiguration.Version;
 			if (v.Major == 2)
 			{
 				cluster.Writer?.WriteDiagnostic($"{{{nameof(ValidatePluginsTask)}}} skipping validate plugins on {{2.x}} version: [{v}]");

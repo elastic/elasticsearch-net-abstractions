@@ -12,7 +12,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 	{
 		public override void Run(EphemeralCluster cluster, INodeFileSystem fs)
 		{
-			var v = fs.Version;
+			var v = cluster.ClusterConfiguration.Version;
 			//on 2.x we do not support tests requiring plugins for 2.x since we can not reliably install them
 			if (v.Major == 2)
 			{
