@@ -2,15 +2,21 @@
 using System.IO;
 using System.Net.Http;
 using Elastic.Managed.ConsoleWriters;
-using Elastic.Managed.FileSystem;
 using ProcNet;
 using ProcNet.Std;
 
-namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
+namespace Elastic.Managed.Ephemeral.Tasks
 {
-	public abstract class InstallationTaskBase
+	public interface IClusterComposeTask<in TConfiguration>
+		where TConfiguration : EphemeralClusterConfiguration
 	{
-		public abstract void Run(EphemeralCluster cluster, INodeFileSystem fs);
+		void Run(IEphemeralCluster<TConfiguration> cluster);
+	}
+
+	public abstract class ClusterComposeTaskBase<TConfiguration> : IClusterComposeTask<TConfiguration>
+		where TConfiguration : EphemeralClusterConfiguration
+	{
+		public abstract void Run(IEphemeralCluster<TConfiguration> cluster);
 
 		private static bool IsMono { get; } = Type.GetType("Mono.Runtime") != null;
 		protected string BinarySuffix => IsMono || Path.PathSeparator == '/' ? "" : ".bat";
@@ -46,4 +52,9 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 		}
 
 	}
+
+	public abstract class ClusterComposeTask : ClusterComposeTaskBase<EphemeralClusterConfiguration> { }
+
+	public abstract class ClusterComposeTask<TConfiguration> : ClusterComposeTaskBase<TConfiguration>
+		where TConfiguration : EphemeralClusterConfiguration { }
 }

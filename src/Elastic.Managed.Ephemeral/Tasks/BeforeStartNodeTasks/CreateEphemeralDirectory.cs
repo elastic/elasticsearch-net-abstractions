@@ -1,16 +1,16 @@
 using System.IO;
 using Elastic.Managed.ConsoleWriters;
-using Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks;
 using Elastic.Managed.FileSystem;
 using static System.IO.Directory;
 using static System.IO.SearchOption;
 
 namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 {
-	public class CreateEphemeralDirectory : BeforeStartNodeTaskBase
+	public class CreateEphemeralDirectory : ClusterComposeTask
 	{
-		public override void Run(EphemeralCluster cluster, INodeFileSystem fs)
+		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
+			var fs = cluster.FileSystem;
 			if (!(fs is EphemeralFileSystem f)) return;
 
 			if (Exists(f.TempFolder)) return;

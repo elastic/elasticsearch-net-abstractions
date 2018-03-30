@@ -9,9 +9,26 @@ using Elastic.Managed.FileSystem;
 
 namespace Elastic.Managed
 {
-	public abstract class ClusterBase : IDisposable
+	public interface ICluster<out TConfiguration> where TConfiguration : ClusterConfiguration
 	{
-		protected ClusterBase(ClusterConfiguration clusterConfiguration)
+		string ClusterMoniker { get; }
+		TConfiguration ClusterConfiguration { get; }
+		INodeFileSystem FileSystem { get; }
+		bool Started { get; }
+		ReadOnlyCollection<ElasticsearchNode> Nodes { get; }
+		IConsoleLineWriter Writer { get; }
+
+	}
+
+	public abstract class ClusterBase : ClusterBase<ClusterConfiguration>
+	{
+		protected ClusterBase(ClusterConfiguration clusterConfiguration) : base(clusterConfiguration) { }
+	}
+
+	public abstract class ClusterBase<TConfiguration> : IDisposable, ICluster<TConfiguration>
+		where TConfiguration : ClusterConfiguration
+	{
+		protected ClusterBase(TConfiguration clusterConfiguration)
 		{
 			this.ClusterConfiguration = clusterConfiguration;
 
@@ -29,16 +46,14 @@ namespace Elastic.Managed
 		/// <summary> A short name to identify the cluster defaults to the <see cref="ClusterBase"/> subclass name with Cluster removed </summary>
 		public virtual string ClusterMoniker { get; }
 
-		public ClusterConfiguration ClusterConfiguration { get; }
+		public TConfiguration ClusterConfiguration { get; }
 		public INodeFileSystem FileSystem => this.ClusterConfiguration.FileSystem;
 
 		public ReadOnlyCollection<ElasticsearchNode> Nodes { get; }
 		public bool Started { get; private set; }
 		public IConsoleLineWriter Writer { get; private set; }
 
-		protected virtual void SeedCluster()
-		{
-		}
+		protected virtual void SeedCluster() { }
 
 		public void Start() => this.Start(TimeSpan.FromMinutes(2));
 

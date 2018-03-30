@@ -4,11 +4,11 @@ using Elasticsearch.Net;
 
 namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 {
-	public class ValidateClusterStateTask : NodeValidationTaskBase
+	public class ValidateClusterStateTask : ClusterComposeTask
 	{
 		private static TimeSpan ClusterHealthTimeout { get; } = TimeSpan.FromSeconds(20);
 
-		public override void Validate(EphemeralCluster cluster, INodeFileSystem fs)
+		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
 			var healthyCluster = cluster.Client.ClusterHealth(g => g
 				.WaitForStatus(WaitForStatus.Yellow)

@@ -6,10 +6,11 @@ using Elastic.Managed.FileSystem;
 
 namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 {
-	public class UnzipElasticsearch : InstallationTaskBase
+	public class UnzipElasticsearch : ClusterComposeTask
 	{
-		public override void Run(EphemeralCluster cluster, INodeFileSystem fs)
+		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
+			var fs = cluster.FileSystem;
 			var v = cluster.ClusterConfiguration.Version;
 			if (Directory.Exists(fs.ElasticsearchHome)) return;
 			var from = Path.Combine(fs.LocalFolder, v.Zip);

@@ -30,7 +30,7 @@ namespace ScratchPad
 //				Console.ReadKey();
 //			}
 
-			using (var cluster = new EphemeralCluster("6.0.0", numberOfNodes: 1))
+			using (var cluster = new EphemeralCluster("6.0.0"))
 			{
 				cluster.Start();
 			}

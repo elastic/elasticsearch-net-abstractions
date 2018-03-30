@@ -3,9 +3,9 @@ using Elastic.Managed.FileSystem;
 
 namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 {
-	public class CreateEasyRunBatFile : InstallationTaskBase
+	public class CreateEasyRunBatFile : ClusterComposeTask
 	{
-		public override void Run(EphemeralCluster cluster, INodeFileSystem fs) =>
-			WriteFileIfNotExist(Path.Combine(fs.ElasticsearchHome, "run.bat"), @"bin\elasticsearch.bat");
+		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster) =>
+			WriteFileIfNotExist(Path.Combine(cluster.FileSystem.ElasticsearchHome, "run.bat"), @"bin\elasticsearch.bat");
 	}
 }

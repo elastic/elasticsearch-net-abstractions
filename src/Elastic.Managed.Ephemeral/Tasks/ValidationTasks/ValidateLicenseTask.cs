@@ -5,9 +5,9 @@ using Nest;
 
 namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 {
-	public class ValidateLicenseTask : NodeValidationTaskBase
+	public class ValidateLicenseTask : ClusterComposeTask
 	{
-		public override void Validate(EphemeralCluster cluster, INodeFileSystem fs)
+		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
 			if (!cluster.ClusterConfiguration.XpackEnabled) return;
 

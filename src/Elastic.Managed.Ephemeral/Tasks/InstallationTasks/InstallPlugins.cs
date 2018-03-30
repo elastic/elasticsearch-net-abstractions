@@ -8,9 +8,9 @@ using Elastic.Managed.FileSystem;
 
 namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 {
-	public class InstallPlugins : InstallationTaskBase
+	public class InstallPlugins : ClusterComposeTask
 	{
-		public override void Run(EphemeralCluster cluster, INodeFileSystem fs)
+		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
 			var v = cluster.ClusterConfiguration.Version;
 			//on 2.x we do not support tests requiring plugins for 2.x since we can not reliably install them
@@ -19,6 +19,8 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 				cluster.Writer?.WriteDiagnostic($"{{{nameof(InstallPlugins)}}} skipping install plugins on {{2.x}} version: [{v}]");
 				return;
 			}
+
+			var fs = cluster.FileSystem;
 			var requiredPlugins = cluster.RequiredPlugins;
 			var plugins =
 				from plugin in requiredPlugins

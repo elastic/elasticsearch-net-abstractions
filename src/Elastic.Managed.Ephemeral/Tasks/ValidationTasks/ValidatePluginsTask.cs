@@ -7,9 +7,9 @@ using Nest;
 
 namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 {
-	public class ValidatePluginsTask : NodeValidationTaskBase
+	public class ValidatePluginsTask : ClusterComposeTask
 	{
-		public override void Validate(EphemeralCluster cluster, INodeFileSystem fs)
+		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
 			var v = cluster.ClusterConfiguration.Version;
 			if (v.Major == 2)

@@ -4,10 +4,11 @@ using Elastic.Managed.FileSystem;
 
 namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 {
-	public class CreateLocalApplicationDirectory : InstallationTaskBase
+	public class CreateLocalApplicationDirectory : ClusterComposeTask
 	{
-		public override void Run(EphemeralCluster cluster, INodeFileSystem fs)
+		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
+			var fs = cluster.FileSystem;
 			if (Directory.Exists(fs.LocalFolder)) return;
 
 			cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateLocalApplicationDirectory)}}} creating {{{fs.LocalFolder}}}");

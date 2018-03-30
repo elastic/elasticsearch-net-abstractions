@@ -5,10 +5,11 @@ using Elastic.Managed.FileSystem;
 
 namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 {
-	public class DownloadElasticsearchVersion : InstallationTaskBase
+	public class DownloadElasticsearchVersion : ClusterComposeTask
 	{
-		public override void Run(EphemeralCluster cluster, INodeFileSystem fs)
+		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
+			var fs = cluster.FileSystem;
 			var v = cluster.ClusterConfiguration.Version;
 			var from = v.DownloadLocations.ElasticsearchDownloadUrl;
 			var to = Path.Combine(fs.LocalFolder, v.Zip);

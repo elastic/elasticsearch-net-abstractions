@@ -3,9 +3,9 @@ using Elastic.Managed.FileSystem;
 
 namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 {
-	public class EnsureJavaHomeEnvironmentVariableIsSet : InstallationTaskBase
+	public class EnsureJavaHomeEnvironmentVariableIsSet : ClusterComposeTask
 	{
-		public override void Run(EphemeralCluster cluster, INodeFileSystem fs)
+		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
 			var javaHome = Environment.GetEnvironmentVariable("JAVA_HOME");
 			if (string.IsNullOrWhiteSpace(javaHome))

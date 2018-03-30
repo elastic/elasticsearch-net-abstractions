@@ -6,10 +6,11 @@ using Elastic.Managed.FileSystem;
 
 namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks
 {
-	public class CreateEasyRunClusterBatFile : BeforeStartNodeTaskBase
+	public class CreateEasyRunClusterBatFile : ClusterComposeTask
 	{
-		public override void Run(EphemeralCluster cluster, INodeFileSystem fs)
+		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
+			var fs = cluster.FileSystem;
 			var clusterMoniker = cluster.ClusterMoniker;
 			var v = cluster.ClusterConfiguration.Version;
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;

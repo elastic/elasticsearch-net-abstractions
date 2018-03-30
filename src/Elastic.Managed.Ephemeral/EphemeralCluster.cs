@@ -8,36 +8,41 @@ using Nest;
 
 namespace Elastic.Managed.Ephemeral
 {
-	public class EphemeralClusterConfiguration : ClusterConfiguration
+	public class EphemeralCluster : EphemeralCluster<EphemeralClusterConfiguration>
 	{
-		private static string UniqueishSuffix => Guid.NewGuid().ToString("N").Substring(0, 6);
-		private static string EphemeralClusterName => $"ephemeral-cluster-{UniqueishSuffix}";
-
-		public EphemeralClusterConfiguration(ElasticsearchVersion version, int numberOfNodes = 1)
-			: base(version, numberOfNodes, EphemeralClusterName, (v, s) => new EphemeralFileSystem(v, s)) { }
-
-		public override string CreateNodeName(int? node)
-		{
-			var suffix = Guid.NewGuid().ToString("N").Substring(0, 6);
-			return $"ephemeral-node-{suffix}{node}";
-		}
-	}
-
-	public class EphemeralCluster : ClusterBase
-	{
-		public EphemeralCluster(ElasticsearchVersion version, int numberOfNodes = 1) : this(new EphemeralClusterConfiguration(version, numberOfNodes)) { }
+		public EphemeralCluster(ElasticsearchVersion version, int numberOfNodes = 1)
+			: base(new EphemeralClusterConfiguration(version, numberOfNodes: numberOfNodes)) { }
 
 		public EphemeralCluster(EphemeralClusterConfiguration clusterConfiguration) : base(clusterConfiguration) { }
+	}
+
+	public interface IEphemeralCluster<out TConfiguration> : ICluster<TConfiguration>
+		where TConfiguration : EphemeralClusterConfiguration
+	{
+		IElasticClient Client { get; }
+		ElasticsearchPluginConfiguration[] RequiredPlugins { get; }
+	}
+
+	public abstract class EphemeralCluster<TConfiguration>
+		: ClusterBase<TConfiguration>, IEphemeralCluster<TConfiguration>
+		where TConfiguration : EphemeralClusterConfiguration
+	{
+		protected EphemeralCluster(TConfiguration clusterConfiguration) : base(clusterConfiguration)
+		{
+			this.Composer = new EphemeralClusterComposer<TConfiguration>(this);
+		}
+
+		protected EphemeralClusterComposer<TConfiguration> Composer { get; }
 
 		protected override void OnBeforeStart()
 		{
-			EphemeralClusterComposer.Install(this);
-			EphemeralClusterComposer.OnBeforeStart(this);
+			this.Composer.Install();
+			this.Composer.OnBeforeStart();
 		}
 
-		protected override void OnDispose() => EphemeralClusterComposer.OnStop(this);
+		protected override void OnDispose() => this.Composer.OnStop();
 
-		protected override void OnAfterStarted() => EphemeralClusterComposer.ValidateAfterStart(this);
+		protected override void OnAfterStarted() => this.Composer.ValidateAfterStart();
 
 		private readonly object _lockGetClient = new object();
 		private IElasticClient _client;
@@ -67,6 +72,5 @@ namespace Elastic.Managed.Ephemeral
 		public virtual ElasticsearchPluginConfiguration[] RequiredPlugins { get; } = new ElasticsearchPluginConfiguration[0];
 
 		protected virtual ConnectionSettings CreateConnectionSettings(ConnectionSettings connectionSettings) => connectionSettings;
-
 	}
 }

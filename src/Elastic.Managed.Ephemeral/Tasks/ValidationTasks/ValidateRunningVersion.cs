@@ -4,9 +4,9 @@ using Elastic.Managed.FileSystem;
 
 namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 {
-	public class ValidateRunningVersion : NodeValidationTaskBase
+	public class ValidateRunningVersion : ClusterComposeTask
 	{
-		public override void Validate(EphemeralCluster cluster, INodeFileSystem fileSystem)
+		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
 			var alreadyUp = cluster.Client.RootNodeInfo();
 			if (!alreadyUp.IsValid) return;
