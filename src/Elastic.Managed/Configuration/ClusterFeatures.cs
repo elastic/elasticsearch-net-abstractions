@@ -11,7 +11,6 @@ namespace Elastic.Managed.Configuration
 	public enum ClusterFeatures
 	{
 		None = 1 << 0,
-		[Obsolete("Starting with ")]
 		XPack = 1 << 1,
 		Security = 1 << 2,
 		// ReSharper disable once InconsistentNaming

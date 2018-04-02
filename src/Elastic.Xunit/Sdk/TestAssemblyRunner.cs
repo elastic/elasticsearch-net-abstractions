@@ -6,8 +6,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Elastic.Managed;
-using Elastic.Xunit.Configuration;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
@@ -17,7 +15,6 @@ namespace Elastic.Xunit.Sdk
 	{
 		private readonly Dictionary<Type, XunitClusterBase> _assemblyFixtureMappings = new Dictionary<Type, XunitClusterBase>();
 		private readonly List<IGrouping<XunitClusterBase, GroupedByCluster>> _grouped;
-		private static readonly object _lock = new object();
 
 		public ConcurrentBag<RunSummary> Summaries { get; } = new ConcurrentBag<RunSummary>();
 		public ConcurrentBag<Tuple<string, string>> FailedCollections { get; } = new ConcurrentBag<Tuple<string, string>>();
@@ -38,6 +35,9 @@ namespace Elastic.Xunit.Sdk
 			: base(testAssembly, testCases, diagnosticMessageSink, executionMessageSink, executionOptions)
 		{
 			var tests = OrderTestCollections();
+			executionOptions.SetValue(nameof(RunAsUnitTests), RunAsUnitTests);
+			executionOptions.SetValue(nameof(TestFilter), TestFilter);
+			executionOptions.SetValue(nameof(RunAsUnitTests), RunAsUnitTests);
 
 			//bit side effecty, sets up _assemblyFixtureMappings before possibly letting xunit do its regular concurrency thing
 			this._grouped = (from c in tests
@@ -50,6 +50,16 @@ namespace Elastic.Xunit.Sdk
 				.ToList();
 		}
 
+		/// <summary>
+		/// If you wish to also use this class to run unit tests this hints to the runner that we can run more than one cluster at a time
+		/// </summary>
+		public bool RunAsUnitTests { get; set; }
+
+		/// <summary>
+		/// Allows you to pass a comma seperated test name filters, uses simple IndexOf matching
+		/// </summary>
+		public string TestFilter { get; set; }
+
 		protected override Task<RunSummary> RunTestCollectionAsync(IMessageBus b, ITestCollection c, IEnumerable<IXunitTestCase> t, CancellationTokenSource s)
 		{
 			var aggregator = new ExceptionAggregator(Aggregator);
@@ -59,15 +69,15 @@ namespace Elastic.Xunit.Sdk
 				.RunAsync();
 		}
 
-		protected override async Task<RunSummary> RunTestCollectionsAsync(IMessageBus messageBus,
-			CancellationTokenSource cancellationTokenSource)
+		protected override async Task<RunSummary> RunTestCollectionsAsync(IMessageBus messageBus, CancellationTokenSource cancellationTokenSource)
 		{
 			//threading guess
 			var defaultMaxConcurrency = Environment.ProcessorCount * 4;
 
-			if (TestConfiguration.Configuration.RunIntegrationTests)
-				return await IntegrationPipeline(defaultMaxConcurrency, messageBus, cancellationTokenSource);
-			return await UnitTestPipeline(defaultMaxConcurrency, messageBus, cancellationTokenSource);
+			if (RunAsUnitTests)
+				return await UnitTestPipeline(defaultMaxConcurrency, messageBus, cancellationTokenSource);
+
+			return await IntegrationPipeline(defaultMaxConcurrency, messageBus, cancellationTokenSource);
 		}
 
 
@@ -76,7 +86,7 @@ namespace Elastic.Xunit.Sdk
 			//make sure all clusters go in started state (won't actually start clusters in unit test mode)
 			foreach (var g in this._grouped) g.Key?.Start();
 
-			var testFilters = CreateTestFilters(TestConfiguration.Configuration.TestFilter);
+			var testFilters = CreateTestFilters(TestFilter);
 			await this._grouped.SelectMany(g => g)
 				.ForEachAsync(defaultMaxConcurrency, async g => { await RunTestCollections(messageBus, ctx, g, testFilters); });
 			foreach (var g in this._grouped) g.Key?.Dispose();
@@ -91,13 +101,15 @@ namespace Elastic.Xunit.Sdk
 
 		private async Task<RunSummary> IntegrationPipeline(int defaultMaxConcurrency, IMessageBus messageBus, CancellationTokenSource ctx)
 		{
-			var testFilters = CreateTestFilters(TestConfiguration.Configuration.TestFilter);
+			var testFilters = CreateTestFilters(TestFilter);
 			foreach (var group in this._grouped)
 			{
 				var type = @group.Key?.GetType();
 				var clusterName = type?.Name.Replace("Cluster", "") ?? "UNKNOWN";
 
-				var dop = @group.Key != null && @group.Key.MaxConcurrency > 0 ? @group.Key.MaxConcurrency : defaultMaxConcurrency;
+
+				var dop= @group?.Key?.ClusterConfiguration?.MaxConcurrency ?? defaultMaxConcurrency;
+				dop = dop <= 0 ? defaultMaxConcurrency : dop;
 
 				this.ClusterTotals.Add(clusterName, Stopwatch.StartNew());
 				//We group over each cluster group and execute test classes pertaining to that cluster

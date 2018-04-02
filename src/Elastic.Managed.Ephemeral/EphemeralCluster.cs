@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using Elastic.Managed.Configuration;
 using Elastic.Managed.Ephemeral.Plugins;
-using Elastic.Managed.FileSystem;
 using Elasticsearch.Net;
 using Nest;
 
@@ -44,6 +43,7 @@ namespace Elastic.Managed.Ephemeral
 
 		protected override void OnAfterStarted() => this.Composer.ValidateAfterStart();
 
+		protected virtual string ClientHostName => "localhost";
 		private readonly object _lockGetClient = new object();
 		private IElasticClient _client;
 		public IElasticClient Client
@@ -58,7 +58,7 @@ namespace Elastic.Managed.Ephemeral
 				{
 					if (this._client != null) return this._client;
 
-					var hosts = this.Nodes.Select(n => new Uri($"http://localhost:{n.NodeConfiguration.DesiredPort ?? 9200}"));
+					var hosts = this.Nodes.Select(n => new Uri($"http://{this.ClientHostName}:{n.NodeConfiguration.DesiredPort ?? 9200}"));
 					var settings = new ConnectionSettings(new StaticConnectionPool(hosts));
 					var client = new ElasticClient(CreateConnectionSettings(settings));
 					// ReSharper disable once PossibleMultipleWriteAccessInDoubleCheckLocking

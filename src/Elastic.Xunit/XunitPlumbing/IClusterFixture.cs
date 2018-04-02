@@ -1,11 +1,10 @@
 ﻿using Elastic.Managed;
 using Elastic.Managed.Ephemeral;
 using Nest;
-using Xunit;
 
 namespace Elastic.Xunit.Sdk
 {
-	public interface IClusterFixture<out TCluster> : IClassFixture<EndpointUsage>
+	public interface IClusterFixture<out TCluster>
 		where TCluster : ICluster<EphemeralClusterConfiguration>, new()
 	{
 		TCluster Cluster { get; }

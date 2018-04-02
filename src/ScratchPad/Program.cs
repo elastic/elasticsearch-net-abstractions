@@ -11,11 +11,11 @@ namespace ScratchPad
 	{
 		public static int Main()
 		{
-//			var clusterConfiguration = new EphemeralClusterConfiguration("6.0.0", 2);
+//			var clusterConfiguration = new EphemeralClusterConfiguration("6.0.0", numberOfNodes: 2);
 //			var ephemeralCluster = new EphemeralCluster(clusterConfiguration);
 //			var nodeConfiguration = new NodeConfiguration(clusterConfiguration, 9200);
 //			var elasticsearchNode = new ElasticsearchNode(nodeConfiguration);
-//
+////
 
 //			using (var node = new ElasticsearchNode("5.5.1"))
 //			{
