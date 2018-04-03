@@ -3,7 +3,6 @@
 #load @"Versioning.fsx"
 #load @"Commandline.fsx"
 #load @"Tooling.fsx"
-#load @"Signing.fsx"
 #load @"Building.fsx"
 
 open Fake

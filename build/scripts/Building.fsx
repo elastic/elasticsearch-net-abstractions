@@ -8,13 +8,10 @@
 #load @"Versioning.fsx"
 
 open System 
-open System.IO
 open Fake 
 open FSharp.Data 
 
 open Paths
-open Projects
-open Tooling
 open Versioning
 
 module Build =
