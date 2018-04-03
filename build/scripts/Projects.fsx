@@ -8,22 +8,31 @@ open Fake
 module Projects = 
 
     type Project =
-        | ElasticsearchNode
-        | ElasticsearchNodeRunner
+        | Managed
+        | Ephemeral
+        | Xunit
 
-        static member All = [ElasticsearchNode; ElasticsearchNodeRunner]
+        static member All = [Managed; Ephemeral; Xunit]
 
-    type ProjectInfo = { name: string; project: Project}
+    type ProjectInfo = { name: string; moniker: string; project: Project}
 
     let nameOf project = 
         match project with
-        | ElasticsearchNode -> "ElasticsearchNode"
-        | ElasticsearchNodeRunner -> "ElasticsearchNode.Runner"
+        | Managed -> "Elastic.Managed"
+        | Ephemeral -> "Elastic.Managed.Ephemeral"
+        | Xunit -> "Elastic.Xunit"
 
-    let infoOf project = { name = project |> nameOf; project = project }
+    let monikerOf project = 
+        match project with
+        | Managed -> "Managed"
+        | Ephemeral -> "Ephemeral"
+        | Xunit -> "Xunit"
+
+    let infoOf project = { name = project |> nameOf; moniker = project |> monikerOf; project = project }
+
     let projectsStartingWith partial =
         Project.All 
-        |> Seq.map nameOf 
+        |> Seq.map monikerOf 
         |> Seq.filter (fun s -> s |> toLower |> startsWith (partial |> toLower) && partial |> isNotNullOrEmpty) 
         |> Seq.toList
 
@@ -31,11 +40,9 @@ module Projects =
         let projectsStartingWith = 
             Project.All 
             |> Seq.map infoOf
-            |> Seq.filter (fun s -> partial |> isNotNullOrEmpty && s.name |> toLower |> startsWith (partial |> toLower)) 
+            |> Seq.filter (fun s -> partial |> isNotNullOrEmpty && s.moniker |> toLower |> startsWith (partial |> toLower)) 
             |> Seq.toList
 
         match projectsStartingWith with 
         | [i] -> Some i.project
         | _ -> None
-
-

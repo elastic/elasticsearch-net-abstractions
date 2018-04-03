@@ -1,6 +1,4 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-using Version = SemVer.Version;
+﻿using Version = SemVer.Version;
 
 namespace Elastic.Managed.Configuration
 {

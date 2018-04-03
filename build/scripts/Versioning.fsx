@@ -28,8 +28,9 @@ module Versioning =
     let globalJson = GlobalJson.Load("../../global.json");
     let private versionOf project =
         match project with
-        | ElasticsearchNode -> globalJson.Versions.Elasticsearchnode.Remove(0, 1)
-        | ElasticsearchNodeRunner -> globalJson.Versions.ElasticsearchnodeRunner.Remove(0, 1)
+        | Managed -> globalJson.Versions.Managed.Remove(0, 1)
+        | Ephemeral -> globalJson.Versions.Ephemeral.Remove(0, 1)
+        | Xunit -> globalJson.Versions.Xunit.Remove(0, 1)
 
     let private assemblyVersionOf v = sprintf "%i.0.0" v.Major |> parse
 
@@ -38,9 +39,12 @@ module Versioning =
     let writeVersionIntoGlobalJson project version =
         //write it with a leading v in the json, needed for the json type provider to keep things strings
         let pre (v: string) = match (v.StartsWith("v")) with | true -> v | _ -> sprintf "v%s" v
-        let elasticsearchNodeVersion = match project with | ElasticsearchNode -> pre version | _ -> pre <| globalJson.Versions.Elasticsearchnode
-        let elasticsearchNodeRunnerVersion = match project with | ElasticsearchNodeRunner -> pre version | _ -> pre <| globalJson.Versions.ElasticsearchnodeRunner
-        let versionsNode = GlobalJson.Versions(elasticsearchNodeVersion, elasticsearchNodeRunnerVersion)
+
+        let managedVersion = match project with | Managed -> pre version | _ -> pre <| globalJson.Versions.Managed
+        let ephemeralVersion = match project with | Ephemeral -> pre version | _ -> pre <| globalJson.Versions.Ephemeral
+        let xunitVersion = match project with | Xunit -> pre version | _ -> pre <| globalJson.Versions.Xunit
+
+        let versionsNode = GlobalJson.Versions(managedVersion, ephemeralVersion, xunitVersion)
 
         let newGlobalJson = GlobalJson.Root (GlobalJson.Sdk(globalJson.Sdk.Version), versionsNode)
         use tw = new StreamWriter("global.json")
