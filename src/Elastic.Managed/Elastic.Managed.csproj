@@ -1,18 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\build\Versioning.targets" />
+  <Import Project="..\..\build\Common.targets" />
   <PropertyGroup>
     <AssemblyName>Elastic.Managed</AssemblyName>
     <TargetFramework>netstandard1.3</TargetFramework>
     <RootNamespace>Elastic.Managed</RootNamespace>
-    <Version>$(ElasticsearchNodeCurrentVersion)</Version>
-    <InformationalVersion>$(ElasticsearchNodeCurrentVersion)</InformationalVersion>
-    <AssemblyVersion>$(ElasticsearchNodeCurrentAssemblyVersion)</AssemblyVersion>
-    <FileVersion>$(ElasticsearchNodeCurrentAssemblyFileVersion)</FileVersion>
     <LangVersion>7.1</LangVersion>
+
+    <Version>$(ManagedVersion)</Version>
+    <InformationalVersion>$(ManagedVersion)</InformationalVersion>
+    <AssemblyVersion>$(ManagedAssemblyVersion)</AssemblyVersion>
+    <FileVersion>$(ManagedAssemblyFileVersion)</FileVersion>
+    
   </PropertyGroup>
   <ItemGroup>
-    <!--<ProjectReference Include="..\..\..\..\proc\src\Proc\Proc.csproj" />-->
     <PackageReference Include="Proc" Version="0.1.3" />
     <PackageReference Include="SemanticVersioning" Version="0.8.0" />
   </ItemGroup>

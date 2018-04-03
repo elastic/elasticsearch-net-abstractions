@@ -16,7 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{73A4EA23
 		..\global.json = ..\global.json
 		..\build\outputpath.props = ..\build\outputpath.props
 		..\paket.dependencies = ..\paket.dependencies
-		..\build\Versioning.targets = ..\build\Versioning.targets
+		..\build\Versioning.targets = ..\build\Common.targets
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elastic.Managed", "Elastic.Managed\Elastic.Managed.csproj", "{0FCE020D-F4BD-4933-A0AB-27537EFA273E}"

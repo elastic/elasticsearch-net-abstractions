@@ -1,10 +1,14 @@
 #I @"../../packages/build/FAKE/tools"
+open Fake.TeamCityRESTHelper
 #r @"FakeLib.dll"
 #load @"Projects.fsx"
+#load @"Versioning.fsx"
 
 open System
 open Fake
 open Projects
+open Versioning
+open SemVerHelper
 
 let private usage = """
 USAGE:
@@ -22,59 +26,35 @@ Targets:
 module Commandline =
 
     let private args = getBuildParamOrDefault "cmdline" "" |> split ' '
-    let skipTests = args |> List.exists (fun x -> x = "skiptests")
-    let private arguments = args |> List.filter (fun x -> x <> "skiptests")
+
+    let private (|IsAVersion|_|) version = match SemVerHelper.isValidSemVer version with | true -> Some (parse version) | _ -> None
+
+    let private (|IsATarget|_|) candidate = match candidate with | "dump" | "build" | "release" -> Some candidate | _ -> None
+    let target = match args with | IsATarget t::_ -> t | _ -> "build"
 
     let private (|IsAProject|_|) candidate =
         let names = projectsStartingWith candidate 
         match names with 
-        | [name] -> Some name
-        | [] ->
-            traceError (sprintf "'%s' did not match any of our known projects '%A'" candidate (Project.All |> Seq.map nameOf))
-            exit 2
-            None
+        | [name] -> tryFind name
+        | [] -> None
         | _ ->
-            traceError (sprintf "'%s' yield more then one project '%A'" candidate names)
+            traceError (sprintf "'%s' yields more then one project '%A' and therefor ambiguous" candidate names)
             exit 2
-            None
-        
-    let private (|IsATarget|_|) (candidate: string) =
-        let isTarget = Fake.TargetHelper.getAllTargetsNames() |> List.exists((=)candidate) 
-        match isTarget with 
-        | true -> Some candidate
-        | _ ->
-            None
-    let project = 
-        let p = 
-            match arguments with
-            | [IsAProject project] -> project |> tryFind
-            | IsAProject project::tail -> project |> tryFind
-            | _ ->
-                traceError usage
-                exit 2
 
-        //we'll already have printed an error message and exited before `None` here triggers
-        match p with | Some p -> p | _ -> raise <| ArgumentNullException();
+    let projects = 
+        let rec a args bucket = 
+            match args with
+            | IsATarget _::IsAProject project::IsAVersion version::tail -> 
+                Versioning.FullVersionInfo project version :: a tail bucket 
+            | IsAProject project::IsAVersion version::tail -> 
+                Versioning.FullVersionInfo project version :: a tail bucket 
+            | _ -> bucket
+        let argProjects = a args []
+        let allProjects = Project.All |> List.map Versioning.VersionInfo
 
-    let target = 
-        match arguments with
-        | [IsAProject project] -> "build"
-        | [IsAProject project; t] -> t
-        | IsAProject project::t::tail -> t
-        | _ ->
-            traceError usage
-            exit 2
+        List.append argProjects allProjects |> List.distinctBy (fun p -> p.Project.name)
+
+    let project = Project.Xunit
 
     let parse () =
-        printfn "%A" arguments
-        match arguments with
-        | [IsAProject project] -> ignore()
-        | [IsAProject project; "release"; version] -> 
-            setBuildParam "version" version
-        | [IsAProject project; IsATarget t] when target |> isNotNullOrEmpty -> ignore()
-        | _ ->
-            traceError usage
-            exit 2
-
         setBuildParam "target" target
-        traceHeader (sprintf "%s - %s" (project |> nameOf) target)

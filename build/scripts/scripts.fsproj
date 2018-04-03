@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <IsPackable>False</IsPackable>
   </PropertyGroup>
   <ItemGroup>
     <None Include="Projects.fsx" />
     <None Include="Paths.fsx" />
     <None Include="Tooling.fsx" />
-    <None Include="Releasing.fsx" />
     <None Include="Versioning.fsx" />
     <None Include="Building.fsx" />
     <None Include="Signing.fsx" />

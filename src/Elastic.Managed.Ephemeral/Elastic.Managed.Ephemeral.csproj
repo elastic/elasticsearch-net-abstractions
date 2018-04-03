@@ -1,15 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\build\Versioning.targets" />
+  <Import Project="..\..\build\Common.targets" />
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <AssemblyName>Elastic.Managed.Ephemeral</AssemblyName>
     <RootNamespace>Elastic.Managed.Ephemeral</RootNamespace>
-    <Version>$(ElasticsearchNodeRunnerCurrentVersion)</Version>
-    <InformationalVersion>$(ElasticsearchNodeRunnerCurrentVersion)</InformationalVersion>
-    <AssemblyVersion>$(ElasticsearchNodeRunnerCurrentAssemblyVersion)</AssemblyVersion>
-    <FileVersion>$(ElasticsearchNodeRunnerCurrentAssemblyFileVersion)</FileVersion>
     <LangVersion>7.1</LangVersion>
+
+    <Version>$(EphemeralVersion)</Version>
+    <InformationalVersion>$(EphemeralVersion)</InformationalVersion>
+    <AssemblyVersion>$(EphemeralAssemblyVersion)</AssemblyVersion>
+    <FileVersion>$(EphemeralAssemblyFileVersion)</FileVersion>
+    
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Elastic.Managed\Elastic.Managed.csproj" />

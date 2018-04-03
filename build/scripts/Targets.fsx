@@ -1,23 +1,15 @@
 #load @"Projects.fsx"
-#load @"Commandline.fsx"
 #load @"Paths.fsx"
-#load @"Tooling.fsx"
 #load @"Versioning.fsx"
-#load @"Testing.fsx"
+#load @"Commandline.fsx"
+#load @"Tooling.fsx"
 #load @"Signing.fsx"
 #load @"Building.fsx"
-#load @"Releasing.fsx"
 
-open System
 open Fake
 
-open Projects
-open Paths
 open Building
-open Testing
 open Versioning
-open Releasing
-open Signing
 open Commandline
 
 Commandline.parse()
@@ -28,33 +20,37 @@ Target "Clean" Build.Clean
 
 Target "Restore" Build.Restore
 
-Target "FullBuild" <| fun _ -> Build.Compile false
-    
-Target "Test" Tests.RunUnitTests
+Target "FullBuild"  <| fun _ -> 
+    Build.Compile Commandline.projects
 
 Target "ChangeVersion" <| fun _ -> 
-    let newVersion = getBuildParam "version"
-    Versioning.writeVersionIntoGlobalJson Commandline.project newVersion
+    for p in Commandline.projects do
+        Versioning.writeVersionIntoGlobalJson (p.Project.project) (p.Informational.ToString())
 
 Target "Version" <| fun _ -> 
-    for v in Versioning.AllProjectVersions do
+    for v in Commandline.projects do
         traceImportant (sprintf "project %s has version %s from here on out" (v.Project.name) (v.Informational.ToString()))
 
 Target "Release" <| fun _ -> 
-    Release.CreateNugetPackage Commandline.project
-    Versioning.ValidateArtifacts Commandline.project
+    Build.CreateNugetPackage Commandline.projects
+    Versioning.ValidateArtifacts Commandline.projects
+
+Target "Dump" <| fun _ -> 
+    for v in Commandline.projects do
+        traceImportant (sprintf "project %s has version %s from here on out" (v.Project.name) (v.Informational.ToString()))
 
 // Dependencies
 "Clean"
-    =?> ("ChangeVersion", hasBuildParam "version")
+    ==> "ChangeVersion"
     ==> "Version"
     ==> "Restore"
     ==> "FullBuild"
-    =?> ("Test", (not Commandline.skipTests))
     ==> "Build"
 
 "Build"
   ==> "Release"
+
+"Dump"
 
 RunTargetOrListTargets()
 

@@ -1,21 +1,24 @@
-type project
+type file
 
-id Elasticsearch.Managed.Node
+id Elastic.Xunit
 
+licenseUrl http://opensource.org/licenses/MIT
 title
-	Elastic.Managed
-summary
-	A simple abstraction layer for exposing elasticsearch as an observable in your application. 
+	Elastic.Xunit
 description
+	Write integration tests against ephemeral Elasticsearch clusters.
 authors Elastic and contributors
 owners Elastic
 licenseUrl https://github.com/elastic/elasticsearch-net-abstractions/blob/master/license.txt
 projectUrl https://github.com/elastic/elasticsearch-net-abstractions
 iconUrl https://raw.githubusercontent.com/elastic/elasticsearch-net-abstractions/master/build/nuget-icon.png
-releaseNotes See https://github.com/elastic/elasticsearch-net-abstractions/releases/tag/$version$
+releaseNotes See https://github.com/elastic/elasticsearch-net-abstractions/releases
 requireLicenseAcceptance false
 copyright 2017 Elasticsearch BV
-tags observable,process
+tags observable,process,elastic,elasticsearch,cluster,managed,xunit
 dependencies
-	Proc >= 0.1.3
-	SemanticVersioning >= 0.8.0
+	Elastic.Managed.Ephemeral >= 0.0.0-bad
+	xunit >= 2.3.1
+
+files
+	bin\Release\**.* => lib

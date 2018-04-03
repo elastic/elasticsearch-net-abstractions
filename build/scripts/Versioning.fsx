@@ -4,24 +4,16 @@
 #r @"FSharp.Data.dll"
 #r @"System.Xml.Linq.dll"
 
-#load @"Projects.fsx"
 #load @"Paths.fsx"
-#load @"Commandline.fsx"
 
-open System
 open System.Diagnostics
 open System.IO
-open System.Xml
-open System.Text.RegularExpressions
 open FSharp.Data
 
 open Fake
-open AssemblyInfoFile
 open SemVerHelper
-open Paths
 open Projects
-open SemVerHelper
-open Commandline
+open Paths
 
 module Versioning =
     type private GlobalJson = JsonProvider<"../../global.json">
@@ -51,51 +43,47 @@ module Versioning =
         newGlobalJson.JsonValue.WriteTo(tw, JsonSaveOptions.None)
         traceImportant <| sprintf "Written (%O) to global.json as the current version will use this version from now on as current in the build" version
 
-    type AssemblyVersionInfo = { Informational: SemVerInfo; Assembly: SemVerInfo; AssemblyFile: SemVerInfo; Project: ProjectInfo }
-    let VersionInfo project =
-        let currentVersion = versionOf project |> parse
-        let bv = getBuildParam "version"
-        let buildVersion = 
-            match (Commandline.project) with 
-            | p when p = project -> if (isNullOrEmpty bv) then None else Some(parse(bv))
-            | _ -> Some(parse(versionOf project))
-        let target =getBuildParam "target"
-        let isCurrentProject = project = Commandline.project
-        match (target, buildVersion, isCurrentProject) with
-        | ("release", None, _) -> failwithf "can not run release because no explicit version number was passed on the command line"
-        | ("release", Some v, true) ->
-            if (currentVersion >= v) then failwithf "tried to create release %O for project %O but current version is already at %O" v project currentVersion
-            { Informational= v; Assembly= assemblyVersionOf v; AssemblyFile = assemblyFileVersionOf v; Project = infoOf project }
-        | _ ->
-            tracefn "Not running 'release' target or %O is not the release current release target (%O) so using version in global.json (%O) as current" project (Commandline.project) currentVersion
-            { Informational= currentVersion; Assembly= assemblyVersionOf currentVersion; AssemblyFile = assemblyFileVersionOf currentVersion; Project = infoOf project}
+    type AssemblyVersionInfo = { Informational: SemVerInfo; Assembly: SemVerInfo; AssemblyFile: SemVerInfo; Project: ProjectInfo; }
 
-    let AllProjectVersions = Project.All |> Seq.map VersionInfo
-    let ValidateArtifacts project =
-        let pi = VersionInfo project
-        let projectAssemblyFile = pi.AssemblyFile
-        let projectAssembly = pi.Assembly
+    let FullVersionInfo project v = 
+        { Informational= v; Assembly= assemblyVersionOf v; AssemblyFile = assemblyFileVersionOf v; Project = infoOf project }
+    let VersionInfo project = 
+        let v = versionOf project |> parse
+        { Informational= v; Assembly= assemblyVersionOf v; AssemblyFile = assemblyFileVersionOf v; Project = infoOf project }
+
+    let MsBuildArgs info =
+        let m = info.Project.moniker
+        let p k v= sprintf "/p:%s%O=%O" m k v
+        [
+            p "Version" <| info.Informational;
+            p "AssemblyVersion" <| info.Assembly;
+            p "AssemblyFileVersion" <| info.AssemblyFile;
+        ]
+
+    let private validateNugetPackage (pi: AssemblyVersionInfo) = 
         traceFAKE "Assembly: %O AssemblyFile %O Informational: %O => project %s" 
-            pi.Assembly pi.AssemblyFile pi.Informational (nameOf project) 
+            pi.Assembly pi.AssemblyFile pi.Informational pi.Project.name 
 
-        let tmp = "build/output/_packages/tmp"
-        !! "build/output/_packages/*.nupkg"
-        |> Seq.iter(fun f ->
-           Unzip tmp f
-           !! (sprintf "%s/**/*.dll" tmp)
-           |> Seq.iter(fun dll ->
-                let fv = FileVersionInfo.GetVersionInfo(dll)
-                let actualFileVersion = fv.FileVersion
-                let actualProductVersion = fv.FileVersion
-                let a = GetAssemblyVersion dll
-                traceFAKE "Assembly: %A AssemblyFile: %s Informational: %s => %s" a fv.FileVersion fv.ProductVersion dll
-                if (a.Minor > 0 || a.Revision > 0 || a.Build > 0) then failwith (sprintf "%s assembly version is not sticky to its major component" dll)
-                if (parse (fv.ProductVersion) <> pi.Informational) then 
-                    failwith <| sprintf "Expected product info %s to match new version %O " fv.ProductVersion pi.Informational
+        let fileName = sprintf "%s.%O" pi.Project.name pi.Informational
+        let tmpFolder = sprintf "%s/tmp-%s" Paths.NugetOutput fileName
+        let nupkg = sprintf "%s/%s.nupkg" Paths.NugetOutput fileName
+        
+        Unzip tmpFolder nupkg
 
-                let assemblyName = System.Reflection.AssemblyName.GetAssemblyName(dll);
-                if not <| assemblyName.FullName.Contains("PublicKeyToken=96c599bbe3e70f5d") then
-                    failwith <| sprintf "%s should have PublicKeyToken=96c599bbe3e70f5d" assemblyName.FullName
-           )
-           DeleteDir tmp
+        !! (sprintf "%s/**/*.dll" tmpFolder)
+        |> Seq.iter(fun dll ->
+            let fv = FileVersionInfo.GetVersionInfo(dll)
+            let a = GetAssemblyVersion dll
+            traceFAKE "Assembly: %A AssemblyFile: %s Informational: %s => %s" a fv.FileVersion fv.ProductVersion dll
+            if (a.Minor > 0 || a.Revision > 0 || a.Build > 0) then failwith (sprintf "%s assembly version is not sticky to its major component" dll)
+            if (parse (fv.ProductVersion) <> pi.Informational) then 
+                failwith <| sprintf "Expected product info %s to match new version %O " fv.ProductVersion pi.Informational
+
+            let assemblyName = System.Reflection.AssemblyName.GetAssemblyName(dll);
+            if not <| assemblyName.FullName.Contains("PublicKeyToken=96c599bbe3e70f5d") then
+                failwith <| sprintf "%s should have PublicKeyToken=96c599bbe3e70f5d" assemblyName.FullName
         )
+        DeleteDir tmpFolder
+
+    let ValidateArtifacts (projects: AssemblyVersionInfo list) = for info in projects do validateNugetPackage info
+    

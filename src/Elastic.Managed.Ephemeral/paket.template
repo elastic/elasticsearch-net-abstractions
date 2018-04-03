@@ -1,20 +1,20 @@
 type project
 
-id ElasticsearchNode.Runner
+id Elastic.Managed.Ephemeral
 
 licenseUrl http://opensource.org/licenses/MIT
 title
-	ElasticsearchNode.Runner - Exposes a more generic Cluster class that is capable of comletely bootstrapping elasticsearch locally
-summary
+	Elastic.Managed.Ephemeral
 description
+	Allows you to programmatically download, bootstrap and start an ephemeral (throwaway) local Elasticsearch instance
 authors Elastic and contributors
 owners Elastic
-licenseUrl https://github.com/elastic/elasticsearch-net-abstractions/blob/master/license.txt</licenseUrl>
-projectUrl https://github.com/elastic/elasticsearch-net-abstractions</projectUrl>
-iconUrl https://raw.githubusercontent.com/elastic/elasticsearch-net-abstractions/master/build/nuget-icon.png</iconUrl>
-releaseNotes See https://github.com/elastic/elasticsearch-net-abstractions/releases/tag/$version$</releaseNotes>
-requireLicenseAcceptance false</requireLicenseAcceptance>
+licenseUrl https://github.com/elastic/elasticsearch-net-abstractions/blob/master/license.txt
+projectUrl https://github.com/elastic/elasticsearch-net-abstractions
+iconUrl https://raw.githubusercontent.com/elastic/elasticsearch-net-abstractions/master/build/nuget-icon.png
+releaseNotes See https://github.com/elastic/elasticsearch-net-abstractions/releases/tag/$version$
+requireLicenseAcceptance false
 copyright 2017 Elasticsearch BV
-tags observable,process
+tags observable,process,elastic,elasticsearch,cluster,managed
 dependencies
-	ElasticsearchNode >= 0.0.0-bad
+	Elastic.Managed >= 0.0.0-bad
