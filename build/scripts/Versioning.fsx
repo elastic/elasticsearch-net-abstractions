@@ -74,6 +74,7 @@ module Versioning =
         let header p = sprintf "# %s %O" p.Project.name p.Informational
         let projectVersions = projects |> List.map header |> String.concat " "
 
+        directRunGitCommandAndFail "." (sprintf "commit -am \"release: %s of %s\" " bumpedVersion projectVersions)
         directRunGitCommandAndFail "." (sprintf "tag -a %s -m \"release: %s of %s\" " bumpedVersion bumpedVersion projectVersions)
     
 
