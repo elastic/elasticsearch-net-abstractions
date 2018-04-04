@@ -51,11 +51,23 @@ namespace Elastic.Managed.Ephemeral
 
 		public void OnStop() => Itterate(NodeStoppedTasks, (t, c, fs) => t.Run(c), log: false);
 
-		public void Install()=> Itterate(InstallationTasks, (t, c, fs) => t.Run(c));
+		public void Install()
+		{
+			var tasks = new List<IClusterComposeTask<TConfiguration>>(InstallationTasks);
+			if (this.Cluster.ClusterConfiguration.AdditionalInstallationTasks != null)
+				tasks.AddRange(this.Cluster.ClusterConfiguration.AdditionalInstallationTasks);
+
+			Itterate(tasks, (t, c, fs) => t.Run(c));
+
+		}
 
 		public void OnBeforeStart() => Itterate(BeforeStart, (t, c, fs) => t.Run(c), log: false);
 
-		public void ValidateAfterStart() => Itterate(ValidationTasks, (t, c, fs) => t.Run(c), log: false);
+		public void ValidateAfterStart()
+		{
+			if (this.Cluster.ClusterConfiguration.SkipValidation) return;
+			Itterate(ValidationTasks, (t, c, fs) => t.Run(c), log: false);
+		}
 
 		private IList<string> GetCurrentRunnerLog()
 		{

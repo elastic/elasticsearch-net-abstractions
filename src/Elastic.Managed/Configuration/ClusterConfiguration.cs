@@ -24,20 +24,17 @@ namespace Elastic.Managed.Configuration
 			this.Add("path.data", fs.DataPath);
 			var logsPathDefault = Path.Combine(fs.ElasticsearchHome, "logs");
 			if (logsPathDefault != fs.LogsPath) this.Add("path.logs", fs.LogsPath);
-
 		}
 
 		public string ClusterName { get; }
-
 		public ElasticsearchVersion Version { get; }
 		public INodeFileSystem FileSystem { get; }
 		public int NumberOfNodes { get; }
-
 		public NodeSettings ClusterNodeSettings { get; } = new NodeSettings();
 
 		public virtual string CreateNodeName(int? node) => null;
 
-		 static int Quorum(int instanceCount) => Math.Max(1, (int) Math.Floor((double) instanceCount / 2) + 1);
+		static int Quorum(int instanceCount) => Math.Max(1, (int) Math.Floor((double) instanceCount / 2) + 1);
 
 		public void Add(string key, string value)
 		{

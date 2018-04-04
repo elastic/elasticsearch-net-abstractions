@@ -10,11 +10,9 @@ namespace Elastic.Xunit
 			: base(version, features, numberOfNodes)
 		{
 		}
-		public override string CreateNodeName(int? node)
-		{
-			var suffix = Guid.NewGuid().ToString("N").Substring(0, 6);
-			return $"xunit-node-{suffix}{node}";
-		}
-		public virtual int MaxConcurrency { get; } = 1;
+
+		protected override string NodePrefix => "xunit";
+
+		public int MaxConcurrency { get; set; }
 	}
 }

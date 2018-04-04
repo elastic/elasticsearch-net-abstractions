@@ -53,5 +53,17 @@ namespace Elastic.Managed.Configuration
 
 		public override string ToString() => this.Version;
 
+		public bool InRange(string range)
+		{
+			var versionRange = new SemVer.Range(range);
+			var satisfied = versionRange.IsSatisfied(this.Version);
+			if (this.ReleaseState != ReleaseState.Released || satisfied) return satisfied;
+
+			//Semver can only match snapshot version with ranges on the same major and minor
+			//anything else fails but we want to know e.g 2.4.5-SNAPSHOT satisfied by <5.0.0;
+			var wholeVersion = $"{this.Major}.{this.Minor}.{this.Patch}";
+			return versionRange.IsSatisfied(wholeVersion);
+		}
+
 	}
 }

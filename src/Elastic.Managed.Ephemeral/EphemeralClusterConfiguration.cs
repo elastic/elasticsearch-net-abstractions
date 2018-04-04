@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Elastic.Managed.Configuration;
+using Elastic.Managed.Ephemeral.Tasks;
 
 namespace Elastic.Managed.Ephemeral
 {
@@ -15,28 +18,39 @@ namespace Elastic.Managed.Ephemeral
 			this.AddXpackSettings();
 		}
 
-		public override string CreateNodeName(int? node)
-		{
-			var suffix = Guid.NewGuid().ToString("N").Substring(0, 6);
-			return $"ephemeral-node-{suffix}{node}";
-		}
-
 		public ClusterFeatures Features { get; }
 
 		public bool XpackEnabled => this.Features.HasFlag(ClusterFeatures.XPack);
 		private bool EnableSsl => this.Features.HasFlag(ClusterFeatures.SSL);
 		private bool EnableSecurity => this.Features.HasFlag(ClusterFeatures.Security);
 
+		public IList<IClusterComposeTask<EphemeralClusterConfiguration>> AdditionalInstallationTasks { get; set; }
+		public bool SkipValidation { get; set; }
+
+		public override string CreateNodeName(int? node)
+		{
+			var suffix = Guid.NewGuid().ToString("N").Substring(0, 6);
+			return $"{this.NodePrefix}-node-{suffix}{node}";
+		}
+
+		protected virtual string NodePrefix => "ephemeral";
+
 		private static readonly ElasticsearchVersion LastVersionThatAcceptedShieldSettings = "5.0.0-alpha1";
+		public void AddXPackSetting(string key, string value)
+		{
+			var shieldOrSecurity = this.Version > LastVersionThatAcceptedShieldSettings ? "xpack.security" : "shield";
+			key = Regex.Replace(key, @"^(?:xpack\.security|shield)\.", "");
+			this.Add($"{shieldOrSecurity}.{key}", value);
+		}
+
 		private void AddXpackSettings()
 		{
 			if (!EnableSecurity) return;
 			var b = this.EnableSecurity.ToString().ToLowerInvariant();
-			var shieldOrSecurity = this.Version > LastVersionThatAcceptedShieldSettings ? "xpack.security" : "shield";
 			var sslEnabled = this.EnableSsl.ToString().ToLowerInvariant();
-			this.Add($"{shieldOrSecurity}.enabled", b);
-			this.Add($"{shieldOrSecurity}.http.ssl.enabled", sslEnabled);
-			this.Add($"{shieldOrSecurity}.authc.realms.pki1.enabled", sslEnabled);
+			this.AddXPackSetting("enabled", b);
+			this.AddXPackSetting("http.ssl.enabled", sslEnabled);
+			this.AddXPackSetting("authc.realms.pki1.enabled", sslEnabled);
 		}
 
 	}
