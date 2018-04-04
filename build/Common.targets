@@ -8,6 +8,16 @@
     <NoWarn>1591,1572,1571,1573,1587,1570</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
     <DebugType>portable</DebugType>
-    <RepoUri>https://raw.githubusercontent.com/elastic/elasticsearch-net-abstractions</RepoUri>
+    <ReposRawUri>https://raw.githubusercontent.com/Mpdreamz/elasticsearch-net-abstraction</ReposRawUri>
+    <ReposUri>https://github.com/Mpdreamz/elasticsearch-net-abstraction</ReposUri>
+    <ReposVersion>master</ReposVersion>
+    
+    <Copyright>2014-$([System.DateTime]::Now.Year) Elasticsearch BV</Copyright>
+    <RepositoryUrl>$(ReposUri)</RepositoryUrl>
+    <PackageProjectUrl>$(ReposUri)/blob/$(ReposVersion)/readme.md</PackageProjectUrl>
+    <PackageIconUrl>$(RawReposUri)/$(ReposVersion)/build/nuget-icon.png</PackageIconUrl>
+    <PackageReleaseNotes>$(ReposUri)/releases/tag/$(ReposVersion></PackageReleaseNotes>
+    <IncludeSymbols>True</IncludeSymbols>
+    
   </PropertyGroup>
 </Project>

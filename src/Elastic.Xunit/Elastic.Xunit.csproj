@@ -10,6 +10,12 @@
     <AssemblyVersion>$(XunitAssemblyVersion)</AssemblyVersion>
     <FileVersion>$(XunitAssemblyFileVersion)</FileVersion>
 
+    <PackageId>Elastic.Xunit</PackageId>
+    <Authors>Elastic and contributors</Authors>
+    <Description>Provides an Xunit test framework allowing you to run integration tests against local ephemeral Elasticsearch clusters</Description>
+    <PackageTags>elastic,elasticsearch,xunit,cluster,integration,test,ephemeral</PackageTags>
+    
+
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Elastic.Managed.Ephemeral\Elastic.Managed.Ephemeral.csproj" />

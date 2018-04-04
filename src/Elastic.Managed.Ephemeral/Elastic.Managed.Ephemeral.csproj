@@ -11,6 +11,11 @@
     <InformationalVersion>$(EphemeralVersion)</InformationalVersion>
     <AssemblyVersion>$(EphemeralAssemblyVersion)</AssemblyVersion>
     <FileVersion>$(EphemeralAssemblyFileVersion)</FileVersion>
+
+    <PackageId>Elastic.Managed.Ephemeral</PackageId>
+    <Authors>Elastic and contributors</Authors>
+    <Description>Provides an EphemeralCluster implementation that can download/bootstrap/run a throwaway customizable Elasticsearch cluster</Description>
+    <PackageTags>elastic,elasticsearch,cluster,ephemeral</PackageTags>
     
   </PropertyGroup>
   <ItemGroup>
