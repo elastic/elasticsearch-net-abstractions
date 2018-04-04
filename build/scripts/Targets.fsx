@@ -22,31 +22,35 @@ Target "Restore" Build.Restore
 Target "FullBuild"  <| fun _ -> 
     Build.Compile Commandline.projects
 
-Target "ChangeVersion" <| fun _ -> 
-    for p in Commandline.projects do
-        Versioning.writeVersionIntoGlobalJson (p.Project.project) (p.Informational.ToString())
-
 Target "Version" <| fun _ -> 
-    for v in Commandline.projects do
-        traceImportant (sprintf "project %s has version %s from here on out" (v.Project.name) (v.Informational.ToString()))
+    let changedResults = 
+        Commandline.projects
+        |> List.map (fun p -> Versioning.writeVersionIntoGlobalJson (p.Project.project) (p.Informational.ToString()))
+        |> List.contains true
 
-Target "Release" <| fun _ -> 
+    setBuildParam "versionchanged" (if changedResults then "1" else "0")
+
+Target "Pack" <| fun _ -> 
     Build.CreateNugetPackage Commandline.projects
     Versioning.ValidateArtifacts Commandline.projects
 
-Target "Dump" <| fun _ -> 
-    for v in Commandline.projects do
-        traceImportant (sprintf "project %s has version %s from here on out" (v.Project.name) (v.Informational.ToString()))
+Target "Release" <| fun _ -> 
+    match getBuildParam "versionchanged" with
+    | "1" -> Versioning.BumpGlobalVersion Commandline.projects
+    | _ ->
+        traceError "none of the packages seem to have bumped versions so we can not release at this time"
 
 // Dependencies
 "Clean"
-    ==> "ChangeVersion"
     ==> "Version"
     ==> "Restore"
     ==> "FullBuild"
     ==> "Build"
 
 "Build"
+  ==> "Pack"
+
+"Pack"
   ==> "Release"
 
 "Dump"

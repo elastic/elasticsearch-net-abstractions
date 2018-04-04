@@ -14,8 +14,10 @@ open Fake
 open SemVerHelper
 open Projects
 open Paths
+open Fake.Git
 
 module Versioning =
+    type AssemblyVersionInfo = { Informational: SemVerInfo; Assembly: SemVerInfo; AssemblyFile: SemVerInfo; Project: ProjectInfo; }
     type private GlobalJson = JsonProvider<"../../global.json">
     let globalJson = GlobalJson.Load("../../global.json");
     let private versionOf project =
@@ -28,22 +30,52 @@ module Versioning =
 
     let private assemblyFileVersionOf v = sprintf "%i.%i.%i.0" v.Major v.Minor v.Patch |> parse
 
-    let writeVersionIntoGlobalJson project version =
-        //write it with a leading v in the json, needed for the json type provider to keep things strings
-        let pre (v: string) = match (v.StartsWith("v")) with | true -> v | _ -> sprintf "v%s" v
-
-        let managedVersion = match project with | Managed -> pre version | _ -> pre <| globalJson.Versions.Managed
-        let ephemeralVersion = match project with | Ephemeral -> pre version | _ -> pre <| globalJson.Versions.Ephemeral
-        let xunitVersion = match project with | Xunit -> pre version | _ -> pre <| globalJson.Versions.Xunit
-
-        let versionsNode = GlobalJson.Versions(managedVersion, ephemeralVersion, xunitVersion)
+    //write it with a leading v in the json, needed for the json type provider to keep things strings
+    let writeGlobalJson reposVersion managedVersion ephemeralVersion xunitVersion =
+        let versionsNode = GlobalJson.Versions(reposVersion, managedVersion, ephemeralVersion, xunitVersion)
 
         let newGlobalJson = GlobalJson.Root (GlobalJson.Sdk(globalJson.Sdk.Version), versionsNode)
         use tw = new StreamWriter("global.json")
         newGlobalJson.JsonValue.WriteTo(tw, JsonSaveOptions.None)
-        traceImportant <| sprintf "Written (%O) to global.json as the current version will use this version from now on as current in the build" version
+    let private pre (v: string) = match (v.StartsWith("v")) with | true -> v | _ -> sprintf "v%s" v
+    let private bumpVersion project version = 
+        let reposVersion = pre <| globalJson.Versions.Repos
+        let managedVersion = match project with | Managed -> pre version | _ -> pre <| globalJson.Versions.Managed
+        let ephemeralVersion = match project with | Ephemeral -> pre version | _ -> pre <| globalJson.Versions.Ephemeral
+        let xunitVersion = match project with | Xunit -> pre version | _ -> pre <| globalJson.Versions.Xunit
+        writeGlobalJson reposVersion managedVersion ephemeralVersion xunitVersion
+        traceImportant <| sprintf "%s bumped version to (%O) in global.json " (nameOf project) version
 
-    type AssemblyVersionInfo = { Informational: SemVerInfo; Assembly: SemVerInfo; AssemblyFile: SemVerInfo; Project: ProjectInfo; }
+    let writeVersionIntoGlobalJson project version =
+        let pv = pre version
+        let changed = 
+            match project with
+            | Managed -> pv <> (pre <| globalJson.Versions.Managed)
+            | Ephemeral -> pv <> (pre <| globalJson.Versions.Ephemeral)
+            | Xunit -> pv <> (pre <| globalJson.Versions.Xunit)
+
+        match changed with 
+        | true -> bumpVersion project version 
+        | _ -> 
+            traceImportant <| sprintf "%s did not change version (%O)" (nameOf project) version
+            ignore()
+        changed
+
+    let BumpGlobalVersion (projects: AssemblyVersionInfo list) = 
+        let v = globalJson.Versions.Repos.Remove(0, 1) |> parse
+        let bumpedVersion = sprintf "v%i.%i.%i.0" v.Major (v.Minor + 1) v.Patch 
+
+        let managedVersion = pre <| globalJson.Versions.Managed
+        let ephemeralVersion = pre <| globalJson.Versions.Ephemeral
+        let xunitVersion = pre <| globalJson.Versions.Xunit
+        writeGlobalJson bumpedVersion managedVersion ephemeralVersion xunitVersion
+        traceImportant <| sprintf "bumped repos version to (%s) in global.json"  bumpedVersion
+
+        let header p = sprintf "# %s %O" p.Project.name p.Informational
+        let projectVersions = projects |> List.map header |> String.concat " "
+
+        directRunGitCommandAndFail ".." (sprintf "tag -a %s -m \"%s\" " bumpedVersion projectVersions)
+    
 
     let FullVersionInfo project v = 
         { Informational= v; Assembly= assemblyVersionOf v; AssemblyFile = assemblyFileVersionOf v; Project = infoOf project }

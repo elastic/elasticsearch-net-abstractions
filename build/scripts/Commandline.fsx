@@ -1,10 +1,8 @@
 #I @"../../packages/build/FAKE/tools"
-open Fake.TeamCityRESTHelper
 #r @"FakeLib.dll"
 #load @"Projects.fsx"
 #load @"Versioning.fsx"
 
-open System
 open Fake
 open Projects
 open Versioning
@@ -19,8 +17,10 @@ Targets:
 
 * build
   - default target if non provided. 
-* release <version>
-  - 0 create a release worthy nuget packages for [version] under build\output
+* pack [project version]*
+  - builds nuget packages for the provided project e.g
+    build pack xunit 1.1.1 managed 1.0.0
+
 """
 
 module Commandline =
@@ -29,7 +29,7 @@ module Commandline =
 
     let private (|IsAVersion|_|) version = match SemVerHelper.isValidSemVer version with | true -> Some (parse version) | _ -> None
 
-    let private (|IsATarget|_|) candidate = match candidate with | "dump" | "build" | "release" -> Some candidate | _ -> None
+    let private (|IsATarget|_|) candidate = match candidate with | "pack" | "build" | "release" -> Some candidate | _ -> None
     let target = match args with | IsATarget t::_ -> t | _ -> "build"
 
     let private (|IsAProject|_|) candidate =
@@ -40,7 +40,6 @@ module Commandline =
         | _ ->
             traceError (sprintf "'%s' yields more then one project '%A' and therefor ambiguous" candidate names)
             exit 2
-
     let projects = 
         let rec a args bucket = 
             match args with
@@ -53,8 +52,6 @@ module Commandline =
         let allProjects = Project.All |> List.map Versioning.VersionInfo
 
         List.append argProjects allProjects |> List.distinctBy (fun p -> p.Project.name)
-
-    let project = Project.Xunit
 
     let parse () =
         setBuildParam "target" target
