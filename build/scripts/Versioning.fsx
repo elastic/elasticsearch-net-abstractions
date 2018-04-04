@@ -20,7 +20,6 @@ open Fake.Git
 module Versioning =
     type AssemblyVersionInfo = { Informational: SemVerInfo; Assembly: SemVerInfo; AssemblyFile: SemVerInfo; Project: ProjectInfo; }
     type private GlobalJson = JsonProvider<"../../global.json">
-    let globalJson = GlobalJson.Load("../../global.json");
 
     let private canaryVersionOrCurrent version = 
         match getBuildParam "target" with
@@ -33,6 +32,7 @@ module Versioning =
         | _ -> version |> parse
 
     let private versionOf project =
+        let globalJson = GlobalJson.Load("../../global.json");
         match project with
         | Managed -> canaryVersionOrCurrent <| globalJson.Versions.Managed.Remove(0, 1)
         | Ephemeral -> canaryVersionOrCurrent <| globalJson.Versions.Ephemeral.Remove(0, 1)
@@ -44,13 +44,16 @@ module Versioning =
 
     //write it with a leading v in the json, needed for the json type provider to keep things strings
     let writeGlobalJson reposVersion managedVersion ephemeralVersion xunitVersion =
+        let globalJson = GlobalJson.Load("../../global.json");
         let versionsNode = GlobalJson.Versions(reposVersion, managedVersion, ephemeralVersion, xunitVersion)
 
         let newGlobalJson = GlobalJson.Root (GlobalJson.Sdk(globalJson.Sdk.Version), versionsNode)
         use tw = new StreamWriter("global.json")
         newGlobalJson.JsonValue.WriteTo(tw, JsonSaveOptions.None)
+
     let private pre (v: string) = match (v.StartsWith("v")) with | true -> v | _ -> sprintf "v%s" v
     let private bumpVersion project version = 
+        let globalJson = GlobalJson.Load("../../global.json");
         let reposVersion = pre <| globalJson.Versions.Repos
         let managedVersion = match project with | Managed -> pre version | _ -> pre <| globalJson.Versions.Managed
         let ephemeralVersion = match project with | Ephemeral -> pre version | _ -> pre <| globalJson.Versions.Ephemeral
@@ -59,6 +62,7 @@ module Versioning =
         traceImportant <| sprintf "%s bumped version to (%O) in global.json " (nameOf project) version
 
     let writeVersionIntoGlobalJson project version =
+        let globalJson = GlobalJson.Load("../../global.json");
         let pv = pre version
         let changed = 
             match project with
@@ -74,6 +78,7 @@ module Versioning =
         changed
 
     let BumpGlobalVersion (projects: AssemblyVersionInfo list) = 
+        let globalJson = GlobalJson.Load("../../global.json");
         let v = globalJson.Versions.Repos.Remove(0, 1) |> parse
         let bumpedVersion = sprintf "v%i.%i.%i" v.Major v.Minor (v.Patch + 1)
 
