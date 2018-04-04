@@ -38,6 +38,7 @@ _NCrunch*/
 .fake/*
 .fake
 packages/*
+!.paket/paket.bootstrapper.exe
 paket.exe
 paket-files/*.cached
 
