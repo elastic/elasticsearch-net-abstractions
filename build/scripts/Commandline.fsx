@@ -40,7 +40,8 @@ module Commandline =
         | _ ->
             traceError (sprintf "'%s' yields more then one project '%A' and therefor ambiguous" candidate names)
             exit 2
-    let projects = 
+
+    let providedProjects =
         let rec a args bucket = 
             match args with
             | IsATarget _::IsAProject project::IsAVersion version::tail -> 
@@ -48,10 +49,12 @@ module Commandline =
             | IsAProject project::IsAVersion version::tail -> 
                 Versioning.FullVersionInfo project version :: a tail bucket 
             | _ -> bucket
-        let argProjects = a args []
+        a args []
+
+    let projects = 
         let allProjects = Project.All |> List.map Versioning.VersionInfo
 
-        List.append argProjects allProjects |> List.distinctBy (fun p -> p.Project.name)
+        List.append providedProjects allProjects |> List.distinctBy (fun p -> p.Project.name)
 
     let parse () =
         setBuildParam "target" target

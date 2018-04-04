@@ -25,7 +25,7 @@ Target "VerifyClean" <| fun _ ->
 
 Target "VerifyVersionChange" <| fun _ -> 
     match getBuildParam "versionchanged" with
-    | "1" -> Versioning.BumpGlobalVersion Commandline.projects
+    | "1" -> Versioning.BumpGlobalVersion Commandline.providedProjects
     | _ ->
         traceError "None of the packages seem to have bumped versions so we can not release at this time"
         failwithf "None of the packages seem to have bumped versions so we can not release at this time"
