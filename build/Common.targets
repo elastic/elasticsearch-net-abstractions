@@ -15,7 +15,7 @@
     <Copyright>2014-$([System.DateTime]::Now.Year) Elasticsearch BV</Copyright>
     <RepositoryUrl>$(ReposUri)</RepositoryUrl>
     <PackageProjectUrl>$(ReposUri)/blob/$(ReposVersion)/readme.md</PackageProjectUrl>
-    <PackageIconUrl>$(RawReposUri)/$(ReposVersion)/build/nuget-icon.png</PackageIconUrl>
+    <PackageIconUrl>$(ReposRawUri)/$(ReposVersion)/build/nuget-icon.png</PackageIconUrl>
     <PackageReleaseNotes>$(ReposUri)/releases/tag/$(ReposVersion)</PackageReleaseNotes>
     <IncludeSymbols>False</IncludeSymbols>
     
