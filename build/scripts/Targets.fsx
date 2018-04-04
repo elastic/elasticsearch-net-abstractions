@@ -39,7 +39,7 @@ Target "FullBuild"  <| fun _ ->
 
 Target "Version" <| fun _ -> 
     let changedResults = 
-        Commandline.projects
+        Commandline.providedProjects
         |> List.map (fun p -> Versioning.writeVersionIntoGlobalJson (p.Project.project) (p.Informational.ToString()))
         |> List.contains true
 
@@ -49,12 +49,14 @@ Target "Pack" <| fun _ ->
     Build.CreateNugetPackage Commandline.projects
     Versioning.ValidateArtifacts Commandline.projects
 
+Target "Canary" <| fun _ -> traceHeader "Running Canary"
+
 Target "Release" <| fun _ -> traceHeader "Running Release"
 
 // Dependencies
 "Clean"
     =?> ("VerifyClean", getBuildParam "target" = "release")
-    ==> "Version"
+    =?> ("Version", getBuildParam "target" = "release")
     =?> ("VerifyVersionChange", getBuildParam "target" = "release")
     ==> "Restore"
     ==> "FullBuild"
@@ -65,6 +67,9 @@ Target "Release" <| fun _ -> traceHeader "Running Release"
 
 "Pack"
   ==> "Release"
+
+"Pack"
+  ==> "Canary"
 
 "Dump"
 

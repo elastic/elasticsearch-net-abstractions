@@ -29,8 +29,12 @@ module Commandline =
 
     let private (|IsAVersion|_|) version = match SemVerHelper.isValidSemVer version with | true -> Some (parse version) | _ -> None
 
-    let private (|IsATarget|_|) candidate = match candidate with | "pack" | "build" | "release" -> Some candidate | _ -> None
-    let target = match args with | IsATarget t::_ -> t | _ -> "build"
+    let private (|IsATarget|_|) candidate = match candidate with | "pack" | "build" | "release" | "canary" -> Some candidate | _ -> None
+
+    let target = 
+        let t = match args with | IsATarget t::_ -> t | _ -> "build"
+        setBuildParam "target" t
+        t
 
     let private (|IsAProject|_|) candidate =
         let names = projectsStartingWith candidate 
@@ -56,5 +60,4 @@ module Commandline =
 
         List.append providedProjects allProjects |> List.distinctBy (fun p -> p.Project.name)
 
-    let parse () =
-        setBuildParam "target" target
+    let parse () = ignore()

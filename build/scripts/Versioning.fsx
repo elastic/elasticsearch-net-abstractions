@@ -8,6 +8,7 @@
 
 open System.Diagnostics
 open System.IO
+open System
 open FSharp.Data
 
 open Fake
@@ -20,11 +21,22 @@ module Versioning =
     type AssemblyVersionInfo = { Informational: SemVerInfo; Assembly: SemVerInfo; AssemblyFile: SemVerInfo; Project: ProjectInfo; }
     type private GlobalJson = JsonProvider<"../../global.json">
     let globalJson = GlobalJson.Load("../../global.json");
+
+    let private canaryVersionOrCurrent version = 
+        match getBuildParam "target" with
+        | "canary" ->
+            let timestampedVersion = (sprintf "ci%s" (DateTime.UtcNow.ToString("yyyyMMddTHHmmss")))
+            tracefn "Canary suffix %s " timestampedVersion
+            let v = version |> parse
+            let canaryVersion = parse ((sprintf "%d.%d.0-%s" v.Major (v.Minor + 1) timestampedVersion).Trim())
+            canaryVersion
+        | _ -> version |> parse
+
     let private versionOf project =
         match project with
-        | Managed -> globalJson.Versions.Managed.Remove(0, 1)
-        | Ephemeral -> globalJson.Versions.Ephemeral.Remove(0, 1)
-        | Xunit -> globalJson.Versions.Xunit.Remove(0, 1)
+        | Managed -> canaryVersionOrCurrent <| globalJson.Versions.Managed.Remove(0, 1)
+        | Ephemeral -> canaryVersionOrCurrent <| globalJson.Versions.Ephemeral.Remove(0, 1)
+        | Xunit -> canaryVersionOrCurrent <| globalJson.Versions.Xunit.Remove(0, 1)
 
     let private assemblyVersionOf v = sprintf "%i.0.0" v.Major |> parse
 
@@ -71,17 +83,16 @@ module Versioning =
         writeGlobalJson bumpedVersion managedVersion ephemeralVersion xunitVersion
         traceImportant <| sprintf "bumped repos version to (%s) in global.json"  bumpedVersion
 
-        let header p = sprintf "# %s %O" p.Project.name p.Informational
-        let projectVersions = projects |> List.map header |> String.concat " "
+        let header p = sprintf "%s %O" p.Project.name p.Informational
+        let projectVersions = projects |> List.map header |> String.concat ", "
 
         directRunGitCommandAndFail "." (sprintf "commit -am \"release: %s of %s\" " bumpedVersion projectVersions)
         directRunGitCommandAndFail "." (sprintf "tag -a %s -m \"release: %s of %s\" " bumpedVersion bumpedVersion projectVersions)
-    
 
     let FullVersionInfo project v = 
         { Informational= v; Assembly= assemblyVersionOf v; AssemblyFile = assemblyFileVersionOf v; Project = infoOf project }
     let VersionInfo project = 
-        let v = versionOf project |> parse
+        let v = versionOf project
         { Informational= v; Assembly= assemblyVersionOf v; AssemblyFile = assemblyFileVersionOf v; Project = infoOf project }
 
     let MsBuildArgs info =
