@@ -23,7 +23,7 @@ module Build =
         let props = (projects |> List.collect Versioning.MsBuildArgs)
         let globalJson = GlobalJson.Load("../../global.json");
         let v = globalJson.Versions.Repos.Remove(0, 1)
-        [(sprintf "/p:ReposVersion=%s" v)] |> List.append props
+        [(sprintf "/p:ReposVersion=v%s" v)] |> List.append props
 
     let Compile (projects: Versioning.AssemblyVersionInfo list) = 
         if not (DotNetCli.isInstalled()) then failwith  "You need to install the dotnet command line SDK to build for .NET Core"

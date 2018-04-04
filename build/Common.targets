@@ -16,8 +16,8 @@
     <RepositoryUrl>$(ReposUri)</RepositoryUrl>
     <PackageProjectUrl>$(ReposUri)/blob/$(ReposVersion)/readme.md</PackageProjectUrl>
     <PackageIconUrl>$(RawReposUri)/$(ReposVersion)/build/nuget-icon.png</PackageIconUrl>
-    <PackageReleaseNotes>$(ReposUri)/releases/tag/$(ReposVersion></PackageReleaseNotes>
-    <IncludeSymbols>True</IncludeSymbols>
+    <PackageReleaseNotes>$(ReposUri)/releases/tag/$(ReposVersion)</PackageReleaseNotes>
+    <IncludeSymbols>False</IncludeSymbols>
     
   </PropertyGroup>
 </Project>
