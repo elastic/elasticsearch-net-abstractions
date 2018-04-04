@@ -63,7 +63,7 @@ module Versioning =
 
     let BumpGlobalVersion (projects: AssemblyVersionInfo list) = 
         let v = globalJson.Versions.Repos.Remove(0, 1) |> parse
-        let bumpedVersion = sprintf "v%i.%i.%i.0" v.Major (v.Minor + 1) v.Patch 
+        let bumpedVersion = sprintf "v%i.%i.%i.0" v.Major v.Minor (v.Patch + 1)
 
         let managedVersion = pre <| globalJson.Versions.Managed
         let ephemeralVersion = pre <| globalJson.Versions.Ephemeral
@@ -74,7 +74,7 @@ module Versioning =
         let header p = sprintf "# %s %O" p.Project.name p.Informational
         let projectVersions = projects |> List.map header |> String.concat " "
 
-        directRunGitCommandAndFail ".." (sprintf "tag -a %s -m \"%s\" " bumpedVersion projectVersions)
+        directRunGitCommandAndFail "." (sprintf "tag -a %s -m \"release: %s of %s\" " bumpedVersion bumpedVersion projectVersions)
     
 
     let FullVersionInfo project v = 

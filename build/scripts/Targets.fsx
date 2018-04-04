@@ -6,6 +6,7 @@
 #load @"Building.fsx"
 
 open Fake
+open Fake.Git
 
 open Building
 open Versioning
@@ -15,6 +16,20 @@ Commandline.parse()
 
 Target "Build" <| fun _ -> traceHeader "STARTING BUILD"
 
+Target "VerifyClean" <| fun _ -> 
+    match isCleanWorkingCopy "." with 
+    | true -> traceHeader "Current checkout is clean, proceeding with release" 
+    | false -> 
+        traceError "Current working dir is NOT clean aborting"
+        failwithf "Current working dir is NOT clean aborting"
+
+Target "VerifyVersionChange" <| fun _ -> 
+    match getBuildParam "versionchanged" with
+    | "1" -> Versioning.BumpGlobalVersion Commandline.projects
+    | _ ->
+        traceError "None of the packages seem to have bumped versions so we can not release at this time"
+        failwithf "None of the packages seem to have bumped versions so we can not release at this time"
+    
 Target "Clean" Build.Clean
 
 Target "Restore" Build.Restore
@@ -34,15 +49,13 @@ Target "Pack" <| fun _ ->
     Build.CreateNugetPackage Commandline.projects
     Versioning.ValidateArtifacts Commandline.projects
 
-Target "Release" <| fun _ -> 
-    match getBuildParam "versionchanged" with
-    | "1" -> Versioning.BumpGlobalVersion Commandline.projects
-    | _ ->
-        traceError "none of the packages seem to have bumped versions so we can not release at this time"
+Target "Release" <| fun _ -> traceHeader "Running Release"
 
 // Dependencies
 "Clean"
+    =?> ("VerifyClean", getBuildParam "target" = "release")
     ==> "Version"
+    =?> ("VerifyVersionChange", getBuildParam "target" = "release")
     ==> "Restore"
     ==> "FullBuild"
     ==> "Build"
@@ -56,4 +69,3 @@ Target "Release" <| fun _ ->
 "Dump"
 
 RunTargetOrListTargets()
-
