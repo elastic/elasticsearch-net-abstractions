@@ -15,12 +15,12 @@ namespace Elastic.Managed.Ephemeral
 			: base(version, numberOfNodes, EphemeralClusterName, (v, s) => new EphemeralFileSystem(v, s))
 		{
 			this.Features = features;
-			this.AddXpackSettings();
+			this.AddXPackSettings();
 		}
 
 		public ClusterFeatures Features { get; }
 
-		public bool XpackEnabled => this.Features.HasFlag(ClusterFeatures.XPack);
+		public bool XPackEnabled => this.Features.HasFlag(ClusterFeatures.XPack);
 		private bool EnableSsl => this.Features.HasFlag(ClusterFeatures.SSL);
 		private bool EnableSecurity => this.Features.HasFlag(ClusterFeatures.Security);
 
@@ -43,7 +43,7 @@ namespace Elastic.Managed.Ephemeral
 			this.Add($"{shieldOrSecurity}.{key}", value);
 		}
 
-		private void AddXpackSettings()
+		private void AddXPackSettings()
 		{
 			if (!EnableSecurity) return;
 			var b = this.EnableSecurity.ToString().ToLowerInvariant();
