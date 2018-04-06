@@ -24,7 +24,8 @@ namespace Elastic.Managed.Ephemeral
 		public bool EnableSsl => this.Features.HasFlag(ClusterFeatures.SSL);
 		public bool EnableSecurity => this.Features.HasFlag(ClusterFeatures.Security);
 
-		public IList<IClusterComposeTask<EphemeralClusterConfiguration>> AdditionalInstallationTasks { get; set; }
+		public IList<IClusterComposeTask<EphemeralClusterConfiguration>> AdditionalInstallationTasks { get; } = new List<IClusterComposeTask<EphemeralClusterConfiguration>>();
+
 		public bool SkipValidation { get; set; }
 
 		public override string CreateNodeName(int? node)
