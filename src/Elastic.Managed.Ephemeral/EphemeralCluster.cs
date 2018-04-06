@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Elastic.Managed.Configuration;
 using Elastic.Managed.Ephemeral.Plugins;
-using Elastic.Managed.Ephemeral.Tasks;
 using Elasticsearch.Net;
 using Nest;
 

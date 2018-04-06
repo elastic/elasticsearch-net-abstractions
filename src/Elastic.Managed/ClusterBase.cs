@@ -17,7 +17,6 @@ namespace Elastic.Managed
 		bool Started { get; }
 		ReadOnlyCollection<ElasticsearchNode> Nodes { get; }
 		IConsoleLineWriter Writer { get; }
-
 	}
 
 	public abstract class ClusterBase : ClusterBase<ClusterConfiguration>
