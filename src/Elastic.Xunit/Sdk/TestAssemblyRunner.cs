@@ -111,6 +111,8 @@ namespace Elastic.Xunit.Sdk
 				var dop= @group?.Key?.ClusterConfiguration?.MaxConcurrency ?? defaultMaxConcurrency;
 				dop = dop <= 0 ? defaultMaxConcurrency : dop;
 
+				var timeout = @group?.Key?.ClusterConfiguration?.Timeout ?? TimeSpan.FromMinutes(2);
+
 				this.ClusterTotals.Add(clusterName, Stopwatch.StartNew());
 				//We group over each cluster group and execute test classes pertaining to that cluster
 				//in parallel
@@ -122,7 +124,7 @@ namespace Elastic.Xunit.Sdk
 				{
                     using (@group.Key)
                     {
-                        @group.Key?.Start();
+                        @group.Key?.Start(timeout);
                         await @group.ForEachAsync(dop, async g => { await RunTestCollections(messageBus, ctx, g, testFilters); });
                     }
 				}

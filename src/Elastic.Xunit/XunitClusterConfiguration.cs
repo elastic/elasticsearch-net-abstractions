@@ -14,5 +14,6 @@ namespace Elastic.Xunit
 		protected override string NodePrefix => "xunit";
 
 		public int MaxConcurrency { get; set; }
+		public TimeSpan? Timeout { get; set; }
 	}
 }
