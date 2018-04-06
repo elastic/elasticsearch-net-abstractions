@@ -21,8 +21,8 @@ namespace Elastic.Managed.Ephemeral
 		public ClusterFeatures Features { get; }
 
 		public bool XPackEnabled => this.Features.HasFlag(ClusterFeatures.XPack);
-		private bool EnableSsl => this.Features.HasFlag(ClusterFeatures.SSL);
-		private bool EnableSecurity => this.Features.HasFlag(ClusterFeatures.Security);
+		public bool EnableSsl => this.Features.HasFlag(ClusterFeatures.SSL);
+		public bool EnableSecurity => this.Features.HasFlag(ClusterFeatures.Security);
 
 		public IList<IClusterComposeTask<EphemeralClusterConfiguration>> AdditionalInstallationTasks { get; set; }
 		public bool SkipValidation { get; set; }
