@@ -36,6 +36,11 @@ namespace Elastic.Managed.Configuration
 
 		static int Quorum(int instanceCount) => Math.Max(1, (int) Math.Floor((double) instanceCount / 2) + 1);
 
+		public string AttributeKey(string attribute)
+		{
+			var attr = this.Version.Major >= 5 ? "attr." : "";
+			return $"node.{attr}.{attribute}";
+		}
 		public void Add(string key, string value)
 		{
 			if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value)) return;
