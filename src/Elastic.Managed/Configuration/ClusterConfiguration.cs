@@ -41,5 +41,11 @@ namespace Elastic.Managed.Configuration
 			if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value)) return;
 			this.ClusterNodeSettings.Add(key,value);
 		}
+		public void Add(string key, string value, string range)
+		{
+			if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value)) return;
+			if (string.IsNullOrWhiteSpace(range) || this.Version.InRange(range))
+				this.ClusterNodeSettings.Add(key, value, range);
+		}
 	}
 }

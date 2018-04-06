@@ -15,7 +15,7 @@ namespace Elastic.Managed.Ephemeral
 			: base(version, numberOfNodes, EphemeralClusterName, (v, s) => new EphemeralFileSystem(v, s))
 		{
 			this.Features = features;
-			this.AddXPackSettings();
+			AddDefaultXPackSettings();
 		}
 
 		public ClusterFeatures Features { get; }
@@ -36,14 +36,17 @@ namespace Elastic.Managed.Ephemeral
 		protected virtual string NodePrefix => "ephemeral";
 
 		private static readonly ElasticsearchVersion LastVersionThatAcceptedShieldSettings = "5.0.0-alpha1";
-		public void AddXPackSetting(string key, string value)
+
+		public void AddXPackSetting(string key, string value) => AddXPackSetting(key, value, null);
+
+		public void AddXPackSetting(string key, string value, string range)
 		{
 			var shieldOrSecurity = this.Version > LastVersionThatAcceptedShieldSettings ? "xpack.security" : "shield";
 			key = Regex.Replace(key, @"^(?:xpack\.security|shield)\.", "");
-			this.Add($"{shieldOrSecurity}.{key}", value);
+			this.Add($"{shieldOrSecurity}.{key}", value, range);
 		}
 
-		private void AddXPackSettings()
+		private void AddDefaultXPackSettings()
 		{
 			if (!EnableSecurity) return;
 			var b = this.EnableSecurity.ToString().ToLowerInvariant();
