@@ -14,10 +14,12 @@ namespace Elastic.Managed.Configuration
 			var s = setting.Split(new[] {'='}, 2, StringSplitOptions.RemoveEmptyEntries);
 			if (s.Length != 2)
 				throw new ArgumentException($"Can only add node settings in key=value from but received: {setting}");
-			this.Add(new NodeSetting(s[0], s[1]));
+			this.Add(new NodeSetting(s[0], s[1], null));
 
 		}
-		public void Add(string key, string value) => this.Add(new NodeSetting(key, value));
+		public void Add(string key, string value) => this.Add(new NodeSetting(key, value, null));
+
+		public void Add(string key, string value, string versionRange) => this.Add(new NodeSetting(key, value, versionRange));
 
 		private static readonly ElasticsearchVersion LastVersionWithoutPrefixForSettings = ElasticsearchVersion.From("5.0.0-alpha2");
 
@@ -26,7 +28,8 @@ namespace Elastic.Managed.Configuration
 			var settingsPrefix = version > LastVersionWithoutPrefixForSettings ? "" : "es.";
 			var settingArgument = version.Major >= 5 ? "-E " : "-D";
 			return this
-
+				//if a node setting is only applicable for a certain version make sure its filtered out
+				.Where(s=>string.IsNullOrEmpty(s.VersionRange) || version.InRange(s.VersionRange))
 				//allow additional settings to take precedence over already DefaultNodeSettings
 				//without relying on elasticsearch to dedup, 5.4.0 no longer allows passing the same setting twice
 				//on the command with the latter taking precedence
