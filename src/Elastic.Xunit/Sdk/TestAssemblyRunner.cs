@@ -35,9 +35,10 @@ namespace Elastic.Xunit.Sdk
 			: base(testAssembly, testCases, diagnosticMessageSink, executionMessageSink, executionOptions)
 		{
 			var tests = OrderTestCollections();
-			executionOptions.SetValue(nameof(RunAsUnitTests), RunAsUnitTests);
-			executionOptions.SetValue(nameof(TestFilter), TestFilter);
-			executionOptions.SetValue(nameof(RunAsUnitTests), RunAsUnitTests);
+			this.RunIntegrationTests = executionOptions.GetValue<bool>(nameof(TestFrameworkExecutor.RunIntegrationTests));
+			this.RunUnitTests = executionOptions.GetValue<bool>(nameof(TestFrameworkExecutor.RunUnitTests));
+			this.TestFilter = executionOptions.GetValue<string>(nameof(TestFrameworkExecutor.TestFilter));
+			this.ClusterFilter = executionOptions.GetValue<string>(nameof(TestFrameworkExecutor.ClusterFilter));
 
 			//bit side effecty, sets up _assemblyFixtureMappings before possibly letting xunit do its regular concurrency thing
 			this._grouped = (from c in tests
@@ -50,15 +51,10 @@ namespace Elastic.Xunit.Sdk
 				.ToList();
 		}
 
-		/// <summary>
-		/// If you wish to also use this class to run unit tests this hints to the runner that we can run more than one cluster at a time
-		/// </summary>
-		public bool RunAsUnitTests { get; set; }
-
-		/// <summary>
-		/// Allows you to pass a comma seperated test name filters, uses simple IndexOf matching
-		/// </summary>
-		public string TestFilter { get; set; }
+		private bool RunIntegrationTests { get; }
+		private bool RunUnitTests { get; }
+		private string TestFilter { get; }
+		private string ClusterFilter { get; }
 
 		protected override Task<RunSummary> RunTestCollectionAsync(IMessageBus b, ITestCollection c, IEnumerable<IXunitTestCase> t, CancellationTokenSource s)
 		{
@@ -74,7 +70,7 @@ namespace Elastic.Xunit.Sdk
 			//threading guess
 			var defaultMaxConcurrency = Environment.ProcessorCount * 4;
 
-			if (RunAsUnitTests)
+			if (this.RunUnitTests && !this.RunIntegrationTests)
 				return await UnitTestPipeline(defaultMaxConcurrency, messageBus, cancellationTokenSource);
 
 			return await IntegrationPipeline(defaultMaxConcurrency, messageBus, cancellationTokenSource);
@@ -106,6 +102,7 @@ namespace Elastic.Xunit.Sdk
 			{
 				var type = @group.Key?.GetType();
 				var clusterName = type?.Name.Replace("Cluster", "") ?? "UNKNOWN";
+				if (!this.MatchesClusterFilter(clusterName)) continue;
 
 
 				var dop= @group?.Key?.ClusterConfiguration?.MaxConcurrency ?? defaultMaxConcurrency;
@@ -122,11 +119,11 @@ namespace Elastic.Xunit.Sdk
 				}
 				else
 				{
-                    using (@group.Key)
-                    {
-                        @group.Key?.Start(timeout);
-                        await @group.ForEachAsync(dop, async g => { await RunTestCollections(messageBus, ctx, g, testFilters); });
-                    }
+					using (@group.Key)
+					{
+						@group.Key?.Start(timeout);
+						await @group.ForEachAsync(dop, async g => { await RunTestCollections(messageBus, ctx, g, testFilters); });
+					}
 				}
 				this.ClusterTotals[clusterName].Stop();
 			}
@@ -168,6 +165,15 @@ namespace Elastic.Xunit.Sdk
 			if (testFilters.Count == 0 || string.IsNullOrWhiteSpace(test)) return true;
 			return testFilters
 				.Any(filter => test.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0);
+		}
+		private bool MatchesClusterFilter(string cluster)
+		{
+			if (string.IsNullOrWhiteSpace(cluster)) return true;
+			return this.ClusterFilter
+				.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
+				.Select(c => c.Trim())
+				.Any(c => cluster.IndexOf(c, StringComparison.OrdinalIgnoreCase) >= 0);
+
 		}
 
 		private XunitClusterBase ClusterFixture(ITestClass testMethodTestClass)

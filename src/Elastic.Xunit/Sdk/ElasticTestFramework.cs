@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using Elastic.Managed.Configuration;
+﻿using System.Linq;
+using System.Reflection;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
@@ -9,21 +9,18 @@ namespace Elastic.Xunit.Sdk
 	{
 		public ElasticTestFramework(IMessageSink messageSink) : base(messageSink) {  }
 
-		public ElasticsearchVersion Version { get; set; }
-		public bool RunIntegrationTests { get; set; } = true;
-		public bool RunUnitTests { get; set; } = false;
-		public string TestFilter { get; set; }
-		public string ClusterFilter { get; set; }
-
 		protected override ITestFrameworkExecutor CreateExecutor(AssemblyName assemblyName)
 		{
+			var a = Assembly.Load(assemblyName);
+			var options = a.GetCustomAttributes<ElasticXunitConfigurationAttribute>().FirstOrDefault()?.Options ?? new ElasticXunitRunOptions();
+
+
 			return new TestFrameworkExecutor(assemblyName, SourceInformationProvider, DiagnosticMessageSink)
 			{
-				Version = this.Version,
-				RunIntegrationTests = this.RunIntegrationTests,
-				RunUnitTests = this.RunUnitTests,
-				TestFilter = this.TestFilter,
-				ClusterFilter = this.ClusterFilter
+				RunIntegrationTests = options.RunIntegrationTests,
+				RunUnitTests = options.RunUnitTests,
+				TestFilter = options.TestFilter,
+				ClusterFilter = options.ClusterFilter
 			};
 		}
 	}

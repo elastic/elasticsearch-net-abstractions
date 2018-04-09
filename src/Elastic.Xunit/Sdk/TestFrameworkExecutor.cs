@@ -12,6 +12,7 @@ namespace Elastic.Xunit.Sdk
 		public TestFrameworkExecutor(AssemblyName a, ISourceInformationProvider sip, IMessageSink d) : base(a, sip, d) { }
 
 		public ElasticsearchVersion Version { get; set; }
+
 		public bool RunIntegrationTests { get; set; } = true;
 		public bool RunUnitTests { get; set; }
 		public string TestFilter { get; set; }
@@ -21,7 +22,8 @@ namespace Elastic.Xunit.Sdk
 		{
 			options.SetValue(nameof(RunIntegrationTests), RunIntegrationTests);
 			options.SetValue(nameof(RunUnitTests), RunUnitTests);
-			options.SetValue(nameof(Version), Version);
+			options.SetValue(nameof(TestFilter), TestFilter);
+			options.SetValue(nameof(ClusterFilter), ClusterFilter);
 			try
 			{
 				using (var runner = new TestAssemblyRunner(TestAssembly, testCases, DiagnosticMessageSink, sink, options))

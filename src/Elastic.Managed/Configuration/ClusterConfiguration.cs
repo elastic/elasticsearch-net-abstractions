@@ -41,12 +41,13 @@ namespace Elastic.Managed.Configuration
 			var attr = this.Version.Major >= 5 ? "attr." : "";
 			return $"node.{attr}.{attribute}";
 		}
-		public void Add(string key, string value)
+		protected void Add(string key, string value)
 		{
 			if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value)) return;
 			this.ClusterNodeSettings.Add(key,value);
 		}
-		public void Add(string key, string value, string range)
+
+		protected void Add(string key, string value, string range)
 		{
 			if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value)) return;
 			if (string.IsNullOrWhiteSpace(range) || this.Version.InRange(range))
