@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Elastic.Managed.Ephemeral;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
@@ -13,8 +14,10 @@ namespace Elastic.Xunit.Sdk
 {
 	internal class TestAssemblyRunner : XunitTestAssemblyRunner
 	{
-		private readonly Dictionary<Type, XunitClusterBase> _assemblyFixtureMappings = new Dictionary<Type, XunitClusterBase>();
-		private readonly List<IGrouping<XunitClusterBase, GroupedByCluster>> _grouped;
+		private readonly Dictionary<Type, IEphemeralCluster<XunitClusterConfiguration>> _assemblyFixtureMappings =
+			new Dictionary<Type, IEphemeralCluster<XunitClusterConfiguration>>();
+
+		private readonly List<IGrouping<IEphemeralCluster<XunitClusterConfiguration>, GroupedByCluster>> _grouped;
 
 		public ConcurrentBag<RunSummary> Summaries { get; } = new ConcurrentBag<RunSummary>();
 		public ConcurrentBag<Tuple<string, string>> FailedCollections { get; } = new ConcurrentBag<Tuple<string, string>>();
@@ -22,7 +25,7 @@ namespace Elastic.Xunit.Sdk
 
 		private class GroupedByCluster
 		{
-			public XunitClusterBase Cluster { get; set; }
+			public IEphemeralCluster<XunitClusterConfiguration> Cluster { get; set; }
 			public ITestCollection Collection { get; set; }
 			public List<IXunitTestCase> TestCases { get; set; }
 		}
@@ -176,7 +179,7 @@ namespace Elastic.Xunit.Sdk
 
 		}
 
-		private XunitClusterBase ClusterFixture(ITestClass testMethodTestClass)
+		private IEphemeralCluster<XunitClusterConfiguration> ClusterFixture(ITestClass testMethodTestClass)
 		{
 			var clusterType = GetClusterForCollection(testMethodTestClass.Class);
 			if (clusterType == null) return null;
@@ -185,7 +188,7 @@ namespace Elastic.Xunit.Sdk
 			Aggregator.Run(() =>
 			{
 				var o = Activator.CreateInstance(clusterType);
-				cluster = o as XunitClusterBase;
+				cluster = o as IEphemeralCluster<XunitClusterConfiguration>;
 			});
 			_assemblyFixtureMappings.Add(clusterType, cluster);
 			return cluster;
@@ -196,6 +199,22 @@ namespace Elastic.Xunit.Sdk
 			where i.IsGenericType
 			from a in i.GetGenericArguments()
 			select a.ToRuntimeType()
-		).FirstOrDefault(type => typeof(XunitClusterBase).IsAssignableFrom(type));
+		).FirstOrDefault(type => typeof(XunitClusterBase).IsAssignableFrom(type) || IsSubclassOfRawGeneric(typeof(XunitClusterBase<>), type));
+
+		private static bool IsSubclassOfRawGeneric(Type generic, Type toCheck)
+		{
+			while (toCheck != null && toCheck != typeof(object))
+			{
+				var cur = toCheck.GetTypeInfo().IsGenericType ? toCheck.GetGenericTypeDefinition() : toCheck;
+				if (generic == cur)
+				{
+					return true;
+				}
+
+				toCheck = toCheck.GetTypeInfo().BaseType;
+			}
+
+			return false;
+		}
 	}
 }

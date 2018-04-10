@@ -9,7 +9,8 @@ using Elastic.Managed.FileSystem;
 
 namespace Elastic.Managed
 {
-	public interface ICluster<out TConfiguration> where TConfiguration : ClusterConfiguration
+	public interface ICluster<out TConfiguration> : IDisposable
+		where TConfiguration : ClusterConfiguration
 	{
 		string ClusterMoniker { get; }
 		TConfiguration ClusterConfiguration { get; }
@@ -17,6 +18,12 @@ namespace Elastic.Managed
 		bool Started { get; }
 		ReadOnlyCollection<ElasticsearchNode> Nodes { get; }
 		IConsoleLineWriter Writer { get; }
+
+		void Start();
+
+		void Start(TimeSpan waitForStarted);
+
+		void Start(IConsoleLineWriter writer, TimeSpan waitForStarted);
 	}
 
 	public abstract class ClusterBase : ClusterBase<ClusterConfiguration>
@@ -24,7 +31,7 @@ namespace Elastic.Managed
 		protected ClusterBase(ClusterConfiguration clusterConfiguration) : base(clusterConfiguration) { }
 	}
 
-	public abstract class ClusterBase<TConfiguration> : IDisposable, ICluster<TConfiguration>
+	public abstract class ClusterBase<TConfiguration> : ICluster<TConfiguration>
 		where TConfiguration : ClusterConfiguration
 	{
 		protected ClusterBase(TConfiguration clusterConfiguration)

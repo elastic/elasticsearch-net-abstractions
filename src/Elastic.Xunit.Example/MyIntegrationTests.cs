@@ -17,8 +17,17 @@ namespace Elastic.Xunit.Example
 
 	public class TestCluster : XunitClusterBase
 	{
-		public static string Filter => "x";
 		public TestCluster() : base(new XunitClusterConfiguration("6.0.0")) { }
+
+		protected override void SeedCluster()
+		{
+			var infoResult = this.Client.RootNodeInfo();
+		}
+	}
+
+	public class TestGenericCluster : XunitClusterBase<XunitClusterConfiguration>
+	{
+		public TestGenericCluster() : base(new XunitClusterConfiguration("6.0.0")) { }
 
 		protected override void SeedCluster()
 		{
@@ -29,6 +38,18 @@ namespace Elastic.Xunit.Example
 	public class MyTestClass : ClusterTestClassBase<TestCluster>
 	{
 		public MyTestClass(TestCluster cluster) : base(cluster) { }
+
+		[I] public void SomeTest()
+		{
+			var info = this.Client.RootNodeInfo();
+
+			info.IsValid.Should().BeTrue();
+		}
+	}
+
+	public class MyGenericTestClass : ClusterTestClassBase<TestGenericCluster>
+	{
+		public MyGenericTestClass(TestGenericCluster cluster) : base(cluster) { }
 
 		[I] public void SomeTest()
 		{
