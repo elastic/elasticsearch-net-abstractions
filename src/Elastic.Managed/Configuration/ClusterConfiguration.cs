@@ -39,7 +39,7 @@ namespace Elastic.Managed.Configuration
 		public string AttributeKey(string attribute)
 		{
 			var attr = this.Version.Major >= 5 ? "attr." : "";
-			return $"node.{attr}.{attribute}";
+			return $"node.{attr}{attribute}";
 		}
 		protected void Add(string key, string value)
 		{
