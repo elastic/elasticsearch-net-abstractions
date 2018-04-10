@@ -168,7 +168,7 @@ namespace Elastic.Xunit.Sdk
 		}
 		private bool MatchesClusterFilter(string cluster)
 		{
-			if (string.IsNullOrWhiteSpace(cluster)) return true;
+			if (string.IsNullOrWhiteSpace(cluster) || string.IsNullOrWhiteSpace(this.ClusterFilter)) return true;
 			return this.ClusterFilter
 				.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
 				.Select(c => c.Trim())
