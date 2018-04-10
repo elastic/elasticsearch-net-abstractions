@@ -1,5 +1,4 @@
 ﻿using System;
-using Elastic.Managed.FileSystem;
 using Elasticsearch.Net;
 
 namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
@@ -10,7 +9,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 
 		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
-			var healthyCluster = cluster.Client.ClusterHealth(g => g
+			var healthyCluster = cluster.Client().ClusterHealth(g => g
 				.WaitForStatus(WaitForStatus.Yellow)
 				.Timeout(ClusterHealthTimeout)
 			);

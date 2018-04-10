@@ -8,7 +8,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 	{
 		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
-			var alreadyUp = cluster.Client.RootNodeInfo();
+			var alreadyUp = cluster.Client().RootNodeInfo();
 			if (!alreadyUp.IsValid) return;
 			var v = cluster.ClusterConfiguration.Version;
 

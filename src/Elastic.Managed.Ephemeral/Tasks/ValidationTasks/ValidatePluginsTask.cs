@@ -21,7 +21,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 			var supported = cluster.RequiredPlugins.Select(p => p.Moniker).ToList();
 			if (!supported.Any()) return;
 
-			var checkPlugins = cluster.Client.CatPlugins();
+			var checkPlugins = cluster.Client().CatPlugins();
 
 			if (!checkPlugins.IsValid)
 				throw new Exception($"Failed to check plugins: {checkPlugins.DebugInformation}.");

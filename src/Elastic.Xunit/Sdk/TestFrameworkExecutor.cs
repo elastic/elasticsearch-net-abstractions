@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Elastic.Managed.Configuration;
 using Xunit.Abstractions;
@@ -33,6 +34,7 @@ namespace Elastic.Xunit.Sdk
 			}
 			catch (Exception e)
 			{
+				sink.OnMessage(new TestAssemblyCleanupFailure(Enumerable.Empty<ITestCase>(), this.TestAssembly, e));
 				Console.WriteLine(e);
 				throw;
 			}

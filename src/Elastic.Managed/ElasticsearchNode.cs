@@ -65,8 +65,19 @@ namespace Elastic.Managed
 			var node = this.NodeConfiguration.DesiredNodeName;
 			writer?.WriteDiagnostic($"Elasticsearch location: [{this.Binary}]", node);
 			writer?.WriteDiagnostic($"Settings: {{{string.Join(" ", this.NodeConfiguration.CommandLineArguments)}}}", node);
-			this.SubscribeLines(l => writer?.Write(l), e => writer?.Write(e), delegate {});
+			this.SubscribeLines(
+				l => writer?.Write(l),
+				e =>
+				{
+					this.LastSeenException = e;
+					writer?.Write(e);
+					this._startedHandle.Set();
+				},
+				() => this._startedHandle.Set()
+			);
 		}
+
+		public Exception LastSeenException { get; set; }
 
 		private readonly ManualResetEvent _startedHandle = new ManualResetEvent(false);
 		public WaitHandle StartedHandle => _startedHandle;
@@ -85,13 +96,6 @@ namespace Elastic.Managed
 
 			var parsed = LineOutParser.TryParse(c?.Line, out _, out _, out var section, out _, out var message, out var started);
 
-			if (!started) started = AssumedStartedStateChecker(section, message);
-			if (started)
-			{
-				this.NodeStarted = true;
-				this._startedHandle.Set();
-			}
-
 			if (!parsed) return this.Writer != null;
 
 			if (this.JavaProcessId == null && LineOutParser.TryParseNodeInfo(section, message, out var version, out var pid))
@@ -103,10 +107,19 @@ namespace Elastic.Managed
 			{
 				this.Port = port;
 				var dp = this.NodeConfiguration.DesiredPort;
-				if (dp.HasValue && this.Port != dp.Value) throw new CleanExitException($"Node started on port {port} but {dp.Value} was requested");
+				if (dp.HasValue && this.Port != dp.Value)
+					throw new CleanExitException($"Node started on port {port} but {dp.Value} was requested");
 			}
 
-			// if we have a writer always return true
+			if (!started) started = AssumedStartedStateChecker(section, message);
+			if (started)
+			{
+				if (!this.Port.HasValue) throw new CleanExitException($"Node started but ElasticsearchNode did not grab its port number");
+				this.NodeStarted = true;
+				this._startedHandle.Set();
+			}
+
+			// if we have dont a writer always return true
 			if (this.Writer != null) return true;
 			//otherwise only keep buffering if we are not started
 			return !started;

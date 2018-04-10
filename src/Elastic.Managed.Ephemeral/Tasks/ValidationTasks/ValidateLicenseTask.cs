@@ -11,21 +11,21 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 		{
 			if (!cluster.ClusterConfiguration.XPackEnabled) return;
 
-			var license = cluster.Client.GetLicense();
+			var license = cluster.Client().GetLicense();
 			if (license.IsValid && license.License.Status == LicenseStatus.Active) return;
 
 			var exceptionMessageStart = "Server has license plugin installed, ";
 			var licenseFile = Environment.GetEnvironmentVariable("ES_LICENSE_FILE");
 			if (!string.IsNullOrWhiteSpace(licenseFile))
 			{
-				var putLicense = cluster.Client.PostLicense(new PostLicenseRequest
+				var putLicense = cluster.Client().PostLicense(new PostLicenseRequest
 				{
 					License = License.LoadFromDisk(licenseFile)
 				});
 				if (!putLicense.IsValid)
 					throw new Exception("Server has invalid license and the ES_LICENSE_FILE failed to register\r\n" + putLicense.DebugInformation);
 
-				license = cluster.Client.GetLicense();
+				license = cluster.Client().GetLicense();
 				if (license.IsValid && license.License.Status == LicenseStatus.Active) return;
 				exceptionMessageStart += " but the installed license is invalid and we attempted to register ES_LICENSE_FILE ";
 			}

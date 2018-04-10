@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using Elastic.Managed.Configuration;
@@ -77,17 +78,27 @@ namespace Elastic.Managed
 			var waitHandles = this.Nodes.Select(w => w.StartedHandle).ToArray();
 			if (!WaitHandle.WaitAll(waitHandles, waitForStarted))
 			{
+				var nodeExceptions = this.Nodes.Select(n => n.LastSeenException).Where(e => e != null).ToList();
 				writer?.WriteError($"{{{this.GetType().Name}.{nameof(Start)}}} cluster did not start after {waitForStarted}");
-				throw new Exception($"Not all nodes started after waiting {waitForStarted}");
+				throw new AggregateException($"Not all nodes started after waiting {waitForStarted}", nodeExceptions);
 			}
 
 			this.Started = this.Nodes.All(n => n.NodeStarted);
-			if (this.Started)
+			if (!this.Started)
 			{
-				this.OnAfterStarted();
-				this.SeedCluster();
+				var nodeExceptions = this.Nodes.Select(n => n.LastSeenException).Where(e => e != null).ToList();
+				var message = $"{{{this.GetType().Name}.{nameof(Start)}}} cluster did not start succesfully";
+				throw new AggregateException(this.CreateNotStartedErrorMessage(message), nodeExceptions);
 			}
-			else writer?.WriteError($"{{{this.GetType().Name}.{nameof(Start)}}} cluster did not start succesfully");
+
+			this.OnAfterStarted();
+			this.SeedCluster();
+		}
+
+		protected virtual string CreateNotStartedErrorMessage(string message)
+		{
+			var log = Path.Combine(this.FileSystem.LogsPath, $"{this.ClusterConfiguration.ClusterName}.log");
+			return $"{message} see {log} to diagnose the issue";
 		}
 
 		public void WaitForExit(TimeSpan waitForCompletion)
