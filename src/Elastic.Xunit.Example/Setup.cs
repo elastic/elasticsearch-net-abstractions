@@ -15,6 +15,8 @@ namespace Elastic.Xunit.Example
 		public MyRunOptions()
 		{
 			this.ClusterFilter = "test";
+			this.RunUnitTests = true;
+			this.RunIntegrationTests = false;
 		}
 	}
 }

@@ -14,17 +14,39 @@ namespace Elastic.Xunit.Sdk
 
 		public ElasticsearchVersion Version { get; set; }
 
-		public bool RunIntegrationTests { get; set; } = true;
-		public bool RunUnitTests { get; set; }
-		public string TestFilter { get; set; }
-		public string ClusterFilter { get; set; }
+		public ElasticXunitRunOptions Options { get; set; }
+
+		public override void RunAll(IMessageSink executionMessageSink, ITestFrameworkDiscoveryOptions discoveryOptions, ITestFrameworkExecutionOptions executionOptions)
+		{
+			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), this.Options.RunIntegrationTests);
+			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), this.Options.RunUnitTests);
+			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.TestFilter), this.Options.TestFilter);
+			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.ClusterFilter), this.Options.ClusterFilter);
+
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), this.Options.RunIntegrationTests);
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), this.Options.RunUnitTests);
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.TestFilter), this.Options.TestFilter);
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.ClusterFilter), this.Options.ClusterFilter);
+
+			base.RunAll(executionMessageSink, discoveryOptions, executionOptions);
+		}
+
+
+		public override void RunTests(IEnumerable<ITestCase> testCases, IMessageSink executionMessageSink, ITestFrameworkExecutionOptions executionOptions)
+		{
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), this.Options.RunIntegrationTests);
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), this.Options.RunUnitTests);
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.TestFilter), this.Options.TestFilter);
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.ClusterFilter), this.Options.ClusterFilter);
+			base.RunTests(testCases, executionMessageSink, executionOptions);
+		}
 
 		protected override async void RunTestCases(IEnumerable<IXunitTestCase> testCases, IMessageSink sink, ITestFrameworkExecutionOptions options)
 		{
-			options.SetValue(nameof(RunIntegrationTests), RunIntegrationTests);
-			options.SetValue(nameof(RunUnitTests), RunUnitTests);
-			options.SetValue(nameof(TestFilter), TestFilter);
-			options.SetValue(nameof(ClusterFilter), ClusterFilter);
+			options.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), this.Options.RunIntegrationTests);
+			options.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), this.Options.RunUnitTests);
+			options.SetValue(nameof(ElasticXunitRunOptions.TestFilter), this.Options.TestFilter);
+			options.SetValue(nameof(ElasticXunitRunOptions.ClusterFilter), this.Options.ClusterFilter);
 			try
 			{
 				using (var runner = new TestAssemblyRunner(TestAssembly, testCases, DiagnosticMessageSink, sink, options))

@@ -27,6 +27,10 @@ namespace Elastic.Xunit.Example
 
 			info.IsValid.Should().BeTrue();
 		}
+		[U] public void UnitTest()
+		{
+			(1 + 1).Should().Be(2);
+		}
 	}
 
 }

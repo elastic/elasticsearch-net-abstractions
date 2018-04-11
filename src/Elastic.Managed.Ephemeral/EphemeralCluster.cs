@@ -41,8 +41,9 @@ namespace Elastic.Managed.Ephemeral
 		{
 			var ssl = this.ClusterConfiguration.EnableSsl ? "s" : "";
 			return this.Nodes
-				.Where(n => n.NodeStarted && n.Port.HasValue)
-				.Select(n => new Uri($"http{ssl}://{hostName}:{n.Port.Value}"))
+				.Select(n=>$"http{ssl}://{hostName}:{n.Port ?? 9200}")
+				.Distinct()
+				.Select(n => new Uri(n))
 				.ToList();
 		}
 

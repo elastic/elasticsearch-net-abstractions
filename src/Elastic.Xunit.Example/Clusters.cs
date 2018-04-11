@@ -33,7 +33,7 @@ namespace Elastic.Xunit.Example
 	{
 		protected MyClusterBase() : base(new XunitClusterConfiguration("6.0.0")) { }
 
-		public IElasticClient Client => this.Started ? this.GetOrAddClient() : null;
+		public IElasticClient Client => this.GetOrAddClient();
 	}
 
 	public class TestCluster : MyClusterBase
@@ -48,7 +48,7 @@ namespace Elastic.Xunit.Example
 	{
 		public TestGenericCluster() : base(new XunitClusterConfiguration("6.0.0")) { }
 
-		public IElasticClient Client => this.Started ? this.GetOrAddClient() : null;
+		public IElasticClient Client => this.GetOrAddClient();
 
 		protected override void SeedCluster()
 		{

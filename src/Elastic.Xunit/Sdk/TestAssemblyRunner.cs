@@ -38,10 +38,10 @@ namespace Elastic.Xunit.Sdk
 			: base(testAssembly, testCases, diagnosticMessageSink, executionMessageSink, executionOptions)
 		{
 			var tests = OrderTestCollections();
-			this.RunIntegrationTests = executionOptions.GetValue<bool>(nameof(TestFrameworkExecutor.RunIntegrationTests));
-			this.RunUnitTests = executionOptions.GetValue<bool>(nameof(TestFrameworkExecutor.RunUnitTests));
-			this.TestFilter = executionOptions.GetValue<string>(nameof(TestFrameworkExecutor.TestFilter));
-			this.ClusterFilter = executionOptions.GetValue<string>(nameof(TestFrameworkExecutor.ClusterFilter));
+			this.RunIntegrationTests = executionOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.RunIntegrationTests));
+			this.RunUnitTests = executionOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.RunUnitTests));
+			this.TestFilter = executionOptions.GetValue<string>(nameof(ElasticXunitRunOptions.TestFilter));
+			this.ClusterFilter = executionOptions.GetValue<string>(nameof(ElasticXunitRunOptions.ClusterFilter));
 
 			//bit side effecty, sets up _assemblyFixtureMappings before possibly letting xunit do its regular concurrency thing
 			this._grouped = (from c in tests
@@ -83,12 +83,12 @@ namespace Elastic.Xunit.Sdk
 		private async Task<RunSummary> UnitTestPipeline(int defaultMaxConcurrency, IMessageBus messageBus, CancellationTokenSource ctx)
 		{
 			//make sure all clusters go in started state (won't actually start clusters in unit test mode)
-			foreach (var g in this._grouped) g.Key?.Start();
+			//foreach (var g in this._grouped) g.Key?.Start();
 
 			var testFilters = CreateTestFilters(TestFilter);
 			await this._grouped.SelectMany(g => g)
 				.ForEachAsync(defaultMaxConcurrency, async g => { await RunTestCollections(messageBus, ctx, g, testFilters); });
-			foreach (var g in this._grouped) g.Key?.Dispose();
+			//foreach (var g in this._grouped) g.Key?.Dispose();
 
 			return new RunSummary()
 			{

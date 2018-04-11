@@ -1,4 +1,3 @@
-using Elastic.Xunit.Sdk;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
@@ -17,7 +16,7 @@ namespace Elastic.Xunit.XunitPlumbing
 
 		protected override bool SkipMethod(ITestFrameworkDiscoveryOptions discoveryOptions, ITestMethod testMethod, IAttributeInfo factAttribute)
 		{
-			var runUnitTests = discoveryOptions.GetValue<bool>(nameof(TestFrameworkExecutor.RunUnitTests));
+			var runUnitTests = discoveryOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.RunUnitTests));
 			return !runUnitTests;
 
 		}

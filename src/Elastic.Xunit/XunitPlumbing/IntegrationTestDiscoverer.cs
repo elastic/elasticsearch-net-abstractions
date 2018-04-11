@@ -25,8 +25,9 @@ namespace Elastic.Xunit.XunitPlumbing
 
 		protected override bool SkipMethod(ITestFrameworkDiscoveryOptions discoveryOptions, ITestMethod testMethod, IAttributeInfo factAttribute)
 		{
-			var runIntegrationTests = discoveryOptions.GetValue<bool>(nameof(TestFrameworkExecutor.RunIntegrationTests));
-			if (runIntegrationTests) return true;
+			var runIntegrationTests = discoveryOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.RunIntegrationTests));
+			if (!runIntegrationTests) return true;
+
 			var v = discoveryOptions.GetValue<ElasticsearchVersion>(nameof(TestFrameworkExecutor.Version));
 
 			//Skip if the version we are testing against is attributed to be skipped do not run the test
