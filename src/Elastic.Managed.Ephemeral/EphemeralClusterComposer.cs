@@ -85,6 +85,7 @@ namespace Elastic.Managed.Ephemeral
 
 		private readonly object _lock = new object();
 		private void Itterate<T>(IEnumerable<T> collection, Action<T, IEphemeralCluster<TConfiguration>, INodeFileSystem> act, bool log = true)
+			where T : IClusterComposeTask
 		{
 			lock (_lock)
 			{
@@ -92,10 +93,11 @@ namespace Elastic.Managed.Ephemeral
 				var taskLog = GetCurrentRunnerLog();
 				foreach (var task in collection)
 				{
+					var shouldLog = log && task.Log;
 					var name = task.GetType().Name;
-					if (log && taskLog.Contains(name)) continue;
+					if (shouldLog && taskLog.Contains(name)) continue;
 					act(task, cluster, cluster.FileSystem);
-					if (log) taskLog.Add(name);
+					if (shouldLog) taskLog.Add(name);
 				}
 				if (log) LogTasks(taskLog);
 			}

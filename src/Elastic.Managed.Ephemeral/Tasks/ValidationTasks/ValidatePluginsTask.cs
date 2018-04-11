@@ -18,7 +18,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 				return;
 			}
 
-			var supported = cluster.RequiredPlugins.Select(p => p.Moniker).ToList();
+			var supported = cluster.Plugins.Select(p => p.Moniker).ToList();
 			if (!supported.Any()) return;
 
 			var checkPlugins = cluster.Client().CatPlugins();

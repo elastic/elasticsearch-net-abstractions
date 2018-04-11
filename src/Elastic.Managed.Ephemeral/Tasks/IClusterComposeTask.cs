@@ -7,7 +7,12 @@ using ProcNet.Std;
 
 namespace Elastic.Managed.Ephemeral.Tasks
 {
-	public interface IClusterComposeTask<in TConfiguration>
+	public interface IClusterComposeTask
+	{
+		bool Log { get; }
+	}
+
+	public interface IClusterComposeTask<in TConfiguration> : IClusterComposeTask
 		where TConfiguration : EphemeralClusterConfiguration
 	{
 		void Run(IEphemeralCluster<TConfiguration> cluster);
@@ -17,6 +22,8 @@ namespace Elastic.Managed.Ephemeral.Tasks
 		where TConfiguration : EphemeralClusterConfiguration
 	{
 		public abstract void Run(IEphemeralCluster<TConfiguration> cluster);
+
+		public virtual bool Log => true;
 
 		private static bool IsMono { get; } = Type.GetType("Mono.Runtime") != null;
 		protected string BinarySuffix => IsMono || Path.PathSeparator == '/' ? "" : ".bat";

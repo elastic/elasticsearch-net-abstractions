@@ -1,29 +1,21 @@
-using System;
-using System.Reflection;
+using System.Collections.Generic;
 
 namespace Elastic.Managed.Ephemeral.Plugins
 {
-	public enum ElasticsearchPlugin
+	public class ElasticsearchPlugins : List<ElasticsearchPlugin>
 	{
-		[Moniker("delete-by-query")] DeleteByQuery,
-		[Moniker("cloud-azure")] CloudAzure,
-		[Moniker("mapper-attachments")] MapperAttachments,
-		[Moniker("mapper-murmur3")] MapperMurmer3,
-		[Moniker("x-pack")] XPack,
-		[Moniker("ingest-geoip")] IngestGeoIp,
-		[Moniker("ingest-attachment")] IngestAttachment,
-		[Moniker("analysis-kuromoji")] AnalysisKuromoji,
-		[Moniker("analysis-icu")] AnalysisIcu
-	}
-	public static class ElasticsearchPluginExtensions
-	{
-		public static string Moniker(this ElasticsearchPlugin plugin)
-		{
-			var info = typeof(ElasticsearchPlugin).GetField(plugin.ToString());
-			var da = info.GetCustomAttribute<MonikerAttribute>();
-
-			if (da == null) throw new InvalidOperationException($"{plugin} plugin must have a {nameof(MonikerAttribute)}");
-			return da.Moniker;
-		}
+		public static ElasticsearchPlugins Supported { get; } =
+			new ElasticsearchPlugins
+			{
+				ElasticsearchPlugin.AnalysisIcu,
+				ElasticsearchPlugin.AnalysisKuromoji,
+				ElasticsearchPlugin.CloudAzure,
+				ElasticsearchPlugin.DeleteByQuery,
+				ElasticsearchPlugin.IngestAttachment,
+				ElasticsearchPlugin.IngestGeoIp,
+				ElasticsearchPlugin.MapperAttachment,
+				ElasticsearchPlugin.MapperMurmur3,
+				ElasticsearchPlugin.XPack,
+			};
 	}
 }

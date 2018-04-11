@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Elastic.Managed.Configuration;
 using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.Ephemeral.Plugins;
@@ -10,9 +11,12 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 {
 	public class InstallPlugins : ClusterComposeTask
 	{
+		public override bool Log => false;
+
 		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
 			var v = cluster.ClusterConfiguration.Version;
+
 			//on 2.x we do not support tests requiring plugins for 2.x since we can not reliably install them
 			if (v.Major == 2)
 			{
@@ -21,7 +25,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 			}
 
 			var fs = cluster.FileSystem;
-			var requiredPlugins = cluster.RequiredPlugins;
+			var requiredPlugins = cluster.Plugins;
 			var plugins =
 				from plugin in requiredPlugins
 				let validForCurrentVersion = plugin.IsValid(v)
@@ -36,7 +40,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 			}
 		}
 
-		private static bool AlreadyInstalled(ElasticsearchPluginConfiguration plugin, INodeFileSystem fileSystem)
+		private static bool AlreadyInstalled(ElasticsearchPlugin plugin, INodeFileSystem fileSystem)
 		{
 			var folder = plugin.Moniker;
 			var pluginFolder = Path.Combine(fileSystem.ElasticsearchHome, "plugins", folder);
@@ -45,7 +49,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 			return Directory.Exists(pluginFolder);
 		}
 
-		private static string UseHttpPluginLocation(IConsoleLineWriter writer, INodeFileSystem fileSystem, ElasticsearchPluginConfiguration plugin, ElasticsearchVersion v)
+		private static string UseHttpPluginLocation(IConsoleLineWriter writer, INodeFileSystem fileSystem, ElasticsearchPlugin plugin, ElasticsearchVersion v)
 		{
 			var downloadLocation = Path.Combine(fileSystem.LocalFolder, $"{plugin.Moniker}-{v}.zip");
 			DownloadPluginSnapshot(writer, downloadLocation, plugin, v);
@@ -53,7 +57,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 			return new Uri(downloadLocation).AbsoluteUri;
 		}
 
-		private static void DownloadPluginSnapshot(IConsoleLineWriter writer, string downloadLocation, ElasticsearchPluginConfiguration plugin, ElasticsearchVersion v)
+		private static void DownloadPluginSnapshot(IConsoleLineWriter writer, string downloadLocation, ElasticsearchPlugin plugin, ElasticsearchVersion v)
 		{
 			if (File.Exists(downloadLocation)) return;
 			var downloadUrl = plugin.DownloadUrl(v);

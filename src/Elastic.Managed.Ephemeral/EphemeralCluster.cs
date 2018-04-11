@@ -27,6 +27,8 @@ namespace Elastic.Managed.Ephemeral
 
 		protected EphemeralClusterComposer<TConfiguration> Composer { get; }
 
+		public ElasticsearchPlugins Plugins { get; } = new ElasticsearchPlugins();
+
 		protected override void OnBeforeStart()
 		{
 			this.Composer.Install();
@@ -72,7 +74,6 @@ namespace Elastic.Managed.Ephemeral
 			}
 		}
 
-		public virtual ElasticsearchPluginConfiguration[] RequiredPlugins { get; } = new ElasticsearchPluginConfiguration[0];
 
 		protected override string CreateNotStartedErrorMessage(string message)
 		{
