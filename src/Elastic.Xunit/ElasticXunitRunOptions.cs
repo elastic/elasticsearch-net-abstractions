@@ -1,4 +1,9 @@
-﻿namespace Elastic.Xunit
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace Elastic.Xunit
 {
 	public class ElasticXunitRunOptions
 	{
@@ -11,5 +16,14 @@
 		public string TestFilter { get; set; }
 		/// <summary> A global cluster filter that can be used to only run certain cluster's tests, accepts a comma separated list of filters</summary>
 		public string ClusterFilter { get; set; }
+
+		/// <summary>
+		/// Gets called when the tests have fininshed running succesfully
+		/// </summary>
+		/// <param name="runnerClusterTotals">Per cluster timings of the total test time (including starting elasticsearch)</param>
+		/// <param name="runnerFailedCollections">All collection of failed cluster, failed tests tuples</param>
+		public virtual void OnTestsFinished(Dictionary<string, Stopwatch> runnerClusterTotals, ConcurrentBag<Tuple<string, string>> runnerFailedCollections)
+		{
+		}
 	}
 }

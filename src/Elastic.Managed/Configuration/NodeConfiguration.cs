@@ -21,6 +21,16 @@ namespace Elastic.Managed.Configuration
 		public ClusterConfiguration ClusterConfiguration { get; }
 		public int? DesiredPort { get; }
 		public string DesiredNodeName { get; }
+
+		/// <summary>
+		/// Wheter <see cref="ElasticsearchNode" /> should continue to write output to console after it has started.
+		/// <para>Defaults to true but useful to turn of if it proofs to be too noisy </para>
+		/// </summary>
+		public bool ShowElasticsearchOutputAfterStarted { get; set; } = true;
+
+		/// <summary>
+		/// The global node settings that apply to each started node, can be
+		/// </summary>
 		private NodeSettings Settings { get; }
 
 		public INodeFileSystem FileSystem => this.ClusterConfiguration.FileSystem;

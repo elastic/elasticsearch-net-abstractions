@@ -40,7 +40,10 @@ namespace Elastic.Managed
 			this.ClusterConfiguration = clusterConfiguration;
 
 			var nodes = Enumerable.Range(9200, this.ClusterConfiguration.NumberOfNodes)
-				.Select(p => new NodeConfiguration(clusterConfiguration))
+				.Select(p => new NodeConfiguration(clusterConfiguration)
+				{
+					ShowElasticsearchOutputAfterStarted =  clusterConfiguration.ShowElasticsearchOutputAfterStarted
+				})
 				.Select(n => new ElasticsearchNode(n)
 				{
 					AssumeStartedOnNotEnoughMasterPing = this.ClusterConfiguration.NumberOfNodes > 1

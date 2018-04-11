@@ -30,6 +30,14 @@ namespace Elastic.Managed.Configuration
 		public ElasticsearchVersion Version { get; }
 		public INodeFileSystem FileSystem { get; }
 		public int NumberOfNodes { get; }
+
+		/// <summary>
+		/// Wheter <see cref="ElasticsearchNode" /> should continue to write output to console after it has started.
+		/// <para>Defaults to true but useful to turn of if it proofs to be too noisy </para>
+		/// </summary>
+		public bool ShowElasticsearchOutputAfterStarted { get; set; } = true;
+
+		/// <summary> The global node settings that apply to each started node, can be added to.</summary>
 		public NodeSettings ClusterNodeSettings { get; } = new NodeSettings();
 
 		public virtual string CreateNodeName(int? node) => null;

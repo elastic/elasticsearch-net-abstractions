@@ -91,8 +91,8 @@ namespace Elastic.Managed
 
 		protected override bool KeepBufferingLines(LineOut c)
 		{
-			//if the node is already started only keep buffering lines while we have a writer;
-			if (this.NodeStarted) return this.Writer != null;
+			//if the node is already started only keep buffering lines while we have a writer and the nodeconfiguration wants output after started
+			if (this.NodeStarted) return this.Writer != null && this.NodeConfiguration.ShowElasticsearchOutputAfterStarted;
 
 			var parsed = LineOutParser.TryParse(c?.Line, out _, out _, out var section, out _, out var message, out var started);
 
