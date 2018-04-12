@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Elastic.Managed.Configuration;
+using Elastic.Managed.Ephemeral.Plugins;
 using Elastic.Managed.Ephemeral.Tasks;
 
 namespace Elastic.Managed.Ephemeral
@@ -19,6 +20,7 @@ namespace Elastic.Managed.Ephemeral
 		}
 
 		public ClusterFeatures Features { get; }
+		public ElasticsearchPlugins Plugins { get; set; } = new ElasticsearchPlugins();
 
 		public bool XPackEnabled => this.Features.HasFlag(ClusterFeatures.XPack);
 		public bool EnableSsl => this.Features.HasFlag(ClusterFeatures.SSL);

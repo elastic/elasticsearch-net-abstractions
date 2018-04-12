@@ -25,7 +25,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 			}
 
 			var fs = cluster.FileSystem;
-			var requiredPlugins = cluster.Plugins;
+			var requiredPlugins = cluster.ClusterConfiguration.Plugins;
 			var plugins =
 				from plugin in requiredPlugins
 				let validForCurrentVersion = plugin.IsValid(v)

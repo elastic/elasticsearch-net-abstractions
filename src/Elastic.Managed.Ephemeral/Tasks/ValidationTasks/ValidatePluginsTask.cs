@@ -1,8 +1,6 @@
 using System;
 using System.Linq;
-using Elastic.Managed.Configuration;
 using Elastic.Managed.ConsoleWriters;
-using Elastic.Managed.FileSystem;
 using Nest;
 
 namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
@@ -18,7 +16,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 				return;
 			}
 
-			var supported = cluster.Plugins.Select(p => p.Moniker).ToList();
+			var supported = cluster.ClusterConfiguration.Plugins.Select(p => p.Moniker).ToList();
 			if (!supported.Any()) return;
 
 			var checkPlugins = cluster.Client().CatPlugins();

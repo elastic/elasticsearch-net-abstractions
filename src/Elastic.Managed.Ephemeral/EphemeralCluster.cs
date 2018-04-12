@@ -27,8 +27,6 @@ namespace Elastic.Managed.Ephemeral
 
 		protected EphemeralClusterComposer<TConfiguration> Composer { get; }
 
-		public ElasticsearchPlugins Plugins { get; } = new ElasticsearchPlugins();
-
 		protected override void OnBeforeStart()
 		{
 			this.Composer.Install();

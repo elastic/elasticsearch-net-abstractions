@@ -10,7 +10,6 @@ namespace Elastic.Managed.Ephemeral
 	public interface IEphemeralCluster
 	{
 		ICollection<Uri> NodesUris(string hostName = "localhost");
-		ElasticsearchPlugins Plugins { get; }
 	}
 
 	public interface IEphemeralCluster<out TConfiguration> : IEphemeralCluster, ICluster<TConfiguration>
