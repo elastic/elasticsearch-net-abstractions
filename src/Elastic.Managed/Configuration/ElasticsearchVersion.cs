@@ -1,10 +1,11 @@
-﻿using Version = SemVer.Version;
+﻿using System;
+using Version = SemVer.Version;
 
 namespace Elastic.Managed.Configuration
 {
 	public enum ReleaseState { Released, Snapshot, BuildCandidate }
 
-	public class ElasticsearchVersion : Version
+	public class ElasticsearchVersion : Version, IComparable<string>
 	{
 		public static implicit operator ElasticsearchVersion(string version) => ElasticsearchVersionResolver.From(version);
 
@@ -65,5 +66,15 @@ namespace Elastic.Managed.Configuration
 			return versionRange.IsSatisfied(wholeVersion);
 		}
 
+		public int CompareTo(string other)
+		{
+			var v = (ElasticsearchVersion) other;
+			return this.CompareTo(v);
+		}
+
+		public static bool operator <(ElasticsearchVersion first, string second) => first < (ElasticsearchVersion) second;
+		public static bool operator >(ElasticsearchVersion first, string second) => first > (ElasticsearchVersion) second;
+		public static bool operator <(string first, ElasticsearchVersion second) => (ElasticsearchVersion)first < second;
+		public static bool operator >(string first, ElasticsearchVersion second) => (ElasticsearchVersion)first > second;
 	}
 }

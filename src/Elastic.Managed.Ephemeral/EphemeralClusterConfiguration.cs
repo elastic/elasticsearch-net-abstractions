@@ -51,10 +51,10 @@ namespace Elastic.Managed.Ephemeral
 
 		private void AddDefaultXPackSettings()
 		{
+			this.AddXPackSetting("enabled", this.XPackEnabled.ToString().ToLower());
 			if (!EnableSecurity) return;
 			var b = this.EnableSecurity.ToString().ToLowerInvariant();
 			var sslEnabled = this.EnableSsl.ToString().ToLowerInvariant();
-			this.AddXPackSetting("enabled", b);
 			this.AddXPackSetting("http.ssl.enabled", sslEnabled);
 			this.AddXPackSetting("authc.realms.pki1.enabled", sslEnabled);
 		}
