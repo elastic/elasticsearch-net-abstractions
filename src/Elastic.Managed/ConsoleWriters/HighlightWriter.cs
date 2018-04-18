@@ -35,7 +35,16 @@ namespace Elastic.Managed.ConsoleWriters
 			this._nodeColors = colors;
 		}
 
-		public void Write(Exception e) => Console.Error.WriteLine(e);
+		public void Write(Exception e)
+		{
+			lock (Lock)
+			{
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Error.WriteLine(e);
+                Console.ResetColor();
+			}
+		}
 
 		public void Write(LineOut lineOut)
 		{

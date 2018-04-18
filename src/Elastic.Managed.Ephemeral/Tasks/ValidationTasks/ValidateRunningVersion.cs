@@ -8,14 +8,17 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 	{
 		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
-			var alreadyUp = cluster.Client().RootNodeInfo();
-			if (!alreadyUp.IsValid) return;
+			var infoResponse = cluster.Client().RootNodeInfo();
+			if (!infoResponse.IsValid) return;
 			var v = cluster.ClusterConfiguration.Version;
 
-			var alreadyUpVersion = ElasticsearchVersion.From(alreadyUp.Version.Number);
-			var alreadyUpSnapshotVersion = ElasticsearchVersion.From(alreadyUp.Version.Number + "-SNAPSHOT");
-			if (v != alreadyUpVersion && v != alreadyUpSnapshotVersion)
-				throw new Exception($"running elasticsearch is version {alreadyUpVersion} but the test config dictates {v}");
+			var runningVersion = ElasticsearchVersion.From(infoResponse.Version.Number);
+			if (v == runningVersion) return;
+
+			var unsnapShot = v.ToString().Replace("-SNAPSHOT", "");
+			if (unsnapShot == runningVersion) return;
+
+			throw new Exception($"running elasticsearch is version {runningVersion} but the test config dictates {v}");
 		}
 	}
 }

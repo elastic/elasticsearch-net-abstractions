@@ -73,7 +73,7 @@ namespace Elastic.Managed.Ephemeral
 		}
 
 
-		protected override string CreateNotStartedErrorMessage(string message)
+		protected override string SeeLogsMessage(string message)
 		{
 
 			var log = Path.Combine(this.FileSystem.LogsPath, $"{this.ClusterConfiguration.ClusterName}.log");

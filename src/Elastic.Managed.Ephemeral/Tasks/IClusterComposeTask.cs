@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using Elastic.Managed.ConsoleWriters;
 using ProcNet;
@@ -47,13 +48,21 @@ namespace Elastic.Managed.Ephemeral.Tasks
 
 		protected static void ExecuteBinary(IConsoleLineWriter writer, string binary, string description, params string[] arguments)
 		{
-			writer?.WriteDiagnostic($"{{{nameof(ExecuteBinary)}}} starting process [{description}] {{{binary}}} {{{string.Join(" ", arguments)}}}");
+			var command = $"{{{binary}}} {{{string.Join(" ", arguments)}}}";
+			writer?.WriteDiagnostic($"{{{nameof(ExecuteBinary)}}} starting process [{description}] {command}");
 
 			var timeout = TimeSpan.FromSeconds(420);
 			var result = Proc.Start(binary, timeout, new ConsoleOutColorWriter(), arguments);
 
 			if (!result.Completed)
 				throw new Exception($"Timeout while executing {description} exceeded {timeout}");
+
+			if (result.ExitCode != 0)
+				throw new Exception($"Expected exit code 0 but recieved ({result.ExitCode}) while executing {description}: {command}");
+
+			var errorOut = result.ConsoleOut.Where(c => c.Error).ToList();
+			if (errorOut.Any())
+				throw new Exception($"Recieved error out with exitCode ({result.ExitCode}) while executing {description}: {command}");
 
 			writer?.WriteDiagnostic($"{{{nameof(ExecuteBinary)}}} finished process [{description}] {{{result.ExitCode}}}");
 		}

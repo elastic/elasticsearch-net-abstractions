@@ -2,7 +2,9 @@
 using Elastic.Managed;
 using Elastic.Managed.Configuration;
 using Elastic.Managed.Ephemeral;
+using Elastic.Managed.Ephemeral.Plugins;
 using Elasticsearch.Net;
+using Nest;
 using ProcNet.Std;
 
 namespace ScratchPad
@@ -30,11 +32,23 @@ namespace ScratchPad
 //				Console.ReadKey();
 //			}
 
-			using (var cluster = new EphemeralCluster("6.0.0"))
+//			using (var cluster = new EphemeralCluster("6.0.0"))
+//			{
+//				cluster.Start();
+//			}
+			using (var cluster = new EphemeralCluster(new EphemeralClusterConfiguration("6.2.0")
+			{
+				Plugins =
+				{
+					ElasticsearchPlugin.RepositoryAzure,
+					ElasticsearchPlugin.XPack,
+				}
+			}))
 			{
 				cluster.Start();
+				var client = new ElasticClient(new ConnectionSettings(new StaticConnectionPool(cluster.NodesUris())));
+				Console.Write(client.CatPlugins().DebugInformation);
 			}
-
 			return 0;
 		}
 

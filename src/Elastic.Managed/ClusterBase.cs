@@ -91,14 +91,25 @@ namespace Elastic.Managed
 			{
 				var nodeExceptions = this.Nodes.Select(n => n.LastSeenException).Where(e => e != null).ToList();
 				var message = $"{{{this.GetType().Name}.{nameof(Start)}}} cluster did not start succesfully";
-				throw new AggregateException(this.CreateNotStartedErrorMessage(message), nodeExceptions);
+				var seeLogsMessage = this.SeeLogsMessage(message);
+				writer?.WriteError(seeLogsMessage);
+				throw new AggregateException(seeLogsMessage, nodeExceptions);
 			}
 
-			this.OnAfterStarted();
-			this.SeedCluster();
+			try
+			{
+                this.OnAfterStarted();
+                this.SeedCluster();
+			}
+			catch (Exception e)
+			{
+				writer?.WriteError(e.Message);
+				throw;
+			}
+
 		}
 
-		protected virtual string CreateNotStartedErrorMessage(string message)
+		protected virtual string SeeLogsMessage(string message)
 		{
 			var log = Path.Combine(this.FileSystem.LogsPath, $"{this.ClusterConfiguration.ClusterName}.log");
 			return $"{message} see {log} to diagnose the issue";

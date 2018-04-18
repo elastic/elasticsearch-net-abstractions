@@ -9,7 +9,7 @@ namespace Elastic.Managed.Ephemeral.Plugins
 			{
 				ElasticsearchPlugin.AnalysisIcu,
 				ElasticsearchPlugin.AnalysisKuromoji,
-				ElasticsearchPlugin.CloudAzure,
+				ElasticsearchPlugin.RepositoryAzure,
 				ElasticsearchPlugin.DeleteByQuery,
 				ElasticsearchPlugin.IngestAttachment,
 				ElasticsearchPlugin.IngestGeoIp,

@@ -11,6 +11,19 @@ namespace Elastic.Managed.Configuration
 
 		public static ElasticsearchVersion From(string version) => ElasticsearchVersionResolver.From(version);
 
+		public static bool TryFrom(string version, out ElasticsearchVersion v)
+		{
+			v = null;
+			try
+			{
+				v = ElasticsearchVersionResolver.From(version);
+			}
+			//ignored
+			catch { }
+
+			return v != null;
+		}
+
 		internal ElasticsearchVersion(string version, string zip, ReleaseState state, string localFolder) : base(version)
 		{
 			this.Version = version;
@@ -74,7 +87,22 @@ namespace Elastic.Managed.Configuration
 
 		public static bool operator <(ElasticsearchVersion first, string second) => first < (ElasticsearchVersion) second;
 		public static bool operator >(ElasticsearchVersion first, string second) => first > (ElasticsearchVersion) second;
+
 		public static bool operator <(string first, ElasticsearchVersion second) => (ElasticsearchVersion)first < second;
 		public static bool operator >(string first, ElasticsearchVersion second) => (ElasticsearchVersion)first > second;
+
+		public static bool operator <=(ElasticsearchVersion first, string second) => first <= (ElasticsearchVersion) second;
+		public static bool operator >=(ElasticsearchVersion first, string second) => first >= (ElasticsearchVersion) second;
+
+		public static bool operator <=(string first, ElasticsearchVersion second) => (ElasticsearchVersion)first <= second;
+		public static bool operator >=(string first, ElasticsearchVersion second) => (ElasticsearchVersion)first >= second;
+
+		public static bool operator ==(ElasticsearchVersion first, string second) => first == (ElasticsearchVersion) second;
+		public static bool operator !=(ElasticsearchVersion first, string second) => first != (ElasticsearchVersion) second;
+
+
+		public static bool operator ==(string first, ElasticsearchVersion second) => (ElasticsearchVersion)first == second;
+		public static bool operator !=(string first, ElasticsearchVersion second) => (ElasticsearchVersion)first != second;
+
 	}
 }
