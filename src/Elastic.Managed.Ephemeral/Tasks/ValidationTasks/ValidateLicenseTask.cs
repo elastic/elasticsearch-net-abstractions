@@ -9,7 +9,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 	{
 		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
-			if (!cluster.ClusterConfiguration.XPackEnabled) return;
+			if (!cluster.ClusterConfiguration.XPackInstalled) return;
 
 			var license = cluster.Client().GetLicense();
 			if (license.IsValid && license.License.Status == LicenseStatus.Active) return;

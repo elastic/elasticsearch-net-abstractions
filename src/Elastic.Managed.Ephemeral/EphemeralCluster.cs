@@ -12,7 +12,7 @@ namespace Elastic.Managed.Ephemeral
 	public class EphemeralCluster : EphemeralCluster<EphemeralClusterConfiguration>
 	{
 		public EphemeralCluster(ElasticsearchVersion version, int numberOfNodes = 1)
-			: base(new EphemeralClusterConfiguration(version, numberOfNodes: numberOfNodes)) { }
+			: base(new EphemeralClusterConfiguration(version, ClusterFeatures.None, numberOfNodes: numberOfNodes)) { }
 
 		public EphemeralCluster(EphemeralClusterConfiguration clusterConfiguration) : base(clusterConfiguration) { }
 	}

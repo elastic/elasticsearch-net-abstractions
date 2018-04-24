@@ -22,13 +22,6 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 				return;
 			}
 
-			//We always install x-pack it is however disabled by default unless ClusterFeatures.XPack is set
-			//this simplifies bootstrapping nodesettings greatly as we can assume x-pack node settings will be recognized by
-			//the elasticsearch server. With 6.3.0 x-pack comes OOTB so this is no longer needed.
-			var requestedPlugins = cluster.ClusterConfiguration.Plugins;
-			if (v < "6.3.0" && !requestedPlugins.Any(p=>p.Moniker == "x-pack"))
-				requestedPlugins.Add(ElasticsearchPlugin.XPack);
-
 			var fs = cluster.FileSystem;
 			var requiredPlugins = cluster.ClusterConfiguration.Plugins;
 			var plugins =

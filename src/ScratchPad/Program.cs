@@ -38,15 +38,9 @@ namespace ScratchPad
 //			}
 
 			var clusterStarted = false;
-			using (var cluster = new EphemeralCluster(new EphemeralClusterConfiguration("6.0.0")
-			{
-				UseStickyInstallation = true,
-				Plugins =
-				{
-					ElasticsearchPlugin.RepositoryAzure,
-					//ElasticsearchPlugin.XPack,
-				}
-			}))
+			var plugins = new ElasticsearchPlugins(ElasticsearchPlugin.RepositoryAzure, ElasticsearchPlugin.IngestAttachment);
+			var config = new EphemeralClusterConfiguration("6.0.0", plugins);
+			using (var cluster = new EphemeralCluster(config))
 			{
 				cluster.Start();
 				var client = new ElasticClient(new ConnectionSettings(new StaticConnectionPool(cluster.NodesUris())).EnableDebugMode());

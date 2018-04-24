@@ -42,7 +42,7 @@ namespace Elastic.Managed.Configuration
 
 		public virtual string CreateNodeName(int? node) => null;
 
-		static int Quorum(int instanceCount) => Math.Max(1, (int) Math.Floor((double) instanceCount / 2) + 1);
+		private static int Quorum(int instanceCount) => Math.Max(1, (int) Math.Floor((double) instanceCount / 2) + 1);
 
 		public string AttributeKey(string attribute)
 		{

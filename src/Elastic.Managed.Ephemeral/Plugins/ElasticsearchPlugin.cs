@@ -1,21 +1,47 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Elastic.Managed.Ephemeral.Plugins
 {
-	public class ElasticsearchPlugins : List<ElasticsearchPlugin>
+	public class ElasticsearchPlugins : ReadOnlyCollection<ElasticsearchPlugin>
 	{
+		public ElasticsearchPlugins(IList<ElasticsearchPlugin> list) : base(list) { }
+
+		public ElasticsearchPlugins(params ElasticsearchPlugin[] list) : base(list) { }
+
 		public static ElasticsearchPlugins Supported { get; } =
-			new ElasticsearchPlugins
+			new ElasticsearchPlugins(new List<ElasticsearchPlugin>
 			{
 				ElasticsearchPlugin.AnalysisIcu,
 				ElasticsearchPlugin.AnalysisKuromoji,
-				ElasticsearchPlugin.RepositoryAzure,
-				ElasticsearchPlugin.DeleteByQuery,
+				ElasticsearchPlugin.AnalysisPhonetic,
+				ElasticsearchPlugin.AnalysisSmartCn,
+				ElasticsearchPlugin.AnalysisStempel,
+				ElasticsearchPlugin.AnalysisUkrainian,
+
+				ElasticsearchPlugin.DiscoveryAzureClassic,
+				ElasticsearchPlugin.DiscoveryEC2,
+				ElasticsearchPlugin.DiscoveryFile,
+				ElasticsearchPlugin.DiscoveryGCE,
+
 				ElasticsearchPlugin.IngestAttachment,
 				ElasticsearchPlugin.IngestGeoIp,
+				ElasticsearchPlugin.IngestUserAgent,
+
 				ElasticsearchPlugin.MapperAttachment,
 				ElasticsearchPlugin.MapperMurmur3,
+				ElasticsearchPlugin.MapperSize,
+
+				ElasticsearchPlugin.RepositoryAzure,
+				ElasticsearchPlugin.RepositoryGCS,
+				ElasticsearchPlugin.RepositoryHDFS,
+				ElasticsearchPlugin.RepositoryS3,
+
+				ElasticsearchPlugin.StoreSMB,
+
+				ElasticsearchPlugin.DeleteByQuery,
 				ElasticsearchPlugin.XPack,
-			};
+			});
+
 	}
 }
