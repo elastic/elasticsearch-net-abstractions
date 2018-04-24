@@ -104,5 +104,11 @@ namespace Elastic.Managed.Configuration
 		public static bool operator ==(string first, ElasticsearchVersion second) => (ElasticsearchVersion)first == second;
 		public static bool operator !=(string first, ElasticsearchVersion second) => (ElasticsearchVersion)first != second;
 
+		private bool Equals(ElasticsearchVersion other) => base.Equals(other);
+
+		public override bool Equals(object obj) => base.Equals(obj);
+
+		public override int GetHashCode() => base.GetHashCode();
+
 	}
 }

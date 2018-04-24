@@ -11,7 +11,7 @@ namespace Elastic.Xunit.Sdk
 		public ElasticTestFramework(IMessageSink messageSink) : base(messageSink) { }
 
 		protected override ITestFrameworkDiscoverer CreateDiscoverer(IAssemblyInfo assemblyInfo) =>
-			new ElasticTestDiscoverer(assemblyInfo, this.SourceInformationProvider, this.DiagnosticMessageSink);
+			new ElasticTestFrameworkDiscoverer(assemblyInfo, this.SourceInformationProvider, this.DiagnosticMessageSink);
 
 		protected override ITestFrameworkExecutor CreateExecutor(AssemblyName assemblyName)
 		{

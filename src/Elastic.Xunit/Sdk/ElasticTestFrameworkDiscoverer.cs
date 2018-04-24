@@ -5,9 +5,9 @@ using Xunit.Sdk;
 
 namespace Elastic.Xunit.Sdk
 {
-	public class ElasticTestDiscoverer : XunitTestFrameworkDiscoverer
+	public class ElasticTestFrameworkDiscoverer : XunitTestFrameworkDiscoverer
 	{
-		public ElasticTestDiscoverer(IAssemblyInfo assemblyInfo, ISourceInformationProvider sourceProvider, IMessageSink diagnosticMessageSink, IXunitTestCollectionFactory collectionFactory = null) : base(assemblyInfo, sourceProvider, diagnosticMessageSink, collectionFactory)
+		public ElasticTestFrameworkDiscoverer(IAssemblyInfo assemblyInfo, ISourceInformationProvider sourceProvider, IMessageSink diagnosticMessageSink, IXunitTestCollectionFactory collectionFactory = null) : base(assemblyInfo, sourceProvider, diagnosticMessageSink, collectionFactory)
 		{
 			var a = Assembly.Load(new AssemblyName(assemblyInfo.Name));
 			var options = a.GetCustomAttributes<ElasticXunitConfigurationAttribute>().FirstOrDefault()?.Options ?? new ElasticXunitRunOptions();

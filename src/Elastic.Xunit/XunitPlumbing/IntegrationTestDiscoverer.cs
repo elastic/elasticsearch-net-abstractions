@@ -19,7 +19,7 @@ namespace Elastic.Xunit.XunitPlumbing
 	[XunitTestCaseDiscoverer("Elastic.Xunit.XunitPlumbing.IntegrationTestDiscoverer", "Elastic.Xunit")]
 	public class I : FactAttribute { }
 
-	public class IntegrationTestDiscoverer : ElasticTestDiscoverer
+	public class IntegrationTestDiscoverer : ElasticTestCaseDiscoverer
 	{
 		public IntegrationTestDiscoverer(IMessageSink diagnosticMessageSink) : base(diagnosticMessageSink) { }
 

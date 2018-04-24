@@ -5,11 +5,11 @@ using Xunit.Sdk;
 
 namespace Elastic.Xunit.XunitPlumbing
 {
-	public abstract class ElasticTestDiscoverer : IXunitTestCaseDiscoverer
+	public abstract class ElasticTestCaseDiscoverer : IXunitTestCaseDiscoverer
 	{
 		protected readonly IMessageSink DiagnosticMessageSink;
 
-		protected ElasticTestDiscoverer(IMessageSink diagnosticMessageSink)
+		protected ElasticTestCaseDiscoverer(IMessageSink diagnosticMessageSink)
 		{
 			this.DiagnosticMessageSink = diagnosticMessageSink;
 		}

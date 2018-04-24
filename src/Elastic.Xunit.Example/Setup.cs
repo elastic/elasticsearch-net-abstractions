@@ -16,7 +16,7 @@ namespace Elastic.Xunit.Example
 		{
 			this.ClusterFilter = "test";
 			this.RunUnitTests = true;
-			this.RunIntegrationTests = false;
+			this.RunIntegrationTests = true;
 		}
 	}
 }
