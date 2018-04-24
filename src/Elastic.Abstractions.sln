@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScratchPad", "ScratchPad\ScratchPad.csproj", "{E7AD2461-309A-4BA7-A6EB-5C1F4F882BC2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScratchPad", "Examples\ScratchPad\ScratchPad.csproj", "{E7AD2461-309A-4BA7-A6EB-5C1F4F882BC2}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "scripts", "..\build\scripts\scripts.fsproj", "{D6997ADC-E933-418E-831C-DE1A78897493}"
 EndProject
@@ -26,7 +26,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elastic.Managed.Ephemeral",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elastic.Xunit", "Elastic.Xunit\Elastic.Xunit.csproj", "{681C6112-B885-4553-A06C-4CD9C262FC49}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elastic.Xunit.Example", "Elastic.Xunit.Example\Elastic.Xunit.Example.csproj", "{A660CA00-91E4-4994-BBA2-406BC5259C33}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elastic.Xunit.Example", "Examples\Elastic.Xunit.ExampleComplex\Elastic.Xunit.ExampleComplex.csproj", "{A660CA00-91E4-4994-BBA2-406BC5259C33}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{9D154338-4AA8-40A9-A378-B27C05D45791}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elastic.Xunit.ExampleMinimal", "Examples\Elastic.Xunit.ExampleMinimal\Elastic.Xunit.ExampleMinimal.csproj", "{93EA909E-7CA6-4263-9E27-0B53BC90CF48}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +42,9 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D6997ADC-E933-418E-831C-DE1A78897493} = {73A4EA23-1EB6-428F-8713-A37C09627DB3}
+		{A660CA00-91E4-4994-BBA2-406BC5259C33} = {9D154338-4AA8-40A9-A378-B27C05D45791}
+		{E7AD2461-309A-4BA7-A6EB-5C1F4F882BC2} = {9D154338-4AA8-40A9-A378-B27C05D45791}
+		{93EA909E-7CA6-4263-9E27-0B53BC90CF48} = {9D154338-4AA8-40A9-A378-B27C05D45791}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AFADDCED-A7DD-43E7-B03C-27F57AC5C358}
@@ -67,5 +74,9 @@ Global
 		{A660CA00-91E4-4994-BBA2-406BC5259C33}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A660CA00-91E4-4994-BBA2-406BC5259C33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A660CA00-91E4-4994-BBA2-406BC5259C33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93EA909E-7CA6-4263-9E27-0B53BC90CF48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93EA909E-7CA6-4263-9E27-0B53BC90CF48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93EA909E-7CA6-4263-9E27-0B53BC90CF48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93EA909E-7CA6-4263-9E27-0B53BC90CF48}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
