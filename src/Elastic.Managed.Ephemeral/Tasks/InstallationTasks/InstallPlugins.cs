@@ -11,8 +11,6 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 {
 	public class InstallPlugins : ClusterComposeTask
 	{
-		public override bool Log => false;
-
 		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
 			var v = cluster.ClusterConfiguration.Version;
@@ -42,7 +40,8 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 
 			foreach (var plugin in plugins)
 			{
-				var installParameter = v.ReleaseState == ReleaseState.Released ? plugin.Moniker : UseHttpPluginLocation(cluster.Writer, fs, plugin, v);
+				//var installParameter = v.ReleaseState == ReleaseState.Released ? plugin.Moniker : UseHttpPluginLocation(cluster.Writer, fs, plugin, v);
+				var installParameter = UseHttpPluginLocation(cluster.Writer, fs, plugin, v);
 				ExecuteBinary(cluster.Writer, "cmd", $"install elasticsearch plugin: {plugin.Moniker}", $"/c CALL {fs.PluginBinary} install --batch", installParameter);
 			}
 		}

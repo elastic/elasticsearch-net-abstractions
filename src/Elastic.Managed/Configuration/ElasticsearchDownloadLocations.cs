@@ -40,6 +40,7 @@ namespace Elastic.Managed.Configuration
 			switch (this.Version.ReleaseState)
 			{
 				case ReleaseState.Snapshot: return $"{SnapshotsHost}/downloads/elasticsearch-plugins/{moniker}/{zip}";
+				case ReleaseState.Released:
 				case ReleaseState.BuildCandidate:
 					return $"{ArtifactsHost}/downloads/elasticsearch-plugins/{moniker}/{zip}";
 			}

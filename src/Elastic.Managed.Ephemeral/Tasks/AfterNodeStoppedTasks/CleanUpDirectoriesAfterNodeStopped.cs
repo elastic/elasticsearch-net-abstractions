@@ -9,6 +9,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.AfterNodeStoppedTasks
 		{
 			var fs = cluster.FileSystem;
 			var w = cluster.Writer;
+			var v = cluster.ClusterConfiguration.Version;
 			DeleteDirectory(w, "cluster data", fs.DataPath);
 			DeleteDirectory(w, "cluster config", fs.ConfigPath);
 			DeleteDirectory(w, "cluster logs", fs.LogsPath);
@@ -16,6 +17,15 @@ namespace Elastic.Managed.Ephemeral.Tasks.AfterNodeStoppedTasks
 			var efs = fs as EphemeralFileSystem;
 			if (!string.IsNullOrWhiteSpace(efs?.TempFolder))
 				DeleteDirectory(w, "cluster temp folder", efs.TempFolder);
+
+			if (efs != null)
+			{
+				var extractedFolder = Path.Combine(fs.LocalFolder, v.FolderInZip);
+				if (extractedFolder != fs.ElasticsearchHome)
+				{
+					DeleteDirectory(w, "ephemeral ES_HOME", fs.ElasticsearchHome);
+				}
+			}
 		}
 		private static void DeleteDirectory(IConsoleLineWriter w, string description, string path)
 		{

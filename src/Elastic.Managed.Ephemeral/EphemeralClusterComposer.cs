@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using Elastic.Managed.Ephemeral.Tasks;
 using Elastic.Managed.Ephemeral.Tasks.AfterNodeStoppedTasks;
-using Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks;
 using Elastic.Managed.Ephemeral.Tasks.InstallationTasks;
 using Elastic.Managed.Ephemeral.Tasks.ValidationTasks;
 using Elastic.Managed.FileSystem;
@@ -26,13 +25,11 @@ namespace Elastic.Managed.Ephemeral
 			new EnsureJavaHomeEnvironmentVariableIsSet(),
 			new DownloadElasticsearchVersion(),
 			new UnzipElasticsearch(),
-			new CreateEasyRunBatFile(),
 			new InstallPlugins(),
 		};
 
 		private static IEnumerable<IClusterComposeTask<TConfiguration>> BeforeStart { get; } = new List<IClusterComposeTask<TConfiguration>>
 		{
-			new CreateEasyRunClusterBatFile(),
 			new CreateEphemeralDirectory()
 		};
 
@@ -49,7 +46,7 @@ namespace Elastic.Managed.Ephemeral
 			new ValidateClusterStateTask()
 		};
 
-		public void OnStop() => Itterate(NodeStoppedTasks, (t, c, fs) => t.Run(c), log: false);
+		public void OnStop() => Itterate(NodeStoppedTasks, (t, c, fs) => t.Run(c));
 
 		public void Install()
 		{
@@ -61,45 +58,25 @@ namespace Elastic.Managed.Ephemeral
 
 		}
 
-		public void OnBeforeStart() => Itterate(BeforeStart, (t, c, fs) => t.Run(c), log: false);
+		public void OnBeforeStart() => Itterate(BeforeStart, (t, c, fs) => t.Run(c));
 
 		public void ValidateAfterStart()
 		{
 			if (this.Cluster.ClusterConfiguration.SkipValidation) return;
-			Itterate(ValidationTasks, (t, c, fs) => t.Run(c), log: false);
-		}
-
-		private IList<string> GetCurrentRunnerLog()
-		{
-			var file = TaskRunnerLogFile();
-			return !File.Exists(file) ? new List<string>() : File.ReadAllLines(file).ToList();
-		}
-
-		private string TaskRunnerLogFile() => Path.Combine(this.Cluster.FileSystem.LocalFolder, "taskrunner.log");
-
-		private void LogTasks(IEnumerable<string> logs)
-		{
-			var file = Path.Combine(this.Cluster.FileSystem.LocalFolder, "taskrunner.log");
-			File.WriteAllText(file, string.Join(Environment.NewLine, logs));
+			Itterate(ValidationTasks, (t, c, fs) => t.Run(c));
 		}
 
 		private readonly object _lock = new object();
-		private void Itterate<T>(IEnumerable<T> collection, Action<T, IEphemeralCluster<TConfiguration>, INodeFileSystem> act, bool log = true)
+		private void Itterate<T>(IEnumerable<T> collection, Action<T, IEphemeralCluster<TConfiguration>, INodeFileSystem> act)
 			where T : IClusterComposeTask
 		{
 			lock (_lock)
 			{
 				var cluster = this.Cluster;
-				var taskLog = GetCurrentRunnerLog();
 				foreach (var task in collection)
 				{
-					var shouldLog = log && task.Log;
-					var name = task.GetType().Name;
-					if (shouldLog && taskLog.Contains(name)) continue;
 					act(task, cluster, cluster.FileSystem);
-					if (shouldLog) taskLog.Add(name);
 				}
-				if (log) LogTasks(taskLog);
 			}
 		}
 	}

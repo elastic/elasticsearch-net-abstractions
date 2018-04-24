@@ -7,7 +7,7 @@ namespace Elastic.Managed.Ephemeral
 {
 	public class EphemeralFileSystem : NodeFileSystem
 	{
-		public EphemeralFileSystem(ElasticsearchVersion version, string clusterName) : base(version, LocalAppDataHome(version))
+		public EphemeralFileSystem(ElasticsearchVersion version, string clusterName) : base(version, EphemeralHome(version, clusterName))
 		{
 			this.ClusterName = clusterName;
 		}
@@ -21,5 +21,11 @@ namespace Elastic.Managed.Ephemeral
 		public override string RepositoryPath => Path.Combine(TempFolder, "repositories");
 		public override string DataPath => Path.Combine(TempFolder, "data");
 
+		protected static string EphemeralHome(ElasticsearchVersion version, string clusterName)
+		{
+			var localFolder = AppDataFolder(version);
+			return Path.Combine(localFolder, clusterName);
+		}
 	}
+
 }

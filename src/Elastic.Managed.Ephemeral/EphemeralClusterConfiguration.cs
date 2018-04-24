@@ -20,7 +20,7 @@ namespace Elastic.Managed.Ephemeral
 		}
 
 		public ClusterFeatures Features { get; }
-		public ElasticsearchPlugins Plugins { get; set; } = new ElasticsearchPlugins();
+		public ElasticsearchPlugins Plugins { get; } = new ElasticsearchPlugins();
 
 		public bool XPackEnabled => this.Features.HasFlag(ClusterFeatures.XPack);
 		public bool EnableSsl => this.Features.HasFlag(ClusterFeatures.SSL);
@@ -29,6 +29,11 @@ namespace Elastic.Managed.Ephemeral
 		public IList<IClusterComposeTask<EphemeralClusterConfiguration>> AdditionalInstallationTasks { get; } = new List<IClusterComposeTask<EphemeralClusterConfiguration>>();
 
 		public bool SkipValidation { get; set; }
+		/// <summary>
+		/// Ephemeral cluster by default also deletes `ES_HOME` after its done. This is done so that you can start the same version with different plugins.
+		/// By setting this to true you will use a fixed `ES_HOME` under local app data.
+		/// </summary>
+		public bool UseStickyInstallation { get; set; }
 
 		public override string CreateNodeName(int? node)
 		{
