@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Elastic.Managed.Configuration;
+using ProcNet;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
@@ -57,8 +58,13 @@ namespace Elastic.Xunit.Sdk
 			}
 			catch (Exception e)
 			{
-				sink.OnMessage(new TestAssemblyCleanupFailure(Enumerable.Empty<ITestCase>(), this.TestAssembly, e));
-				Console.WriteLine(e);
+				if (e is CleanExitException || e is AggregateException ae && ae.Flatten().InnerException is CleanExitException)
+				{
+					sink.OnMessage(new TestAssemblyCleanupFailure(Enumerable.Empty<ITestCase>(), this.TestAssembly,
+						new CleanExitException("Node failed to start")));
+				}
+				else
+					sink.OnMessage(new TestAssemblyCleanupFailure(Enumerable.Empty<ITestCase>(), this.TestAssembly, e));
 				throw;
 			}
 		}
