@@ -17,12 +17,6 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 				return;
 			}
 
-			if (Exists(f.TempFolder))
-			{
-				cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateEphemeralDirectory)}}} already exists {{{f.TempFolder}}}");
-				return;
-			}
-
 			cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateEphemeralDirectory)}}} creating {{{f.TempFolder}}}");
 
 			CreateDirectory(f.TempFolder);
@@ -36,7 +30,11 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 			var target = f.ConfigPath;
 
 			var source = Path.Combine(f.ElasticsearchHome, "config");
-			if (!Exists(source)) return;
+			if (!Exists(source))
+			{
+				cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateEphemeralDirectory)}}} source config {{{source}}} does not exist nothing to copy");
+				return;
+			}
 
 			foreach (var sourceDir in GetDirectories(source, "*", AllDirectories))
 			{
