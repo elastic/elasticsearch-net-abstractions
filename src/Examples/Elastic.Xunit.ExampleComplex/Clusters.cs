@@ -18,7 +18,6 @@ namespace Elastic.Xunit.Example
 				var client = new ElasticClient(settings);
 				return client;
 			});
-
 		}
 	}
 
