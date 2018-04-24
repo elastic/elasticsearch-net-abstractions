@@ -11,9 +11,17 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
 			var fs = cluster.FileSystem;
-			if (!(fs is EphemeralFileSystem f)) return;
+			if (!(fs is EphemeralFileSystem f))
+			{
+				cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateEphemeralDirectory)}}} unexpected IFileSystem implementation {{{fs.GetType()}}}");
+				return;
+			}
 
-			if (Exists(f.TempFolder)) return;
+			if (Exists(f.TempFolder))
+			{
+				cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateEphemeralDirectory)}}} already exists {{{f.TempFolder}}}");
+				return;
+			}
 
 			cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateEphemeralDirectory)}}} creating {{{f.TempFolder}}}");
 
@@ -26,23 +34,22 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 
 			}
 			var target = f.ConfigPath;
+
 			var source = Path.Combine(f.ElasticsearchHome, "config");
+			if (!Exists(source)) return;
 
-			if (Exists(source))
+			foreach (var sourceDir in GetDirectories(source, "*", AllDirectories))
 			{
-				foreach (var sourceDir in GetDirectories(source, "*", AllDirectories))
-				{
-					var targetDir = sourceDir.Replace(source, target);
-					cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateEphemeralDirectory)}}} creating config folder {{{targetDir}}}");
-					CreateDirectory(targetDir);
-				}
+				var targetDir = sourceDir.Replace(source, target);
+				cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateEphemeralDirectory)}}} creating config folder {{{targetDir}}}");
+				CreateDirectory(targetDir);
+			}
 
-				foreach (var sourcePath in GetFiles(source, "*.*", AllDirectories))
-				{
-					var targetPath = sourcePath.Replace(source, target);
-					cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateEphemeralDirectory)}}} copying config file to {{{targetPath}}}");
-					File.Copy(sourcePath, targetPath, true);
-				}
+			foreach (var sourcePath in GetFiles(source, "*.*", AllDirectories))
+			{
+				var targetPath = sourcePath.Replace(source, target);
+				cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateEphemeralDirectory)}}} copying config file to {{{targetPath}}}");
+				File.Copy(sourcePath, targetPath, true);
 			}
 		}
 	}

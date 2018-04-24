@@ -9,7 +9,11 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
 			var fs = cluster.FileSystem;
-			if (Directory.Exists(fs.LocalFolder)) return;
+			if (Directory.Exists(fs.LocalFolder))
+			{
+				cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateLocalApplicationDirectory)}}} already exists: {{{fs.LocalFolder}}}");
+				return;
+			}
 
 			cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateLocalApplicationDirectory)}}} creating {{{fs.LocalFolder}}}");
 
