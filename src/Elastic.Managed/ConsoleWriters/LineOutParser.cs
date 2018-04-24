@@ -60,7 +60,8 @@ namespace Elastic.Managed.ConsoleWriters
 		public static bool TryGetPortNumber(string section, string message, out int port)
 		{
 			port = 0;
-			var inHttpSection = section == "o.e.h.HttpServer" || section == "http" || section == "o.e.h.n.Netty4HttpServerTransport";
+			var inHttpSection = section == "o.e.h.HttpServer" || section == "http" || section == "o.e.h.n.Netty4HttpServerTransport"
+				|| section == "o.e.x.s.t.n.SecurityNetty4HttpServerTransport";
 			if (!inHttpSection) return false;
 
 			if (string.IsNullOrWhiteSpace(message)) return false;
