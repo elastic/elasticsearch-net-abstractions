@@ -8,9 +8,7 @@ using ProcNet.Std;
 
 namespace Elastic.Managed.Ephemeral.Tasks
 {
-	public interface IClusterComposeTask
-	{
-	}
+	public interface IClusterComposeTask { }
 
 	public interface IClusterComposeTask<in TConfiguration> : IClusterComposeTask
 		where TConfiguration : EphemeralClusterConfiguration
@@ -23,7 +21,7 @@ namespace Elastic.Managed.Ephemeral.Tasks
 	{
 		public abstract void Run(IEphemeralCluster<TConfiguration> cluster);
 
-		private static bool IsMono { get; } = Type.GetType("Mono.Runtime") != null;
+		private bool IsMono { get; } = Type.GetType("Mono.Runtime") != null;
 		protected string BinarySuffix => IsMono || Path.PathSeparator == '/' ? "" : ".bat";
 
 		protected static void DownloadFile(string from, string to)
@@ -63,7 +61,6 @@ namespace Elastic.Managed.Ephemeral.Tasks
 
 			writer?.WriteDiagnostic($"{{{nameof(ExecuteBinary)}}} finished process [{description}] {{{result.ExitCode}}}");
 		}
-
 	}
 
 	public abstract class ClusterComposeTask : ClusterComposeTaskBase<EphemeralClusterConfiguration> { }

@@ -108,10 +108,10 @@ namespace Elastic.Xunit.Sdk
 				if (!this.MatchesClusterFilter(clusterName)) continue;
 
 
-				var dop= @group?.Key?.ClusterConfiguration?.MaxConcurrency ?? defaultMaxConcurrency;
+				var dop= @group.Key?.ClusterConfiguration?.MaxConcurrency ?? defaultMaxConcurrency;
 				dop = dop <= 0 ? defaultMaxConcurrency : dop;
 
-				var timeout = @group?.Key?.ClusterConfiguration?.Timeout ?? TimeSpan.FromMinutes(2);
+				var timeout = @group.Key?.ClusterConfiguration?.Timeout ?? TimeSpan.FromMinutes(2);
 
 				this.ClusterTotals.Add(clusterName, Stopwatch.StartNew());
 				//We group over each cluster group and execute test classes pertaining to that cluster
@@ -161,7 +161,7 @@ namespace Elastic.Xunit.Sdk
 
 		private static string[] CreateTestFilters(string testFilters) =>
 			testFilters?.Split(',').Select(s => s.Trim()).Where(s=>!string.IsNullOrWhiteSpace(s)).ToArray()
-			?? new string[0] { };
+			?? new string[] { };
 
 		private static bool MatchesATestFilter(string test, IReadOnlyCollection<string> testFilters)
 		{

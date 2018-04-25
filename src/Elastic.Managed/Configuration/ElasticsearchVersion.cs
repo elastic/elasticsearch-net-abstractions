@@ -18,8 +18,10 @@ namespace Elastic.Managed.Configuration
 			{
 				v = ElasticsearchVersionResolver.From(version);
 			}
-			//ignored
-			catch { }
+			catch
+			{
+				// ignored
+			}
 
 			return v != null;
 		}
@@ -104,6 +106,7 @@ namespace Elastic.Managed.Configuration
 		public static bool operator ==(string first, ElasticsearchVersion second) => (ElasticsearchVersion)first == second;
 		public static bool operator !=(string first, ElasticsearchVersion second) => (ElasticsearchVersion)first != second;
 
+		// ReSharper disable once UnusedMember.Local
 		private bool Equals(ElasticsearchVersion other) => base.Equals(other);
 
 		public override bool Equals(object obj) => base.Equals(obj);

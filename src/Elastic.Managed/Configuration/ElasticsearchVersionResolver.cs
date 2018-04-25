@@ -34,12 +34,12 @@ namespace Elastic.Managed.Configuration
 					version = LatestVersion.Value;
 					zip = LatestSnapshot.Value;
 					break;
-				case string snapShotVersion when version.EndsWith("-snapshot", StringComparison.OrdinalIgnoreCase):
+				case string _ when version.EndsWith("-snapshot", StringComparison.OrdinalIgnoreCase):
 					state = ReleaseState.Snapshot;
 					zip = SnapshotZipFilename(version);
 					localFolder = zip?.Replace(".zip", "").Replace("elasticsearch-", "");
 					break;
-				case string bcVersion when TryParseBuildCandidate(version, out var v, out var gitHash):
+				case string _ when TryParseBuildCandidate(version, out var v, out var gitHash):
 					state = ReleaseState.BuildCandidate;
 					version = v;
 					zip = $"elasticsearch-{version}.zip";

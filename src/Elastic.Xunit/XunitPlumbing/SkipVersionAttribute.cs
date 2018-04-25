@@ -9,6 +9,8 @@ namespace Elastic.Xunit.XunitPlumbing
 	{
 		public IList<Range> Ranges { get; }
 
+		// ReSharper disable once UnusedParameter.Local
+		// reason is used to allow the test its used on to self document why its been put in place
 		public SkipVersionAttribute(string skipVersionRangesSeparatedByComma, string reason)
 		{
 			this.Ranges = skipVersionRangesSeparatedByComma.Split(',')
