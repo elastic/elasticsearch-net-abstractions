@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
-using Elastic.Managed.FileSystem;
-using Nest;
+using Elastic.Managed.ConsoleWriters;
 
 namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 {
@@ -11,43 +10,26 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 		{
 			if (!cluster.ClusterConfiguration.XPackInstalled) return;
 
-			var license = cluster.Client().GetLicense();
-			if (license.IsValid && license.License.Status == LicenseStatus.Active) return;
+			cluster.Writer.WriteDiagnostic($"{{{nameof(ValidateLicenseTask)}}} validating the x-pack license is active");
+			var licenseType = GetLicenseType(cluster);
 
-			var exceptionMessageStart = "Server has license plugin installed, ";
-			var licenseFile = Environment.GetEnvironmentVariable("ES_LICENSE_FILE");
-			if (!string.IsNullOrWhiteSpace(licenseFile))
-			{
-				var putLicense = cluster.Client().PostLicense(new PostLicenseRequest
-				{
-					License = License.LoadFromDisk(licenseFile)
-				});
-				if (!putLicense.IsValid)
-					throw new Exception("Server has invalid license and the ES_LICENSE_FILE failed to register\r\n" + putLicense.DebugInformation);
+			var licenseStatus = GetLicenseStatus(cluster);
+			if (licenseStatus == "active") return;
+			throw new Exception($"x-pack is installed but the {licenseType} license was expected to be active but is {licenseStatus}");
+		}
 
-				license = cluster.Client().GetLicense();
-				if (license.IsValid && license.License.Status == LicenseStatus.Active) return;
-				exceptionMessageStart += " but the installed license is invalid and we attempted to register ES_LICENSE_FILE ";
-			}
+		private string GetLicenseStatus(IEphemeralCluster<EphemeralClusterConfiguration> cluster) => LicenseInfo(cluster, "license.status");
+		private string GetLicenseType(IEphemeralCluster<EphemeralClusterConfiguration> cluster) => LicenseInfo(cluster, "license.type");
 
-			Exception exception = null;
-			if (!license.IsValid)
-			{
-				exception = license.ApiCall.HttpStatusCode == 404
-					? new Exception($"{exceptionMessageStart} but the license was not found! Details: {license.DebugInformation}")
-					: new Exception($"{exceptionMessageStart} but a {license.ApiCall.HttpStatusCode} was returned! Details: {license.DebugInformation}");
-			}
-			else if (license.License == null)
-				exception = new Exception($"{exceptionMessageStart}  but the license was deleted!");
-
-			else if (license.License.Status == LicenseStatus.Expired)
-				exception = new Exception($"{exceptionMessageStart} but the license has expired!");
-
-			else if (license.License.Status == LicenseStatus.Invalid)
-				exception = new Exception($"{exceptionMessageStart} but the license is invalid!");
-
-			if (exception != null)
-				throw exception;
+		private string LicenseInfo(IEphemeralCluster<EphemeralClusterConfiguration> cluster, string filter)
+		{
+			var getLicense = this.Get(cluster, "_xpack/license", "filter_path=" + filter);
+			if (getLicense == null || !getLicense.IsSuccessStatusCode) throw new Exception($"Calling GET _xpack/license did not result in an OK response");
+			var licenseStatusString = this.GetResponseString(getLicense)
+				.Where(c => !new[] {' ', '\n', '{', '"', '}'}.Contains(c))
+				.ToArray();
+			var status = new string(licenseStatusString).Replace($"{filter.Replace(".", ":")}:", "");
+			return status;
 		}
 	}
 }

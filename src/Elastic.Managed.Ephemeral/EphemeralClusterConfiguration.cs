@@ -38,8 +38,15 @@ namespace Elastic.Managed.Ephemeral
 		public bool EnableSsl => this.Features.HasFlag(ClusterFeatures.SSL) && XPackInstalled;
 		public bool EnableSecurity => this.Features.HasFlag(ClusterFeatures.Security) && XPackInstalled;
 
-		public IList<IClusterComposeTask<EphemeralClusterConfiguration>> AdditionalInstallationTasks { get; } = new List<IClusterComposeTask<EphemeralClusterConfiguration>>();
-		public bool SkipValidation { get; set; }
+		public IList<IClusterComposeTask> AdditionalInstallationTasks { get; } = new List<IClusterComposeTask>();
+		
+		public IList<IClusterComposeTask> AdditionalAfterStartedTasks { get; } = new List<IClusterComposeTask>();
+		/// <summary>
+		/// Expert level setting, skips all builtin validation tasks for cases where you need to guarantee your call is the first call into the cluster
+		/// </summary>
+		public bool SkipBuiltInAfterStartTasks { get; set; }
+		/// <summary> If not null or empty will be posted as the x-pack license to use. </summary>
+		public string XPackLicenseJson { get; set; }
 
 		public override string CreateNodeName(int? node)
 		{
@@ -51,9 +58,9 @@ namespace Elastic.Managed.Ephemeral
 
 		private static readonly ElasticsearchVersion LastVersionThatAcceptedShieldSettings = "5.0.0-alpha1";
 
-		public void AddXPackSetting(string key, string value) => AddXPackSetting(key, value, null);
+		public void AddSecuritySetting(string key, string value) => AddSecuritySetting(key, value, null);
 
-		public void AddXPackSetting(string key, string value, string range)
+		public void AddSecuritySetting(string key, string value, string range)
 		{
 			if (!this.XPackInstalled) return;
 			var shieldOrSecurity = this.Version > LastVersionThatAcceptedShieldSettings ? "xpack.security" : "shield";
@@ -64,15 +71,14 @@ namespace Elastic.Managed.Ephemeral
 		private void AddDefaultXPackSettings()
 		{
 			if (!this.XPackInstalled) return;
-			this.AddXPackSetting("enabled", this.XPackInstalled.ToString().ToLower());
 
 			var securityEnabled = this.EnableSecurity.ToString().ToLowerInvariant();
-			this.AddXPackSetting("http.security.enabled", securityEnabled);
+			this.AddSecuritySetting("enabled", securityEnabled);
 			if (this.EnableSecurity)
 			{
                 var sslEnabled = this.EnableSsl.ToString().ToLowerInvariant();
-                this.AddXPackSetting("http.ssl.enabled", sslEnabled);
-                this.AddXPackSetting("authc.realms.pki1.enabled", sslEnabled);
+                this.AddSecuritySetting("http.ssl.enabled", sslEnabled);
+                this.AddSecuritySetting("authc.realms.pki1.enabled", sslEnabled);
 
 			}
 		}

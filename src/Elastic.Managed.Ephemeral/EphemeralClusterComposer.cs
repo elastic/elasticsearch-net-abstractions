@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Elastic.Managed.Ephemeral.Tasks;
 using Elastic.Managed.Ephemeral.Tasks.AfterNodeStoppedTasks;
 using Elastic.Managed.Ephemeral.Tasks.InstallationTasks;
@@ -10,16 +8,11 @@ using Elastic.Managed.FileSystem;
 
 namespace Elastic.Managed.Ephemeral
 {
-	public class EphemeralClusterComposer<TConfiguration> where TConfiguration : EphemeralClusterConfiguration
+	public class EphemeralClusterComposerBase
 	{
-		public EphemeralClusterComposer(IEphemeralCluster<TConfiguration> cluster)
-		{
-			this.Cluster = cluster;
-		}
+		protected EphemeralClusterComposerBase() { }
 
-		private IEphemeralCluster<TConfiguration> Cluster { get; }
-
-		private static IEnumerable<IClusterComposeTask<TConfiguration>> InstallationTasks { get; } = new List<IClusterComposeTask<TConfiguration>>
+		protected static IEnumerable<IClusterComposeTask> InstallationTasks { get; } = new List<IClusterComposeTask>
 		{
 			new CreateLocalApplicationDirectory(),
 			new EnsureJavaHomeEnvironmentVariableIsSet(),
@@ -28,42 +21,55 @@ namespace Elastic.Managed.Ephemeral
 			new InstallPlugins(),
 		};
 
-		private static IEnumerable<IClusterComposeTask<TConfiguration>> BeforeStart { get; } = new List<IClusterComposeTask<TConfiguration>>
+		protected static IEnumerable<IClusterComposeTask> BeforeStart { get; } = new List<IClusterComposeTask>
 		{
 			new CreateEphemeralDirectory()
 		};
 
-		private static IEnumerable<IClusterComposeTask<TConfiguration>> NodeStoppedTasks { get; } = new List<IClusterComposeTask<TConfiguration>>
+		protected static IEnumerable<IClusterComposeTask> NodeStoppedTasks { get; } = new List<IClusterComposeTask>
 		{
 			new CleanUpDirectoriesAfterNodeStopped()
 		};
 
-		private static IEnumerable<IClusterComposeTask<TConfiguration>> ValidationTasks  { get; } = new List<IClusterComposeTask<TConfiguration>>
+		protected static IEnumerable<IClusterComposeTask> AfterStartedTasks  { get; } = new List<IClusterComposeTask>
 		{
 			new ValidateRunningVersion(),
+			new PostLicenseTask(),
+			new ValidateLicenseTask(),
 			new ValidateLicenseTask(),
 			new ValidatePluginsTask(),
 			new ValidateClusterStateTask()
 		};
+	}
+
+
+	public class EphemeralClusterComposer<TConfiguration> : EphemeralClusterComposerBase
+		where TConfiguration : EphemeralClusterConfiguration
+	{
+		public EphemeralClusterComposer(IEphemeralCluster<TConfiguration> cluster) => this.Cluster = cluster;
+
+		private IEphemeralCluster<TConfiguration> Cluster { get; }
 
 		public void OnStop() => Itterate(NodeStoppedTasks, (t, c, fs) => t.Run(c));
 
 		public void Install()
 		{
-			var tasks = new List<IClusterComposeTask<TConfiguration>>(InstallationTasks);
+			var tasks = new List<IClusterComposeTask>(InstallationTasks);
 			if (this.Cluster.ClusterConfiguration.AdditionalInstallationTasks != null)
 				tasks.AddRange(this.Cluster.ClusterConfiguration.AdditionalInstallationTasks);
 
 			Itterate(tasks, (t, c, fs) => t.Run(c));
-
 		}
 
 		public void OnBeforeStart() => Itterate(BeforeStart, (t, c, fs) => t.Run(c));
 
-		public void ValidateAfterStart()
+		public void OnAfterStart()
 		{
-			if (this.Cluster.ClusterConfiguration.SkipValidation) return;
-			Itterate(ValidationTasks, (t, c, fs) => t.Run(c));
+			if (this.Cluster.ClusterConfiguration.SkipBuiltInAfterStartTasks) return;
+			var tasks = new List<IClusterComposeTask>(AfterStartedTasks);
+			if (this.Cluster.ClusterConfiguration.AdditionalAfterStartedTasks != null)
+				tasks.AddRange(this.Cluster.ClusterConfiguration.AdditionalAfterStartedTasks);
+			Itterate(tasks, (t, c, fs) => t.Run(c));
 		}
 
 		private readonly object _lock = new object();

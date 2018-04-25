@@ -1,20 +1,17 @@
 ﻿using System;
-using Elasticsearch.Net;
+using System.Net;
+using Elastic.Managed.ConsoleWriters;
 
 namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 {
 	public class ValidateClusterStateTask : ClusterComposeTask
 	{
-		private static TimeSpan ClusterHealthTimeout { get; } = TimeSpan.FromSeconds(20);
-
 		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
-			var healthyCluster = cluster.Client().ClusterHealth(g => g
-				.WaitForStatus(WaitForStatus.Yellow)
-				.Timeout(ClusterHealthTimeout)
-			);
-			if(!healthyCluster.IsValid)
-				throw new Exception($"Did not see a healhty cluster before calling onNodeStarted handler." + healthyCluster.DebugInformation);
+			cluster.Writer.WriteDiagnostic($"{{{nameof(ValidateClusterStateTask)}}} waiting cluster to go into yellow health state");
+			var healthyResponse = this.Get(cluster, "_cluster/health", "wait_for_status=yellow&timeout=20s");
+			if (healthyResponse == null || healthyResponse.StatusCode != HttpStatusCode.OK)
+				throw new Exception($"Cluster health waiting for status yellow failed after 20s");
 		}
 	}
 }

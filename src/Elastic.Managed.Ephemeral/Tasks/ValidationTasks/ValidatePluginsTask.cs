@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using Elastic.Managed.ConsoleWriters;
-using Nest;
 
 namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 {
@@ -16,16 +15,16 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 				return;
 			}
 
-			var supported = cluster.ClusterConfiguration.Plugins.Select(p => p.ListedPluginName(v)).ToList();
-			if (!supported.Any()) return;
+			var requestPlugins = cluster.ClusterConfiguration.Plugins.Select(p => p.ListedPluginName(v)).ToList();
+			if (!requestPlugins.Any()) return;
 
-			var checkPlugins = cluster.Client().CatPlugins();
+			cluster.Writer.WriteDiagnostic($"{{{nameof(ValidatePluginsTask)}}} validating the cluster is running the requested plugins");
+			var catPlugins = this.Get(cluster, "_cat/plugins", "h=component");
+			if (catPlugins == null || !catPlugins.IsSuccessStatusCode) throw new Exception($"Calling _cat/plugins did not result in an OK response");
 
-			if (!checkPlugins.IsValid)
-				throw new Exception($"Failed to check plugins: {checkPlugins.DebugInformation}.");
+			var installedPlugins = GetResponseString(catPlugins).Split(new [] {'\n'}, StringSplitOptions.RemoveEmptyEntries).ToList();
 
-			var installedPlugins = (checkPlugins.Records ?? Enumerable.Empty<CatPluginsRecord>()).Select(r => r.Component).ToList();
-			var missingPlugins = supported.Except(installedPlugins).ToList();
+			var missingPlugins = requestPlugins.Except(installedPlugins).ToList();
 			if (!missingPlugins.Any()) return;
 
 			var missingString = string.Join(", ", missingPlugins);

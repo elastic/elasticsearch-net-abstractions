@@ -1,6 +1,5 @@
 ﻿using Elastic.Managed;
 using Elastic.Managed.Ephemeral;
-using Nest;
 
 namespace Elastic.Xunit.Sdk
 {

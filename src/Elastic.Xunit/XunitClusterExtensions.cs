@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using Elastic.Managed.Ephemeral;
-using Elasticsearch.Net;
-using Nest;
 
 namespace Elastic.Xunit
 {

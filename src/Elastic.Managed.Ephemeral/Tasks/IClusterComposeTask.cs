@@ -1,25 +1,25 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Elastic.Managed.ConsoleWriters;
 using ProcNet;
 using ProcNet.Std;
 
 namespace Elastic.Managed.Ephemeral.Tasks
 {
-	public interface IClusterComposeTask { }
-
-	public interface IClusterComposeTask<in TConfiguration> : IClusterComposeTask
-		where TConfiguration : EphemeralClusterConfiguration
+	public interface IClusterComposeTask
 	{
-		void Run(IEphemeralCluster<TConfiguration> cluster);
+		void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster);
 	}
 
-	public abstract class ClusterComposeTaskBase<TConfiguration> : IClusterComposeTask<TConfiguration>
-		where TConfiguration : EphemeralClusterConfiguration
+	public abstract class ClusterComposeTask: IClusterComposeTask
 	{
-		public abstract void Run(IEphemeralCluster<TConfiguration> cluster);
+		public abstract void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster);
 
 		private bool IsMono { get; } = Type.GetType("Mono.Runtime") != null;
 		protected string BinarySuffix => IsMono || Path.PathSeparator == '/' ? "" : ".bat";
@@ -34,6 +34,36 @@ namespace Elastic.Managed.Ephemeral.Tasks
 				stream.CopyTo(fileStream);
 				fileStream.Flush();
 			}
+		}
+		protected string GetResponseString(HttpResponseMessage m) => m.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+
+		protected HttpResponseMessage Get(IEphemeralCluster<EphemeralClusterConfiguration> cluster, string path, string query) =>
+			Call(cluster, path, query, (c, u, t) => c.GetAsync(u, t));
+
+		protected HttpResponseMessage Post(IEphemeralCluster<EphemeralClusterConfiguration> cluster, string path, string query, string json) =>
+			Call(cluster, path, query, (c, u, t) => c.PostAsync(u, new StringContent(json, Encoding.UTF8, "application/json" ), t));
+
+		private HttpResponseMessage Call(
+			IEphemeralCluster<EphemeralClusterConfiguration> cluster,
+			string path,
+			string query,
+			Func<HttpClient, Uri, CancellationToken, Task<HttpResponseMessage>> verb)
+		{
+			var statusUrl = new UriBuilder(cluster.NodesUris().First()) { Path = path, Query = query }.Uri;
+			var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+			using (var client = new HttpClient { Timeout = TimeSpan.FromSeconds(20)})
+			{
+				try
+				{
+					var response = verb(client, statusUrl, tokenSource.Token).ConfigureAwait(false).GetAwaiter().GetResult();
+					if (response.StatusCode == HttpStatusCode.OK) return response;
+				}
+				catch
+				{
+					// ignored
+				}
+			}
+			return null;
 		}
 
 		protected static void WriteFileIfNotExist(string fileLocation, string contents)
@@ -62,9 +92,4 @@ namespace Elastic.Managed.Ephemeral.Tasks
 			writer?.WriteDiagnostic($"{{{nameof(ExecuteBinary)}}} finished process [{description}] {{{result.ExitCode}}}");
 		}
 	}
-
-	public abstract class ClusterComposeTask : ClusterComposeTaskBase<EphemeralClusterConfiguration> { }
-
-	public abstract class ClusterComposeTask<TConfiguration> : ClusterComposeTaskBase<TConfiguration>
-		where TConfiguration : EphemeralClusterConfiguration { }
 }

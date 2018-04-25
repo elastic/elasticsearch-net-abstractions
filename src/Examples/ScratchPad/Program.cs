@@ -39,7 +39,7 @@ namespace ScratchPad
 
 			var clusterStarted = false;
 			var plugins = new ElasticsearchPlugins(ElasticsearchPlugin.RepositoryAzure, ElasticsearchPlugin.IngestAttachment);
-			var config = new EphemeralClusterConfiguration("6.0.0", plugins);
+			var config = new EphemeralClusterConfiguration("6.0.0", ClusterFeatures.XPack, plugins);
 			using (var cluster = new EphemeralCluster(config))
 			{
 				cluster.Start();

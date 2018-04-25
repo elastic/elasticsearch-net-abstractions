@@ -17,6 +17,5 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Elastic.Managed\Elastic.Managed.csproj" />
-    <PackageReference Include="NEST" Version="6.0.1" />
   </ItemGroup>
 </Project>

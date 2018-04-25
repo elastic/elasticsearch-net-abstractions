@@ -8,5 +8,6 @@
     <ProjectReference Include="..\..\Elastic.Managed.Ephemeral\Elastic.Managed.Ephemeral.csproj" />
     <!--<ProjectReference Include="..\..\..\..\proc\src\Proc\Proc.csproj" />-->
     <PackageReference Include="Proc" Version="0.1.4" />
+    <PackageReference Include="NEST" Version="6.0.1" />
   </ItemGroup>
 </Project>

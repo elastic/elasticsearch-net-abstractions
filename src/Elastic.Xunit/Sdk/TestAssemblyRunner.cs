@@ -199,7 +199,8 @@ namespace Elastic.Xunit.Sdk
 			where i.IsGenericType
 			from a in i.GetGenericArguments()
 			select a.ToRuntimeType()
-		).FirstOrDefault(type => typeof(XunitClusterBase).IsAssignableFrom(type) || IsSubclassOfRawGeneric(typeof(XunitClusterBase<>), type));
+		).FirstOrDefault(type => typeof(XunitClusterBase).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo())
+		                         || IsSubclassOfRawGeneric(typeof(XunitClusterBase<>), type));
 
 		private static bool IsSubclassOfRawGeneric(Type generic, Type toCheck)
 		{
