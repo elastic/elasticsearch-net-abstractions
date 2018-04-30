@@ -92,7 +92,7 @@ namespace Elastic.Managed
 				var nodeExceptions = this.Nodes.Select(n => n.LastSeenException).Where(e => e != null).ToList();
 				var message = $"{{{this.GetType().Name}.{nameof(Start)}}} cluster did not start succesfully";
 				var seeLogsMessage = this.SeeLogsMessage(message);
-				writer?.WriteError(message);
+				writer?.WriteError(seeLogsMessage);
 				throw new AggregateException(seeLogsMessage, nodeExceptions);
 			}
 

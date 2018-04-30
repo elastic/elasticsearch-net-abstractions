@@ -61,7 +61,7 @@ namespace Elastic.Xunit.Sdk
 				if (e is CleanExitException || e is AggregateException ae && ae.Flatten().InnerException is CleanExitException)
 				{
 					sink.OnMessage(new TestAssemblyCleanupFailure(Enumerable.Empty<ITestCase>(), this.TestAssembly,
-						new CleanExitException("Node failed to start")));
+						new CleanExitException("Node failed to start", e)));
 				}
 				else
 					sink.OnMessage(new TestAssemblyCleanupFailure(Enumerable.Empty<ITestCase>(), this.TestAssembly, e));
