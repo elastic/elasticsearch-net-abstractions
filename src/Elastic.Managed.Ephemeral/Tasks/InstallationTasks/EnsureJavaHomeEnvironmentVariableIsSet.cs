@@ -1,4 +1,5 @@
 ﻿using System;
+using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.FileSystem;
 
 namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
@@ -10,6 +11,8 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 			var javaHome = Environment.GetEnvironmentVariable("JAVA_HOME");
 			if (string.IsNullOrWhiteSpace(javaHome))
 				throw new Exception("The elasticsearch bat files are resillient to JAVA_HOME not being set, however the shield tooling is not");
+
+			cluster.Writer?.WriteDiagnostic($"{{{nameof(EnsureJavaHomeEnvironmentVariableIsSet)}}} JAVA_HOME is set proceeding");
 		}
 	}
 }

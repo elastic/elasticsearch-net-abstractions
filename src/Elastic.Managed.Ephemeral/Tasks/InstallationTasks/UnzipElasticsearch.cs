@@ -12,7 +12,11 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 		{
 			var fs = cluster.FileSystem;
 			var v = cluster.ClusterConfiguration.Version;
-			if (Directory.Exists(fs.ElasticsearchHome)) return;
+			if (Directory.Exists(fs.ElasticsearchHome))
+			{
+                cluster.Writer?.WriteDiagnostic($"{{{nameof(UnzipElasticsearch)}}} skipping [{fs.ElasticsearchHome}] already exists");
+				return;
+			}
 
 			var from = Path.Combine(fs.LocalFolder, v.Zip);
 			var extractedFolder = Path.Combine(fs.LocalFolder, v.FolderInZip);
