@@ -130,7 +130,6 @@ namespace Elastic.Managed
 		public void Dispose()
 		{
 			this.Started = false;
-			foreach (var node in this.Nodes) node.SendControlC();
 			foreach (var node in this.Nodes) node?.Dispose();
 			this.OnDispose();
 		}
