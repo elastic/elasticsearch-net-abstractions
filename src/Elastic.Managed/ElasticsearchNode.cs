@@ -75,13 +75,13 @@ namespace Elastic.Managed
 
 		public IDisposable SubscribeLines() => this.SubscribeLines(new LineHighlightWriter());
 		public IDisposable SubscribeLines(IConsoleLineWriter writer) =>
-			this.SubscribeLines(delegate { }, delegate { }, delegate { });
+			this.SubscribeLines(writer, delegate { }, delegate { }, delegate { });
 
 		public IDisposable SubscribeLines(IConsoleLineWriter writer, Action<LineOut> onNext) =>
-			this.SubscribeLines(onNext, delegate { }, delegate { });
+			this.SubscribeLines(writer, onNext, delegate { }, delegate { });
 
 		public IDisposable SubscribeLines(IConsoleLineWriter writer, Action<LineOut> onNext, Action<Exception> onError) =>
-			this.SubscribeLines(onNext, onError, delegate { });
+			this.SubscribeLines(writer, onNext, onError, delegate { });
 
 		public IDisposable SubscribeLines(IConsoleLineWriter writer, Action<LineOut> onNext, Action<Exception> onError, Action onCompleted)
 		{

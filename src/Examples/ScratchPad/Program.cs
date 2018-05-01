@@ -32,10 +32,10 @@ namespace ScratchPad
 //				Console.ReadKey();
 //			}
 
-//			using (var cluster = new EphemeralCluster("6.0.0"))
-//			{
-//				cluster.Start();
-//			}
+			using (var cluster = new EphemeralCluster("6.0.0"))
+			{
+				cluster.Start();
+			}
 
 			var clusterStarted = false;
 			var plugins = new ElasticsearchPlugins(ElasticsearchPlugin.RepositoryAzure, ElasticsearchPlugin.IngestAttachment);
@@ -44,7 +44,11 @@ namespace ScratchPad
 			{
 				cluster.Start();
 
-				var client = new ElasticClient(new ConnectionSettings(new StaticConnectionPool(cluster.NodesUris())).EnableDebugMode());
+				var nodes = cluster.NodesUris();
+				var connectionPool = new StaticConnectionPool(nodes);
+				var settings = new ConnectionSettings(connectionPool).EnableDebugMode();
+				var client = new ElasticClient(settings);
+				
 				Console.Write(client.CatPlugins().DebugInformation);
 
 				clusterStarted = true;

@@ -71,18 +71,6 @@ namespace Elastic.Managed
 		public IDisposable Start(TimeSpan waitForStarted) =>
 			this.Start(new LineHighlightWriter(this.Nodes.Select(n => n.NodeConfiguration.DesiredNodeName).ToArray()), waitForStarted);
 
-		private class Subscriptions : IDisposable
-		{
-			private List<IDisposable> Disposables { get; } = new List<IDisposable>();
-
-			internal void Add(IDisposable disposable) => this.Disposables.Add(disposable);
-
-			public void Dispose()
-			{
-				foreach(var d in Disposables) d.Dispose();
-			}
-		}
-
 		public IDisposable Start(IConsoleLineWriter writer, TimeSpan waitForStarted)
 		{
 			this.Writer = writer;
@@ -123,6 +111,19 @@ namespace Elastic.Managed
 
 			return subscriptions;
 		}
+
+		private class Subscriptions : IDisposable
+		{
+			private List<IDisposable> Disposables { get; } = new List<IDisposable>();
+
+			internal void Add(IDisposable disposable) => this.Disposables.Add(disposable);
+
+			public void Dispose()
+			{
+				foreach(var d in Disposables) d.Dispose();
+			}
+		}
+
 
 		protected virtual string SeeLogsMessage(string message)
 		{

@@ -17,7 +17,9 @@ namespace Elastic.Xunit.ExampleMinimal
 		/// We pass our configuration instance to the base class.
 		/// We only configure it to run version 6.2.3 here but lots of additional options are available.
 		/// </summary>
-		public MyTestCluster() : base(new XunitClusterConfiguration("6.2.0")) { }
+		public MyTestCluster() : base(new XunitClusterConfiguration("6.2.0"))
+		{
+		}
 	}
 
 	public class ExampleTest : IClusterFixture<MyTestCluster>
@@ -34,18 +36,19 @@ namespace Elastic.Xunit.ExampleMinimal
 			//
 			this.Client = cluster.GetOrAddClient(c =>
 			{
-                var nodes = cluster.NodesUris();
-                var connectionPool = new StaticConnectionPool(nodes);
-                var settings = new ConnectionSettings(connectionPool)
+				var nodes = cluster.NodesUris();
+				var connectionPool = new StaticConnectionPool(nodes);
+				var settings = new ConnectionSettings(connectionPool)
 					.EnableDebugMode();
-                return new ElasticClient(settings);
+				return new ElasticClient(settings);
 			});
 		}
 
 		private ElasticClient Client { get; }
 
 		/// <summary> [I] marks an integration test (like [Fact] would for plain Xunit) </summary>
-		[I] public void SomeTest()
+		[I]
+		public void SomeTest()
 		{
 			var rootNodeInfo = this.Client.RootNodeInfo();
 
