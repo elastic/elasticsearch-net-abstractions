@@ -6,9 +6,9 @@ You've reached the home repository for several auxiliary projects from the .NET 
 
 Current projects:
 
-* ###[Elastic.Managed](src/Elastic.Managed/README.md)
-* ###[Elastic.Managed.Ephemeral](src/Elastic.Managed/README.md)
-* ###[Elastic.Xunit](src/Elastic.Managed/README.md)
+ ###[Elastic.Managed](src/Elastic.Managed/README.md)
+ ###[Elastic.Managed.Ephemeral](src/Elastic.Managed/README.md)
+ ###[Elastic.Xunit](src/Elastic.Managed/README.md)
 
 
 
