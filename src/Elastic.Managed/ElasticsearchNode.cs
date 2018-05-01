@@ -58,36 +58,54 @@ namespace Elastic.Managed
 		}
 
 
-		public void Start() => this.Start(TimeSpan.FromMinutes(2));
+		public IDisposable Start() => this.Start(TimeSpan.FromMinutes(2));
 
-		public void Start(TimeSpan waitForStarted) => this.Start(new HighlightWriter(), waitForStarted);
+		public IDisposable Start(TimeSpan waitForStarted) => this.Start(new LineHighlightWriter(), waitForStarted);
 
-		public void Start(IConsoleLineWriter writer, TimeSpan waitForStarted)
+		public IDisposable Start(IConsoleLineWriter writer, TimeSpan waitForStarted)
 		{
 			var node = this.NodeConfiguration.DesiredNodeName;
-			this.Subscribe(writer);
-			if (!this.WaitForStarted(waitForStarted))
-				throw new CleanExitException($"Failed to start node: {node} before the configured timeout of: {waitForStarted}");
+			var subscription = this.SubscribeLines(writer);
+			if (this.WaitForStarted(waitForStarted)) return subscription;
+			subscription.Dispose();
+			throw new CleanExitException($"Failed to start node: {node} before the configured timeout of: {waitForStarted}");
 		}
 
 		internal IConsoleLineWriter Writer { get; private set; }
-		public void Subscribe() => this.Subscribe(new HighlightWriter());
-		public void Subscribe(IConsoleLineWriter writer)
+
+		public IDisposable SubscribeLines() => this.SubscribeLines(new LineHighlightWriter());
+		public IDisposable SubscribeLines(IConsoleLineWriter writer) =>
+			this.SubscribeLines(delegate { }, delegate { }, delegate { });
+
+		public IDisposable SubscribeLines(IConsoleLineWriter writer, Action<LineOut> onNext) =>
+			this.SubscribeLines(onNext, delegate { }, delegate { });
+
+		public IDisposable SubscribeLines(IConsoleLineWriter writer, Action<LineOut> onNext, Action<Exception> onError) =>
+			this.SubscribeLines(onNext, onError, delegate { });
+
+		public IDisposable SubscribeLines(IConsoleLineWriter writer, Action<LineOut> onNext, Action<Exception> onError, Action onCompleted)
 		{
 			this.Writer = writer;
 			var node = this.NodeConfiguration.DesiredNodeName;
 			writer?.WriteDiagnostic($"Elasticsearch location: [{this.Binary}]", node);
 			writer?.WriteDiagnostic($"Settings: {{{string.Join(" ", this.NodeConfiguration.CommandLineArguments)}}}", node);
-			this.SubscribeLines(
-				l => writer?.Write(l),
+			return this.SubscribeLines(
+				l => {
+					writer?.Write(l);
+					onNext?.Invoke(l);
+				},
 				e =>
 				{
 					this.LastSeenException = e;
 					writer?.Write(e);
+					onError?.Invoke(e);
 					this._startedHandle.Set();
 				},
-				() => this._startedHandle.Set()
-			);
+				() =>
+				{
+					onCompleted?.Invoke();
+					this._startedHandle.Set();
+				});
 		}
 
 		public Exception LastSeenException { get; set; }

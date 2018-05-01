@@ -6,7 +6,7 @@ using ProcNet.Std;
 
 namespace Elastic.Managed.ConsoleWriters
 {
-	public class HighlightWriter : IConsoleLineWriter
+	public class LineHighlightWriter : IConsoleLineWriter
 	{
 		private static readonly ConsoleColor[] AvailableNodeColors =
 		{
@@ -21,9 +21,9 @@ namespace Elastic.Managed.ConsoleWriters
 		private readonly Dictionary<string, ConsoleColor> _nodeColors;
 		private ConsoleColor NodeColor(string node) => (_nodeColors != null && _nodeColors.TryGetValue(node, out var color)) ? color : AvailableNodeColors[0];
 
-		public HighlightWriter() { }
+		public LineHighlightWriter() { }
 
-		public HighlightWriter(IList<string> nodes)
+		public LineHighlightWriter(IList<string> nodes)
 		{
 			var colors = new Dictionary<string, ConsoleColor>();
 			for (var i = 0; i < nodes.Count; i++)

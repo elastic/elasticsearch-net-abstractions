@@ -10,29 +10,35 @@ namespace Elastic.Managed.Example
 	{
 		static void Main(string[] args)
 		{
-			var v = ElasticsearchVersion.From("6.2.0");
-			var esHome = Environment.ExpandEnvironmentVariables(@"%LOCALAPPDATA%\ElasticManaged\6.2.0\elasticsearch-6.2.0");
+			var version = "6.2.0";
+			var esHome = Environment.ExpandEnvironmentVariables($@"%LOCALAPPDATA%\ElasticManaged\{version}\elasticsearch-{version}");
 
-			var clusterConfiguration = new ClusterConfiguration("6.2.0", esHome, 2);
-			var nodeConfiguration = new NodeConfiguration(clusterConfiguration, 9200);
+//			var clusterConfiguration = new ClusterConfiguration(version, esHome);
+//			var nodeConfiguration = new NodeConfiguration(clusterConfiguration, 9200)
+//			{
+//				ShowElasticsearchOutputAfterStarted = false,
+//				Settings =
+//				{
+//					"node.attr.x", "y"
+//				}
+//			};
 
-//			using (var node = new ElasticsearchNode(v, esHome))
+//			using (var node = new ElasticsearchNode(version, esHome))
 //			{
 //				node.Start();
 //			}
-//			using (var node = new ElasticsearchNode(v, esHome))
+//			using (var node = new ElasticsearchNode(version, esHome))
 //			{
-//				node.Subscribe(new HighlightWriter());
-//
-//				node.WaitForStarted(TimeSpan.FromSeconds(30));
-//			}
-//			using (var node = new ElasticsearchNode(nodeConfiguration))
-//			{
-//				node.Subscribe(new HighlightWriter());
-//
-//				node.WaitForStarted(TimeSpan.FromSeconds(30));
+//				node.SubscribeLines(new LineHighlightWriter());
+//				if (!node.WaitForStarted(TimeSpan.FromMinutes(2))) throw new Exception();
 //			}
 
+//			using (var node = new ElasticsearchNode(nodeConfiguration))
+//			{
+//				node.Start();
+//			}
+
+			var clusterConfiguration = new ClusterConfiguration(version, esHome, numberOfNodes: 2);
 			using (var cluster = new ElasticsearchCluster(clusterConfiguration))
 			{
 				cluster.Start();

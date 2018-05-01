@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -19,11 +20,11 @@ namespace Elastic.Managed
 		ReadOnlyCollection<ElasticsearchNode> Nodes { get; }
 		IConsoleLineWriter Writer { get; }
 
-		void Start();
+		IDisposable Start();
 
-		void Start(TimeSpan waitForStarted);
+		IDisposable Start(TimeSpan waitForStarted);
 
-		void Start(IConsoleLineWriter writer, TimeSpan waitForStarted);
+		IDisposable Start(IConsoleLineWriter writer, TimeSpan waitForStarted);
 	}
 
 
@@ -65,18 +66,31 @@ namespace Elastic.Managed
 
 		protected virtual void SeedCluster() { }
 
-		public void Start() => this.Start(TimeSpan.FromMinutes(2));
+		public IDisposable Start() => this.Start(TimeSpan.FromMinutes(2));
 
-		public void Start(TimeSpan waitForStarted) =>
-			this.Start(new HighlightWriter(this.Nodes.Select(n => n.NodeConfiguration.DesiredNodeName).ToArray()), waitForStarted);
+		public IDisposable Start(TimeSpan waitForStarted) =>
+			this.Start(new LineHighlightWriter(this.Nodes.Select(n => n.NodeConfiguration.DesiredNodeName).ToArray()), waitForStarted);
 
-		public void Start(IConsoleLineWriter writer, TimeSpan waitForStarted)
+		private class Subscriptions : IDisposable
+		{
+			private List<IDisposable> Disposables { get; } = new List<IDisposable>();
+
+			internal void Add(IDisposable disposable) => this.Disposables.Add(disposable);
+
+			public void Dispose()
+			{
+				foreach(var d in Disposables) d.Dispose();
+			}
+		}
+
+		public IDisposable Start(IConsoleLineWriter writer, TimeSpan waitForStarted)
 		{
 			this.Writer = writer;
 
 			this.OnBeforeStart();
 
-			foreach (var node in this.Nodes) node.Subscribe(writer);
+			var subscriptions = new Subscriptions();
+			foreach (var node in this.Nodes) subscriptions.Add(node.SubscribeLines(writer));
 
 			var waitHandles = this.Nodes.Select(w => w.StartedHandle).ToArray();
 			if (!WaitHandle.WaitAll(waitHandles, waitForStarted))
@@ -106,6 +120,8 @@ namespace Elastic.Managed
 				writer?.WriteError(e.Message);
 				throw;
 			}
+
+			return subscriptions;
 		}
 
 		protected virtual string SeeLogsMessage(string message)
