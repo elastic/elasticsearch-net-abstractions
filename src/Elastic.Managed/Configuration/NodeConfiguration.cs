@@ -12,13 +12,14 @@ namespace Elastic.Managed.Configuration
 			this.ClusterConfiguration = clusterConfiguration;
 			this.DesiredPort = port;
 			this.DesiredNodeName = clusterConfiguration.CreateNodeName(port);
-			this.Settings = new NodeSettings(clusterConfiguration.ClusterNodeSettings);
+			this.Settings = new NodeSettings(clusterConfiguration.DefaultNodeSettings);
 
 			if (!string.IsNullOrWhiteSpace(this.DesiredNodeName)) this.Settings.Add("node.name", this.DesiredNodeName);
 			if (this.DesiredPort.HasValue) this.Settings.Add("http.port", this.DesiredPort.Value.ToString(CultureInfo.InvariantCulture));
 		}
 
-		public ClusterConfiguration ClusterConfiguration { get; }
+		private ClusterConfiguration ClusterConfiguration { get; }
+
 		public int? DesiredPort { get; }
 		public string DesiredNodeName { get; }
 
@@ -29,9 +30,9 @@ namespace Elastic.Managed.Configuration
 		public bool ShowElasticsearchOutputAfterStarted { get; set; } = true;
 
 		/// <summary>
-		/// The global node settings that apply to each started node, can be
+		/// Copy of <see cref="ClusterConfiguration.DefaultNodeSettings" />. Add individual node settings here.
 		/// </summary>
-		private NodeSettings Settings { get; }
+		public NodeSettings Settings { get; }
 
 		public INodeFileSystem FileSystem => this.ClusterConfiguration.FileSystem;
 		public ElasticsearchVersion Version => this.ClusterConfiguration.Version;

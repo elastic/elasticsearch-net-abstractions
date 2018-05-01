@@ -13,12 +13,11 @@ namespace Elastic.Managed.Ephemeral
 		private static string UniqueishSuffix => Guid.NewGuid().ToString("N").Substring(0, 6);
 		private static string EphemeralClusterName => $"ephemeral-cluster-{UniqueishSuffix}";
 
-
 		public EphemeralClusterConfiguration(ElasticsearchVersion version, ElasticsearchPlugins plugins = null, int numberOfNodes = 1)
 			: this(version, ClusterFeatures.None, plugins, numberOfNodes) { }
 
 		public EphemeralClusterConfiguration(ElasticsearchVersion version, ClusterFeatures features = ClusterFeatures.None, ElasticsearchPlugins plugins = null, int numberOfNodes = 1)
-			: base(version, numberOfNodes, EphemeralClusterName, (v, s) => new EphemeralFileSystem(v, s))
+			: base(version, (v, s) => new EphemeralFileSystem(v, s), numberOfNodes, EphemeralClusterName)
 		{
 			this.Features = features;
 
@@ -39,7 +38,7 @@ namespace Elastic.Managed.Ephemeral
 		public bool EnableSecurity => this.Features.HasFlag(ClusterFeatures.Security) && XPackInstalled;
 
 		public IList<IClusterComposeTask> AdditionalInstallationTasks { get; } = new List<IClusterComposeTask>();
-		
+
 		public IList<IClusterComposeTask> AdditionalAfterStartedTasks { get; } = new List<IClusterComposeTask>();
 		/// <summary>
 		/// Expert level setting, skips all builtin validation tasks for cases where you need to guarantee your call is the first call into the cluster

@@ -36,7 +36,6 @@ namespace Elastic.Managed.Ephemeral
 			new ValidateRunningVersion(),
 			new PostLicenseTask(),
 			new ValidateLicenseTask(),
-			new ValidateLicenseTask(),
 			new ValidatePluginsTask(),
 			new ValidateClusterStateTask()
 		};

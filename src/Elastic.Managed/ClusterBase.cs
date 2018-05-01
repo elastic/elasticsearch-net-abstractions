@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -27,6 +26,7 @@ namespace Elastic.Managed
 		void Start(IConsoleLineWriter writer, TimeSpan waitForStarted);
 	}
 
+
 	public abstract class ClusterBase : ClusterBase<ClusterConfiguration>
 	{
 		protected ClusterBase(ClusterConfiguration clusterConfiguration) : base(clusterConfiguration) { }
@@ -39,8 +39,8 @@ namespace Elastic.Managed
 		{
 			this.ClusterConfiguration = clusterConfiguration;
 
-			var nodes = Enumerable.Range(9200, this.ClusterConfiguration.NumberOfNodes)
-				.Select(p => new NodeConfiguration(clusterConfiguration)
+			var nodes = Enumerable.Range(this.ClusterConfiguration.StartingPortNumber, this.ClusterConfiguration.NumberOfNodes)
+				.Select(p => new NodeConfiguration(clusterConfiguration, p)
 				{
 					ShowElasticsearchOutputAfterStarted =  clusterConfiguration.ShowElasticsearchOutputAfterStarted
 				})
@@ -106,7 +106,6 @@ namespace Elastic.Managed
 				writer?.WriteError(e.Message);
 				throw;
 			}
-
 		}
 
 		protected virtual string SeeLogsMessage(string message)

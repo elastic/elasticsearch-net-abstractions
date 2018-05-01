@@ -21,7 +21,7 @@ namespace Elastic.Managed
 		public int? HostProcessId => base.ProcessId;
 
 		public ElasticsearchNode(ElasticsearchVersion version, string elasticsearchHome = null)
-			: this(new NodeConfiguration(new ClusterConfiguration(version, fileSystem: (v,s) => new NodeFileSystem(v, elasticsearchHome)))) { }
+			: this(new NodeConfiguration(new ClusterConfiguration(version, fileSystem: (v, s) => new NodeFileSystem(v, elasticsearchHome)))) { }
 
 		public ElasticsearchNode(NodeConfiguration config) : base(StartArgs(config)) => this.NodeConfiguration = config;
 
@@ -55,6 +55,19 @@ namespace Elastic.Managed
 			    && message.Contains("not enough master nodes discovered during pinging"))
 				return true;
 			return false;
+		}
+
+
+		public void Start() => this.Start(TimeSpan.FromMinutes(2));
+
+		public void Start(TimeSpan waitForStarted) => this.Start(new HighlightWriter(), waitForStarted);
+
+		public void Start(IConsoleLineWriter writer, TimeSpan waitForStarted)
+		{
+			var node = this.NodeConfiguration.DesiredNodeName;
+			this.Subscribe(writer);
+			if (!this.WaitForStarted(waitForStarted))
+				throw new CleanExitException($"Failed to start node: {node} before the configured timeout of: {waitForStarted}");
 		}
 
 		internal IConsoleLineWriter Writer { get; private set; }

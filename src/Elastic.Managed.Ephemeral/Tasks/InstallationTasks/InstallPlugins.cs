@@ -6,6 +6,7 @@ using Elastic.Managed.Configuration;
 using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.Ephemeral.Plugins;
 using Elastic.Managed.FileSystem;
+using ProcNet;
 
 namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 {
@@ -24,6 +25,10 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 
 			var fs = cluster.FileSystem;
 			var requiredPlugins = cluster.ClusterConfiguration.Plugins;
+			var invalidPlugins = requiredPlugins.Where(p => !p.IsValid(v)).Select(p=>p.Moniker).ToList();
+			if (invalidPlugins.Any())
+				throw new CleanExitException($"Can not install the following plugins for version {v}: {string.Join(", ", invalidPlugins)} ");
+
 			var plugins =
 				from plugin in requiredPlugins
 				let validForCurrentVersion = plugin.IsValid(v)
