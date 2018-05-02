@@ -25,5 +25,12 @@ namespace Elastic.Xunit
 		public virtual void OnTestsFinished(Dictionary<string, Stopwatch> runnerClusterTotals, ConcurrentBag<Tuple<string, string>> runnerFailedCollections)
 		{
 		}
+
+		/// <summary>
+		/// Gets called before testing begins, ideal place to dump information to e.g Console.
+		/// </summary>
+		public virtual void OnBeforeTestsRun()
+		{
+		}
 	}
 }

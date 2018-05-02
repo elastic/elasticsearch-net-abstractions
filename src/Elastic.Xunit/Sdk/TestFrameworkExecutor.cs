@@ -52,6 +52,7 @@ namespace Elastic.Xunit.Sdk
 			{
 				using (var runner = new TestAssemblyRunner(TestAssembly, testCases, DiagnosticMessageSink, sink, options))
 				{
+					this.Options.OnBeforeTestsRun();
 					await runner.RunAsync();
 					this.Options.OnTestsFinished(runner.ClusterTotals, runner.FailedCollections);
 				}

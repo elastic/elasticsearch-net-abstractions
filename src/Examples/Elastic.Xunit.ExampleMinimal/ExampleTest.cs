@@ -20,6 +20,7 @@ namespace Elastic.Xunit.ExampleMinimal
 		public MyTestCluster() : base(new XunitClusterConfiguration("6.2.0"))
 		{
 		}
+
 	}
 
 	public class ExampleTest : IClusterFixture<MyTestCluster>

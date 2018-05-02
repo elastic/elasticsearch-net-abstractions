@@ -48,13 +48,13 @@ namespace ScratchPad
 				var connectionPool = new StaticConnectionPool(nodes);
 				var settings = new ConnectionSettings(connectionPool).EnableDebugMode();
 				var client = new ElasticClient(settings);
-				
+
 				Console.Write(client.CatPlugins().DebugInformation);
 
 				clusterStarted = true;
 			}
 
-			Console.WriteLine($"Clusterstarted:{clusterStarted}");
+			//Console.WriteLine($"Clusterstarted:{clusterStarted}");
 			return 0;
 		}
 
