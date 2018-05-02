@@ -23,8 +23,8 @@ namespace Elastic.Managed.Ephemeral
 
 		protected static string EphemeralHome(ElasticsearchVersion version, string clusterName)
 		{
-			var localFolder = AppDataFolder(version);
-			return Path.Combine(localFolder, clusterName);
+		 	var temp = Path.Combine(Path.GetTempPath(), SubFolder, version.FolderInZip, clusterName);
+			return Path.Combine(temp, "home");
 		}
 	}
 

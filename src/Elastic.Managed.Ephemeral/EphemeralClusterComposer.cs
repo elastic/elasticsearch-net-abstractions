@@ -19,11 +19,11 @@ namespace Elastic.Managed.Ephemeral
 			new DownloadElasticsearchVersion(),
 			new UnzipElasticsearch(),
 			new InstallPlugins(),
+			new CreateEphemeralDirectory()
 		};
 
 		protected static IEnumerable<IClusterComposeTask> BeforeStart { get; } = new List<IClusterComposeTask>
 		{
-			new CreateEphemeralDirectory()
 		};
 
 		protected static IEnumerable<IClusterComposeTask> NodeStoppedTasks { get; } = new List<IClusterComposeTask>
