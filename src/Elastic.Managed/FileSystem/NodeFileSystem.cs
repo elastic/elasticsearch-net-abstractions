@@ -12,7 +12,7 @@ namespace Elastic.Managed.FileSystem
 		protected ElasticsearchVersion Version { get; }
 
 		private static bool IsMono { get; } = Type.GetType("Mono.Runtime") != null;
-		private static string BinarySuffix => IsMono || Path.PathSeparator == '/' ? "" : ".bat";
+		private static string BinarySuffix => IsMono || Path.DirectorySeparatorChar == '/' ? "" : ".bat";
 
 		public string Binary => Path.Combine(this.ElasticsearchHome, "bin", "elasticsearch") + BinarySuffix;
 		public string PluginBinary => Path.Combine(this.ElasticsearchHome, "bin", (this.Version.Major >= 5 ? "elasticsearch-" : "" ) +"plugin") + BinarySuffix;
