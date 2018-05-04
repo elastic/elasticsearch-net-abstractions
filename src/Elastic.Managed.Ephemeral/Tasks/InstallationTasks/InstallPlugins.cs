@@ -40,7 +40,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 			{
 				//var installParameter = v.ReleaseState == ReleaseState.Released ? plugin.Moniker : UseHttpPluginLocation(cluster.Writer, fs, plugin, v);
 				var installParameter = UseHttpPluginLocation(cluster.Writer, fs, plugin, v);
-				ExecuteBinary(cluster.Writer, "cmd", $"install elasticsearch plugin: {plugin.Moniker}", $"/c CALL {fs.PluginBinary} install --batch", installParameter);
+				ExecuteBinary(cluster.ClusterConfiguration, cluster.Writer, "cmd", $"install elasticsearch plugin: {plugin.Moniker}", $"/c CALL {fs.PluginBinary} install --batch", installParameter);
 			}
 		}
 

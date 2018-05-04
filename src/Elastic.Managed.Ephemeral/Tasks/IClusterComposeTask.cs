@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -71,13 +72,21 @@ namespace Elastic.Managed.Ephemeral.Tasks
 			if (!File.Exists(fileLocation)) File.WriteAllText(fileLocation, contents);
 		}
 
-		protected static void ExecuteBinary(IConsoleLineWriter writer, string binary, string description, params string[] arguments)
+		protected static void ExecuteBinary(EphemeralClusterConfiguration config, IConsoleLineWriter writer, string binary, string description, params string[] arguments)
 		{
 			var command = $"{{{binary}}} {{{string.Join(" ", arguments)}}}";
 			writer?.WriteDiagnostic($"{{{nameof(ExecuteBinary)}}} starting process [{description}] {command}");
 
 			var timeout = TimeSpan.FromSeconds(420);
-			var result = Proc.Start(binary, timeout, new ConsoleOutColorWriter(), arguments);
+			var processStartArguments = new StartArguments(binary, arguments)
+			{
+				Environment = new Dictionary<string, string>
+				{
+					{"ES_PATH_CONF", config.FileSystem.ConfigPath},
+					{"ES_HOME", config.FileSystem.ElasticsearchHome}
+				}
+			};
+			var result = Proc.Start(processStartArguments, timeout, new ConsoleOutColorWriter());
 
 			if (!result.Completed)
 				throw new Exception($"Timeout while executing {description} exceeded {timeout}");
