@@ -123,7 +123,6 @@ namespace Elastic.Managed
 		protected override bool ContinueReadingFromProcessReaders()
 		{
 			if (!this.NodeStarted) return true;
-			if (this.Writer == null) return false;
 			return this.NodeConfiguration.ShowElasticsearchOutputAfterStarted;
 		}
 
