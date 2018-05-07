@@ -120,6 +120,13 @@ namespace Elastic.Managed
 			base.OnBeforeSetCompletedHandle();
 		}
 
+		protected override bool ContinueReadingFromProcessReaders()
+		{
+			if (!this.NodeStarted) return true;
+			if (this.Writer == null) return false;
+			return this.NodeConfiguration.ShowElasticsearchOutputAfterStarted;
+		}
+
 		protected override bool KeepBufferingLines(LineOut c)
 		{
 			//if the node is already started only keep buffering lines while we have a writer and the nodeconfiguration wants output after started

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Elastic.Managed;
 using Elastic.Managed.Configuration;
 using Elastic.Managed.Ephemeral;
@@ -39,7 +40,10 @@ namespace ScratchPad
 
 			var clusterStarted = false;
 			var plugins = new ElasticsearchPlugins(ElasticsearchPlugin.RepositoryAzure, ElasticsearchPlugin.IngestAttachment);
-			var config = new EphemeralClusterConfiguration("6.2.3", ClusterFeatures.XPack, plugins, numberOfNodes: 2);
+			var config = new EphemeralClusterConfiguration("6.2.3", ClusterFeatures.XPack, plugins, numberOfNodes: 2)
+			{
+				ShowElasticsearchOutputAfterStarted = false
+			};
 			using (var cluster = new EphemeralCluster(config))
 			{
 				cluster.Start();
@@ -49,7 +53,9 @@ namespace ScratchPad
 				var settings = new ConnectionSettings(connectionPool).EnableDebugMode();
 				var client = new ElasticClient(settings);
 
-				Console.Write(client.CatPlugins().DebugInformation);
+				Console.Write(client.RootNodeInfo().DebugInformation);
+				Thread.Sleep(1000 * 10);
+				Console.Write(client.CatNodes().DebugInformation);
 
 				clusterStarted = true;
 			}
