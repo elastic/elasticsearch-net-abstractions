@@ -7,7 +7,7 @@ namespace Elastic.Managed.Configuration
 	{
 		public NodeConfiguration(ElasticsearchVersion version, int? port = null) : this(new ClusterConfiguration(version), port) { }
 
-		public NodeConfiguration(ClusterConfiguration clusterConfiguration, int? port = null)
+		public NodeConfiguration(IClusterConfiguration<NodeFileSystem> clusterConfiguration, int? port = null)
 		{
 			this.ClusterConfiguration = clusterConfiguration;
 			this.DesiredPort = port;
@@ -18,7 +18,7 @@ namespace Elastic.Managed.Configuration
 			if (this.DesiredPort.HasValue) this.Settings.Add("http.port", this.DesiredPort.Value.ToString(CultureInfo.InvariantCulture));
 		}
 
-		private ClusterConfiguration ClusterConfiguration { get; }
+		private IClusterConfiguration<NodeFileSystem> ClusterConfiguration { get; }
 
 		public int? DesiredPort { get; }
 		public string DesiredNodeName { get; }

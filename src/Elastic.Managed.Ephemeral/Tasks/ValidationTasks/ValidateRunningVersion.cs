@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using Elastic.Managed.Configuration;
 using Elastic.Managed.ConsoleWriters;
 
 namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks

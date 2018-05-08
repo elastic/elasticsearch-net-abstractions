@@ -5,19 +5,37 @@ using Elastic.Managed.FileSystem;
 
 namespace Elastic.Managed.Configuration
 {
-	public class ClusterConfiguration
+	public interface IClusterConfiguration<out TFileSystem>
+	{
+		TFileSystem FileSystem { get; }
+
+		string ClusterName { get; }
+		NodeSettings DefaultNodeSettings { get; }
+		ElasticsearchVersion Version { get; }
+		int NumberOfNodes { get; }
+		int StartingPortNumber { get; set; }
+		bool ShowElasticsearchOutputAfterStarted { get; set; }
+
+		string CreateNodeName(int? node);
+	}
+
+	public class ClusterConfiguration : ClusterConfiguration<NodeFileSystem>
 	{
 		public ClusterConfiguration(ElasticsearchVersion version, string esHome, int numberOfNodes = 1)
-			: this(version, (v, s) => new NodeFileSystem(v, esHome), numberOfNodes , null)
-		{
+			: base(version, (v, s) => new NodeFileSystem(v, esHome), numberOfNodes , null) { }
 
-		}
+		public ClusterConfiguration(ElasticsearchVersion version, Func<ElasticsearchVersion, string, NodeFileSystem> fileSystem = null, int numberOfNodes = 1, string clusterName = null)
+			: base(version, fileSystem ?? ((v, s) => new NodeFileSystem(v, s)), numberOfNodes , clusterName) { }
+	}
 
-		public ClusterConfiguration(ElasticsearchVersion version, Func<ElasticsearchVersion, string, INodeFileSystem> fileSystem = null, int numberOfNodes = 1, string clusterName = null)
+	public class ClusterConfiguration<TFileSystem> : IClusterConfiguration<TFileSystem>
+		where TFileSystem : INodeFileSystem
+	{
+		public ClusterConfiguration(ElasticsearchVersion version, Func<ElasticsearchVersion, string, TFileSystem> fileSystem = null, int numberOfNodes = 1, string clusterName = null)
 		{
 			this.ClusterName = clusterName;
 			this.Version = version;
-			fileSystem = fileSystem ?? ((v, s) => new NodeFileSystem(v, s));
+			fileSystem = fileSystem ?? throw new ArgumentException(nameof(fileSystem));
 			this.FileSystem = fileSystem(this.Version, this.ClusterName);
 			this.NumberOfNodes = numberOfNodes;
 
@@ -34,7 +52,7 @@ namespace Elastic.Managed.Configuration
 
 		public string ClusterName { get; }
 		public ElasticsearchVersion Version { get; }
-		public INodeFileSystem FileSystem { get; }
+		public TFileSystem FileSystem { get; }
 		public int NumberOfNodes { get; }
 		public int StartingPortNumber { get; set; } = 9200;
 

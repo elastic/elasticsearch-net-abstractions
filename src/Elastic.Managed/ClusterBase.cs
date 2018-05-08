@@ -11,7 +11,7 @@ using Elastic.Managed.FileSystem;
 namespace Elastic.Managed
 {
 	public interface ICluster<out TConfiguration> : IDisposable
-		where TConfiguration : ClusterConfiguration
+		where TConfiguration : IClusterConfiguration<NodeFileSystem>
 	{
 		string ClusterMoniker { get; }
 		TConfiguration ClusterConfiguration { get; }
@@ -34,7 +34,7 @@ namespace Elastic.Managed
 	}
 
 	public abstract class ClusterBase<TConfiguration> : ICluster<TConfiguration>
-		where TConfiguration : ClusterConfiguration
+		where TConfiguration : IClusterConfiguration<NodeFileSystem>
 	{
 		protected ClusterBase(TConfiguration clusterConfiguration)
 		{

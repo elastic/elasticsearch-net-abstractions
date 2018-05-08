@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Elastic.Managed.Ephemeral.Tasks;
 using Elastic.Managed.Ephemeral.Tasks.AfterNodeStoppedTasks;
 using Elastic.Managed.Ephemeral.Tasks.InstallationTasks;
+using Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack;
 using Elastic.Managed.Ephemeral.Tasks.ValidationTasks;
 using Elastic.Managed.FileSystem;
 
@@ -19,11 +20,19 @@ namespace Elastic.Managed.Ephemeral
 			new DownloadElasticsearchVersion(),
 			new UnzipElasticsearch(),
 			new InstallPlugins(),
-			new CreateEphemeralDirectory()
+
+			new EnsureElasticsearchBatWorksAcrossDrives(),
+			new EnsureXPackEnvBinaryExists(),
 		};
 
 		protected static IEnumerable<IClusterComposeTask> BeforeStart { get; } = new List<IClusterComposeTask>
 		{
+			new CreateEphemeralDirectory(),
+			new EnsureSecurityRealms(),
+			new EnsureSecurityRolesFileExists(),
+
+			new EnsureSecurityUsersInDefaultRealmAreAdded(),
+			new GenerateCertificatesTask()
 		};
 
 		protected static IEnumerable<IClusterComposeTask> NodeStoppedTasks { get; } = new List<IClusterComposeTask>
@@ -51,16 +60,17 @@ namespace Elastic.Managed.Ephemeral
 
 		public void OnStop() => Itterate(NodeStoppedTasks, (t, c, fs) => t.Run(c));
 
-		public void Install()
+		public void Install() => Itterate(InstallationTasks, (t, c, fs) => t.Run(c));
+
+		public void OnBeforeStart()
 		{
-			var tasks = new List<IClusterComposeTask>(InstallationTasks);
-			if (this.Cluster.ClusterConfiguration.AdditionalInstallationTasks != null)
-				tasks.AddRange(this.Cluster.ClusterConfiguration.AdditionalInstallationTasks);
+			var tasks = new List<IClusterComposeTask>(BeforeStart);
+			if (this.Cluster.ClusterConfiguration.AdditionalBeforeNodeStartedTasks != null)
+				tasks.AddRange(this.Cluster.ClusterConfiguration.AdditionalBeforeNodeStartedTasks);
 
 			Itterate(tasks, (t, c, fs) => t.Run(c));
 		}
 
-		public void OnBeforeStart() => Itterate(BeforeStart, (t, c, fs) => t.Run(c));
 
 		public void OnAfterStart()
 		{

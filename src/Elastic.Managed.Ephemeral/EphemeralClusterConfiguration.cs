@@ -8,7 +8,7 @@ using Elastic.Managed.Ephemeral.Tasks;
 
 namespace Elastic.Managed.Ephemeral
 {
-	public class EphemeralClusterConfiguration : ClusterConfiguration
+	public class EphemeralClusterConfiguration : ClusterConfiguration<EphemeralFileSystem>
 	{
 		private static string UniqueishSuffix => Guid.NewGuid().ToString("N").Substring(0, 6);
 		private static string EphemeralClusterName => $"ephemeral-cluster-{UniqueishSuffix}";
@@ -37,7 +37,7 @@ namespace Elastic.Managed.Ephemeral
 		public bool EnableSsl => this.Features.HasFlag(ClusterFeatures.SSL) && XPackInstalled;
 		public bool EnableSecurity => this.Features.HasFlag(ClusterFeatures.Security) && XPackInstalled;
 
-		public IList<IClusterComposeTask> AdditionalInstallationTasks { get; } = new List<IClusterComposeTask>();
+		public IList<IClusterComposeTask> AdditionalBeforeNodeStartedTasks { get; } = new List<IClusterComposeTask>();
 
 		public IList<IClusterComposeTask> AdditionalAfterStartedTasks { get; } = new List<IClusterComposeTask>();
 		/// <summary>
@@ -81,6 +81,7 @@ namespace Elastic.Managed.Ephemeral
 
 			}
 		}
+
 
 	}
 }

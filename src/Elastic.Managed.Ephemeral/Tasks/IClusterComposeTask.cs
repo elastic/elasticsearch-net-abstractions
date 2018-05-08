@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -51,9 +52,16 @@ namespace Elastic.Managed.Ephemeral.Tasks
 			Func<HttpClient, Uri, CancellationToken, Task<HttpResponseMessage>> verb)
 		{
 			var statusUrl = new UriBuilder(cluster.NodesUris().First()) { Path = path, Query = query }.Uri;
+
 			var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(20));
 			using (var client = new HttpClient { Timeout = TimeSpan.FromSeconds(20)})
 			{
+				if (cluster.ClusterConfiguration.EnableSecurity)
+				{
+                    var byteArray = Encoding.ASCII.GetBytes($"{ClusterAuthentication.Admin.Username}:{ClusterAuthentication.Admin.Password}");
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+				}
+
 				try
 				{
 					var response = verb(client, statusUrl, tokenSource.Token).ConfigureAwait(false).GetAwaiter().GetResult();
