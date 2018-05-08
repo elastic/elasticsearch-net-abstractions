@@ -39,7 +39,7 @@ namespace ScratchPad
 //			}
 
 			var plugins = new ElasticsearchPlugins(ElasticsearchPlugin.RepositoryAzure, ElasticsearchPlugin.IngestAttachment);
-			var config = new EphemeralClusterConfiguration("6.2.3", ClusterFeatures.XPack, plugins, 2)
+			var config = new EphemeralClusterConfiguration("6.2.3", ClusterFeatures.XPack, plugins, 1)
 			{
 				ShowElasticsearchOutputAfterStarted = false
 			};
