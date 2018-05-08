@@ -72,13 +72,19 @@ namespace Elastic.Managed.Ephemeral
 			if (!this.XPackInstalled) return;
 
 			var securityEnabled = this.EnableSecurity.ToString().ToLowerInvariant();
+            var sslEnabled = this.EnableSsl.ToString().ToLowerInvariant();
 			this.AddSecuritySetting("enabled", securityEnabled);
-			if (this.EnableSecurity)
-			{
-                var sslEnabled = this.EnableSsl.ToString().ToLowerInvariant();
-                this.AddSecuritySetting("http.ssl.enabled", sslEnabled);
-                this.AddSecuritySetting("authc.realms.pki1.enabled", sslEnabled);
 
+            this.AddSecuritySetting("http.ssl.enabled", sslEnabled);
+            this.AddSecuritySetting("authc.realms.pki1.enabled", sslEnabled);
+            this.AddSecuritySetting("transport.ssl.enabled", sslEnabled);
+            this.AddSecuritySetting("authc.token.enabled", "true", ">=5.5.0");
+
+			if (this.EnableSsl)
+			{
+                this.Add("xpack.ssl.key", this.FileSystem.NodePrivateKey);
+                this.Add("xpack.ssl.certificate", this.FileSystem.NodeCertificate);
+                this.Add("xpack.ssl.certificate_authorities", this.FileSystem.CaCertificate);
 			}
 		}
 

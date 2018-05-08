@@ -34,7 +34,7 @@ namespace Elastic.Managed.Ephemeral
 
 		protected override void OnAfterStarted() => this.Composer.OnAfterStart();
 
-		public ICollection<Uri> NodesUris(string hostName = "localhost")
+		public ICollection<Uri> NodesUris(string hostName = "ipv4.fiddler")
 		{
 			var ssl = this.ClusterConfiguration.EnableSsl ? "s" : "";
 			return this.Nodes

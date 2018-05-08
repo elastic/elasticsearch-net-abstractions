@@ -7,6 +7,7 @@ using Elastic.Managed.Ephemeral.Plugins;
 using Elasticsearch.Net;
 using Nest;
 using ProcNet.Std;
+using static Elastic.Managed.Ephemeral.ClusterFeatures;
 
 namespace ScratchPad
 {
@@ -38,10 +39,9 @@ namespace ScratchPad
 //				cluster.Start();
 //			}
 
-			var plugins = new ElasticsearchPlugins(ElasticsearchPlugin.RepositoryAzure, ElasticsearchPlugin.IngestAttachment);
-			var config = new EphemeralClusterConfiguration("6.2.3", ClusterFeatures.XPack, plugins, 1)
+			var config = new EphemeralClusterConfiguration("6.2.3", XPack | Security | SSL, null, 1)
 			{
-				ShowElasticsearchOutputAfterStarted = false
+				ShowElasticsearchOutputAfterStarted = true
 			};
 			using (var cluster = new EphemeralCluster(config))
 			{
@@ -50,11 +50,12 @@ namespace ScratchPad
 				var nodes = cluster.NodesUris();
 				var connectionPool = new StaticConnectionPool(nodes);
 				var settings = new ConnectionSettings(connectionPool).EnableDebugMode();
+				if (config.EnableSecurity)
+					settings = settings.BasicAuthentication(ClusterAuthentication.Admin.Username, ClusterAuthentication.Admin.Password);
+
 				var client = new ElasticClient(settings);
 
-				Console.Write(client.RootNodeInfo().DebugInformation);
-				Thread.Sleep(1000 * 5);
-				Console.Write(client.CatNodes().DebugInformation);
+				Console.Write(client.XPackInfo().DebugInformation);
 			}
 
 			Console.WriteLine($".. DONE ...");

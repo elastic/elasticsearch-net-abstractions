@@ -54,7 +54,15 @@ namespace Elastic.Managed.Ephemeral.Tasks
 			var statusUrl = new UriBuilder(cluster.NodesUris().First()) { Path = path, Query = query }.Uri;
 
 			var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(20));
-			using (var client = new HttpClient { Timeout = TimeSpan.FromSeconds(20)})
+			var handler = new HttpClientHandler
+			{
+				AutomaticDecompression =  DecompressionMethods.Deflate | DecompressionMethods.GZip | DecompressionMethods.None,
+			};
+			if (cluster.ClusterConfiguration.EnableSsl)
+			{
+				handler.ServerCertificateCustomValidationCallback += (m, c,cn, p) => true;
+			}
+			using (var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(20)})
 			{
 				if (cluster.ClusterConfiguration.EnableSecurity)
 				{
