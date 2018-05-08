@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Elastic.Managed.Configuration;
+using Elastic.Xunit.XunitPlumbing;
 
 namespace Elastic.Xunit
 {

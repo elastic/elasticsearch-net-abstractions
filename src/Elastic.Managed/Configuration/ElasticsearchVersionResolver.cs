@@ -22,6 +22,7 @@ namespace Elastic.Managed.Configuration
 		/// </summary>
 		public static ElasticsearchVersion From(string managedVersionString)
 		{
+			if (string.IsNullOrWhiteSpace(managedVersionString)) return null;
 			var version = managedVersionString;
 			var zip = $"elasticsearch-{version}.zip";
 			ReleaseState state;

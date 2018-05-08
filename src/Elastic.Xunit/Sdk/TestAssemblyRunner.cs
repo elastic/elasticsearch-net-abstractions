@@ -107,11 +107,19 @@ namespace Elastic.Xunit.Sdk
 				var clusterName = type?.Name.Replace("Cluster", "") ?? "UNKNOWN";
 				if (!this.MatchesClusterFilter(clusterName)) continue;
 
-
 				var dop= @group.Key?.ClusterConfiguration?.MaxConcurrency ?? defaultMaxConcurrency;
 				dop = dop <= 0 ? defaultMaxConcurrency : dop;
 
 				var timeout = @group.Key?.ClusterConfiguration?.Timeout ?? TimeSpan.FromMinutes(2);
+
+				var skipReasons = @group.SelectMany(g => g.TestCases.Select(t => t.SkipReason)).ToList();
+				var allSkipped = skipReasons.All(r=>!string.IsNullOrWhiteSpace(r));
+				if (allSkipped)
+				{
+					Console.WriteLine($" -> All tests from {clusterName} are skipped under the current configuration");
+					this.Summaries.Add(new RunSummary() { Total = skipReasons.Count, Skipped = skipReasons.Count});
+					continue;
+				}
 
 				this.ClusterTotals.Add(clusterName, Stopwatch.StartNew());
 				//We group over each cluster group and execute test classes pertaining to that cluster

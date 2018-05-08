@@ -28,7 +28,7 @@ namespace Elastic.Xunit.Example
 
 	public abstract class MyClusterBase : XunitClusterBase, IMyCluster
 	{
-		protected MyClusterBase() : base(new XunitClusterConfiguration("6.0.0")) { }
+		protected MyClusterBase() : base(new XunitClusterConfiguration(MyRunOptions.TestVersion)) { }
 
 		public IElasticClient Client => this.GetOrAddClient();
 	}
@@ -43,7 +43,7 @@ namespace Elastic.Xunit.Example
 
 	public class TestGenericCluster : XunitClusterBase<XunitClusterConfiguration>, IMyCluster
 	{
-		public TestGenericCluster() : base(new XunitClusterConfiguration("6.0.0")) { }
+		public TestGenericCluster() : base(new XunitClusterConfiguration(MyRunOptions.TestVersion)) { }
 
 		public IElasticClient Client => this.GetOrAddClient();
 

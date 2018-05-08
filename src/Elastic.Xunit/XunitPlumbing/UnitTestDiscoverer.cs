@@ -14,8 +14,9 @@ namespace Elastic.Xunit.XunitPlumbing
 	{
 		public UnitTestDiscoverer(IMessageSink diagnosticMessageSink) : base(diagnosticMessageSink) { }
 
-		protected override bool SkipMethod(ITestFrameworkDiscoveryOptions discoveryOptions, ITestMethod testMethod, IAttributeInfo factAttribute)
+		protected override bool SkipMethod(ITestFrameworkDiscoveryOptions discoveryOptions, ITestMethod testMethod, out string skipReason)
 		{
+			skipReason = null;
 			var runUnitTests = discoveryOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.RunUnitTests));
 			return !runUnitTests;
 

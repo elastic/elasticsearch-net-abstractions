@@ -30,7 +30,7 @@ namespace Elastic.Managed.Configuration
 		public bool ShowElasticsearchOutputAfterStarted { get; set; } = true;
 
 		/// <summary>
-		/// Copy of <see cref="ClusterConfiguration.DefaultNodeSettings" />. Add individual node settings here.
+		/// Copy of <see cref="IClusterConfiguration{TFileSystem}.DefaultNodeSettings" />. Add individual node settings here.
 		/// </summary>
 		public NodeSettings Settings { get; }
 

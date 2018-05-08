@@ -15,6 +15,13 @@ namespace ScratchPad
 	{
 		public static int Main()
 		{
+			ElasticsearchVersion v = null;
+
+
+			var x = v != null;
+
+
+
 //			var clusterConfiguration = new EphemeralClusterConfiguration("6.0.0", numberOfNodes: 2);
 //			var ephemeralCluster = new EphemeralCluster(clusterConfiguration);
 //			var nodeConfiguration = new NodeConfiguration(clusterConfiguration, 9200);
@@ -39,26 +46,26 @@ namespace ScratchPad
 //				cluster.Start();
 //			}
 
-			var config = new EphemeralClusterConfiguration("6.2.3", XPack | Security | SSL, null, 1)
-			{
-				ShowElasticsearchOutputAfterStarted = true
-			};
-			using (var cluster = new EphemeralCluster(config))
-			{
-				cluster.Start();
-
-				var nodes = cluster.NodesUris();
-				var connectionPool = new StaticConnectionPool(nodes);
-				var settings = new ConnectionSettings(connectionPool).EnableDebugMode();
-				if (config.EnableSecurity)
-					settings = settings.BasicAuthentication(ClusterAuthentication.Admin.Username, ClusterAuthentication.Admin.Password);
-
-				var client = new ElasticClient(settings);
-
-				Console.Write(client.XPackInfo().DebugInformation);
-			}
-
-			Console.WriteLine($".. DONE ...");
+//			var config = new EphemeralClusterConfiguration("6.2.3", XPack | Security | SSL, null, 1)
+//			{
+//				ShowElasticsearchOutputAfterStarted = true
+//			};
+//			using (var cluster = new EphemeralCluster(config))
+//			{
+//				cluster.Start();
+//
+//				var nodes = cluster.NodesUris();
+//				var connectionPool = new StaticConnectionPool(nodes);
+//				var settings = new ConnectionSettings(connectionPool).EnableDebugMode();
+//				if (config.EnableSecurity)
+//					settings = settings.BasicAuthentication(ClusterAuthentication.Admin.Username, ClusterAuthentication.Admin.Password);
+//
+//				var client = new ElasticClient(settings);
+//
+//				Console.Write(client.XPackInfo().DebugInformation);
+//			}
+//
+//			Console.WriteLine($".. DONE ...");
 			return 0;
 		}
 
