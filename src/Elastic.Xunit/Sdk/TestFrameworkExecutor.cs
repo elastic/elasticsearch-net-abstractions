@@ -13,17 +13,17 @@ namespace Elastic.Xunit.Sdk
 	{
 		public TestFrameworkExecutor(AssemblyName a, ISourceInformationProvider sip, IMessageSink d) : base(a, sip, d) { }
 
-		public ElasticsearchVersion Version { get; set; }
-
 		public ElasticXunitRunOptions Options { get; set; }
 
 		public override void RunAll(IMessageSink executionMessageSink, ITestFrameworkDiscoveryOptions discoveryOptions, ITestFrameworkExecutionOptions executionOptions)
 		{
+			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.Version), this.Options.Version);
 			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), this.Options.RunIntegrationTests);
 			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), this.Options.RunUnitTests);
 			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.TestFilter), this.Options.TestFilter);
 			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.ClusterFilter), this.Options.ClusterFilter);
 
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.Version), this.Options.Version);
 			executionOptions.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), this.Options.RunIntegrationTests);
 			executionOptions.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), this.Options.RunUnitTests);
 			executionOptions.SetValue(nameof(ElasticXunitRunOptions.TestFilter), this.Options.TestFilter);
@@ -35,6 +35,7 @@ namespace Elastic.Xunit.Sdk
 
 		public override void RunTests(IEnumerable<ITestCase> testCases, IMessageSink executionMessageSink, ITestFrameworkExecutionOptions executionOptions)
 		{
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.Version), this.Options.Version);
 			executionOptions.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), this.Options.RunIntegrationTests);
 			executionOptions.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), this.Options.RunUnitTests);
 			executionOptions.SetValue(nameof(ElasticXunitRunOptions.TestFilter), this.Options.TestFilter);
@@ -44,6 +45,7 @@ namespace Elastic.Xunit.Sdk
 
 		protected override async void RunTestCases(IEnumerable<IXunitTestCase> testCases, IMessageSink sink, ITestFrameworkExecutionOptions options)
 		{
+			options.SetValue(nameof(ElasticXunitRunOptions.Version), this.Options.Version);
 			options.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), this.Options.RunIntegrationTests);
 			options.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), this.Options.RunUnitTests);
 			options.SetValue(nameof(ElasticXunitRunOptions.TestFilter), this.Options.TestFilter);

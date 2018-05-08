@@ -28,11 +28,12 @@ namespace Elastic.Xunit.XunitPlumbing
 			var runIntegrationTests = discoveryOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.RunIntegrationTests));
 			if (!runIntegrationTests) return true;
 
-			var v = discoveryOptions.GetValue<ElasticsearchVersion>(nameof(TestFrameworkExecutor.Version));
+			var v = discoveryOptions.GetValue<ElasticsearchVersion>(nameof(ElasticXunitRunOptions.Version));
 
 			//Skip if the version we are testing against is attributed to be skipped do not run the test
 			var skipVersionRanges = GetAttribute<SkipVersionAttribute, IList<Range>>(testMethod, nameof(SkipVersionAttribute.Ranges));
-			if (skipVersionRanges != null && skipVersionRanges.Any(range => range.IsSatisfied(v))) return true;
+			if (v != null && skipVersionRanges != null && skipVersionRanges.Count > 0 && skipVersionRanges.Any(range => range.IsSatisfied(v)))
+				return true;
 
 			var skipTests = GetAttributes<SkipTestAttributeBase, bool>(testMethod, nameof(SkipTestAttributeBase.Skip));
 			return skipTests.Any(skip => skip);

@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Elastic.Managed.Configuration;
 
 namespace Elastic.Xunit
 {
@@ -16,6 +17,8 @@ namespace Elastic.Xunit
 		public string TestFilter { get; set; }
 		/// <summary> A global cluster filter that can be used to only run certain cluster's tests, accepts a comma separated list of filters</summary>
 		public string ClusterFilter { get; set; }
+		/// <summary> Hints the execution engine what version is under test, required for <see cref="SkipVersionAttribute"/> to kick in</summary>
+		public ElasticsearchVersion Version { get; set; }
 
 		/// <summary>
 		/// Gets called when the tests have fininshed running succesfully

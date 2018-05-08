@@ -14,6 +14,8 @@ namespace Elastic.Xunit.XunitPlumbing
 		public SkipVersionAttribute(string skipVersionRangesSeparatedByComma, string reason)
 		{
 			this.Ranges = skipVersionRangesSeparatedByComma.Split(',')
+				.Select(r=>r.Trim())
+				.Where(r=>!string.IsNullOrWhiteSpace(r))
 				.Select(r => new Range(r))
 				.ToList();
 		}
