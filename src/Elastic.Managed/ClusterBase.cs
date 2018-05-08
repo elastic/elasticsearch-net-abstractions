@@ -47,7 +47,7 @@ namespace Elastic.Managed
 				})
 				.Select(n => new ElasticsearchNode(n)
 				{
-					AssumeStartedOnNotEnoughMasterPing = this.ClusterConfiguration.NumberOfNodes > 1
+					AssumeStartedOnNotEnoughMasterPing = this.ClusterConfiguration.NumberOfNodes > 1,
 				})
 				.ToList();
 			this.Nodes = new ReadOnlyCollection<ElasticsearchNode>(nodes);
