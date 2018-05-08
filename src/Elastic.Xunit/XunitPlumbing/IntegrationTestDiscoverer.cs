@@ -31,8 +31,8 @@ namespace Elastic.Xunit.XunitPlumbing
 			var v = discoveryOptions.GetValue<ElasticsearchVersion>(nameof(TestFrameworkExecutor.Version));
 
 			//Skip if the version we are testing against is attributed to be skipped do not run the test
-			var skipVersionRange = GetAttribute<SkipVersionAttribute, IList<Range>>(testMethod, nameof(SkipVersionAttribute.Ranges));
-			if (skipVersionRange != null) return v.InRange(skipVersionRange.ToString());
+			var skipVersionRanges = GetAttribute<SkipVersionAttribute, IList<Range>>(testMethod, nameof(SkipVersionAttribute.Ranges));
+			if (skipVersionRanges != null && skipVersionRanges.Any(range => range.IsSatisfied(v))) return true;
 
 			var skipTests = GetAttributes<SkipTestAttributeBase, bool>(testMethod, nameof(SkipTestAttributeBase.Skip));
 			return skipTests.Any(skip => skip);
