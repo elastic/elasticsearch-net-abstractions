@@ -56,6 +56,9 @@ namespace Elastic.Managed.Configuration
 		public int NumberOfNodes { get; }
 		public int StartingPortNumber { get; set; } = 9200;
 
+		/// <summary> Will print the contents of all the yaml files when starting the cluster up, great for debugging purposes</summary>
+		public bool PrintYamlFilesInConfigFolder { get; set; }
+
 		/// <summary>
 		/// Wheter <see cref="ElasticsearchNode" /> should continue to write output to console after it has started.
 		/// <para>Defaults to true but useful to turn of if it proofs to be too noisy </para>

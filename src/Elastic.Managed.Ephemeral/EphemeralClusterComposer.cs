@@ -68,6 +68,9 @@ namespace Elastic.Managed.Ephemeral
 			if (this.Cluster.ClusterConfiguration.AdditionalBeforeNodeStartedTasks != null)
 				tasks.AddRange(this.Cluster.ClusterConfiguration.AdditionalBeforeNodeStartedTasks);
 
+			if (this.Cluster.ClusterConfiguration.PrintYamlFilesInConfigFolder)
+				tasks.Add(new PrintYamlContents());
+
 			Itterate(tasks, (t, c, fs) => t.Run(c));
 		}
 

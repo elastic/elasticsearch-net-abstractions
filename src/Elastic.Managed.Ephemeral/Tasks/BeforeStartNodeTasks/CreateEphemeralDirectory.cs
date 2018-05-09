@@ -50,5 +50,6 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 				File.Copy(sourcePath, targetPath, true);
 			}
 		}
+
 	}
 }

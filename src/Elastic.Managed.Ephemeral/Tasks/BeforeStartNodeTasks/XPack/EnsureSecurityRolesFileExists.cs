@@ -22,6 +22,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack
 				cluster.Writer.WriteDiagnostic($"{{{nameof(EnsureSecurityRolesFileExists)}}} {rolesConfig} does not exist");
 				Directory.CreateDirectory(Path.Combine(cluster.FileSystem.ConfigPath, folder));
 				File.WriteAllText(rolesConfig, string.Empty);
+
 			}
 
 			var lines = File.ReadAllLines(rolesConfig).ToList();
