@@ -1,3 +1,4 @@
+using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
@@ -18,7 +19,13 @@ namespace Elastic.Xunit.XunitPlumbing
 		{
 			skipReason = null;
 			var runUnitTests = discoveryOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.RunUnitTests));
-			return !runUnitTests;
+			if (!runUnitTests) return true;
+
+			var skipTests = GetAttributes<SkipTestAttributeBase>(testMethod).FirstOrDefault(a=>a.GetNamedArgument<bool>(nameof(SkipTestAttributeBase.Skip)));
+			if (skipTests == null) return false;
+
+			skipReason = skipTests.GetNamedArgument<string>(nameof(SkipTestAttributeBase.Reason));
+			return true;
 
 		}
 	}
