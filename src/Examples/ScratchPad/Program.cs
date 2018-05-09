@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 using Elastic.Managed;
 using Elastic.Managed.Configuration;
@@ -16,10 +17,6 @@ namespace ScratchPad
 		public static int Main()
 		{
 			ElasticsearchVersion v = null;
-
-
-			var x = v != null;
-
 
 
 //			var clusterConfiguration = new EphemeralClusterConfiguration("6.0.0", numberOfNodes: 2);
@@ -46,24 +43,26 @@ namespace ScratchPad
 //				cluster.Start();
 //			}
 
-//			var config = new EphemeralClusterConfiguration("6.2.3", XPack | Security | SSL, null, 1)
-//			{
-//				ShowElasticsearchOutputAfterStarted = true
-//			};
-//			using (var cluster = new EphemeralCluster(config))
-//			{
-//				cluster.Start();
-//
-//				var nodes = cluster.NodesUris();
-//				var connectionPool = new StaticConnectionPool(nodes);
-//				var settings = new ConnectionSettings(connectionPool).EnableDebugMode();
-//				if (config.EnableSecurity)
-//					settings = settings.BasicAuthentication(ClusterAuthentication.Admin.Username, ClusterAuthentication.Admin.Password);
-//
-//				var client = new ElasticClient(settings);
-//
-//				Console.Write(client.XPackInfo().DebugInformation);
-//			}
+			var config = new EphemeralClusterConfiguration("6.2.3", XPack | SSL, null, 1)
+			{
+				ShowElasticsearchOutputAfterStarted = true
+			};
+			using (var cluster = new EphemeralCluster(config))
+			{
+				cluster.Start();
+
+				var nodes = cluster.NodesUris();
+				var connectionPool = new StaticConnectionPool(nodes);
+				var settings = new ConnectionSettings(connectionPool).EnableDebugMode();
+				if (config.EnableSecurity)
+					settings = settings.BasicAuthentication(ClusterAuthentication.Admin.Username, ClusterAuthentication.Admin.Password);
+				if (config.EnableSecurity)
+					settings = settings.ServerCertificateValidationCallback(CertificateValidations.AllowAll);
+
+				var client = new ElasticClient(settings);
+
+				Console.Write(client.XPackInfo().DebugInformation);
+			}
 //
 //			Console.WriteLine($".. DONE ...");
 			return 0;

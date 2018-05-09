@@ -33,9 +33,10 @@ namespace Elastic.Managed.Ephemeral
 		public ClusterFeatures Features { get; }
 		public ElasticsearchPlugins Plugins { get; }
 
-		public bool XPackInstalled => this.Features.HasFlag(ClusterFeatures.XPack) || this.Plugins.Any(p => p.Moniker == "x-pack");
-		public bool EnableSsl => this.Features.HasFlag(ClusterFeatures.SSL) && XPackInstalled;
-		public bool EnableSecurity => this.Features.HasFlag(ClusterFeatures.Security) && XPackInstalled;
+		public bool XPackInstalled => this.Features.HasFlag(ClusterFeatures.XPack)
+		                              || this.Plugins.Any(p => p.Moniker == "x-pack") || this.EnableSsl || this.EnableSecurity;
+		public bool EnableSecurity => this.Features.HasFlag(ClusterFeatures.Security) || this.EnableSsl;
+		public bool EnableSsl => this.Features.HasFlag(ClusterFeatures.SSL);
 
 		public IList<IClusterComposeTask> AdditionalBeforeNodeStartedTasks { get; } = new List<IClusterComposeTask>();
 
@@ -76,9 +77,12 @@ namespace Elastic.Managed.Ephemeral
 			this.AddSecuritySetting("enabled", securityEnabled);
 
             this.AddSecuritySetting("http.ssl.enabled", sslEnabled);
-            this.AddSecuritySetting("authc.realms.pki1.enabled", sslEnabled);
             this.AddSecuritySetting("transport.ssl.enabled", sslEnabled);
             this.AddSecuritySetting("authc.token.enabled", "true", ">=5.5.0");
+			if (this.EnableSecurity)
+			{
+	           	this.AddSecuritySetting("authc.realms.pki1.enabled", sslEnabled);
+			}
 
 			if (this.EnableSsl)
 			{
