@@ -44,7 +44,7 @@ namespace Elastic.Xunit.XunitPlumbing
 			where TAttribute : Attribute
 		{
 			var classAttributes = testMethod.TestClass.Class.GetCustomAttributes(typeof(TAttribute)) ?? Enumerable.Empty<IAttributeInfo>();
-			var methodAttributes = testMethod.Method.GetCustomAttributes(typeof(TAttribute)) ?? Enumerable.Empty<IAttributeInfo>();;
+			var methodAttributes = testMethod.Method.GetCustomAttributes(typeof(TAttribute)) ?? Enumerable.Empty<IAttributeInfo>();
 			var attribute = classAttributes.Concat(methodAttributes).FirstOrDefault();
 			return attribute == null ? default(TValue) : attribute.GetNamedArgument<TValue>(propertyName);
 		}
@@ -52,8 +52,8 @@ namespace Elastic.Xunit.XunitPlumbing
 		protected static IList<IAttributeInfo> GetAttributes<TAttribute>(ITestMethod testMethod)
 			where TAttribute : Attribute
 		{
-			var classAttributes = testMethod.TestClass.Class.GetCustomAttributes(typeof(TAttribute)) ?? Enumerable.Empty<IAttributeInfo>();;
-			var methodAttributes = testMethod.Method.GetCustomAttributes(typeof(TAttribute)) ?? Enumerable.Empty<IAttributeInfo>();;
+			var classAttributes = testMethod.TestClass.Class.GetCustomAttributes(typeof(TAttribute)) ?? Enumerable.Empty<IAttributeInfo>();
+			var methodAttributes = testMethod.Method.GetCustomAttributes(typeof(TAttribute)) ?? Enumerable.Empty<IAttributeInfo>();
 			return classAttributes.Concat(methodAttributes).ToList();
 		}
 
