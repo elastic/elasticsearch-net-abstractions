@@ -3,7 +3,7 @@ using Elastic.Managed.Ephemeral;
 using Elasticsearch.Net;
 using Nest;
 
-namespace Elastic.Xunit.Example
+namespace Elastic.Xunit.ExampleComplex
 {
 	internal static class EphemeralClusterExtensions
 	{

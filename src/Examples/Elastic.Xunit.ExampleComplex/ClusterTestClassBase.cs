@@ -1,10 +1,8 @@
-using Elastic.Managed;
 using Elastic.Managed.Ephemeral;
-using Elastic.Xunit.Sdk;
-using Elasticsearch.Net;
+using Elastic.Xunit.XunitPlumbing;
 using Nest;
 
-namespace Elastic.Xunit.Example
+namespace Elastic.Xunit.ExampleComplex
 {
 	public abstract class ClusterTestClassBase<TCluster> : IClusterFixture<TCluster>
 		where TCluster : IEphemeralCluster<EphemeralClusterConfiguration>, IMyCluster, new()

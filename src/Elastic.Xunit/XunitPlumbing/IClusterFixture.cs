@@ -1,7 +1,7 @@
 ﻿using Elastic.Managed;
 using Elastic.Managed.Ephemeral;
 
-namespace Elastic.Xunit.Sdk
+namespace Elastic.Xunit.XunitPlumbing
 {
 	// ReSharper disable once UnusedTypeParameter
 	// used by the runner to new() the proper cluster

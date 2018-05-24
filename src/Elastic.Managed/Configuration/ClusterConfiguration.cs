@@ -60,7 +60,7 @@ namespace Elastic.Managed.Configuration
 		public bool PrintYamlFilesInConfigFolder { get; set; }
 
 		/// <summary>
-		/// Wheter <see cref="ElasticsearchNode" /> should continue to write output to console after it has started.
+		/// Whether <see cref="ElasticsearchNode" /> should continue to write output to console after it has started.
 		/// <para>Defaults to true but useful to turn of if it proofs to be too noisy </para>
 		/// </summary>
 		public bool ShowElasticsearchOutputAfterStarted { get; set; } = true;

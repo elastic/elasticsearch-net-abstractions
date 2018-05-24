@@ -10,10 +10,13 @@ namespace Elastic.Xunit.Sdk
 		public ElasticTestFrameworkDiscoverer(IAssemblyInfo assemblyInfo, ISourceInformationProvider sourceProvider, IMessageSink diagnosticMessageSink, IXunitTestCollectionFactory collectionFactory = null) : base(assemblyInfo, sourceProvider, diagnosticMessageSink, collectionFactory)
 		{
 			var a = Assembly.Load(new AssemblyName(assemblyInfo.Name));
-			var options = a.GetCustomAttributes<ElasticXunitConfigurationAttribute>().FirstOrDefault()?.Options ?? new ElasticXunitRunOptions();
+			var options = a.GetCustomAttribute<ElasticXunitConfigurationAttribute>()?.Options ?? new ElasticXunitRunOptions();
 			this.Options = options;
 		}
 
+		/// <summary>
+		/// The options for
+		/// </summary>
 		public ElasticXunitRunOptions Options { get; }
 
 		protected override bool FindTestsForType(ITestClass testClass, bool includeSourceInformation, IMessageBus messageBus, ITestFrameworkDiscoveryOptions discoveryOptions)
