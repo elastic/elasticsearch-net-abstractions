@@ -3,6 +3,9 @@ using Elastic.Managed.Configuration;
 
 namespace Elastic.Managed.Ephemeral.Plugins
 {
+	/// <summary>
+	/// An Elasticsearch plugin
+	/// </summary>
 	public class ElasticsearchPlugin
 	{
 
@@ -54,10 +57,10 @@ namespace Elastic.Managed.Ephemeral.Plugins
 		/// <summary> The moniker the plugin is known by in Elasticsearch </summary>
 		public string Moniker { get; }
 
-		/// <summary> what name to check under /_cat/plugins for the plugins existense</summary>
+		/// <summary> what name to check under /_cat/plugins for the plugins existence</summary>
 		public string ListedPluginName(ElasticsearchVersion version) => _getListedPluginName(version);
 
-		/// <summary> The folder name under /plugins, defaults to moniker </summary>
+		/// <summary> The folder name under /plugins, defaults to the value of <see cref="Moniker"/></summary>
 		public virtual string FolderName { get; }
 
 		public bool IsValid(ElasticsearchVersion version) => _isValid(version);

@@ -15,6 +15,7 @@ namespace Elastic.Managed.Configuration
 		int NumberOfNodes { get; }
 		int StartingPortNumber { get; set; }
 		bool ShowElasticsearchOutputAfterStarted { get; set; }
+		bool CacheEsHomeInstallation { get; set; }
 
 		string CreateNodeName(int? node);
 	}
@@ -73,6 +74,8 @@ namespace Elastic.Managed.Configuration
 		/// <para>Defaults to <c>true</c></para>
 		/// </summary>
 		public bool ShowElasticsearchOutputAfterStarted { get; set; } = true;
+
+		public bool CacheEsHomeInstallation { get; set; }
 
 		/// <summary>The node settings to apply to each started node</summary>
 		public NodeSettings DefaultNodeSettings { get; } = new NodeSettings();

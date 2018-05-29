@@ -31,6 +31,7 @@ namespace Elastic.Managed.Ephemeral
 		public string ClientCertificateFilename => "john_doe";
 
 		public string CertificatesPath => Path.Combine(this.ConfigPath, this.CertificateFolderName);
+
 		public string CaCertificate => Path.Combine(this.CertificatesPath, "ca", "ca") + ".crt";
 		public string NodePrivateKey => Path.Combine(this.CertificatesPath, this.CertificateNodeName, this.CertificateNodeName) + ".key";
 		public string NodeCertificate => Path.Combine(this.CertificatesPath, this.CertificateNodeName, this.CertificateNodeName) + ".crt";

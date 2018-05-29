@@ -5,6 +5,9 @@ namespace Elastic.Managed.Ephemeral.Plugins
 	[AttributeUsage(AttributeTargets.Field)]
 	public class MonikerAttribute : Attribute
 	{
+		/// <summary>
+		/// The moniker
+		/// </summary>
 		public string Moniker { get; }
 
 		public MonikerAttribute(string moniker)

@@ -2,7 +2,6 @@ using System.IO;
 using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.FileSystem;
 using static System.IO.Directory;
-using static System.IO.SearchOption;
 
 namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 {
@@ -27,29 +26,24 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 				CreateDirectory(f.ConfigPath);
 
 			}
-			var target = f.ConfigPath;
 
-			var source = Path.Combine(f.ElasticsearchHome, "config");
+			CopyHomeConfigToEphemeralConfig(cluster, f, fs);
+		}
+
+		private static void CopyHomeConfigToEphemeralConfig(IEphemeralCluster<EphemeralClusterConfiguration> cluster, EphemeralFileSystem ephemeralFileSystem, INodeFileSystem fs)
+		{
+			var target = ephemeralFileSystem.ConfigPath;
+			var cachedEsHomeFolder = Path.Combine(fs.LocalFolder, cluster.GetCacheFolderName());
+			var homeSource = cluster.CachingAndCachedHomeExists() ? cachedEsHomeFolder : fs.ElasticsearchHome;
+			var source = Path.Combine(homeSource, "config");
 			if (!Exists(source))
 			{
 				cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateEphemeralDirectory)}}} source config {{{source}}} does not exist nothing to copy");
 				return;
 			}
 
-			foreach (var sourceDir in GetDirectories(source, "*", AllDirectories))
-			{
-				var targetDir = sourceDir.Replace(source, target);
-				cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateEphemeralDirectory)}}} creating config folder {{{targetDir}}}");
-				CreateDirectory(targetDir);
-			}
-
-			foreach (var sourcePath in GetFiles(source, "*.*", AllDirectories))
-			{
-				var targetPath = sourcePath.Replace(source, target);
-				cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateEphemeralDirectory)}}} copying config file to {{{targetPath}}}");
-				File.Copy(sourcePath, targetPath, true);
-			}
+			cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateEphemeralDirectory)}}} copying cached {{{source}}} as to [{target}]");
+			CopyFolder(source, target);
 		}
-
 	}
 }

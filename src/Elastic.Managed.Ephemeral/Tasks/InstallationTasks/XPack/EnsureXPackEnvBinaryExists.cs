@@ -8,6 +8,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack
 		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
 			if (!cluster.ClusterConfiguration.XPackInstalled) return;
+			if (cluster.CachingAndCachedHomeExists()) return;
 
 			var config = cluster.ClusterConfiguration;
 			var v = config.Version;

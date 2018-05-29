@@ -1,12 +1,10 @@
 ﻿using Elastic.Managed.Configuration;
-using Elastic.Xunit.Example;
-using Elastic.Xunit.XunitPlumbing;
-using FluentAssertions;
+using Elastic.Xunit.ExampleComplex;
 
 [assembly: Xunit.TestFrameworkAttribute("Elastic.Xunit.Sdk.ElasticTestFramework", "Elastic.Xunit")]
 [assembly: Elastic.Xunit.ElasticXunitConfiguration(typeof(MyRunOptions))]
 
-namespace Elastic.Xunit.Example
+namespace Elastic.Xunit.ExampleComplex
 {
 	/// <summary>
 	/// Allows us to control the custom xunit test pipeline
