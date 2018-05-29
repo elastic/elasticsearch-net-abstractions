@@ -45,13 +45,12 @@ namespace Elastic.Xunit.Sdk
 
 			//bit side effecty, sets up _assemblyFixtureMappings before possibly letting xunit do its regular concurrency thing
 			this._grouped = (from c in tests
-				let cluster = ClusterFixture(c.Item2.First().TestMethod.TestClass)
-				let testcase = new GroupedByCluster {Collection = c.Item1, TestCases = c.Item2, Cluster = cluster}
-				group testcase by testcase.Cluster
-				into g
-				orderby g.Count() descending
-				select g)
-				.ToList();
+							 let cluster = ClusterFixture(c.Item2.First().TestMethod.TestClass)
+							 let testcase = new GroupedByCluster { Collection = c.Item1, TestCases = c.Item2, Cluster = cluster }
+							 group testcase by testcase.Cluster
+							 into g
+							 orderby g.Count() descending
+							 select g).ToList();
 		}
 
 		private bool RunIntegrationTests { get; }
@@ -90,7 +89,7 @@ namespace Elastic.Xunit.Sdk
 				.ForEachAsync(defaultMaxConcurrency, async g => { await RunTestCollections(messageBus, ctx, g, testFilters); });
 			//foreach (var g in this._grouped) g.Key?.Dispose();
 
-			return new RunSummary()
+			return new RunSummary
 			{
 				Total = this.Summaries.Sum(s => s.Total),
 				Failed = this.Summaries.Sum(s => s.Failed),
@@ -104,7 +103,7 @@ namespace Elastic.Xunit.Sdk
 			foreach (var group in this._grouped)
 			{
 				var type = @group.Key?.GetType();
-				var clusterName = type?.Name.Replace("Cluster", "") ?? "UNKNOWN";
+				var clusterName = type?.Name.Replace("Cluster", string.Empty) ?? "UNKNOWN";
 				if (!this.MatchesClusterFilter(clusterName)) continue;
 
 				var dop= @group.Key?.ClusterConfiguration?.MaxConcurrency ?? defaultMaxConcurrency;
@@ -117,13 +116,12 @@ namespace Elastic.Xunit.Sdk
 				if (allSkipped)
 				{
 					Console.WriteLine($" -> All tests from {clusterName} are skipped under the current configuration");
-					this.Summaries.Add(new RunSummary() { Total = skipReasons.Count, Skipped = skipReasons.Count});
+					this.Summaries.Add(new RunSummary { Total = skipReasons.Count, Skipped = skipReasons.Count});
 					continue;
 				}
 
 				this.ClusterTotals.Add(clusterName, Stopwatch.StartNew());
-				//We group over each cluster group and execute test classes pertaining to that cluster
-				//in parallel
+				//We group over each cluster group and execute test classes pertaining to that cluster in parallel
 				if (@group.Key == null)
 				{
 					await @group.ForEachAsync(dop, async g => { await RunTestCollections(messageBus, ctx, g, testFilters); });
@@ -139,7 +137,7 @@ namespace Elastic.Xunit.Sdk
 				this.ClusterTotals[clusterName].Stop();
 			}
 
-			return new RunSummary()
+			return new RunSummary
 			{
 				Total = this.Summaries.Sum(s => s.Total),
 				Failed = this.Summaries.Sum(s => s.Failed),
@@ -149,7 +147,7 @@ namespace Elastic.Xunit.Sdk
 
 		private async Task RunTestCollections(IMessageBus messageBus, CancellationTokenSource ctx, GroupedByCluster g, string[] testFilters)
 		{
-			var test = g.Collection.DisplayName.Replace("Test collection for", "").Trim();
+			var test = g.Collection.DisplayName.Replace("Test collection for", string.Empty).Trim();
 			if (!MatchesATestFilter(test, testFilters)) return;
 			if (testFilters.Length > 0) Console.WriteLine(" -> " + test);
 
@@ -164,6 +162,7 @@ namespace Elastic.Xunit.Sdk
 			}
 			catch (TaskCanceledException)
 			{
+				// TODO: What should happen here?
 			}
 		}
 
@@ -177,6 +176,7 @@ namespace Elastic.Xunit.Sdk
 			return testFilters
 				.Any(filter => test.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0);
 		}
+
 		private bool MatchesClusterFilter(string cluster)
 		{
 			if (string.IsNullOrWhiteSpace(cluster) || string.IsNullOrWhiteSpace(this.ClusterFilter)) return true;
