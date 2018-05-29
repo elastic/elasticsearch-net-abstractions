@@ -9,6 +9,8 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack
 		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
 			if (!cluster.ClusterConfiguration.EnableSecurity) return;
+			if (!cluster.ClusterConfiguration.EnableSecurity) return;
+
 
 			//2.x tests only use prebaked roles
 			var v = cluster.ClusterConfiguration.Version;

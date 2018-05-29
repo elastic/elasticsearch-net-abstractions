@@ -9,6 +9,8 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 	{
 		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
+			if (cluster.CachingAndCachedHomeExists()) return;
+
 			var fs = cluster.FileSystem;
 			var v = cluster.ClusterConfiguration.Version;
 			var from = v.DownloadLocations.ElasticsearchDownloadUrl;

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading;
 using Elastic.Managed.Configuration;
 
 namespace Elastic.Managed.Ephemeral
@@ -55,5 +57,32 @@ namespace Elastic.Managed.Ephemeral
 				return message + $" contents of {log}:{Environment.NewLine}" + logContents;
 			}
 		}
+
+		public bool CachingAndCachedHomeExists()
+		{
+			if (!this.ClusterConfiguration.CacheEsHomeInstallation) return false;
+			var cachedEsHomeFolder = Path.Combine(this.FileSystem.LocalFolder, this.GetCacheFolderName());
+			return Directory.Exists(cachedEsHomeFolder);
+		}
+
+		public virtual string GetCacheFolderName()
+		{
+			var config = this.ClusterConfiguration;
+
+			var sb = new StringBuilder();
+			sb.Append(EphemeralClusterComposerBase.InstallationTasks.Count());
+			sb.Append("-");
+			if (config.XPackInstalled) sb.Append("x");
+			if (config.EnableSecurity) sb.Append("sec");
+			if (config.EnableSsl) sb.Append("ssl");
+			if (config.Plugins != null && config.Plugins.Count > 0)
+			{
+				sb.Append("-");
+				foreach (var p in config.Plugins.OrderBy(p=>p.Moniker))
+					sb.Append(p.Moniker.ToLowerInvariant());
+			}
+			return sb.ToString();
+		}
+
 	}
 }

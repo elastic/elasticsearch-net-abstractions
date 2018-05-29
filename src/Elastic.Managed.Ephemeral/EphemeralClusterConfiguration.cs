@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Elastic.Managed.Configuration;
 using Elastic.Managed.Ephemeral.Plugins;
@@ -53,6 +54,7 @@ namespace Elastic.Managed.Ephemeral
 			var suffix = Guid.NewGuid().ToString("N").Substring(0, 6);
 			return $"{this.NodePrefix}-node-{suffix}{node}";
 		}
+
 
 		protected virtual string NodePrefix => "ephemeral";
 

@@ -8,6 +8,8 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 	{
 		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
+			if (cluster.CachingAndCachedHomeExists()) return;
+
 			var config = cluster.ClusterConfiguration;
 			if (config.Version < "6.2.0" || config.Version >= "6.3.0")
 				return;

@@ -116,5 +116,20 @@ namespace Elastic.Managed.Ephemeral.Tasks
 
 			writer?.WriteDiagnostic($"{{{nameof(ExecuteBinary)}}} finished process [{description}] {{{result.ExitCode}}}");
 		}
+
+		protected static void CopyFolder(string source, string target)
+		{
+			foreach (var sourceDir in Directory.GetDirectories(source, "*", SearchOption.AllDirectories))
+			{
+				var targetDir = sourceDir.Replace(source, target);
+				Directory.CreateDirectory(targetDir);
+			}
+
+			foreach (var sourcePath in Directory.GetFiles(source, "*.*", SearchOption.AllDirectories))
+			{
+				var targetPath = sourcePath.Replace(source, target);
+				File.Copy(sourcePath, targetPath, true);
+			}
+		}
 	}
 }

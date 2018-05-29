@@ -10,6 +10,8 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 	{
 		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
+			if (cluster.CachingAndCachedHomeExists()) return;
+
 			var fs = cluster.FileSystem;
 			var v = cluster.ClusterConfiguration.Version;
 			if (Directory.Exists(fs.ElasticsearchHome))
@@ -25,18 +27,12 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
                 cluster.Writer?.WriteDiagnostic($"{{{nameof(UnzipElasticsearch)}}} unzipping version [{v}] {{{from}}}");
                 ZipFile.ExtractToDirectory(from, fs.LocalFolder);
                 cluster.Writer?.WriteDiagnostic($"{{{nameof(UnzipElasticsearch)}}} extracted version [{v}] to {{{fs.LocalFolder}}}");
-
 			}
 
 			if (extractedFolder == fs.ElasticsearchHome) return;
-			cluster.Writer?.WriteDiagnostic($"{{{nameof(UnzipElasticsearch)}}} Copying extracted folder {{{extractedFolder}}} => {fs.ElasticsearchHome}");
-			Copy(new DirectoryInfo(extractedFolder), new DirectoryInfo(fs.ElasticsearchHome));
-		}
 
-		private static void Copy(DirectoryInfo source, DirectoryInfo target)
-		{
-			foreach (var dir in source.GetDirectories()) Copy(dir, target.CreateSubdirectory(dir.Name));
-			foreach (var file in source.GetFiles()) file.CopyTo(Path.Combine(target.FullName, file.Name));
+			cluster.Writer?.WriteDiagnostic($"{{{nameof(UnzipElasticsearch)}}} Copying extracted folder {{{extractedFolder}}} => {fs.ElasticsearchHome}");
+			CopyFolder(extractedFolder, fs.ElasticsearchHome);
 		}
 	}
 }

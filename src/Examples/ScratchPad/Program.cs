@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading;
-using Elastic.Managed;
 using Elastic.Managed.Configuration;
 using Elastic.Managed.Ephemeral;
-using Elastic.Managed.Ephemeral.Plugins;
 using Elasticsearch.Net;
 using Nest;
-using ProcNet.Std;
 using static Elastic.Managed.Ephemeral.ClusterFeatures;
 
 namespace ScratchPad
@@ -46,9 +41,10 @@ namespace ScratchPad
 
 			var config = new EphemeralClusterConfiguration("6.2.3", XPack | Security | SSL, null, 1)
 			{
-				PrintYamlFilesInConfigFolder = true,
-				ShowElasticsearchOutputAfterStarted = true
+				ShowElasticsearchOutputAfterStarted = true,
+				CacheEsHomeInstallation = true
 			};
+
 			using (var cluster = new EphemeralCluster(config))
 			{
 				cluster.Start();
@@ -56,15 +52,10 @@ namespace ScratchPad
 				var nodes = cluster.NodesUris();
 				var connectionPool = new StaticConnectionPool(nodes);
 				var settings = new ConnectionSettings(connectionPool).EnableDebugMode();
-				if (config.EnableSecurity && !config.EnableSsl)
+				if (config.EnableSecurity)
 					settings = settings.BasicAuthentication(ClusterAuthentication.Admin.Username, ClusterAuthentication.Admin.Password);
 				if (config.EnableSsl)
-				{
 					settings = settings.ServerCertificateValidationCallback(CertificateValidations.AllowAll);
-					settings = settings.ClientCertificate(new X509Certificate2(config.FileSystem.ClientCertificate));
-
-
-				}
 
 				var client = new ElasticClient(settings);
 

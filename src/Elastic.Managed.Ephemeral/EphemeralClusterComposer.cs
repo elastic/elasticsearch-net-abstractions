@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Http.Headers;
 using Elastic.Managed.Ephemeral.Tasks;
 using Elastic.Managed.Ephemeral.Tasks.AfterNodeStoppedTasks;
+using Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks;
 using Elastic.Managed.Ephemeral.Tasks.InstallationTasks;
 using Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack;
 using Elastic.Managed.Ephemeral.Tasks.ValidationTasks;
@@ -13,9 +15,10 @@ namespace Elastic.Managed.Ephemeral
 	{
 		protected EphemeralClusterComposerBase() { }
 
-		protected static IEnumerable<IClusterComposeTask> InstallationTasks { get; } = new List<IClusterComposeTask>
+		internal static IEnumerable<IClusterComposeTask> InstallationTasks { get; } = new List<IClusterComposeTask>
 		{
 			new CreateLocalApplicationDirectory(),
+			new CopyCachedEsInstallation(),
 			new EnsureJavaHomeEnvironmentVariableIsSet(),
 			new DownloadElasticsearchVersion(),
 			new UnzipElasticsearch(),
@@ -32,7 +35,9 @@ namespace Elastic.Managed.Ephemeral
 			new EnsureSecurityRolesFileExists(),
 
 			new EnsureSecurityUsersInDefaultRealmAreAdded(),
-			new GenerateCertificatesTask()
+			new GenerateCertificatesTask(),
+			new AddClientCertificateRoleMappingTask(),
+			new CacheElasticsearchInstallation()
 		};
 
 		protected static IEnumerable<IClusterComposeTask> NodeStoppedTasks { get; } = new List<IClusterComposeTask>
