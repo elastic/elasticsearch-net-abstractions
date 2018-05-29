@@ -5,7 +5,7 @@ using Elastic.Managed.FileSystem;
 
 namespace Elastic.Managed.Configuration
 {
-	public interface IClusterConfiguration<out TFileSystem>
+	public interface IClusterConfiguration<out TFileSystem> where TFileSystem : INodeFileSystem
 	{
 		TFileSystem FileSystem { get; }
 
@@ -32,11 +32,20 @@ namespace Elastic.Managed.Configuration
 	public class ClusterConfiguration<TFileSystem> : IClusterConfiguration<TFileSystem>
 		where TFileSystem : INodeFileSystem
 	{
-		public ClusterConfiguration(ElasticsearchVersion version, Func<ElasticsearchVersion, string, TFileSystem> fileSystem = null, int numberOfNodes = 1, string clusterName = null)
+		/// <summary>
+		/// Creates a new instance of a configuration for an Elasticsearch cluster.
+		/// </summary>
+		/// <param name="version">The version of Elasticsearch</param>
+		/// <param name="fileSystem">A delegate to create the instance of <typeparamref name="TFileSystem"/>.
+		/// Passed the Elasticsearch version and the Cluster name</param>
+		/// <param name="numberOfNodes">The number of nodes in the cluster</param>
+		/// <param name="clusterName">The name of the cluster</param>
+		public ClusterConfiguration(ElasticsearchVersion version, Func<ElasticsearchVersion, string, TFileSystem> fileSystem, int numberOfNodes = 1, string clusterName = null)
 		{
+			if (fileSystem == null) throw new ArgumentException(nameof(fileSystem));
+
 			this.ClusterName = clusterName;
 			this.Version = version;
-			fileSystem = fileSystem ?? throw new ArgumentException(nameof(fileSystem));
 			this.FileSystem = fileSystem(this.Version, this.ClusterName);
 			this.NumberOfNodes = numberOfNodes;
 
@@ -62,30 +71,47 @@ namespace Elastic.Managed.Configuration
 
 		/// <summary>
 		/// Whether <see cref="ElasticsearchNode" /> should continue to write output to console after it has started.
-		/// <para>Defaults to true but useful to turn of if it proofs to be too noisy </para>
+		/// <para>Defaults to <c>true</c></para>
 		/// </summary>
 		public bool ShowElasticsearchOutputAfterStarted { get; set; } = true;
 
 		public bool CacheEsHomeInstallation { get; set; }
 
-		/// <summary> The global node settings that apply to each started node, can be added to.</summary>
+		/// <summary>The node settings to apply to each started node</summary>
 		public NodeSettings DefaultNodeSettings { get; } = new NodeSettings();
 
+		/// <summary>
+		/// Creates a node name
+		/// </summary>
 		public virtual string CreateNodeName(int? node) => node.HasValue ? $"managed-elasticsearch-{node}" : " managed-elasticsearch";
 
+		/// <summary>
+		/// Calculates the quorum given the number of instances
+		/// </summary>
 		private static int Quorum(int instanceCount) => Math.Max(1, (int) Math.Floor((double) instanceCount / 2) + 1);
 
+		/// <summary>
+		/// Creates a node attribute for the version of Elasticsearch
+		/// </summary>
 		public string AttributeKey(string attribute)
 		{
 			var attr = this.Version.Major >= 5 ? "attr." : "";
 			return $"node.{attr}{attribute}";
 		}
+
+		/// <summary>
+		/// Adds a node setting to the default node settings
+		/// </summary>
 		protected void Add(string key, string value)
 		{
 			if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value)) return;
 			this.DefaultNodeSettings.Add(key,value);
 		}
 
+		/// <summary>
+		/// Adds a node setting to the default node settings only if the Elasticsearch
+		/// version is in the range.
+		/// </summary>
 		protected void Add(string key, string value, string range)
 		{
 			if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value)) return;
