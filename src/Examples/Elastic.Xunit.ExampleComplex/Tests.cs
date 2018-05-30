@@ -1,9 +1,7 @@
 ﻿using Elastic.Xunit.XunitPlumbing;
-using Elasticsearch.Net;
 using FluentAssertions;
-using Nest;
 
-namespace Elastic.Xunit.Example
+namespace Elastic.Xunit.ExampleComplex
 {
 //	public class MyTestClass : ClusterTestClassBase<TestCluster>
 //	{

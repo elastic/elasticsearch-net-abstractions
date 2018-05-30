@@ -14,10 +14,10 @@ namespace Elastic.Xunit.Sdk
 
 		protected override ITestFrameworkExecutor CreateExecutor(AssemblyName assemblyName)
 		{
-			var a = Assembly.Load(assemblyName);
-			var options = a.GetCustomAttributes<ElasticXunitConfigurationAttribute>().FirstOrDefault()?.Options ?? new ElasticXunitRunOptions();
+			var assembly = Assembly.Load(assemblyName);
+			var options = assembly.GetCustomAttribute<ElasticXunitConfigurationAttribute>()?.Options ?? new ElasticXunitRunOptions();
 
-			return new TestFrameworkExecutor(assemblyName, SourceInformationProvider, DiagnosticMessageSink)
+			return new TestFrameworkExecutor(assemblyName, this.SourceInformationProvider, this.DiagnosticMessageSink)
 			{
 				Options = options
 			};
