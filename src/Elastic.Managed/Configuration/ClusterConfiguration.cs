@@ -14,6 +14,7 @@ namespace Elastic.Managed.Configuration
 		ElasticsearchVersion Version { get; }
 		int NumberOfNodes { get; }
 		int StartingPortNumber { get; set; }
+
 		bool ShowElasticsearchOutputAfterStarted { get; set; }
 		bool CacheEsHomeInstallation { get; set; }
 
@@ -58,6 +59,9 @@ namespace Elastic.Managed.Configuration
 			this.Add("path.data", fs.DataPath);
 			var logsPathDefault = Path.Combine(fs.ElasticsearchHome, "logs");
 			if (logsPathDefault != fs.LogsPath) this.Add("path.logs", fs.LogsPath);
+
+			if (version.Major < 6) this.Add("path.conf", fs.ConfigPath);
+
 		}
 
 		public string ClusterName { get; }

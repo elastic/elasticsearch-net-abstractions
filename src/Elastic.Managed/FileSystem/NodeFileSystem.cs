@@ -35,11 +35,15 @@ namespace Elastic.Managed.FileSystem
 		/// <inheritdoc />
 		public virtual string RepositoryPath => null;
 
+		public string ConfigEnvironmentVariableName { get; }
+
 		public NodeFileSystem(ElasticsearchVersion version, string elasticsearchHome = null)
 		{
 			this.Version = version;
 			this.LocalFolder = AppDataFolder(version);
 			this.ElasticsearchHome = elasticsearchHome ?? GetEsHomeVariable() ?? throw new ArgumentNullException(nameof(elasticsearchHome));
+
+			this.ConfigEnvironmentVariableName = version.Major >= 6 ? "ES_PATH_CONF" : "CONF_DIR";
 		}
 
 		protected static string AppDataFolder(ElasticsearchVersion version)

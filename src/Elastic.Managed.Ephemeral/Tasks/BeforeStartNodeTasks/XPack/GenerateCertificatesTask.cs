@@ -108,6 +108,12 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack
 			if (!Directory.Exists(path))
 				ExecuteBinary(config, writer, config.FileSystem.CertGenBinary, "generating ssl certificates for this session",
 					"-in", silentModeConfigFile, "-out", @out);
+			if (config.Version.Major < 6)
+			{
+				var badLocation = Path.Combine(config.FileSystem.ElasticsearchHome, "config", "x-pack", @out);
+				writer.WriteDiagnostic($"{{{nameof(GenerateCertificatesTask)}}} moving {badLocation} to {@out}");
+				File.Move(badLocation, zipLocation);
+			}
 		}
 
 

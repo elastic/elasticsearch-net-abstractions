@@ -98,7 +98,7 @@ namespace Elastic.Managed.Ephemeral.Tasks
 			{
 				Environment = new Dictionary<string, string>
 				{
-					{"ES_PATH_CONF", config.FileSystem.ConfigPath},
+					{ config.FileSystem.ConfigEnvironmentVariableName, config.FileSystem.ConfigPath },
 					{"ES_HOME", config.FileSystem.ElasticsearchHome}
 				}
 			};

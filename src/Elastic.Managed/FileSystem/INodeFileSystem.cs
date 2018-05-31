@@ -37,5 +37,9 @@
 		/// The path to the directory in which this node resides
 		/// </summary>
 		string LocalFolder { get; }
+
+		/// <summary> The config environment variable to use for this version</summary>
+		string ConfigEnvironmentVariableName { get; }
+
 	}
 }

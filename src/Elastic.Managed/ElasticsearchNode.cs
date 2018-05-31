@@ -34,11 +34,11 @@ namespace Elastic.Managed
 
 		private static Dictionary<string, string> EnvVars(NodeConfiguration config)
 		{
-			if (config.Version.Major < 6) return null;
 			if (string.IsNullOrWhiteSpace(config.FileSystem.ConfigPath)) return null;
 			return new Dictionary<string, string>
 			{
-				{ "ES_PATH_CONF", config.FileSystem.ConfigPath }
+				{ config.FileSystem.ConfigEnvironmentVariableName, config.FileSystem.ConfigPath },
+				{"ES_HOME", config.FileSystem.ElasticsearchHome}
 			};
 		}
 
