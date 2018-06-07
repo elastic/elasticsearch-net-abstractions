@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elastic.Xunit.ExampleMinima
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elastic.Managed.Example", "Examples\Elastic.Managed.Example\Elastic.Managed.Example.csproj", "{294F5209-AD64-4812-AA4E-C7B016927A0F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nest.TypescriptExporter", "Nest.TypescriptExporter\Nest.TypescriptExporter.csproj", "{C05F7B36-EEF7-4BCD-86A2-F5F1BB8CFEB9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,5 +88,9 @@ Global
 		{294F5209-AD64-4812-AA4E-C7B016927A0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{294F5209-AD64-4812-AA4E-C7B016927A0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{294F5209-AD64-4812-AA4E-C7B016927A0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C05F7B36-EEF7-4BCD-86A2-F5F1BB8CFEB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C05F7B36-EEF7-4BCD-86A2-F5F1BB8CFEB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C05F7B36-EEF7-4BCD-86A2-F5F1BB8CFEB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C05F7B36-EEF7-4BCD-86A2-F5F1BB8CFEB9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
