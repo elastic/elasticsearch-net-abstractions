@@ -13,8 +13,12 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack
 			if (!cluster.ClusterConfiguration.EnableSsl) return;
 
 			var config = cluster.ClusterConfiguration;
+			var v = config.Version;
 
-			var file = Path.Combine(config.FileSystem.ConfigPath, "x-pack", "role_mapping") + ".yml";
+			var file = v >= "6.3.0"
+				? Path.Combine(config.FileSystem.ConfigPath, "role_mapping") + ".yml"
+				: Path.Combine(config.FileSystem.ConfigPath, "x-pack", "role_mapping") + ".yml";
+
 			var name = config.FileSystem.ClientCertificateName;
 			if (!File.Exists(file) || !File.ReadAllLines(file).Any(f => f.Contains(name)))
 				File.WriteAllLines(file, new[]
@@ -47,10 +51,13 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack
 		private static void GenerateCertGenConfigFiles(IEphemeralCluster<EphemeralClusterConfiguration> cluster, INodeFileSystem fileSystem, string silentModeConfigFile, EphemeralClusterConfiguration config)
 		{
 			var silentModeConfigFileDuplicate = Path.Combine(fileSystem.ConfigPath, "x-pack", "certgen") + ".yml";
+			var files = cluster.ClusterConfiguration.Version >= "6.3.0"
+				? new[] {silentModeConfigFile}
+				: new[] {silentModeConfigFile, silentModeConfigFileDuplicate};
 
 			cluster.Writer.WriteDiagnostic($"{{{nameof(GenerateCertificatesTask)}}} creating config files");
 
-			foreach (var file in new[] {silentModeConfigFile, silentModeConfigFileDuplicate})
+			foreach (var file in files)
 				if (!File.Exists(file))
 					File.WriteAllLines(file, new[]
 					{
@@ -90,7 +97,9 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack
 				return;
 			}
 
-			var zipLocation = Path.Combine(config.FileSystem.ConfigPath, "x-pack", name) + ".zip";
+			var zipLocation = config.Version >= "6.3.0"
+				? Path.Combine(config.FileSystem.ConfigPath, name) + ".zip"
+				: Path.Combine(config.FileSystem.ConfigPath, "x-pack", name) + ".zip";
 			GenerateCertificate(config, name, path, zipLocation, silentModeConfigFile, writer);
 
 			if (!File.Exists(zipLocationCache))
@@ -105,8 +114,14 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack
 		private static void GenerateCertificate(EphemeralClusterConfiguration config, string name, string path, string zipLocation, string silentModeConfigFile, IConsoleLineWriter writer)
 		{
 			var @out = config.Version.Major < 6 ? $"{name}.zip" : zipLocation;
+			var fs = config.FileSystem;
+			var binary = config.Version >= "6.3.0"
+				? Path.Combine(fs.ElasticsearchHome, "bin", "elasticsearch-certgen") + BinarySuffix
+				: Path.Combine(fs.ElasticsearchHome, "bin", "x-pack", "certgen") + BinarySuffix;
+
+
 			if (!Directory.Exists(path))
-				ExecuteBinary(config, writer, config.FileSystem.CertGenBinary, "generating ssl certificates for this session",
+				ExecuteBinary(config, writer, binary, "generating ssl certificates for this session",
 					"-in", silentModeConfigFile, "-out", @out);
 			if (config.Version.Major < 6)
 			{

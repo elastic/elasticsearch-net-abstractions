@@ -18,13 +18,22 @@ namespace Elastic.Managed.Ephemeral.Tasks
 	{
 		void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster);
 	}
+	public interface IClusterTeardownTask
+	{
+		/// <summary>
+		/// Called when the cluster disposes, used to clean up after itself.
+		/// </summary>
+		/// <param name="cluster">The cluster configuration of the node that was started</param>
+		/// <param name="nodeStarted">Whether the cluster composer was successful in starting the node</param>
+		void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster, bool nodeStarted);
+	}
 
 	public abstract class ClusterComposeTask: IClusterComposeTask
 	{
 		public abstract void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster);
 
-		private bool IsMono { get; } = Type.GetType("Mono.Runtime") != null;
-		protected string BinarySuffix => IsMono || Path.DirectorySeparatorChar == '/' ? "" : ".bat";
+		private static bool IsMono { get; } = Type.GetType("Mono.Runtime") != null;
+		protected static string BinarySuffix => IsMono || Path.DirectorySeparatorChar == '/' ? "" : ".bat";
 
 		protected static void DownloadFile(string from, string to)
 		{

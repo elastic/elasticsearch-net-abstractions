@@ -11,9 +11,12 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack
 
 			var config = cluster.ClusterConfiguration;
 			var fileSystem = cluster.FileSystem;
+			var v = config.Version;
 
-			var xpackConfigFolder = Path.Combine(fileSystem.ConfigPath, "x-pack");
-			var xpackConfigFolderCached = Path.Combine(fileSystem.LocalFolder, cluster.GetCacheFolderName(), "config", "x-pack");
+			var xpackConfigFolder = v >= "6.3.0" ? fileSystem.ConfigPath : Path.Combine(fileSystem.ConfigPath, "x-pack");;
+			var xpackConfigFolderCached = v >= "6.3.0"
+				? Path.Combine(fileSystem.LocalFolder, cluster.GetCacheFolderName(), "config")
+				: Path.Combine(fileSystem.LocalFolder, cluster.GetCacheFolderName(), "config", "x-pack");
 
 			var usersFile = Path.Combine(xpackConfigFolder, "users");
 			var usersFileCached = usersFile.Replace(xpackConfigFolder, xpackConfigFolderCached);
@@ -30,11 +33,17 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack
 			}
 			else
 			{
-				var v = config.Version;
-				var folder = v.Major >= 5 ? "x-pack" : "shield";
-				var plugin = v.Major >= 5 ? "users" : "esusers";
+				var folder = v.Major >= 5
+					? v >= "6.3.0" ? string.Empty : "x-pack"
+					: "shield";
+				var binary = v.Major >= 5
+					? v >= "6.3.0" ? "elasticsearch-users" : "users"
+					: "esusers";
 
-				var pluginBat = Path.Combine(fileSystem.ElasticsearchHome, "bin", folder, plugin) + BinarySuffix;
+				var h = fileSystem.ElasticsearchHome;
+				var pluginFolder = v >= "6.3.0" ? Path.Combine(h, "bin") : Path.Combine(h, "bin", folder);
+				var pluginBat = Path.Combine(pluginFolder, binary) + BinarySuffix;
+
 				foreach (var cred in ClusterAuthentication.AllUsers)
 					ExecuteBinary(cluster.ClusterConfiguration, cluster.Writer, pluginBat, $"adding user {cred.Username}", $"useradd {cred.Username} -p {cred.Password} -r {cred.Role}");
 

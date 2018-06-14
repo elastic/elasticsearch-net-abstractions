@@ -27,7 +27,10 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 
 			var fs = cluster.FileSystem;
 			var requiredPlugins = cluster.ClusterConfiguration.Plugins;
-			var invalidPlugins = requiredPlugins.Where(p => !p.IsValid(v)).Select(p=>p.Moniker).ToList();
+			var invalidPlugins = requiredPlugins
+				.Where(p => !p.IsValid(v))
+				.Where(p=>p.Moniker != "x-pack") //x-pack is already installed OOTB since 6.3.0 NOT an error condition though to specify the plugin
+				.Select(p=>p.Moniker).ToList();
 			if (invalidPlugins.Any())
 				throw new CleanExitException($"Can not install the following plugins for version {v}: {string.Join(", ", invalidPlugins)} ");
 

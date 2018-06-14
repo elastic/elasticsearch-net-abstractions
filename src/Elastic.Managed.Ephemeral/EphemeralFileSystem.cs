@@ -22,9 +22,6 @@ namespace Elastic.Managed.Ephemeral
 		public override string DataPath => Path.Combine(TempFolder, "data");
 
 		//certificates
-		public string CertGenBinary => Path.Combine(this.ElasticsearchHome, "bin", "x-pack", "certgen") + BinarySuffix;
-		public string XPackEnvBinary => Path.Combine(this.ElasticsearchHome, "bin", "x-pack", "x-pack-env") + BinarySuffix;
-
 		public string CertificateFolderName => "node-certificates";
 		public string CertificateNodeName => "node01";
 		public string ClientCertificateName => "cn=John Doe,ou=example,o=com";

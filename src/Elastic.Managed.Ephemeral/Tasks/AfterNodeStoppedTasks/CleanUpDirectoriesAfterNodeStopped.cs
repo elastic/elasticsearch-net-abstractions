@@ -3,9 +3,9 @@ using Elastic.Managed.ConsoleWriters;
 
 namespace Elastic.Managed.Ephemeral.Tasks.AfterNodeStoppedTasks
 {
-	public class CleanUpDirectoriesAfterNodeStopped : ClusterComposeTask
+	public class CleanUpDirectoriesAfterNodeStopped : IClusterTeardownTask
 	{
-		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
+		public void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster, bool nodeStarted)
 		{
 			var fs = cluster.FileSystem;
 			var w = cluster.Writer;
@@ -26,7 +26,15 @@ namespace Elastic.Managed.Ephemeral.Tasks.AfterNodeStoppedTasks
 					DeleteDirectory(w, "ephemeral ES_HOME", fs.ElasticsearchHome);
 				}
 			}
+
+			//if the node did not start make sure we delete the cached folder as we can not assume its in a good state
+			if (cluster.ClusterConfiguration.CacheEsHomeInstallation && !nodeStarted)
+			{
+				var cachedEsHomeFolder = Path.Combine(fs.LocalFolder, cluster.GetCacheFolderName());
+				DeleteDirectory(w, "cached installation - node failed to start", cachedEsHomeFolder);
+			}
 		}
+
 		private static void DeleteDirectory(IConsoleLineWriter w, string description, string path)
 		{
 			if (!Directory.Exists(path)) return;

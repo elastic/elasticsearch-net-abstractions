@@ -35,7 +35,11 @@ namespace Elastic.Managed.Ephemeral
 		public ElasticsearchPlugins Plugins { get; }
 
 		public bool XPackInstalled => this.Features.HasFlag(ClusterFeatures.XPack)
-		                              || this.Plugins.Any(p => p.Moniker == "x-pack") || this.EnableSsl || this.EnableSecurity;
+		                              || this.Version >= "6.3.0"
+		                              || this.Plugins.Any(p => p.Moniker == "x-pack")
+		                              || this.EnableSsl
+		                              || this.EnableSecurity;
+
 		public bool EnableSecurity => this.Features.HasFlag(ClusterFeatures.Security) || this.EnableSsl;
 		public bool EnableSsl => this.Features.HasFlag(ClusterFeatures.SSL);
 

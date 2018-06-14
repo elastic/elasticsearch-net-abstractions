@@ -12,10 +12,14 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack
 
 			var config = cluster.ClusterConfiguration;
 			var v = config.Version;
-			if (v.Major != 6 || File.Exists(config.FileSystem.XPackEnvBinary)) return;
 
-			cluster.Writer.WriteDiagnostic($"{{{nameof(EnsureSecurityUsersInDefaultRealmAreAdded)}}} {config.FileSystem.XPackEnvBinary} does not exist, patching now.");
-			File.WriteAllText(config.FileSystem.XPackEnvBinary, "set ES_CLASSPATH=!ES_CLASSPATH!;!ES_HOME!/plugins/x-pack/*");
+			var envBinary = Path.Combine(config.FileSystem.ElasticsearchHome, "bin", "x-pack", "x-pack-env") + BinarySuffix;
+
+			if (v.Major != 6 || File.Exists(envBinary)) return;
+			if (v >= "6.3.0") return;
+
+			cluster.Writer.WriteDiagnostic($"{{{nameof(EnsureSecurityUsersInDefaultRealmAreAdded)}}} {envBinary} does not exist, patching now.");
+			File.WriteAllText(envBinary, "set ES_CLASSPATH=!ES_CLASSPATH!;!ES_HOME!/plugins/x-pack/*");
 		}
 	}
 }

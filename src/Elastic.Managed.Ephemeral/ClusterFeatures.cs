@@ -10,7 +10,7 @@ namespace Elastic.Managed.Ephemeral
 	public enum ClusterFeatures
 	{
 		/// <summary>
-		/// No features
+		/// No features, note that as of Elasticsearch 6.3.0 x-pack ships OOTB
 		/// </summary>
 		None = 1 << 0,
 		/// <summary>

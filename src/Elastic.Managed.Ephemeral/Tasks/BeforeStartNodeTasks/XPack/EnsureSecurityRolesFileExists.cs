@@ -16,7 +16,9 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack
 			var v = cluster.ClusterConfiguration.Version;
 			if (v.Major < 5) return;
 			var folder = v.Major >= 5 ? "x-pack" : "shield";
-			var rolesConfig = Path.Combine(cluster.FileSystem.ConfigPath, folder, "roles.yml");
+			var rolesConfig = v >= "6.3.0"
+				? Path.Combine(cluster.FileSystem.ConfigPath, "roles.yml")
+				: Path.Combine(cluster.FileSystem.ConfigPath, folder, "roles.yml");
 
 			cluster.Writer.WriteDiagnostic($"{{{nameof(EnsureSecurityRolesFileExists)}}} adding roles to {rolesConfig}");
 			if (!File.Exists(rolesConfig))

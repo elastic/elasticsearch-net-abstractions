@@ -40,7 +40,7 @@ namespace Elastic.Managed.Ephemeral
 			new CacheElasticsearchInstallation()
 		};
 
-		protected static IEnumerable<IClusterComposeTask> NodeStoppedTasks { get; } = new List<IClusterComposeTask>
+		protected static IEnumerable<IClusterTeardownTask> NodeStoppedTasks { get; } = new List<IClusterTeardownTask>
 		{
 			new CleanUpDirectoriesAfterNodeStopped()
 		};
@@ -63,7 +63,9 @@ namespace Elastic.Managed.Ephemeral
 
 		private IEphemeralCluster<TConfiguration> Cluster { get; }
 
-		public void OnStop() => Itterate(NodeStoppedTasks, (t, c, fs) => t.Run(c));
+		private bool NodeStarted { get; set; }
+
+		public void OnStop() => Itterate(NodeStoppedTasks, (t, c, fs) => t.Run(c, this.NodeStarted));
 
 		public void Install() => Itterate(InstallationTasks, (t, c, fs) => t.Run(c));
 
@@ -77,6 +79,8 @@ namespace Elastic.Managed.Ephemeral
 				tasks.Add(new PrintYamlContents());
 
 			Itterate(tasks, (t, c, fs) => t.Run(c));
+
+			NodeStarted = true;
 		}
 
 
@@ -91,7 +95,6 @@ namespace Elastic.Managed.Ephemeral
 
 		private readonly object _lock = new object();
 		private void Itterate<T>(IEnumerable<T> collection, Action<T, IEphemeralCluster<TConfiguration>, INodeFileSystem> act)
-			where T : IClusterComposeTask
 		{
 			lock (_lock)
 			{
