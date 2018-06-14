@@ -34,7 +34,9 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 		{
 			var target = ephemeralFileSystem.ConfigPath;
 			var cachedEsHomeFolder = Path.Combine(fs.LocalFolder, cluster.GetCacheFolderName());
-			var homeSource = cluster.CachingAndCachedHomeExists() ? cachedEsHomeFolder : fs.ElasticsearchHome;
+			var cachedElasticsearchYaml = Path.Combine(cachedEsHomeFolder, "config", "elasticsearch.yaml");
+
+			var homeSource = cluster.ClusterConfiguration.CacheEsHomeInstallation && File.Exists(cachedElasticsearchYaml) ? cachedEsHomeFolder : fs.ElasticsearchHome;
 			var source = Path.Combine(homeSource, "config");
 			if (!Exists(source))
 			{

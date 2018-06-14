@@ -2,6 +2,7 @@
 using System.Security.Cryptography.X509Certificates;
 using Elastic.Managed.Configuration;
 using Elastic.Managed.Ephemeral;
+using Elastic.Managed.Ephemeral.Plugins;
 using Elasticsearch.Net;
 using Nest;
 using static Elastic.Managed.Ephemeral.ClusterFeatures;
@@ -12,7 +13,7 @@ namespace ScratchPad
 	{
 		public static int Main()
 		{
-			ElasticsearchVersion version = "5.6.0";
+			ElasticsearchVersion version = "6.2.0";
 
 
 //			var clusterConfiguration = new EphemeralClusterConfiguration("6.0.0", numberOfNodes: 2);
@@ -39,7 +40,8 @@ namespace ScratchPad
 //				cluster.Start();
 //			}
 
-			var config = new EphemeralClusterConfiguration(version, XPack | Security | SSL, null, 1)
+			var plugins = new ElasticsearchPlugins(ElasticsearchPlugin.IngestGeoIp);
+			var config = new EphemeralClusterConfiguration(version, XPack | Security | SSL, plugins, 1)
 			{
 				ShowElasticsearchOutputAfterStarted = true,
 				PrintYamlFilesInConfigFolder = true,
@@ -61,6 +63,7 @@ namespace ScratchPad
 				var client = new ElasticClient(settings);
 
 				Console.Write(client.XPackInfo().DebugInformation);
+				Console.ReadKey();
 			}
 //
 //			Console.WriteLine($".. DONE ...");

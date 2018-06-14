@@ -43,7 +43,24 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 				//var installParameter = v.ReleaseState == ReleaseState.Released ? plugin.Moniker : UseHttpPluginLocation(cluster.Writer, fs, plugin, v);
 				var installParameter = UseHttpPluginLocation(cluster.Writer, fs, plugin, v);
 				ExecuteBinary(cluster.ClusterConfiguration, cluster.Writer, "cmd", $"install elasticsearch plugin: {plugin.Moniker}", $"/c CALL {fs.PluginBinary} install --batch", installParameter);
+				CopyConfigDirectoryToHomeCacheConfigDirectory(cluster, plugin);
 			}
+		}
+
+		private static void CopyConfigDirectoryToHomeCacheConfigDirectory(IEphemeralCluster<EphemeralClusterConfiguration> cluster, ElasticsearchPlugin plugin)
+		{
+			if (plugin.Moniker == "x-pack") return;
+			if (!cluster.ClusterConfiguration.CacheEsHomeInstallation) return;
+			var fs = cluster.FileSystem;
+			var cachedEsHomeFolder = Path.Combine(fs.LocalFolder, cluster.GetCacheFolderName());
+			var configTarget = Path.Combine(cachedEsHomeFolder, "config");
+
+			var configPluginPath = Path.Combine(fs.ConfigPath, plugin.Moniker);
+			var configPluginPathCached = Path.Combine(configTarget, plugin.Moniker);
+			if (!Directory.Exists(configPluginPath) || Directory.Exists(configPluginPathCached)) return;
+
+			Directory.CreateDirectory(configPluginPathCached);
+			CopyFolder(configPluginPath, configPluginPathCached);
 		}
 
 		private static bool AlreadyInstalled(INodeFileSystem fileSystem, string folderName)
