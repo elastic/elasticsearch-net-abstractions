@@ -50,7 +50,7 @@ namespace Nest.TypescriptGenerator
 		{
 			{ typeof(IResponse), new [] { nameof(IResponse.IsValid), nameof(IResponse.DebugInformation) } }
 		};
-			
+
 
 		public bool PropertyTypesToIgnore(Type propertyType)
 		{
@@ -61,13 +61,13 @@ namespace Nest.TypescriptGenerator
 		{
 			AddNamespaceHeader(classModel.Name, sb);
 
-			string typeName = this.GetTypeName(classModel);
-			string visibility = this.GetTypeVisibility(classModel, typeName) ? "export " : "";
+			var typeName = this.GetTypeName(classModel);
+			var visibility = this.GetTypeVisibility(classModel, typeName) ? "export " : "";
 
 			AddDocCommentForCustomJsonConverter(sb, classModel);
 			_docAppender.AppendClassDoc(sb, classModel, typeName);
 
-			sb.AppendFormatIndented("{0}interface {1}", visibility, typeName);
+			sb.AppendFormatIndented("{0}class {1}", visibility, typeName);
 			if (classModel.BaseType != null)
 			{
 				sb.AppendFormat(" extends {0}", this.GetFullyQualifiedTypeName(classModel.BaseType));
@@ -99,8 +99,8 @@ namespace Nest.TypescriptGenerator
 			{
 				foreach (var property in members)
 				{
-					if (property.IsIgnored || 
-						PropertyTypesToIgnore(property.PropertyType.Type) || 
+					if (property.IsIgnored ||
+						PropertyTypesToIgnore(property.PropertyType.Type) ||
 						(_typesPropertiesToIgnore.ContainsKey(classModel.Type) && _typesPropertiesToIgnore[classModel.Type].Contains(property.Name)))
 					{
 						continue;
@@ -119,10 +119,11 @@ namespace Nest.TypescriptGenerator
 
 		private void AddNamespaceHeader(string name, ScriptBuilder sb)
 		{
-			string ns;
-			sb.AppendLineIndented(this._namespaceMapping.TryGetValue(name, out ns)
-				? $"/**namespace:{ns} */"
-				: $"/**namespace:DefaultLanguageConstruct */");
+			var n = "DefaultLanguageConstruct";
+			if (this._namespaceMapping.TryGetValue(name, out var ns))
+				n = string.Join('.', ns.Split(".").Select(Program.SnakeCase));
+
+			sb.AppendLineIndented($"@namespace(\"{n}\")");
 		}
 
 		private void AddDocCommentForCustomJsonConverter(ScriptBuilder sb, TsProperty property)
@@ -130,35 +131,44 @@ namespace Nest.TypescriptGenerator
 			var declaringType = property.MemberInfo.DeclaringType;
 			var propertyName = property.MemberInfo.Name;
 
-			var nonGenericTypeName = Program.RemoveGeneric.Replace(declaringType.Name, "$1");
-
-			if (declaringType.Name.Contains("Request") && Program.RequestParameters.ContainsKey(nonGenericTypeName))
-			{
-				var rp = Program.RequestParameters[nonGenericTypeName];
-				var method = rp.GetMethod(propertyName);
-				if (method != null)
-					sb.AppendLineIndented("/**ambiguous_origin*/");
-			}
 			var iface = declaringType.GetInterfaces().FirstOrDefault(ii => ii.Name == "I" + declaringType.Name);
 			var ifaceProperty = iface?.GetProperty(propertyName);
-		
-			var jsonConverterAttribute = ifaceProperty?.GetCustomAttribute<JsonConverterAttribute>() ??
-			                             property.MemberInfo.GetCustomAttribute<JsonConverterAttribute>();
 
-			if (jsonConverterAttribute != null)
-				sb.AppendLineIndented("/**custom_serialization */");
+			var attributes = new List<Attribute>();
+			if (ifaceProperty != null) attributes.AddRange(ifaceProperty.GetCustomAttributes());
+			attributes.AddRange(property.MemberInfo.GetCustomAttributes());
+
+			var isRequest = declaringType.Name.Contains("Request");
+			if (isRequest)
+			{
+
+			}
+			var nonGenericTypeName = Program.RemoveGeneric.Replace(declaringType.Name, "$1");
+			if (Program.InterfaceRegex.IsMatch(nonGenericTypeName)) nonGenericTypeName = nonGenericTypeName.Substring(1);
+
+			if (isRequest && Program.RequestParameters.ContainsKey(nonGenericTypeName))
+			{
+				var rp = Program.RequestParameters[nonGenericTypeName];
+				var prop = rp.GetProperty(propertyName);
+				if (prop != null)
+					sb.AppendLineIndented("@request_parameter()");
+			}
+
+			if (attributes.Any(a => a.TypeId.ToString() == "Nest.Json.JsonConverterAttribute"))
+				sb.AppendLineIndented("@custom_json()");
 		}
 
 		private void AddDocCommentForCustomJsonConverter(ScriptBuilder sb, TsClass classModel)
 		{
 			var iface = classModel.Type.GetInterfaces().FirstOrDefault(i => i.Name == "I" + classModel.Type.Name);
 
-			var jsonConverterAttribute = iface?.GetCustomAttribute<JsonConverterAttribute>() ??
-										 classModel.Type.GetCustomAttribute<JsonConverterAttribute>();
+			var attributes = new List<Attribute>();
+			if (iface != null) attributes.AddRange(iface.GetCustomAttributes());
+			attributes.AddRange(classModel.Type.GetCustomAttributes());
 
-			if (jsonConverterAttribute != null)
+			if (attributes.Any(a => a.TypeId.ToString() == "Nest.Json.JsonConverterAttribute"))
 			{
-				sb.AppendLineIndented("/**custom_serialization*/");
+				sb.AppendLineIndented("@custom_json()");
 			}
 		}
 
@@ -182,7 +192,7 @@ namespace Nest.TypescriptGenerator
 				{
 					_docAppender.AppendEnumValueDoc(sb, v);
 					var enumMemberAttribute = v.Field.GetCustomAttribute<EnumMemberAttribute>();
-					var name = !string.IsNullOrEmpty(enumMemberAttribute?.Value) ? enumMemberAttribute.Value : v.Name;
+					var name = Program.QuoteMaybe(!string.IsNullOrEmpty(enumMemberAttribute?.Value) ? enumMemberAttribute.Value : v.Name);
 
 					sb.AppendLineIndented(string.Format(i < enumModel.Values.Count ? "{0} = {1}," : "{0} = {1}", name, v.Value));
 					i++;
@@ -217,7 +227,7 @@ namespace Nest.TypescriptGenerator
 			if (((generatorOutput & TsGeneratorOutput.Properties) == TsGeneratorOutput.Properties)
 				|| (generatorOutput & TsGeneratorOutput.Fields) == TsGeneratorOutput.Fields)
 			{
-				foreach (var classModel in classes.OrderBy(c => c.Type?.IsInterface ?? false ? 0 : 1))
+				foreach (var classModel in classes.OrderBy(OrderTypes))
 				{
 					var c = ReMapClass(classModel);
 					if (Ignore(c)) continue;
@@ -240,6 +250,39 @@ namespace Nest.TypescriptGenerator
 					this.AppendConstantModule(classModel, sb);
 				}
 			}
+		}
+		public static IEnumerable<Type> GetParentTypes(Type type)
+		{
+			// is there any base type?
+			if (type == null)
+			{
+				yield break;
+			}
+
+			// return all implemented or inherited interfaces
+			foreach (var i in type.GetInterfaces())
+			{
+				yield return i;
+			}
+
+			// return all inherited types
+			var currentBaseType = type.BaseType;
+			while (currentBaseType != null)
+			{
+				yield return currentBaseType;
+				currentBaseType= currentBaseType.BaseType;
+			}
+		}
+
+		private static int OrderTypes(TsClass c)
+		{
+			var weigth = 0;
+			if (!c.Type.IsInterface) weigth += 100;
+
+			var baseTypesCount = GetParentTypes(c.Type).Count();
+			weigth += baseTypesCount;
+
+			return weigth;
 		}
 
 		protected bool Ignore(TsClass classModel)

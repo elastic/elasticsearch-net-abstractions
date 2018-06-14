@@ -19,7 +19,7 @@ namespace Nest.TypescriptGenerator
 	{
 		public static Dictionary<string, Type> RequestParameters { get; set; }
 		private static MachineApiGenerator _scriptGenerator;
-		private static readonly Regex InterfaceRegex = new Regex("(?-i)^I[A-Z].*$");
+		public static readonly Regex InterfaceRegex = new Regex("(?-i)^I[A-Z].*$");
 		public static Regex RemoveGeneric { get; } = new Regex(@"^(.+)(?:\`.+)$");
 
 		private static string NestFolder = @"..\..\..\net-master\src\Nest";
@@ -53,7 +53,7 @@ namespace Nest.TypescriptGenerator
 				}
 			}
 
-			var isBadClassRe = new Regex(@"(Descriptor|Attribute)(?:Base)?(?:\`.+$|$)");
+			var isBadClassRe = new Regex(@"(SynchronizedCollection|Descriptor|Attribute)(?:Base)?(?:\`.+$|$)");
 
 			var nestAssembly = typeof(IRequest<>).Assembly;
 			var lowLevelAssembly = typeof(IElasticLowLevelClient).Assembly;
@@ -61,12 +61,13 @@ namespace Nest.TypescriptGenerator
 			var exposeInterfaces = new[]
 			{
 				typeof(IRequest), typeof(IResponse), typeof(ICharFilter), typeof(ITokenFilter), typeof(IAnalyzer), typeof(ITokenizer),
+				typeof(IDictionaryResponse<,>),
 				typeof(IIndicesModuleSettings), typeof(IProperty)
 			};
 
 			var nestInterfaces = nestAssembly
 				.GetTypes()
-				.Where(t => exposeInterfaces.Any(i=>i.IsAssignableFrom(t)))
+				.Where(t => exposeInterfaces.Any(i=> i.IsAssignableFrom(t)))
 				.Where(t => t.IsClass && !isBadClassRe.IsMatch(t.Name))
 				.ToArray();
 
@@ -85,11 +86,17 @@ namespace Nest.TypescriptGenerator
 				.AsConstEnums(false)
 				.WithModuleNameFormatter(module => string.Empty);
 
-			typeScriptFluent.For(typeof (Map<,>));
+			//typeScriptFluent.For(typeof (Map<,>));
 			typeScriptFluent.For<DateInterval>();
 			var definitions = nestInterfaces.Aggregate(typeScriptFluent, (def, t) => def.For(t));
 
 			File.WriteAllText("typedefinitions.ts", definitions.Generate());
+			var hack = @"
+function custom_json() { return function(...args : any[]){}}
+function request_parameter() {return function (...args : any[]){}}
+function namespace(ns: string) {return function (...args : any[]){}}
+";
+			File.AppendAllText("typedefinitions.ts", hack);
 		}
 
 		private static string FormatMemberType(TsProperty tsProperty, string memberTypeName)
@@ -107,21 +114,36 @@ namespace Nest.TypescriptGenerator
 			var declaringType = property.MemberInfo.DeclaringType;
 			var propertyName = property.MemberInfo.Name;
 
-			if (declaringType == null) return propertyName;
+			if (declaringType == null) return QuoteMaybe(SnakeCase(propertyName));
 			var iface = declaringType.GetInterfaces().FirstOrDefault(ii => ii.Name == "I" + declaringType.Name);
 			var ifaceProperty = iface?.GetProperty(propertyName);
 
-			var jsonPropertyAttribute = ifaceProperty?.GetCustomAttribute<JsonPropertyAttribute>() ??
-			                            property.MemberInfo.GetCustomAttribute<JsonPropertyAttribute>();
+			var attributes = new List<Attribute>();
+			if (ifaceProperty != null) attributes.AddRange(ifaceProperty.GetCustomAttributes());
+			attributes.AddRange(property.MemberInfo.GetCustomAttributes());
+			if (attributes.Any(a => a.TypeId.ToString() == "Nest.Json.JsonIgnoreAttribute"))
+			{
+				property.IsIgnored = true;
+			}
 
-			if (!string.IsNullOrWhiteSpace(jsonPropertyAttribute?.PropertyName))
-				propertyName = jsonPropertyAttribute.PropertyName;
+			var jsonPropertyAttribute = attributes.FirstOrDefault(a => a.TypeId.ToString() == "Nest.Json.JsonPropertyAttribute");
+			if (jsonPropertyAttribute != null)
+			{
+				var v = jsonPropertyAttribute.GetType().GetProperty("PropertyName").GetGetMethod().Invoke(jsonPropertyAttribute, new object[] {});
+				return QuoteMaybe((string) v ?? SnakeCase(propertyName));
+			}
+			return QuoteMaybe(SnakeCase(propertyName));
+		}
 
+		public static string QuoteMaybe(string propertyName)
+		{
+			if (propertyName.Contains('-')) return $"\'{propertyName}\'";
 			return propertyName;
+
 		}
 
 		private static Regex SnakeCaseRe = new Regex("(?<=.)([A-Z])");
-		private static string SnakeCase(string token) => SnakeCaseRe.Replace(token, "_$0").ToLowerInvariant();
+		public static string SnakeCase(string token) => SnakeCaseRe.Replace(token, "_$0").ToLowerInvariant();
 
 		private static string FormatType(TsType type, ITsTypeFormatter formatter)
 		{
@@ -138,7 +160,6 @@ namespace Nest.TypescriptGenerator
 
 			if (InterfaceRegex.IsMatch(name)) name = name.Substring(1);
 
-			name = SnakeCase(name);
 			if (!tsClass.GenericArguments.Any()) return name;
 
 			return name + "<" + string.Join(", ", tsClass.GenericArguments.Select(WriteArrayIfCollection)) + ">";
