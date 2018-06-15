@@ -54,6 +54,10 @@ namespace Nest.TypescriptGenerator
 
 		public bool PropertyTypesToIgnore(Type propertyType)
 		{
+			if (propertyType.Name.Contains("DynamicMapping"))
+			{
+
+			}
 			return _propertyTypesToIgnore.Contains(propertyType) || (propertyType.BaseType != null && propertyType.BaseType == typeof (MulticastDelegate));
 		}
 
@@ -116,10 +120,26 @@ namespace Nest.TypescriptGenerator
 
 			_generatedClasses.Add(classModel);
 		}
+		private bool AddNamespaceHeaderEnum(string name, string ns, ScriptBuilder sb)
+		{
+			if (!ns.StartsWith("Nest") && !ns.StartsWith("Elasticsearch.Net")) return false;
+
+			if (name == "ParserTimeZone")
+			{
+
+			}
+
+			var n = "common";
+			if (this._namespaceMapping.TryGetValue(name, out var fullNs))
+				n = string.Join('.', fullNs.Split(".").Select(Program.SnakeCase));
+
+			sb.AppendLineIndented($"/** namespace:{n} **/");
+			return true;
+		}
 
 		private void AddNamespaceHeader(string name, ScriptBuilder sb)
 		{
-			var n = "DefaultLanguageConstruct";
+			var n = "common";
 			if (this._namespaceMapping.TryGetValue(name, out var ns))
 				n = string.Join('.', ns.Split(".").Select(Program.SnakeCase));
 
@@ -154,8 +174,12 @@ namespace Nest.TypescriptGenerator
 					sb.AppendLineIndented("@request_parameter()");
 			}
 
-			if (attributes.Any(a => a.TypeId.ToString() == "Nest.Json.JsonConverterAttribute"))
-				sb.AppendLineIndented("@custom_json()");
+			var converter = attributes.FirstOrDefault(a => a.TypeId.ToString() == "Nest.Json.JsonConverterAttribute");
+			if (converter != null)
+			{
+				if (GetConverter(converter, out var type)) return;
+				sb.AppendLineIndented($"@prop_serializer(\"{type.Name}\")");
+			}
 		}
 
 		private void AddDocCommentForCustomJsonConverter(ScriptBuilder sb, TsClass classModel)
@@ -166,23 +190,35 @@ namespace Nest.TypescriptGenerator
 			if (iface != null) attributes.AddRange(iface.GetCustomAttributes());
 			attributes.AddRange(classModel.Type.GetCustomAttributes());
 
-			if (attributes.Any(a => a.TypeId.ToString() == "Nest.Json.JsonConverterAttribute"))
+			var converter = attributes.FirstOrDefault(a => a.TypeId.ToString() == "Nest.Json.JsonConverterAttribute");
+			if (converter != null)
 			{
-				sb.AppendLineIndented("@custom_json()");
+				if (GetConverter(converter, out var type)) return;
+				sb.AppendLineIndented($"@class_serializer(\"{type.Name}\")");
 			}
+		}
+
+		private static bool GetConverter(Attribute converter, out Type type)
+		{
+			type = (Type) converter.GetType().GetProperty("ConverterType").GetGetMethod().Invoke(converter, new object[] { });
+			if (type.Name.StartsWith("ReadAsTypeJsonConverter")) return true;
+			if (type.Name.StartsWith("VerbatimDictionary")) return true;
+			if (type.Name.StartsWith("StringEnum")) return true;
+			if (type.Name.StartsWith("Reserialize")) return true;
+			return false;
 		}
 
 		protected override void AppendEnumDefinition(TsEnum enumModel, ScriptBuilder sb, TsGeneratorOutput output)
 		{
-			AddNamespaceHeader(enumModel.Name, sb);
+			if (!AddNamespaceHeaderEnum(enumModel.Name, enumModel.Type.Assembly.FullName, sb)) return;
 			if (_typesToIgnore.Contains(enumModel.Type)) return;
 
-			string typeName = this.GetTypeName(enumModel);
-			string visibility = string.Empty;
+			var typeName = this.GetTypeName(enumModel);
+			var visibility = string.Empty;
 
 			_docAppender.AppendEnumDoc(sb, enumModel, typeName);
 
-			string constSpecifier = this.GenerateConstEnums ? "const " : string.Empty;
+			var constSpecifier = this.GenerateConstEnums ? "const " : string.Empty;
 			sb.AppendLineIndented(string.Format("{0}{2}enum {1} {{", visibility, typeName, constSpecifier));
 
 			using (sb.IncreaseIndentation())
@@ -227,7 +263,11 @@ namespace Nest.TypescriptGenerator
 			if (((generatorOutput & TsGeneratorOutput.Properties) == TsGeneratorOutput.Properties)
 				|| (generatorOutput & TsGeneratorOutput.Fields) == TsGeneratorOutput.Fields)
 			{
-				foreach (var classModel in classes.OrderBy(OrderTypes))
+				var cc = classes.Select(c => new {c, order = OrderTypes(c)}).ToList();
+
+				var orderedClasses = cc.OrderBy(c=>c.order).Select(c=>c.c).ToList();
+				var temp = cc.OrderBy(c=>c.order).Select(c => $"{c.order} - {c.c.Type.FullName}").ToList();
+				foreach (var classModel in orderedClasses)
 				{
 					var c = ReMapClass(classModel);
 					if (Ignore(c)) continue;
@@ -242,10 +282,7 @@ namespace Nest.TypescriptGenerator
 			{
 				foreach (var classModel in classes)
 				{
-					if (classModel.IsIgnored)
-					{
-						continue;
-					}
+					if (classModel.IsIgnored) continue;
 
 					this.AppendConstantModule(classModel, sb);
 				}
@@ -277,10 +314,12 @@ namespace Nest.TypescriptGenerator
 		private static int OrderTypes(TsClass c)
 		{
 			var weigth = 0;
-			if (!c.Type.IsInterface) weigth += 100;
+			if (c.Type.Namespace.StartsWith("Nest")) weigth += 100;
+			if (!c.Type.IsInterface) weigth += 50;
 
 			var baseTypesCount = GetParentTypes(c.Type).Count();
 			weigth += baseTypesCount;
+			if (c.Type.Name == "Error") weigth = 2;
 
 			return weigth;
 		}
@@ -326,6 +365,8 @@ namespace Nest.TypescriptGenerator
 	public class Request { }
 
 	public class Response { }
+
+	public class SourceDocument { }
 
 	public class Map<TKey, TValue> { }
 }

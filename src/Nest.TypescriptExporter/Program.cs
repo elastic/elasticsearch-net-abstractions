@@ -67,14 +67,27 @@ namespace Nest.TypescriptGenerator
 
 			var nestInterfaces = nestAssembly
 				.GetTypes()
-				.Where(t => exposeInterfaces.Any(i=> i.IsAssignableFrom(t)))
-				.Where(t => t.IsClass && !isBadClassRe.IsMatch(t.Name))
+				.Where(t =>
+					(t.IsEnum && !t.Namespace.StartsWith("Nest.Json") && (t.Namespace.StartsWith("Nest") || t.Namespace.StartsWith("Elasticsearch.Net")))
+					|| (exposeInterfaces.Any(i=> i.IsAssignableFrom(t)) && t.IsClass && !isBadClassRe.IsMatch(t.Name))
+				)
+				.OrderBy(t =>
+				{
+					var weight = 0;
+					if (t.IsClass || t.IsInterface) weight += 100;
+					else return weight;
+					if (t.Name.StartsWith("Nest")) weight += 50;
+					weight += MachineApiGenerator.GetParentTypes(t).Count();
+					return weight;
+				})
 				.ToArray();
 
 			RequestParameters = lowLevelAssembly
 				.GetTypes()
 				.Where(t => t.IsClass && t.Name.EndsWith("RequestParameters"))
 				.ToDictionary(t=>t.Name.Replace("Parameters", ""));
+
+			var x = dictionary["DynamicMapping"];
 
 			_scriptGenerator = new MachineApiGenerator(dictionary);
 
@@ -90,13 +103,45 @@ namespace Nest.TypescriptGenerator
 			typeScriptFluent.For<DateInterval>();
 			var definitions = nestInterfaces.Aggregate(typeScriptFluent, (def, t) => def.For(t));
 
-			File.WriteAllText("typedefinitions.ts", definitions.Generate());
-			var hack = @"
-function custom_json() { return function(...args : any[]){}}
-function request_parameter() {return function (...args : any[]){}}
-function namespace(ns: string) {return function (...args : any[]){}}
+			var file = "typedefinitions.ts";
+			File.WriteAllText(file, definitions.Generate());
+			var errorCauseDef = @"@namespace(""common"")
+class ErrorCause {
+	reason: string;
+	type: string;
+	caused_by: ErrorCause;
+	stack_trace: string;
+	metadata: ErrorCauseMetadata;
+}
 ";
-			File.AppendAllText("typedefinitions.ts", hack);
+		var errorDef = @"@namespace(""common"")
+class Error extends ErrorCause {
+	root_cause: ErrorCause[];
+	headers: Map<string, string>;
+}
+";
+			var hack = @"
+function class_serializer(ns: string) {return function (ns: any){}}
+function prop_serializer(ns: string) {return function (ns: any, x:any){}}
+function request_parameter() {return function (ns: any, x:any){}}
+function namespace(ns: string) {return function (ns: any){}}
+
+interface Uri {}
+interface Date {}
+interface TimeSpan {}
+interface SourceDocument {}
+";
+			hack += errorCauseDef;
+			hack += errorDef;
+			var contents = File.ReadAllText(file);
+			contents = contents
+				.Replace(errorCauseDef, "")
+				.Replace(errorDef, "")
+				.Replace("\thits: Hit<T>[];", "\t//hits: Hit<T>[];");
+
+
+			File.WriteAllText(file, hack);
+			File.AppendAllText(file, contents);
 		}
 
 		private static string FormatMemberType(TsProperty tsProperty, string memberTypeName)
@@ -122,9 +167,7 @@ function namespace(ns: string) {return function (...args : any[]){}}
 			if (ifaceProperty != null) attributes.AddRange(ifaceProperty.GetCustomAttributes());
 			attributes.AddRange(property.MemberInfo.GetCustomAttributes());
 			if (attributes.Any(a => a.TypeId.ToString() == "Nest.Json.JsonIgnoreAttribute"))
-			{
 				property.IsIgnored = true;
-			}
 
 			var jsonPropertyAttribute = attributes.FirstOrDefault(a => a.TypeId.ToString() == "Nest.Json.JsonPropertyAttribute");
 			if (jsonPropertyAttribute != null)
@@ -137,7 +180,10 @@ function namespace(ns: string) {return function (...args : any[]){}}
 
 		public static string QuoteMaybe(string propertyName)
 		{
+			//this is dumb on purpose
 			if (propertyName.Contains('-')) return $"\'{propertyName}\'";
+			if (propertyName.Contains('+')) return $"\'{propertyName}\'";
+			if (Regex.IsMatch(propertyName, @"^\d")) return $"\'{propertyName}\'";
 			return propertyName;
 
 		}

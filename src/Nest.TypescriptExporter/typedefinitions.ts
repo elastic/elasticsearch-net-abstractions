@@ -1,3 +1,26 @@
+
+function class_serializer(ns: string) {return function (ns: any){}}
+function prop_serializer(ns: string) {return function (ns: any, x:any){}}
+function request_parameter() {return function (ns: any, x:any){}}
+function namespace(ns: string) {return function (ns: any){}}
+
+interface Uri {}
+interface Date {}
+interface TimeSpan {}
+interface SourceDocument {}
+@namespace("common")
+class ErrorCause {
+	reason: string;
+	type: string;
+	caused_by: ErrorCause;
+	stack_trace: string;
+	metadata: ErrorCauseMetadata;
+}
+@namespace("common")
+class Error extends ErrorCause {
+	root_cause: ErrorCause[];
+	headers: Map<string, string>;
+}
 interface short {}
 interface byte {}
 interface integer {}
@@ -5,7 +28,7 @@ interface long {}
 interface float {}
 interface double {}
 
-@namespace("aggregations.bucket.date_histogram")
+/** namespace:aggregations.bucket.date_histogram **/
 enum DateInterval {
 	second = 0,
 	minute = 1,
@@ -16,7 +39,64 @@ enum DateInterval {
 	quarter = 6,
 	year = 7
 }
-@namespace("analysis.languages")
+/** namespace:aggregations.bucket.geo_hash_grid **/
+enum GeoHashPrecision {
+	Precision1 = 1,
+	Precision2 = 2,
+	Precision3 = 3,
+	Precision4 = 4,
+	Precision5 = 5,
+	Precision6 = 6,
+	Precision7 = 7,
+	Precision8 = 8,
+	Precision9 = 9,
+	Precision10 = 10,
+	Precision11 = 11,
+	Precision12 = 12
+}
+/** namespace:aggregations.bucket.sampler **/
+enum SamplerAggregationExecutionHint {
+	map = 0,
+	global_ordinals = 1,
+	bytes_hash = 2
+}
+/** namespace:aggregations.bucket.terms **/
+enum TermsAggregationCollectMode {
+	depth_first = 0,
+	breadth_first = 1
+}
+/** namespace:aggregations.bucket.terms **/
+enum TermsAggregationExecutionHint {
+	map = 0,
+	global_ordinals = 1,
+	global_ordinals_hash = 2,
+	global_ordinals_low_cardinality = 3
+}
+/** namespace:aggregations.matrix.matrix_stats **/
+enum MatrixStatsMode {
+	avg = 0,
+	min = 1,
+	max = 2,
+	sum = 3,
+	median = 4
+}
+/** namespace:aggregations.pipeline **/
+enum GapPolicy {
+	skip = 0,
+	insert_zeros = 1
+}
+/** namespace:aggregations.pipeline.moving_average.models **/
+enum HoltWintersType {
+	add = 0,
+	mult = 1
+}
+/** namespace:aggregations.visitor **/
+enum AggregationVisitorScope {
+	Unknown = 0,
+	Aggregation = 1,
+	Bucket = 2
+}
+/** namespace:analysis.languages **/
 enum Language {
 	Arabic = 0,
 	Armenian = 1,
@@ -52,7 +132,7 @@ enum Language {
 	Turkish = 31,
 	Thai = 32
 }
-@namespace("analysis.languages")
+/** namespace:analysis.languages **/
 enum SnowballLanguage {
 	Armenian = 0,
 	Basque = 1,
@@ -77,7 +157,22 @@ enum SnowballLanguage {
 	Swedish = 20,
 	Turkish = 21
 }
-@namespace("analysis.plugins.icu.collation")
+/** namespace:analysis.plugins.icu.collation **/
+enum IcuCollationAlternate {
+	shifted = 0,
+	'non-ignorable' = 1
+}
+/** namespace:analysis.plugins.icu.collation **/
+enum IcuCollationCaseFirst {
+	lower = 0,
+	upper = 1
+}
+/** namespace:analysis.plugins.icu.collation **/
+enum IcuCollationDecomposition {
+	no = 0,
+	identical = 1
+}
+/** namespace:analysis.plugins.icu.collation **/
 enum IcuCollationStrength {
 	primary = 0,
 	secondary = 1,
@@ -85,44 +180,29 @@ enum IcuCollationStrength {
 	quaternary = 3,
 	identical = 4
 }
-@namespace("analysis.plugins.icu.collation")
-enum IcuCollationDecomposition {
-	no = 0,
-	identical = 1
+/** namespace:analysis.plugins.icu.normalization **/
+enum IcuNormalizationMode {
+	decompose = 0,
+	compose = 1
 }
-@namespace("analysis.plugins.icu.collation")
-enum IcuCollationAlternate {
-	shifted = 0,
-	'non-ignorable' = 1
-}
-@namespace("analysis.plugins.icu.collation")
-enum IcuCollationCaseFirst {
-	lower = 0,
-	upper = 1
-}
-@namespace("analysis.plugins.icu.normalization")
+/** namespace:analysis.plugins.icu.normalization **/
 enum IcuNormalizationType {
 	nfc = 0,
 	nfkc = 1,
 	nfkc_cf = 2
 }
-@namespace("analysis.plugins.icu.normalization")
-enum IcuNormalizationMode {
-	decompose = 0,
-	compose = 1
-}
-@namespace("analysis.plugins.icu.transform")
+/** namespace:analysis.plugins.icu.transform **/
 enum IcuTransformDirection {
 	forward = 0,
 	reverse = 1
 }
-@namespace("analysis.plugins.kuromoji")
+/** namespace:analysis.plugins.kuromoji **/
 enum KuromojiTokenizationMode {
 	normal = 0,
 	search = 1,
 	extended = 2
 }
-@namespace("analysis.plugins.phonetic")
+/** namespace:analysis.plugins.phonetic **/
 enum PhoneticEncoder {
 	metaphone = 0,
 	doublemetaphone = 1,
@@ -136,23 +216,23 @@ enum PhoneticEncoder {
 	haasephonetik = 9,
 	beidermorse = 10
 }
-@namespace("analysis.token_filters.delimited_payload")
+/** namespace:analysis.token_filters.delimited_payload **/
 enum DelimitedPayloadEncoding {
 	int = 0,
 	float = 1,
 	identity = 2
 }
-@namespace("analysis.token_filters.edge_n_gram")
+/** namespace:analysis.token_filters.edge_n_gram **/
 enum EdgeNGramSide {
 	front = 0,
 	back = 1
 }
-@namespace("analysis.token_filters.synonym")
+/** namespace:analysis.token_filters.synonym **/
 enum SynonymFormat {
 	solr = 0,
 	wordnet = 1
 }
-@namespace("analysis.tokenizers.n_gram")
+/** namespace:analysis.tokenizers.n_gram **/
 enum TokenChar {
 	letter = 0,
 	digit = 1,
@@ -160,17 +240,28 @@ enum TokenChar {
 	punctuation = 3,
 	symbol = 4
 }
-@namespace("common_options.time_unit")
-enum TimeUnit {
-	nanos = 0,
-	micros = 1,
-	ms = 2,
-	s = 3,
-	m = 4,
-	h = 5,
-	d = 6
+/** namespace:cluster.cluster_allocation_explain **/
+enum AllocationExplainDecision {
+	NO = 0,
+	YES = 1,
+	THROTTLE = 2,
+	ALWAYS = 3
 }
-@namespace("cluster.cluster_allocation_explain")
+/** namespace:cluster.cluster_allocation_explain **/
+enum Decision {
+	yes = 0,
+	no = 1
+}
+/** namespace:cluster.cluster_allocation_explain **/
+enum StoreCopy {
+	NONE = 0,
+	AVAILABLE = 1,
+	CORRUPT = 2,
+	IO_ERROR = 3,
+	STALE = 4,
+	UNKNOWN = 5
+}
+/** namespace:cluster.cluster_allocation_explain **/
 enum UnassignedInformationReason {
 	INDEX_CREATED = 0,
 	CLUSTER_RECOVERED = 1,
@@ -185,44 +276,69 @@ enum UnassignedInformationReason {
 	REINITIALIZED = 10,
 	REALLOCATED_REPLICA = 11
 }
-@namespace("cluster.cluster_allocation_explain")
-enum AllocationExplainDecision {
-	NO = 0,
-	YES = 1,
-	THROTTLE = 2,
-	ALWAYS = 3
-}
-@namespace("cluster.cluster_allocation_explain")
-enum Decision {
-	yes = 0,
-	no = 1
-}
-@namespace("cluster")
+/** namespace:cluster **/
 enum ClusterStatus {
 	green = 0,
 	yellow = 1,
 	red = 2
 }
-@namespace("cluster.nodes_info")
+/** namespace:cluster.nodes_info **/
 enum NodeRole {
 	master = 0,
 	data = 1,
 	client = 2,
 	ingest = 3
 }
-@namespace("search.search.sort")
-enum SortOrder {
-	asc = 0,
-	desc = 1
+/** namespace:common_options.date_math **/
+enum DateMathOperation {
+	'+' = 0,
+	'-' = 1
 }
-@namespace("search.search.sort")
-enum SortMode {
-	min = 0,
-	max = 1,
-	sum = 2,
-	avg = 3
+/** namespace:common_options.date_math **/
+enum DateMathTimeUnit {
+	s = 0,
+	m = 1,
+	h = 2,
+	d = 3,
+	w = 4,
+	M = 5,
+	y = 6
 }
-@namespace("document")
+/** namespace:common_options.geo **/
+enum DistanceUnit {
+	in = 0,
+	ft = 1,
+	yd = 2,
+	mi = 3,
+	nmi = 4,
+	km = 5,
+	m = 6,
+	cm = 7,
+	mm = 8
+}
+/** namespace:common_options.geo **/
+enum GeoDistanceType {
+	arc = 0,
+	plane = 1
+}
+/** namespace:common_options.geo **/
+enum GeoShapeRelation {
+	intersects = 0,
+	disjoint = 1,
+	within = 2,
+	contains = 3
+}
+/** namespace:common_options.time_unit **/
+enum TimeUnit {
+	nanos = 0,
+	micros = 1,
+	ms = 2,
+	s = 3,
+	m = 4,
+	h = 5,
+	d = 6
+}
+/** namespace:document **/
 enum Result {
 	Error = 0,
 	created = 1,
@@ -231,16 +347,309 @@ enum Result {
 	not_found = 4,
 	noop = 5
 }
-@namespace("query_dsl.multi_term_query_rewrite")
-enum RewriteMultiTerm {
-	constant_score = 0,
-	scoring_boolean = 1,
-	constant_score_boolean = 2,
-	top_terms_N = 3,
-	top_terms_boost_N = 4,
-	top_terms_blended_freqs_N = 5
+/** namespace:index_modules.index_settings.settings **/
+enum RecoveryInitialShards {
+	quorem = 0,
+	'quorem-1' = 1,
+	full = 2,
+	'full-1' = 3
 }
-@namespace("query_dsl.full_text.multi_match")
+/** namespace:index_modules.index_settings.slow_log **/
+enum LogLevel {
+	error = 0,
+	warn = 1,
+	info = 2,
+	debug = 3,
+	trace = 4
+}
+/** namespace:index_modules.index_settings.sorting **/
+enum IndexSortMode {
+	min = 0,
+	max = 1
+}
+/** namespace:index_modules.index_settings.sorting **/
+enum IndexSortMissing {
+	_first = 0,
+	_last = 1
+}
+/** namespace:index_modules.index_settings.sorting **/
+enum IndexSortOrder {
+	asc = 0,
+	desc = 1
+}
+/** namespace:index_modules.index_settings.store **/
+enum FileSystemStorageImplementation {
+	simplefs = 0,
+	niofs = 1,
+	mmapfs = 2,
+	default_fs = 3
+}
+/** namespace:index_modules.index_settings.translog **/
+enum TranslogDurability {
+	request = 0,
+	async = 1
+}
+/** namespace:index_modules.similarity.d_f_i **/
+enum DFIIndependenceMeasure {
+	standardized = 0,
+	saturated = 1,
+	chisquared = 2
+}
+/** namespace:index_modules.similarity.d_f_r **/
+enum DFRAfterEffect {
+	no = 0,
+	b = 1,
+	l = 2
+}
+/** namespace:index_modules.similarity.d_f_r **/
+enum DFRBasicModel {
+	be = 0,
+	d = 1,
+	g = 2,
+	if = 3,
+	in = 4,
+	ine = 5,
+	p = 6
+}
+/** namespace:index_modules.similarity.i_b **/
+enum IBDistribution {
+	ll = 0,
+	spl = 1
+}
+/** namespace:index_modules.similarity.i_b **/
+enum IBLambda {
+	df = 0,
+	ttf = 1
+}
+/** namespace:index_modules.similarity **/
+enum Normalization {
+	no = 0,
+	h1 = 1,
+	h2 = 2,
+	h3 = 3,
+	z = 4
+}
+/** namespace:indices.monitoring.indices_shard_stores **/
+enum ShardStoreAllocation {
+	primary = 0,
+	replica = 1,
+	unused = 2
+}
+/** namespace:ingest.processors **/
+enum ConvertProcessorType {
+	integer = 0,
+	float = 1,
+	string = 2,
+	boolean = 3,
+	auto = 4
+}
+/** namespace:ingest.processors **/
+enum DateRounding {
+	s = 0,
+	m = 1,
+	h = 2,
+	d = 3,
+	w = 4,
+	M = 5,
+	y = 6
+}
+/** namespace:ingest.processors.plugins.user_agent **/
+enum UserAgentProperty {
+	NAME = 0,
+	MAJOR = 1,
+	MINOR = 2,
+	PATCH = 3,
+	OS = 4,
+	OS_NAME = 5,
+	OS_MAJOR = 6,
+	OS_MINOR = 7,
+	DEVICE = 8,
+	BUILD = 9
+}
+/** namespace:mapping **/
+enum DynamicMapping {
+	strict = 0
+}
+/** namespace:common **/
+enum FieldIndexOption {
+	analyzed = 0,
+	not_analyzed = 1,
+	no = 2
+}
+/** namespace:mapping **/
+enum SimilarityOption {
+	classic = 0,
+	BM25 = 1
+}
+/** namespace:mapping **/
+enum TermVectorOption {
+	no = 0,
+	yes = 1,
+	with_offsets = 2,
+	with_positions = 3,
+	with_positions_offsets = 4,
+	with_positions_offsets_payloads = 5
+}
+/** namespace:mapping.types.core.number **/
+enum NumberType {
+	float = 0,
+	half_float = 1,
+	scaled_float = 2,
+	double = 3,
+	integer = 4,
+	long = 5,
+	short = 6,
+	byte = 7
+}
+/** namespace:mapping.types.core.range **/
+enum RangeType {
+	integer_range = 0,
+	float_range = 1,
+	long_range = 2,
+	double_range = 3,
+	date_range = 4
+}
+/** namespace:mapping.types.core.text **/
+enum IndexOptions {
+	docs = 0,
+	freqs = 1,
+	positions = 2,
+	offsets = 3
+}
+/** namespace:mapping.types **/
+enum FieldType {
+	none = 0,
+	geo_point = 1,
+	geo_shape = 2,
+	ip = 3,
+	binary = 4,
+	keyword = 5,
+	text = 6,
+	date = 7,
+	boolean = 8,
+	completion = 9,
+	nested = 10,
+	object = 11,
+	murmur3 = 12,
+	token_count = 13,
+	percolator = 14,
+	integer = 15,
+	long = 16,
+	short = 17,
+	byte = 18,
+	float = 19,
+	half_float = 20,
+	scaled_float = 21,
+	double = 22,
+	integer_range = 23,
+	float_range = 24,
+	long_range = 25,
+	double_range = 26,
+	date_range = 27,
+	join = 28
+}
+/** namespace:mapping.types.geo.geo_shape **/
+enum GeoOrientation {
+	cw = 0,
+	ccw = 1
+}
+/** namespace:mapping.types.geo.geo_shape **/
+enum GeoStrategy {
+	recursive = 0,
+	term = 1
+}
+/** namespace:mapping.types.geo.geo_shape **/
+enum GeoTree {
+	geohash = 0,
+	quadtree = 1
+}
+/** namespace:modules.cluster.shard_allocation **/
+enum AllocationEnable {
+	all = 0,
+	primaries = 1,
+	new_primaries = 2,
+	none = 3
+}
+/** namespace:modules.cluster.shard_allocation **/
+enum AllowRebalance {
+	always = 0,
+	indices_primaries_active = 1,
+	indices_all_active = 2
+}
+/** namespace:modules.cluster.shard_allocation **/
+enum RebalanceEnable {
+	all = 0,
+	primaries = 1,
+	replicas = 2,
+	none = 3
+}
+/** namespace:modules.indices.fielddata **/
+enum FielddataLoading {
+	eager = 0,
+	eager_global_ordinals = 1
+}
+/** namespace:modules.indices.fielddata.geo_point **/
+enum GeoPointFielddataFormat {
+	array = 0,
+	doc_values = 1,
+	compressed = 2,
+	disabled = 3
+}
+/** namespace:modules.indices.fielddata.numeric **/
+enum NumericFielddataFormat {
+	array = 0,
+	disabled = 1
+}
+/** namespace:modules.indices.fielddata.string **/
+enum StringFielddataFormat {
+	paged_bytes = 0,
+	disabled = 1
+}
+/** namespace:modules.scripting **/
+enum ScriptLang {
+	painless = 0,
+	expression = 1,
+	mustache = 2
+}
+/** namespace:query_dsl.compound.function_score.functions.decay **/
+enum MultiValueMode {
+	min = 0,
+	max = 1,
+	avg = 2,
+	sum = 3
+}
+/** namespace:query_dsl.compound.function_score.functions.field_value **/
+enum FieldValueFactorModifier {
+	none = 0,
+	log = 1,
+	log1p = 2,
+	log2p = 3,
+	ln = 4,
+	ln1p = 5,
+	ln2p = 6,
+	square = 7,
+	sqrt = 8,
+	reciprocal = 9
+}
+/** namespace:query_dsl.compound.function_score.functions **/
+enum FunctionBoostMode {
+	multiply = 0,
+	replace = 1,
+	sum = 2,
+	avg = 3,
+	max = 4,
+	min = 5
+}
+/** namespace:query_dsl.compound.function_score.functions **/
+enum FunctionScoreMode {
+	multiply = 0,
+	sum = 1,
+	avg = 2,
+	first = 3,
+	max = 4,
+	min = 5
+}
+/** namespace:query_dsl.full_text.multi_match **/
 enum TextQueryType {
 	best_fields = 0,
 	most_fields = 1,
@@ -248,56 +657,12 @@ enum TextQueryType {
 	phrase = 3,
 	phrase_prefix = 4
 }
-@namespace("query_dsl")
-enum Operator {
-	and = 0,
-	or = 1
-}
-@namespace("query_dsl.full_text.multi_match")
+/** namespace:query_dsl.full_text.multi_match **/
 enum ZeroTermsQuery {
 	all = 0,
 	none = 1
 }
-@namespace("common_options.geo")
-enum GeoShapeRelation {
-	intersects = 0,
-	disjoint = 1,
-	within = 2,
-	contains = 3
-}
-@namespace("search.search.highlighting")
-enum HighlighterOrder {
-	score = 0
-}
-@namespace("search.search.highlighting")
-enum HighlighterTagsSchema {
-	styled = 0
-}
-@namespace("search.search.highlighting")
-enum BoundaryScanner {
-	chars = 0,
-	sentence = 1,
-	word = 2
-}
-@namespace("search.search.highlighting")
-enum HighlighterFragmenter {
-	simple = 0,
-	span = 1
-}
-@namespace("search.search.highlighting")
-enum HighlighterEncoder {
-	default = 0,
-	html = 1
-}
-@namespace("query_dsl.joining.has_child")
-enum ChildScoreMode {
-	none = 0,
-	avg = 1,
-	sum = 2,
-	max = 3,
-	min = 4
-}
-@namespace("query_dsl.full_text.simple_query_string")
+/** namespace:query_dsl.full_text.simple_query_string **/
 enum SimpleQueryStringFlags {
 	NONE = 1,
 	AND = 2,
@@ -313,7 +678,26 @@ enum SimpleQueryStringFlags {
 	SLOP = 2048,
 	ALL = 4096
 }
-@namespace("query_dsl.joining.nested")
+/** namespace:query_dsl.geo.bounding_box **/
+enum GeoExecution {
+	memory = 0,
+	indexed = 1
+}
+/** namespace:query_dsl.geo **/
+enum GeoValidationMethod {
+	coerce = 0,
+	ignore_malformed = 1,
+	strict = 2
+}
+/** namespace:query_dsl.joining.has_child **/
+enum ChildScoreMode {
+	none = 0,
+	avg = 1,
+	sum = 2,
+	max = 3,
+	min = 4
+}
+/** namespace:query_dsl.joining.nested **/
 enum NestedScoreMode {
 	avg = 0,
 	sum = 1,
@@ -321,119 +705,69 @@ enum NestedScoreMode {
 	max = 3,
 	none = 4
 }
-@namespace("query_dsl.compound.function_score.functions")
-enum FunctionScoreMode {
-	multiply = 0,
-	sum = 1,
-	avg = 2,
-	first = 3,
-	max = 4,
-	min = 5
+/** namespace:query_dsl.multi_term_query_rewrite **/
+enum RewriteMultiTerm {
+	constant_score = 0,
+	scoring_boolean = 1,
+	constant_score_boolean = 2,
+	top_terms_N = 3,
+	top_terms_boost_N = 4,
+	top_terms_blended_freqs_N = 5
 }
-@namespace("query_dsl.compound.function_score.functions")
-enum FunctionBoostMode {
-	multiply = 0,
-	replace = 1,
-	sum = 2,
-	avg = 3,
-	max = 4,
-	min = 5
+/** namespace:query_dsl **/
+enum Operator {
+	and = 0,
+	or = 1
 }
-@namespace("query_dsl.geo.bounding_box")
-enum GeoExecution {
-	memory = 0,
-	indexed = 1
+/** namespace:query_dsl.term_level.range **/
+enum RangeRelation {
+	within = 0,
+	contains = 1,
+	intersects = 2
 }
-@namespace("query_dsl.geo")
-enum GeoValidationMethod {
-	coerce = 0,
-	ignore_malformed = 1,
-	strict = 2
+/** namespace:query_dsl.visitor **/
+enum VisitorScope {
+	Unknown = 0,
+	Query = 1,
+	Filter = 2,
+	Must = 3,
+	MustNot = 4,
+	Should = 5,
+	PositiveQuery = 6,
+	NegativeQuery = 7,
+	Span = 8
 }
-@namespace("common_options.geo")
-enum DistanceUnit {
-	in = 0,
-	ft = 1,
-	yd = 2,
-	mi = 3,
-	nmi = 4,
-	km = 5,
-	m = 6,
-	cm = 7,
-	mm = 8
+/** namespace:search.search.highlighting **/
+enum BoundaryScanner {
+	chars = 0,
+	sentence = 1,
+	word = 2
 }
-@namespace("common_options.geo")
-enum GeoDistanceType {
-	arc = 0,
-	plane = 1
+/** namespace:search.search.highlighting **/
+enum HighlighterEncoder {
+	default = 0,
+	html = 1
 }
-@namespace("indices.monitoring.indices_shard_stores")
-enum ShardStoreAllocation {
-	primary = 0,
-	replica = 1,
-	unused = 2
+/** namespace:search.search.highlighting **/
+enum HighlighterFragmenter {
+	simple = 0,
+	span = 1
 }
-@namespace("modules.indices.fielddata.numeric")
-enum NumericFielddataFormat {
-	array = 0,
-	disabled = 1
+/** namespace:search.search.highlighting **/
+enum HighlighterOrder {
+	score = 0
 }
-@namespace("mapping.types.core.text")
-enum IndexOptions {
-	docs = 0,
-	freqs = 1,
-	positions = 2,
-	offsets = 3
+/** namespace:search.search.highlighting **/
+enum HighlighterTagsSchema {
+	styled = 0
 }
-@namespace("mapping")
-enum TermVectorOption {
-	no = 0,
-	yes = 1,
-	with_offsets = 2,
-	with_positions = 3,
-	with_positions_offsets = 4,
-	with_positions_offsets_payloads = 5
+/** namespace:search.search.highlighting **/
+enum HighlighterType {
+	plain = 0,
+	fvh = 1,
+	unified = 2
 }
-@namespace("mapping.types.geo.geo_shape")
-enum GeoTree {
-	geohash = 0,
-	quadtree = 1
-}
-@namespace("mapping.types.geo.geo_shape")
-enum GeoOrientation {
-	cw = 0,
-	ccw = 1
-}
-@namespace("mapping.types.geo.geo_shape")
-enum GeoStrategy {
-	recursive = 0,
-	term = 1
-}
-@namespace("modules.indices.fielddata.string")
-enum StringFielddataFormat {
-	paged_bytes = 0,
-	disabled = 1
-}
-@namespace("DefaultLanguageConstruct")
-enum FieldIndexOption {
-	analyzed = 0,
-	not_analyzed = 1,
-	no = 2
-}
-@namespace("search.suggesters.term_suggester")
-enum SuggestSort {
-	score = 0,
-	frequency = 1
-}
-@namespace("search.suggesters.term_suggester")
-enum StringDistance {
-	internal = 0,
-	damerau_levenshtein = 1,
-	levenstein = 2,
-	jarowinkler = 3,
-	ngram = 4
-}
-@namespace("search.search.rescoring")
+/** namespace:search.search.rescoring **/
 enum ScoreMode {
 	avg = 0,
 	max = 1,
@@ -441,55 +775,51 @@ enum ScoreMode {
 	multiply = 3,
 	total = 4
 }
-@namespace("aggregations.bucket.geo_hash_grid")
-enum GeoHashPrecision {
-	Precision1 = 1,
-	Precision2 = 2,
-	Precision3 = 3,
-	Precision4 = 4,
-	Precision5 = 5,
-	Precision6 = 6,
-	Precision7 = 7,
-	Precision8 = 8,
-	Precision9 = 9,
-	Precision10 = 10,
-	Precision11 = 11,
-	Precision12 = 12
+/** namespace:search.search.sort **/
+enum SortMode {
+	min = 0,
+	max = 1,
+	sum = 2,
+	avg = 3
 }
-@namespace("aggregations.bucket.terms")
-enum TermsAggregationExecutionHint {
-	map = 0,
-	global_ordinals = 1,
-	global_ordinals_hash = 2,
-	global_ordinals_low_cardinality = 3
+/** namespace:search.search.sort **/
+enum SortOrder {
+	asc = 0,
+	desc = 1
 }
-@namespace("aggregations.bucket.terms")
-enum TermsAggregationCollectMode {
-	depth_first = 0,
-	breadth_first = 1
+/** namespace:search.search.sort **/
+enum SortSpecialField {
+	_score = 0,
+	_doc = 1
 }
-@namespace("aggregations.bucket.sampler")
-enum SamplerAggregationExecutionHint {
-	map = 0,
-	global_ordinals = 1,
-	bytes_hash = 2
+/** namespace:search.suggesters.term_suggester **/
+enum StringDistance {
+	internal = 0,
+	damerau_levenshtein = 1,
+	levenstein = 2,
+	jarowinkler = 3,
+	ngram = 4
 }
-@namespace("aggregations.matrix.matrix_stats")
-enum MatrixStatsMode {
-	avg = 0,
-	min = 1,
-	max = 2,
-	sum = 3,
-	median = 4
+/** namespace:search.suggesters.term_suggester **/
+enum SuggestSort {
+	score = 0,
+	frequency = 1
 }
-@namespace("x_pack.migration.deprecation_info")
+/** namespace:x_pack.migration.deprecation_info **/
 enum DeprecationWarningLevel {
 	none = 0,
 	info = 1,
 	warning = 2,
 	critical = 3
 }
-@namespace("x_pack.license.get_license")
+/** namespace:x_pack.license.get_license **/
+enum LicenseStatus {
+	active = 0,
+	valid = 1,
+	invalid = 2,
+	expired = 3
+}
+/** namespace:x_pack.license.get_license **/
 enum LicenseType {
 	missing = 0,
 	trial = 1,
@@ -500,33 +830,20 @@ enum LicenseType {
 	gold = 6,
 	platinum = 7
 }
-@namespace("x_pack.license.get_license")
-enum LicenseStatus {
-	active = 0,
-	valid = 1,
-	invalid = 2,
-	expired = 3
+/** namespace:x_pack.machine_learning.datafeed **/
+enum ChunkingMode {
+	auto = 0,
+	manual = 1,
+	off = 2
 }
-@namespace("x_pack.machine_learning.datafeed")
+/** namespace:x_pack.machine_learning.datafeed **/
 enum DatafeedState {
 	started = 0,
 	stopped = 1,
 	starting = 2,
 	stopping = 3
 }
-@namespace("x_pack.machine_learning.datafeed")
-enum ChunkingMode {
-	auto = 0,
-	manual = 1,
-	off = 2
-}
-@namespace("x_pack.machine_learning.job.config")
-enum MemoryStatus {
-	ok = 0,
-	soft_limit = 1,
-	hard_limit = 2
-}
-@namespace("x_pack.machine_learning.job.config")
+/** namespace:x_pack.machine_learning.job.config **/
 enum JobState {
 	closing = 0,
 	closed = 1,
@@ -534,32 +851,95 @@ enum JobState {
 	failed = 3,
 	opening = 4
 }
-@namespace("x_pack.machine_learning.put_job")
+/** namespace:x_pack.machine_learning.job.config **/
+enum MemoryStatus {
+	ok = 0,
+	soft_limit = 1,
+	hard_limit = 2
+}
+/** namespace:x_pack.machine_learning.job.detectors **/
+enum CountFunction {
+	Count = 0,
+	HighCount = 1,
+	LowCount = 2
+}
+/** namespace:x_pack.machine_learning.job.detectors **/
+enum NonZeroCountFunction {
+	NonZeroCount = 0,
+	LowNonZeroCount = 1,
+	HighNonZeroCount = 2
+}
+/** namespace:x_pack.machine_learning.job.detectors **/
+enum DistinctCountFunction {
+	DistinctCount = 0,
+	LowDistinctCount = 1,
+	HighDistinctCount = 2
+}
+/** namespace:x_pack.machine_learning.job.detectors **/
+enum GeographicFunction {
+	LatLong = 0
+}
+/** namespace:x_pack.machine_learning.job.detectors **/
+enum InfoContentFunction {
+	InfoContent = 0,
+	HighInfoContent = 1,
+	LowInfoContent = 2
+}
+/** namespace:x_pack.machine_learning.job.detectors **/
+enum MetricFunction {
+	Min = 0,
+	Max = 1,
+	Median = 2,
+	HighMedian = 3,
+	LowMedian = 4,
+	Mean = 5,
+	HighMean = 6,
+	LowMean = 7,
+	Metric = 8,
+	Varp = 9,
+	HighVarp = 10,
+	LowVarp = 11
+}
+/** namespace:x_pack.machine_learning.job.detectors **/
+enum RareFunction {
+	Rare = 0,
+	FreqRare = 1
+}
+/** namespace:x_pack.machine_learning.job.detectors **/
+enum SumFunction {
+	Sum = 0,
+	HighSum = 1,
+	LowSum = 2
+}
+/** namespace:x_pack.machine_learning.job.detectors **/
+enum NonNullSumFunction {
+	NonNullSum = 0,
+	HighNonNullSum = 1,
+	LowNonNullSum = 2
+}
+/** namespace:x_pack.machine_learning.job.detectors **/
+enum TimeFunction {
+	TimeOfDay = 0,
+	TimeOfWeek = 1
+}
+/** namespace:x_pack.machine_learning.put_job **/
 enum ExcludeFrequent {
 	all = 0,
 	none = 1,
 	by = 2,
 	over = 3
 }
-@namespace("x_pack.security.user.get_user_access_token")
+/** namespace:x_pack.security.user.get_user_access_token **/
 enum AccessTokenGrantType {
 	password = 0
 }
-@namespace("x_pack.watcher.acknowledge_watch")
+/** namespace:x_pack.watcher.acknowledge_watch **/
 enum AcknowledgementState {
 	awaits_successful_execution = 0,
 	ackable = 1,
 	acked = 2
 }
-@namespace("x_pack.watcher.execution")
-enum ActionExecutionMode {
-	simulate = 0,
-	force_simulate = 1,
-	execute = 2,
-	force_execute = 3,
-	skip = 4
-}
-@namespace("x_pack.watcher.action")
+/** namespace:x_pack.watcher.action **/
 enum ActionType {
 	email = 0,
 	webhook = 1,
@@ -569,28 +949,12 @@ enum ActionType {
 	slack = 5,
 	pagerduty = 6
 }
-@namespace("x_pack.watcher.input")
-enum InputType {
-	http = 0,
-	search = 1,
-	simple = 2
+/** namespace:x_pack.watcher.action.email **/
+enum DataAttachmentFormat {
+	json = 0,
+	yaml = 1
 }
-@namespace("x_pack.watcher.execution")
-enum Status {
-	success = 0,
-	failure = 1,
-	simulated = 2,
-	throttled = 3
-}
-@namespace("x_pack.watcher.condition")
-enum ConditionType {
-	always = 0,
-	never = 1,
-	script = 2,
-	compare = 3,
-	array_compare = 4
-}
-@namespace("x_pack.watcher.action.email")
+/** namespace:x_pack.watcher.action.email **/
 enum EmailPriority {
 	lowest = 0,
 	low = 1,
@@ -598,36 +962,12 @@ enum EmailPriority {
 	high = 3,
 	highest = 4
 }
-@namespace("x_pack.watcher.input")
-enum ConnectionScheme {
-	http = 0,
-	https = 1
-}
-@namespace("x_pack.watcher.input")
-enum HttpInputMethod {
-	head = 0,
-	get = 1,
-	post = 2,
-	put = 3,
-	delete = 4
-}
-@namespace("x_pack.watcher.action.pager_duty")
-enum PagerDutyContextType {
-	link = 0,
-	image = 1
-}
-@namespace("x_pack.watcher.action.pager_duty")
-enum PagerDutyEventType {
-	trigger = 0,
-	resolve = 1,
-	acknowledge = 2
-}
-@namespace("x_pack.watcher.action.hip_chat")
+/** namespace:x_pack.watcher.action.hip_chat **/
 enum HipChatMessageFormat {
 	html = 0,
 	text = 1
 }
-@namespace("x_pack.watcher.action.hip_chat")
+/** namespace:x_pack.watcher.action.hip_chat **/
 enum HipChatMessageColor {
 	gray = 0,
 	green = 1,
@@ -635,7 +975,31 @@ enum HipChatMessageColor {
 	red = 3,
 	yellow = 4
 }
-@namespace("x_pack.watcher.execute_watch")
+/** namespace:x_pack.watcher.action.pager_duty **/
+enum PagerDutyEventType {
+	trigger = 0,
+	resolve = 1,
+	acknowledge = 2
+}
+/** namespace:x_pack.watcher.action.pager_duty **/
+enum PagerDutyContextType {
+	link = 0,
+	image = 1
+}
+/** namespace:x_pack.watcher.condition **/
+enum Quantifier {
+	some = 0,
+	all = 1
+}
+/** namespace:x_pack.watcher.condition **/
+enum ConditionType {
+	always = 0,
+	never = 1,
+	script = 2,
+	compare = 3,
+	array_compare = 4
+}
+/** namespace:x_pack.watcher.execute_watch **/
 enum ActionExecutionState {
 	awaits_execution = 0,
 	checking = 1,
@@ -646,18 +1010,47 @@ enum ActionExecutionState {
 	deleted_while_queued = 6,
 	not_executed_already_queued = 7
 }
-@namespace("x_pack.watcher.input")
+/** namespace:x_pack.watcher.execution **/
+enum ActionExecutionMode {
+	simulate = 0,
+	force_simulate = 1,
+	execute = 2,
+	force_execute = 3,
+	skip = 4
+}
+/** namespace:x_pack.watcher.execution **/
+enum Status {
+	success = 0,
+	failure = 1,
+	simulated = 2,
+	throttled = 3
+}
+/** namespace:x_pack.watcher.input **/
+enum ConnectionScheme {
+	http = 0,
+	https = 1
+}
+/** namespace:x_pack.watcher.input **/
+enum HttpInputMethod {
+	head = 0,
+	get = 1,
+	post = 2,
+	put = 3,
+	delete = 4
+}
+/** namespace:x_pack.watcher.input **/
+enum InputType {
+	http = 0,
+	search = 1,
+	simple = 2
+}
+/** namespace:x_pack.watcher.input **/
 enum ResponseContentType {
 	json = 0,
 	yaml = 1,
 	text = 2
 }
-@namespace("x_pack.watcher.condition")
-enum Quantifier {
-	some = 0,
-	all = 1
-}
-@namespace("x_pack.watcher.schedule")
+/** namespace:x_pack.watcher.schedule **/
 enum Day {
 	sunday = 0,
 	monday = 1,
@@ -667,7 +1060,15 @@ enum Day {
 	friday = 5,
 	saturday = 6
 }
-@namespace("x_pack.watcher.schedule")
+/** namespace:x_pack.watcher.schedule **/
+enum IntervalUnit {
+	s = 0,
+	m = 1,
+	h = 2,
+	d = 3,
+	w = 4
+}
+/** namespace:x_pack.watcher.schedule **/
 enum Month {
 	january = 0,
 	february = 1,
@@ -682,15 +1083,14 @@ enum Month {
 	november = 10,
 	december = 11
 }
-@namespace("x_pack.watcher.schedule")
-enum IntervalUnit {
-	s = 0,
-	m = 1,
-	h = 2,
-	d = 3,
-	w = 4
+/** namespace:x_pack.watcher.watcher_stats **/
+enum WatcherState {
+	stopped = 0,
+	starting = 1,
+	started = 2,
+	stopping = 3
 }
-@namespace("x_pack.watcher.watcher_stats")
+/** namespace:x_pack.watcher.watcher_stats **/
 enum ExecutionPhase {
 	awaits_execution = 0,
 	started = 1,
@@ -701,19 +1101,25 @@ enum ExecutionPhase {
 	aborted = 6,
 	finished = 7
 }
-@namespace("x_pack.watcher.watcher_stats")
-enum WatcherState {
-	stopped = 0,
-	starting = 1,
-	started = 2,
-	stopping = 3
+@namespace("modules.indices.circuit_breaker")
+class CircuitBreakerSettings {
+	total_limit: string;
+	fielddata_limit: string;
+	fielddata_overhead: float;
+	request_limit: string;
+	request_overhead: float;
 }
-@namespace("cluster.cluster_reroute.commands")
-class ClusterRerouteCommand {
-	name: string;
+@namespace("modules.indices.recovery")
+class IndicesRecoverySettings {
+	concurrent_streams: integer;
+	concurrent_small_file_streams: integer;
+	file_chunk_size: string;
+	translog_operations: integer;
+	translog_size: string;
+	compress: boolean;
+	max_bytes_per_second: string;
 }
 @namespace("mapping")
-@custom_json()
 class TypeMapping {
 	dynamic_date_formats: string[];
 	date_detection: boolean;
@@ -724,14 +1130,12 @@ class TypeMapping {
 	_index: IndexField;
 	_size: SizeField;
 	_field_names: FieldNamesField;
-	@custom_json()
 	_meta: Map<string, any>;
 	dynamic_templates: Map<string, DynamicTemplate>;
 	dynamic: Union<boolean, DynamicMapping>;
 	properties: Map<PropertyName, Property>;
 }
 @namespace("mapping.dynamic_template")
-@custom_json()
 class DynamicTemplate {
 	match: string;
 	unmatch: string;
@@ -741,28 +1145,14 @@ class DynamicTemplate {
 	mapping: Property;
 }
 @namespace("indices.alias_management")
-@custom_json()
 class Alias {
 	filter: QueryContainer;
 	routing: Routing;
 	index_routing: Routing;
 	search_routing: Routing;
 }
-@namespace("document.multiple.bulk.bulk_operation")
-class BulkOperation {
-	operation: string;
-	_index: IndexName;
-	_type: TypeName;
-	_id: Id;
-	version: long;
-	@custom_json()
-	version_type: VersionType;
-	routing: Routing;
-	parent: Id;
-	retry_on_conflict: integer;
-}
 @namespace("document.multiple.bulk.bulk_response_item")
-@custom_json()
+@class_serializer("BulkResponseItemJsonConverter")
 class BulkResponseItem {
 	operation: string;
 	_index: string;
@@ -776,32 +1166,6 @@ class BulkResponseItem {
 	_primary_term: long;
 	is_valid: boolean;
 }
-@namespace("search.scroll.scroll")
-@custom_json()
-class SlicedScroll {
-	id: integer;
-	max: integer;
-	field: Field;
-}
-@namespace("document.multiple.multi_get.request")
-@custom_json()
-class MultiGetOperation {
-	_index: IndexName;
-	_type: TypeName;
-	_id: Id;
-	stored_fields: Field[];
-	routing: string;
-	_source: Union<boolean, SourceFilter>;
-	version: long;
-	version_type: VersionType;
-	can_be_flattened: boolean;
-}
-@namespace("search.search.source_filtering")
-@custom_json()
-class SourceFilter {
-	includes: Field[];
-	excludes: Field[];
-}
 @namespace("document.multiple.multi_get.response")
 class MultiGetHit<TDocument> {
 	source: TDocument;
@@ -814,34 +1178,6 @@ class MultiGetHit<TDocument> {
 	routing: string;
 	error: Error;
 }
-@namespace("document.multiple.multi_term_vectors")
-class MultiTermVectorOperation {
-	_index: IndexName;
-	_type: TypeName;
-	_id: Id;
-	@custom_json()
-	doc: any;
-	fields: Field[];
-	offsets: boolean;
-	payloads: boolean;
-	positions: boolean;
-	term_statistics: boolean;
-	field_statistics: boolean;
-	filter: TermVectorFilter;
-	version: long;
-	version_type: VersionType;
-	routing: Routing;
-}
-@namespace("document.single.term_vectors")
-class TermVectorFilter {
-	max_num_terms: integer;
-	min_term_freq: integer;
-	max_term_freq: integer;
-	min_doc_freq: integer;
-	max_doc_freq: integer;
-	min_word_length: integer;
-	max_word_length: integer;
-}
 @namespace("document.single.term_vectors")
 class TermVectors {
 	index: string;
@@ -852,49 +1188,87 @@ class TermVectors {
 	took: long;
 	term_vectors: Map<Field, TermVector>;
 }
-@namespace("document.multiple.reindex_on_server")
-class ReindexSource {
-	query: QueryContainer;
-	sort: Sort[];
-	index: Indices;
-	type: Types;
-	size: integer;
-	remote: RemoteSource;
+@namespace("common_abstractions.lazy_document")
+class LazyDocument {
 }
-@namespace("search.search.sort")
-class Sort {
-	sort_key: Field;
-	missing: any;
-	order: SortOrder;
-	mode: SortMode;
-	nested_filter: QueryContainer;
-	nested_path: Field;
+@namespace("modules.scripting")
+class StoredScript {
+	lang: string;
+	source: string;
 }
-@namespace("document.multiple.reindex_on_server")
-class RemoteSource {
-	host: Uri;
-	username: string;
-	password: string;
+@namespace("modules.snapshot_and_restore.repositories")
+class SnapshotRepository {
+	type: string;
 }
-@namespace("document.multiple.reindex_on_server")
-class ReindexDestination {
-	index: IndexName;
-	type: TypeName;
-	routing: ReindexRouting;
-	@custom_json()
-	op_type: OpType;
-	@custom_json()
-	version_type: VersionType;
+@namespace("aggregations")
+class Aggregate {
+	meta: Map<string, any>;
+}
+@namespace("aggregations")
+class AggregationContainer {
+	meta: Map<string, any>;
+	avg: AverageAggregation;
+	date_histogram: DateHistogramAggregation;
+	percentiles: PercentilesAggregation;
+	date_range: DateRangeAggregation;
+	extended_stats: ExtendedStatsAggregation;
+	filter: FilterAggregation;
+	filters: FiltersAggregation;
+	geo_distance: GeoDistanceAggregation;
+	geohash_grid: GeoHashGridAggregation;
+	geo_bounds: GeoBoundsAggregation;
+	histogram: HistogramAggregation;
+	global: GlobalAggregation;
+	ip_range: IpRangeAggregation;
+	max: MaxAggregation;
+	min: MinAggregation;
+	cardinality: CardinalityAggregation;
+	missing: MissingAggregation;
+	nested: NestedAggregation;
+	reverse_nested: ReverseNestedAggregation;
+	range: RangeAggregation;
+	stats: StatsAggregation;
+	sum: SumAggregation;
+	terms: TermsAggregation;
+	significant_terms: SignificantTermsAggregation;
+	value_count: ValueCountAggregation;
+	percentile_ranks: PercentileRanksAggregation;
+	top_hits: TopHitsAggregation;
+	children: ChildrenAggregation;
+	scripted_metric: ScriptedMetricAggregation;
+	avg_bucket: AverageBucketAggregation;
+	derivative: DerivativeAggregation;
+	max_bucket: MaxBucketAggregation;
+	min_bucket: MinBucketAggregation;
+	sum_bucket: SumBucketAggregation;
+	stats_bucket: StatsBucketAggregation;
+	extended_stats_bucket: ExtendedStatsBucketAggregation;
+	percentiles_bucket: PercentilesBucketAggregation;
+	moving_avg: MovingAverageAggregation;
+	cumulative_sum: CumulativeSumAggregation;
+	serial_diff: SerialDifferencingAggregation;
+	bucket_script: BucketScriptAggregation;
+	bucket_selector: BucketSelectorAggregation;
+	sampler: SamplerAggregation;
+	geo_centroid: GeoCentroidAggregation;
+	matrix_stats: MatrixStatsAggregation;
+	adjacency_matrix: AdjacencyMatrixAggregation;
+	aggs: Map<string, AggregationContainer>;
 }
 @namespace("common_options.scripting")
-@custom_json()
+@class_serializer("ScriptJsonConverter")
 class Script {
-	@custom_json()
 	params: Map<string, any>;
 	lang: string;
 }
-@namespace("indices.alias_management.alias.actions")
-class AliasAction {
+@namespace("aggregations.metric.percentiles.methods")
+class PercentilesMethod {
+}
+@namespace("aggregations.bucket.date_range")
+class DateRangeExpression {
+	from: DateMath;
+	to: DateMath;
+	key: string;
 }
 @namespace("query_dsl.abstractions.container")
 class QueryContainer {
@@ -949,14 +1323,13 @@ class QueryContainer {
 	percolate: PercolateQuery;
 }
 @namespace("common_options.fuzziness")
-@custom_json()
+@class_serializer("FuzzinessJsonConverter")
 class Fuzziness {
 	auto: boolean;
 	edit_distance: integer;
 	ratio: double;
 }
 @namespace("query_dsl.abstractions.field_lookup")
-@custom_json()
 class FieldLookup {
 	index: IndexName;
 	type: TypeName;
@@ -965,7 +1338,6 @@ class FieldLookup {
 	routing: Routing;
 }
 @namespace("search.search.inner_hits")
-@custom_json()
 class InnerHits {
 	name: string;
 	from: integer;
@@ -978,8 +1350,16 @@ class InnerHits {
 	script_fields: Map<string, ScriptField>;
 	docvalue_fields: Field[];
 }
+@namespace("search.search.sort")
+class Sort {
+	sort_key: Field;
+	missing: any;
+	order: SortOrder;
+	mode: SortMode;
+	nested_filter: QueryContainer;
+	nested_path: Field;
+}
 @namespace("search.search.highlighting")
-@custom_json()
 class Highlight {
 	pre_tags: string[];
 	post_tags: string[];
@@ -991,7 +1371,6 @@ class Highlight {
 	encoder: HighlighterEncoder;
 	order: HighlighterOrder;
 	tags_schema: HighlighterTagsSchema;
-	@custom_json()
 	fields: Map<Field, HighlightField>;
 	require_field_match: boolean;
 	boundary_chars: string;
@@ -1001,7 +1380,6 @@ class Highlight {
 	fragmenter: HighlighterFragmenter;
 }
 @namespace("search.search.highlighting")
-@custom_json()
 class HighlightField {
 	field: Field;
 	pre_tags: string[];
@@ -1025,20 +1403,24 @@ class HighlightField {
 	highlight_query: QueryContainer;
 	phrase_limit: integer;
 }
+@namespace("search.search.source_filtering")
+@class_serializer("SourceFilterJsonConverter")
+class SourceFilter {
+	includes: Field[];
+	excludes: Field[];
+}
 @namespace("common_options.scripting")
-@custom_json()
 class ScriptField {
 	script: Script;
 }
 @namespace("query_dsl.specialized.more_like_this.like")
-@custom_json()
 class LikeDocument {
 	_index: IndexName;
 	_type: TypeName;
 	_id: Id;
 	fields: Field[];
 	_routing: Routing;
-	@custom_json()
+	@prop_serializer("SourceConverter")
 	doc: any;
 	per_field_analyzer: Map<Field, string>;
 }
@@ -1048,10 +1430,427 @@ class ScoreFunction {
 	weight: double;
 }
 @namespace("query_dsl.geo.bounding_box")
-@custom_json()
 class BoundingBox {
 	top_left: GeoLocation;
 	bottom_right: GeoLocation;
+}
+@namespace("common_options.range")
+class AggregationRange {
+	from: double;
+	to: double;
+	key: string;
+}
+@namespace("common")
+class IpRange {
+	from: string;
+	to: string;
+	mask: string;
+}
+@namespace("aggregations.bucket.significant_terms.heuristics")
+class MutualInformationHeuristic {
+	include_negatives: boolean;
+	background_is_superset: boolean;
+}
+@namespace("aggregations.bucket.significant_terms.heuristics")
+class ChiSquareHeuristic {
+	include_negatives: boolean;
+	background_is_superset: boolean;
+}
+@namespace("aggregations.bucket.significant_terms.heuristics")
+class GoogleNormalizedDistanceHeuristic {
+	background_is_superset: boolean;
+}
+@namespace("aggregations.bucket.significant_terms.heuristics")
+class PercentageScoreHeuristic {
+}
+@namespace("aggregations.bucket.significant_terms.heuristics")
+class ScriptedHeuristic {
+	script: Script;
+}
+@namespace("aggregations.pipeline.moving_average.models")
+class MovingAverageModel {
+	name: string;
+}
+@namespace("x_pack.machine_learning.datafeed")
+class ChunkingConfig {
+	mode: ChunkingMode;
+	time_span: Time;
+}
+@namespace("x_pack.machine_learning.job.config")
+class AnalysisConfig {
+	bucket_span: Time;
+	categorization_field_name: Field;
+	categorization_filters: string[];
+	detectors: Detector[];
+	influencers: Field[];
+	latency: Time;
+	multivariate_by_fields: boolean;
+	summary_count_field_name: Field;
+}
+@namespace("x_pack.machine_learning.job.detectors")
+class Detector {
+	detector_description: string;
+	exclude_frequent: ExcludeFrequent;
+	function: string;
+	use_null: boolean;
+	detector_index: integer;
+}
+@namespace("x_pack.machine_learning.job.config")
+class AnalysisLimits {
+	categorization_examples_limit: long;
+	model_memory_limit: string;
+}
+@namespace("x_pack.machine_learning.job.config")
+class DataDescription {
+	format: string;
+	time_field: Field;
+	time_format: string;
+}
+@namespace("x_pack.watcher.trigger")
+class TriggerEventContainer {
+	schedule: ScheduleTriggerEvent;
+}
+@namespace("x_pack.watcher.input")
+class HttpInputAuthentication {
+	basic: HttpInputBasicAuthentication;
+}
+@namespace("x_pack.watcher.input")
+class HttpInputBasicAuthentication {
+	username: string;
+	password: string;
+}
+@namespace("x_pack.watcher.input")
+class HttpInputProxy {
+	host: string;
+	port: integer;
+}
+@namespace("x_pack.watcher.action.pager_duty")
+class PagerDutyContext {
+	type: PagerDutyContextType;
+	href: string;
+	src: string;
+}
+@namespace("x_pack.watcher.action.hip_chat")
+class HipChatMessage {
+	body: string;
+	format: HipChatMessageFormat;
+	color: HipChatMessageColor;
+	notify: boolean;
+	from: string;
+	@prop_serializer("ReadSingleOrEnumerableJsonConverter`1")
+	room: string[];
+	@prop_serializer("ReadSingleOrEnumerableJsonConverter`1")
+	user: string[];
+}
+@namespace("x_pack.watcher.action.slack")
+class SlackMessage {
+	from: string;
+	to: string[];
+	icon: string;
+	text: string;
+	attachments: SlackAttachment[];
+	dynamic_attachments: SlackDynamicAttachment;
+}
+@namespace("x_pack.watcher.action.slack")
+class SlackAttachment {
+	fallback: string;
+	color: string;
+	pretext: string;
+	author_name: string;
+	author_link: string;
+	author_icon: string;
+	title: string;
+	title_link: string;
+	text: string;
+	fields: SlackAttachmentField[];
+	image_url: string;
+	thumb_url: string;
+	footer: string;
+	footer_icon: string;
+	@prop_serializer("EpochSecondsDateTimeJsonConverter")
+	ts: Date;
+}
+@namespace("x_pack.watcher.action.slack")
+class SlackAttachmentField {
+	title: string;
+	value: string;
+	short: boolean;
+}
+@namespace("x_pack.watcher.action.slack")
+class SlackDynamicAttachment {
+	list_path: string;
+	attachment_template: SlackAttachment;
+}
+@namespace("x_pack.watcher.input")
+class InputContainer {
+	http: HttpInput;
+	search: SearchInput;
+	simple: SimpleInput;
+	chain: ChainInput;
+}
+@namespace("x_pack.watcher.input")
+class HttpInputRequest {
+	scheme: ConnectionScheme;
+	port: integer;
+	host: string;
+	path: string;
+	method: HttpInputMethod;
+	headers: Map<string, string>;
+	params: Map<string, string>;
+	url: string;
+	auth: HttpInputAuthentication;
+	proxy: HttpInputProxy;
+	connection_timeout: Time;
+	read_timeout: Time;
+	body: string;
+}
+@namespace("x_pack.watcher.input")
+class SearchInputRequest {
+	indices: IndexName[];
+	types: TypeName[];
+	search_type: SearchType;
+	indices_options: IndicesOptions;
+	body: SearchRequest;
+	template: SearchTemplateRequest;
+}
+@namespace("x_pack.watcher.input")
+class IndicesOptions {
+	expand_wildcards: ExpandWildcards;
+	ignore_unavailable: boolean;
+	allow_no_indices: boolean;
+}
+@namespace("search.suggesters")
+class SuggestBucket {
+	text: string;
+	prefix: string;
+	regex: string;
+	term: TermSuggester;
+	phrase: PhraseSuggester;
+	completion: CompletionSuggester;
+}
+@namespace("search.suggesters.phrase_suggester")
+class DirectGenerator {
+	field: Field;
+	size: integer;
+	prefix_length: integer;
+	suggest_mode: SuggestMode;
+	min_word_length: integer;
+	max_edits: integer;
+	max_inspections: double;
+	min_doc_freq: double;
+	max_term_freq: double;
+	pre_filter: string;
+	post_filter: string;
+}
+@namespace("search.suggesters.phrase_suggester")
+class PhraseSuggestHighlight {
+	pre_tag: string;
+	post_tag: string;
+}
+@namespace("search.suggesters.phrase_suggester")
+class PhraseSuggestCollate {
+	query: PhraseSuggestCollateQuery;
+	prune: boolean;
+	params: Map<string, any>;
+}
+@namespace("search.suggesters.phrase_suggester")
+class PhraseSuggestCollateQuery {
+	source: string;
+	id: Id;
+}
+@namespace("search.suggesters.completion_suggester")
+class FuzzySuggester {
+	transpositions: boolean;
+	min_length: integer;
+	prefix_length: integer;
+	fuzziness: Fuzziness;
+	unicode_aware: boolean;
+}
+@namespace("search.suggesters.context_suggester")
+class SuggestContextQuery {
+	context: Context;
+	boost: double;
+	prefix: boolean;
+	precision: Union<Distance, integer>;
+	neighbours: Union<Distance[], integer[]>;
+}
+@namespace("search.search.collapsing")
+class FieldCollapse {
+	field: Field;
+	inner_hits: InnerHits;
+	max_concurrent_group_searches: integer;
+}
+@namespace("search.search.rescoring")
+class Rescore {
+	window_size: integer;
+	query: RescoreQuery;
+}
+@namespace("search.search.rescoring")
+class RescoreQuery {
+	rescore_query: QueryContainer;
+	query_weight: double;
+	rescore_query_weight: double;
+	score_mode: ScoreMode;
+}
+@namespace("search.scroll.scroll")
+class SlicedScroll {
+	id: integer;
+	max: integer;
+	field: Field;
+}
+@namespace("x_pack.watcher.condition")
+class ConditionContainer {
+	always: AlwaysCondition;
+	never: NeverCondition;
+	compare: CompareCondition;
+	array_compare: ArrayCompareCondition;
+	script: ScriptCondition;
+}
+@namespace("x_pack.watcher.condition")
+@class_serializer("ArrayCompareConditionConverter")
+class ArrayCompareCondition {
+	array_path: string;
+	path: string;
+	comparison: string;
+	value: any;
+	quantifier: Quantifier;
+}
+@namespace("x_pack.watcher.trigger")
+class TriggerContainer {
+	schedule: ScheduleContainer;
+}
+@namespace("x_pack.watcher.schedule")
+class ScheduleContainer {
+	hourly: HourlySchedule;
+	daily: DailySchedule;
+	weekly: TimeOfWeek[];
+	monthly: TimeOfMonth[];
+	yearly: TimeOfYear[];
+	cron: CronExpression;
+	interval: Interval;
+}
+@namespace("x_pack.watcher.schedule")
+class TimeOfDay {
+	hour: integer[];
+	minute: integer[];
+}
+@namespace("x_pack.watcher.schedule")
+class TimeOfWeek {
+	@prop_serializer("ReadSingleOrEnumerableJsonConverter`1")
+	on: Day[];
+	@prop_serializer("ReadSingleOrEnumerableJsonConverter`1")
+	at: string[];
+}
+@namespace("x_pack.watcher.schedule")
+class TimeOfMonth {
+	@prop_serializer("ReadSingleOrEnumerableJsonConverter`1")
+	on: integer[];
+	@prop_serializer("ReadSingleOrEnumerableJsonConverter`1")
+	at: string[];
+}
+@namespace("x_pack.watcher.schedule")
+class TimeOfYear {
+	@prop_serializer("ReadSingleOrEnumerableJsonConverter`1")
+	int: Month[];
+	@prop_serializer("ReadSingleOrEnumerableJsonConverter`1")
+	on: integer[];
+	@prop_serializer("ReadSingleOrEnumerableJsonConverter`1")
+	at: string[];
+}
+@namespace("x_pack.watcher.transform")
+class TransformContainer {
+	search: SearchTransform;
+	script: ScriptTransform;
+	chain: ChainTransform;
+}
+@namespace("x_pack.watcher.action")
+class Action {
+	name: string;
+	action_type: ActionType;
+	transform: TransformContainer;
+	throttle_period: Time;
+}
+@namespace("cluster.cluster_reroute.commands")
+class ClusterRerouteCommand {
+	name: string;
+}
+@namespace("document.multiple.bulk.bulk_operation")
+class BulkOperation {
+	operation: string;
+	_index: IndexName;
+	_type: TypeName;
+	_id: Id;
+	version: long;
+	version_type: VersionType;
+	routing: Routing;
+	parent: Id;
+	retry_on_conflict: integer;
+}
+@namespace("document.multiple.multi_get.request")
+class MultiGetOperation {
+	_index: IndexName;
+	_type: TypeName;
+	_id: Id;
+	stored_fields: Field[];
+	routing: string;
+	_source: Union<boolean, SourceFilter>;
+	version: long;
+	version_type: VersionType;
+	can_be_flattened: boolean;
+}
+@namespace("document.multiple.multi_term_vectors")
+class MultiTermVectorOperation {
+	_index: IndexName;
+	_type: TypeName;
+	_id: Id;
+	@prop_serializer("SourceConverter")
+	doc: any;
+	fields: Field[];
+	offsets: boolean;
+	payloads: boolean;
+	positions: boolean;
+	term_statistics: boolean;
+	field_statistics: boolean;
+	filter: TermVectorFilter;
+	version: long;
+	version_type: VersionType;
+	routing: Routing;
+}
+@namespace("document.single.term_vectors")
+class TermVectorFilter {
+	max_num_terms: integer;
+	min_term_freq: integer;
+	max_term_freq: integer;
+	min_doc_freq: integer;
+	max_doc_freq: integer;
+	min_word_length: integer;
+	max_word_length: integer;
+}
+@namespace("document.multiple.reindex_on_server")
+class ReindexSource {
+	query: QueryContainer;
+	sort: Sort[];
+	index: Indices;
+	type: Types;
+	size: integer;
+	remote: RemoteSource;
+}
+@namespace("document.multiple.reindex_on_server")
+class RemoteSource {
+	host: Uri;
+	username: string;
+	password: string;
+}
+@namespace("document.multiple.reindex_on_server")
+class ReindexDestination {
+	index: IndexName;
+	type: TypeName;
+	routing: ReindexRouting;
+	op_type: OpType;
+	version_type: VersionType;
+}
+@namespace("indices.alias_management.alias.actions")
+class AliasAction {
 }
 @namespace("analysis.tokenizers")
 class Tokenizer {
@@ -1068,17 +1867,8 @@ class TokenFilter {
 	version: string;
 	type: string;
 }
-@namespace("indices.index_management.rollover_index")
-@custom_json()
-class RolloverConditions {
-	max_age: Time;
-	max_docs: long;
-}
-@namespace("mapping.meta_fields")
-class FieldMapping {
-}
 @namespace("ingest")
-@custom_json()
+@class_serializer("PipelineJsonConverter")
 class Pipeline {
 	description: string;
 	processors: Processor[];
@@ -1094,247 +1884,42 @@ class SimulatePipelineDocument {
 	_index: IndexName;
 	_type: TypeName;
 	_id: Id;
-	@custom_json()
+	@prop_serializer("SourceConverter")
 	_source: any;
 }
-@namespace("common_abstractions.lazy_document")
-class LazyDocument {
-}
-@namespace("modules.indices.fielddata")
-@custom_json()
-class FielddataFrequencyFilter {
-	min: double;
-	max: double;
-	min_segment_size: integer;
-}
-@namespace("search.suggesters.context_suggester")
-@custom_json()
-class SuggestContext {
-	name: string;
-	type: string;
-	path: Field;
-}
-@namespace("modules.indices.circuit_breaker")
-class CircuitBreakerSettings {
-	total_limit: string;
-	fielddata_limit: string;
-	fielddata_overhead: float;
-	request_limit: string;
-	request_overhead: float;
-}
-@namespace("modules.indices.recovery")
-class IndicesRecoverySettings {
-	concurrent_streams: integer;
-	concurrent_small_file_streams: integer;
-	file_chunk_size: string;
-	translog_operations: integer;
-	translog_size: string;
-	compress: boolean;
-	max_bytes_per_second: string;
-}
-@namespace("modules.scripting")
-@custom_json()
-class StoredScript {
-	lang: string;
-	source: string;
-}
-@namespace("modules.snapshot_and_restore.repositories")
-class SnapshotRepository {
-	type: string;
-}
-@namespace("search.suggesters")
-@custom_json()
-class SuggestBucket {
-	text: string;
-	prefix: string;
-	regex: string;
-	term: TermSuggester;
-	phrase: PhraseSuggester;
-	completion: CompletionSuggester;
-}
-@namespace("search.suggesters.phrase_suggester")
-@custom_json()
-class DirectGenerator {
-	field: Field;
+@namespace("x_pack.machine_learning.job")
+class Page {
+	from: integer;
 	size: integer;
-	prefix_length: integer;
-	@custom_json()
-	suggest_mode: SuggestMode;
-	min_word_length: integer;
-	max_edits: integer;
-	max_inspections: double;
-	min_doc_freq: double;
-	max_term_freq: double;
-	pre_filter: string;
-	post_filter: string;
 }
-@namespace("search.suggesters.phrase_suggester")
-class PhraseSuggestHighlight {
-	pre_tag: string;
-	post_tag: string;
+@namespace("x_pack.machine_learning.job.config")
+class AnalysisMemoryLimit {
+	model_memory_limit: string;
 }
-@namespace("search.suggesters.phrase_suggester")
-@custom_json()
-class PhraseSuggestCollate {
-	query: PhraseSuggestCollateQuery;
-	prune: boolean;
-	params: Map<string, any>;
+@namespace("x_pack.machine_learning.job.config")
+class ModelPlotConfigEnabled {
+	enabled: boolean;
 }
-@namespace("search.suggesters.phrase_suggester")
-@custom_json()
-class PhraseSuggestCollateQuery {
-	source: string;
-	id: Id;
+@namespace("x_pack.security.role.put_role")
+class IndicesPrivileges {
+	@prop_serializer("IndicesJsonConverter")
+	names: Indices;
+	privileges: string[];
+	field_security: FieldSecurity;
+	query: QueryContainer;
 }
-@namespace("search.suggesters.completion_suggester")
-@custom_json()
-class FuzzySuggester {
-	transpositions: boolean;
-	min_length: integer;
-	prefix_length: integer;
-	fuzziness: Fuzziness;
-	unicode_aware: boolean;
+@namespace("x_pack.security.role")
+class FieldSecurity {
+	grant: Field[];
+	except: Field[];
 }
-@namespace("search.suggesters.context_suggester")
-@custom_json()
-class SuggestContextQuery {
-	context: Context;
-	boost: double;
-	prefix: boolean;
-	precision: Union<Distance, integer>;
-	neighbours: Union<Distance[], integer[]>;
+@namespace("indices.index_management.rollover_index")
+class RolloverConditions {
+	max_age: Time;
+	max_docs: long;
 }
-@namespace("search.search.collapsing")
-@custom_json()
-class FieldCollapse {
-	field: Field;
-	inner_hits: InnerHits;
-	max_concurrent_group_searches: integer;
-}
-@namespace("search.search.rescoring")
-@custom_json()
-class Rescore {
-	window_size: integer;
-	query: RescoreQuery;
-}
-@namespace("search.search.rescoring")
-@custom_json()
-class RescoreQuery {
-	rescore_query: QueryContainer;
-	query_weight: double;
-	rescore_query_weight: double;
-	score_mode: ScoreMode;
-}
-@namespace("aggregations")
-@custom_json()
-class AggregationContainer {
-	@custom_json()
-	meta: Map<string, any>;
-	avg: AverageAggregation;
-	date_histogram: DateHistogramAggregation;
-	percentiles: PercentilesAggregation;
-	date_range: DateRangeAggregation;
-	extended_stats: ExtendedStatsAggregation;
-	filter: FilterAggregation;
-	filters: FiltersAggregation;
-	geo_distance: GeoDistanceAggregation;
-	geohash_grid: GeoHashGridAggregation;
-	geo_bounds: GeoBoundsAggregation;
-	histogram: HistogramAggregation;
-	global: GlobalAggregation;
-	ip_range: IpRangeAggregation;
-	max: MaxAggregation;
-	min: MinAggregation;
-	cardinality: CardinalityAggregation;
-	missing: MissingAggregation;
-	nested: NestedAggregation;
-	reverse_nested: ReverseNestedAggregation;
-	range: RangeAggregation;
-	stats: StatsAggregation;
-	sum: SumAggregation;
-	terms: TermsAggregation;
-	significant_terms: SignificantTermsAggregation;
-	value_count: ValueCountAggregation;
-	percentile_ranks: PercentileRanksAggregation;
-	top_hits: TopHitsAggregation;
-	children: ChildrenAggregation;
-	scripted_metric: ScriptedMetricAggregation;
-	avg_bucket: AverageBucketAggregation;
-	derivative: DerivativeAggregation;
-	max_bucket: MaxBucketAggregation;
-	min_bucket: MinBucketAggregation;
-	sum_bucket: SumBucketAggregation;
-	stats_bucket: StatsBucketAggregation;
-	extended_stats_bucket: ExtendedStatsBucketAggregation;
-	percentiles_bucket: PercentilesBucketAggregation;
-	moving_avg: MovingAverageAggregation;
-	cumulative_sum: CumulativeSumAggregation;
-	serial_diff: SerialDifferencingAggregation;
-	bucket_script: BucketScriptAggregation;
-	bucket_selector: BucketSelectorAggregation;
-	sampler: SamplerAggregation;
-	geo_centroid: GeoCentroidAggregation;
-	matrix_stats: MatrixStatsAggregation;
-	adjacency_matrix: AdjacencyMatrixAggregation;
-	aggs: Map<string, AggregationContainer>;
-}
-@namespace("aggregations.metric.percentiles.methods")
-class PercentilesMethod {
-}
-@namespace("aggregations.bucket.date_range")
-@custom_json()
-class DateRangeExpression {
-	from: DateMath;
-	to: DateMath;
-	key: string;
-}
-@namespace("common_options.range")
-@custom_json()
-class AggregationRange {
-	from: double;
-	to: double;
-	key: string;
-}
-@namespace("DefaultLanguageConstruct")
-@custom_json()
-class IpRange {
-	from: string;
-	to: string;
-	mask: string;
-}
-@namespace("aggregations.bucket.significant_terms.heuristics")
-@custom_json()
-class MutualInformationHeuristic {
-	include_negatives: boolean;
-	background_is_superset: boolean;
-}
-@namespace("aggregations.bucket.significant_terms.heuristics")
-@custom_json()
-class ChiSquareHeuristic {
-	include_negatives: boolean;
-	background_is_superset: boolean;
-}
-@namespace("aggregations.bucket.significant_terms.heuristics")
-@custom_json()
-class GoogleNormalizedDistanceHeuristic {
-	background_is_superset: boolean;
-}
-@namespace("aggregations.bucket.significant_terms.heuristics")
-@custom_json()
-class PercentageScoreHeuristic {
-}
-@namespace("aggregations.bucket.significant_terms.heuristics")
-@custom_json()
-class ScriptedHeuristic {
-	script: Script;
-}
-@namespace("aggregations.pipeline.moving_average.models")
-class MovingAverageModel {
-	name: string;
-}
-@namespace("aggregations")
-class Aggregate {
-	meta: Map<string, any>;
+@namespace("mapping.meta_fields")
+class FieldMapping {
 }
 @namespace("x_pack.graph.explore.request")
 class GraphVertexDefinition {
@@ -1358,288 +1943,20 @@ class GraphExploreControls {
 	timeout: Time;
 	sample_diversity: SampleDiversity;
 }
-@namespace("x_pack.machine_learning.job")
-class Page {
-	from: integer;
-	size: integer;
+@namespace("modules.indices.fielddata")
+class FielddataFrequencyFilter {
+	min: double;
+	max: double;
+	min_segment_size: integer;
 }
-@namespace("x_pack.machine_learning.datafeed")
-@custom_json()
-class ChunkingConfig {
-	mode: ChunkingMode;
-	time_span: Time;
-}
-@namespace("x_pack.machine_learning.job.config")
-@custom_json()
-class AnalysisConfig {
-	bucket_span: Time;
-	categorization_field_name: Field;
-	categorization_filters: string[];
-	detectors: Detector[];
-	influencers: Field[];
-	latency: Time;
-	multivariate_by_fields: boolean;
-	summary_count_field_name: Field;
-}
-@namespace("x_pack.machine_learning.job.detectors")
-class Detector {
-	detector_description: string;
-	exclude_frequent: ExcludeFrequent;
-	function: string;
-	use_null: boolean;
-	detector_index: integer;
-}
-@namespace("x_pack.machine_learning.job.config")
-@custom_json()
-class AnalysisLimits {
-	categorization_examples_limit: long;
-	model_memory_limit: string;
-}
-@namespace("x_pack.machine_learning.job.config")
-@custom_json()
-class DataDescription {
-	format: string;
-	time_field: Field;
-	time_format: string;
-}
-@namespace("x_pack.machine_learning.job.config")
-@custom_json()
-class AnalysisMemoryLimit {
-	model_memory_limit: string;
-}
-@namespace("x_pack.machine_learning.job.config")
-@custom_json()
-class ModelPlotConfigEnabled {
-	enabled: boolean;
-}
-@namespace("x_pack.security.role.put_role")
-@custom_json()
-class IndicesPrivileges {
-	@custom_json()
-	names: Indices;
-	privileges: string[];
-	field_security: FieldSecurity;
-	query: QueryContainer;
-}
-@namespace("x_pack.security.role")
-@custom_json()
-class FieldSecurity {
-	grant: Field[];
-	except: Field[];
-}
-@namespace("x_pack.watcher.action")
-class Action {
+@namespace("search.suggesters.context_suggester")
+@class_serializer("SuggestContextJsonConverter")
+class SuggestContext {
 	name: string;
-	action_type: ActionType;
-	transform: TransformContainer;
-	throttle_period: Time;
-}
-@namespace("x_pack.watcher.trigger")
-@custom_json()
-class TriggerEventContainer {
-	schedule: ScheduleTriggerEvent;
-}
-@namespace("x_pack.watcher.input")
-class HttpInputAuthentication {
-	basic: HttpInputBasicAuthentication;
-}
-@namespace("x_pack.watcher.input")
-@custom_json()
-class HttpInputBasicAuthentication {
-	username: string;
-	password: string;
-}
-@namespace("x_pack.watcher.input")
-@custom_json()
-class HttpInputProxy {
-	host: string;
-	port: integer;
-}
-@namespace("x_pack.watcher.action.pager_duty")
-@custom_json()
-class PagerDutyContext {
-	type: PagerDutyContextType;
-	href: string;
-	src: string;
-}
-@namespace("x_pack.watcher.action.hip_chat")
-@custom_json()
-class HipChatMessage {
-	body: string;
-	format: HipChatMessageFormat;
-	color: HipChatMessageColor;
-	notify: boolean;
-	from: string;
-	@custom_json()
-	room: string[];
-	@custom_json()
-	user: string[];
-}
-@namespace("x_pack.watcher.action.slack")
-@custom_json()
-class SlackMessage {
-	from: string;
-	to: string[];
-	icon: string;
-	text: string;
-	attachments: SlackAttachment[];
-	dynamic_attachments: SlackDynamicAttachment;
-}
-@namespace("x_pack.watcher.action.slack")
-@custom_json()
-class SlackAttachment {
-	fallback: string;
-	color: string;
-	pretext: string;
-	author_name: string;
-	author_link: string;
-	author_icon: string;
-	title: string;
-	title_link: string;
-	text: string;
-	fields: SlackAttachmentField[];
-	image_url: string;
-	thumb_url: string;
-	footer: string;
-	footer_icon: string;
-	@custom_json()
-	ts: Date;
-}
-@namespace("x_pack.watcher.action.slack")
-@custom_json()
-class SlackAttachmentField {
-	title: string;
-	value: string;
-	short: boolean;
-}
-@namespace("x_pack.watcher.action.slack")
-@custom_json()
-class SlackDynamicAttachment {
-	list_path: string;
-	attachment_template: SlackAttachment;
-}
-@namespace("x_pack.watcher.input")
-@custom_json()
-class InputContainer {
-	http: HttpInput;
-	search: SearchInput;
-	simple: SimpleInput;
-	chain: ChainInput;
-}
-@namespace("x_pack.watcher.input")
-@custom_json()
-class HttpInputRequest {
-	@custom_json()
-	scheme: ConnectionScheme;
-	port: integer;
-	host: string;
-	path: string;
-	method: HttpInputMethod;
-	headers: Map<string, string>;
-	params: Map<string, string>;
-	url: string;
-	auth: HttpInputAuthentication;
-	proxy: HttpInputProxy;
-	connection_timeout: Time;
-	read_timeout: Time;
-	body: string;
-}
-@namespace("x_pack.watcher.input")
-@custom_json()
-class SearchInputRequest {
-	indices: IndexName[];
-	types: TypeName[];
-	@custom_json()
-	search_type: SearchType;
-	indices_options: IndicesOptions;
-	@custom_json()
-	body: SearchRequest;
-	@custom_json()
-	template: SearchTemplateRequest;
-}
-@namespace("x_pack.watcher.input")
-@custom_json()
-class IndicesOptions {
-	@custom_json()
-	expand_wildcards: ExpandWildcards;
-	ignore_unavailable: boolean;
-	allow_no_indices: boolean;
-}
-@namespace("x_pack.watcher.condition")
-@custom_json()
-class ConditionContainer {
-	always: AlwaysCondition;
-	never: NeverCondition;
-	compare: CompareCondition;
-	array_compare: ArrayCompareCondition;
-	script: ScriptCondition;
-}
-@namespace("x_pack.watcher.condition")
-@custom_json()
-class ArrayCompareCondition {
-	array_path: string;
-	path: string;
-	comparison: string;
-	value: any;
-	quantifier: Quantifier;
-}
-@namespace("x_pack.watcher.trigger")
-@custom_json()
-class TriggerContainer {
-	schedule: ScheduleContainer;
-}
-@namespace("x_pack.watcher.schedule")
-@custom_json()
-class ScheduleContainer {
-	hourly: HourlySchedule;
-	daily: DailySchedule;
-	weekly: TimeOfWeek[];
-	monthly: TimeOfMonth[];
-	yearly: TimeOfYear[];
-	cron: CronExpression;
-	interval: Interval;
-}
-@namespace("x_pack.watcher.schedule")
-@custom_json()
-class TimeOfDay {
-	hour: integer[];
-	minute: integer[];
-}
-@namespace("x_pack.watcher.schedule")
-@custom_json()
-class TimeOfWeek {
-	@custom_json()
-	on: Day[];
-	@custom_json()
-	at: string[];
-}
-@namespace("x_pack.watcher.schedule")
-@custom_json()
-class TimeOfMonth {
-	@custom_json()
-	on: integer[];
-	@custom_json()
-	at: string[];
-}
-@namespace("x_pack.watcher.schedule")
-@custom_json()
-class TimeOfYear {
-	@custom_json()
-	int: Month[];
-	@custom_json()
-	on: integer[];
-	@custom_json()
-	at: string[];
-}
-@namespace("x_pack.watcher.transform")
-@custom_json()
-class TransformContainer {
-	search: SearchTransform;
-	script: ScriptTransform;
-	chain: ChainTransform;
+	type: string;
+	path: Field;
 }
 @namespace("mapping.meta_fields.source")
-@custom_json()
 class SourceField {
 	enabled: boolean;
 	compress: boolean;
@@ -1648,7 +1965,6 @@ class SourceField {
 	excludes: string[];
 }
 @namespace("mapping.meta_fields.all")
-@custom_json()
 class AllField {
 	enabled: boolean;
 	store: boolean;
@@ -1662,22 +1978,18 @@ class AllField {
 	similarity: string;
 }
 @namespace("mapping.meta_fields.routing")
-@custom_json()
 class RoutingField {
 	required: boolean;
 }
 @namespace("mapping.meta_fields.index")
-@custom_json()
 class IndexField {
 	enabled: boolean;
 }
 @namespace("mapping.meta_fields.size")
-@custom_json()
 class SizeField {
 	enabled: boolean;
 }
 @namespace("mapping.meta_fields.field_names")
-@custom_json()
 class FieldNamesField {
 	enabled: boolean;
 }
@@ -1687,12 +1999,25 @@ class Property {
 	type: string;
 	local_metadata: Map<string, any>;
 }
+@namespace("common_abstractions.response")
+class Response {
+	server_error: ServerError;
+}
+@namespace("search.search.hits")
+class Hit<TDocument> {
+	score: double;
+	fields: Map<string, LazyDocument>;
+	sorts: any[];
+	highlights: Map<string, HighlightHit>;
+	explanation: Explanation;
+	matched_queries: string[];
+	inner_hits: Map<string, InnerHitsResult>;
+}
 @namespace("query_dsl.nest_specific")
 class RawQuery {
 	raw: string;
 }
 @namespace("query_dsl.compound.bool")
-@custom_json()
 class BoolQuery {
 	must: QueryContainer[];
 	must_not: QueryContainer[];
@@ -1702,40 +2027,33 @@ class BoolQuery {
 	locked: boolean;
 }
 @namespace("query_dsl")
-@custom_json()
 class MatchAllQuery {
 	norm_field: string;
 }
 @namespace("query_dsl")
-@custom_json()
 class MatchNoneQuery {
 }
 @namespace("query_dsl.compound.boosting")
-@custom_json()
 class BoostingQuery {
 	positive: QueryContainer;
 	negative: QueryContainer;
 	negative_boost: double;
 }
 @namespace("query_dsl.term_level.ids")
-@custom_json()
 class IdsQuery {
 	type: Types;
 	values: Id[];
 }
 @namespace("query_dsl.compound.constant_score")
-@custom_json()
 class ConstantScoreQuery {
 	filter: QueryContainer;
 }
 @namespace("query_dsl.compound.dismax")
-@custom_json()
 class DisMaxQuery {
 	tie_breaker: double;
 	queries: QueryContainer[];
 }
 @namespace("query_dsl.full_text.multi_match")
-@custom_json()
 class MultiMatchQuery {
 	type: TextQueryType;
 	query: string;
@@ -1755,7 +2073,6 @@ class MultiMatchQuery {
 	zero_terms_query: ZeroTermsQuery;
 }
 @namespace("query_dsl.joining.has_child")
-@custom_json()
 class HasChildQuery {
 	type: TypeName;
 	score_mode: ChildScoreMode;
@@ -1766,7 +2083,6 @@ class HasChildQuery {
 	ignore_unmapped: boolean;
 }
 @namespace("query_dsl.joining.has_parent")
-@custom_json()
 class HasParentQuery {
 	parent_type: TypeName;
 	score: boolean;
@@ -1775,14 +2091,12 @@ class HasParentQuery {
 	ignore_unmapped: boolean;
 }
 @namespace("query_dsl.joining.parent_id")
-@custom_json()
 class ParentIdQuery {
 	type: RelationName;
 	id: Id;
 	ignore_unmapped: boolean;
 }
 @namespace("query_dsl.full_text.simple_query_string")
-@custom_json()
 class SimpleQueryStringQuery {
 	fields: Field[];
 	query: string;
@@ -1795,7 +2109,6 @@ class SimpleQueryStringQuery {
 	quote_field_suffix: string;
 }
 @namespace("query_dsl.full_text.query_string")
-@custom_json()
 class QueryStringQuery {
 	type: TextQueryType;
 	query: string;
@@ -1820,7 +2133,6 @@ class QueryStringQuery {
 	escape: boolean;
 }
 @namespace("query_dsl.specialized.more_like_this")
-@custom_json()
 class MoreLikeThisQuery {
 	fields: Field[];
 	like: Like[];
@@ -1842,7 +2154,6 @@ class MoreLikeThisQuery {
 	routing: Routing;
 }
 @namespace("query_dsl.span")
-@custom_json()
 class SpanQuery {
 	span_term: SpanTermQuery;
 	span_first: SpanFirstQuery;
@@ -1855,7 +2166,6 @@ class SpanQuery {
 	field_masking_span: SpanFieldMaskingQuery;
 }
 @namespace("query_dsl.joining.nested")
-@custom_json()
 class NestedQuery {
 	score_mode: NestedScoreMode;
 	query: QueryContainer;
@@ -1864,7 +2174,6 @@ class NestedQuery {
 	ignore_unmapped: boolean;
 }
 @namespace("query_dsl.compound.function_score")
-@custom_json()
 class FunctionScoreQuery {
 	query: QueryContainer;
 	functions: ScoreFunction[];
@@ -1874,31 +2183,27 @@ class FunctionScoreQuery {
 	min_score: double;
 }
 @namespace("query_dsl.specialized.script")
-@custom_json()
+@class_serializer("ScriptQueryConverter")
 class ScriptQuery {
 	source: string;
 	inline: string;
 	id: Id;
-	@custom_json()
 	params: Map<string, any>;
 	lang: string;
 }
 @namespace("query_dsl.term_level.exists")
-@custom_json()
 class ExistsQuery {
 	field: Field;
 }
 @namespace("query_dsl.term_level.type")
-@custom_json()
 class TypeQuery {
 	value: TypeName;
 }
 @namespace("query_dsl.specialized.percolate")
-@custom_json()
 class PercolateQuery {
 	field: Field;
 	document_type: TypeName;
-	@custom_json()
+	@prop_serializer("SourceConverter")
 	document: any;
 	id: Id;
 	index: IndexName;
@@ -1907,23 +2212,32 @@ class PercolateQuery {
 	preference: string;
 	version: long;
 }
-@namespace("modules.indices.fielddata.numeric")
-@custom_json()
-class NumericFielddata {
-	format: NumericFielddataFormat;
+@namespace("x_pack.machine_learning.job.config")
+class ModelPlotConfig {
+	terms: Field[];
 }
-@namespace("modules.indices.fielddata.string")
-@custom_json()
-class StringFielddata {
-	format: StringFielddataFormat;
+@namespace("x_pack.watcher.schedule")
+class ScheduleTriggerEvent {
+	triggered_time: Union<Date, string>;
+	scheduled_time: Union<Date, string>;
+}
+@namespace("x_pack.watcher.input")
+class HttpInput {
+	extract: string[];
+	request: HttpInputRequest;
+	response_content_type: ResponseContentType;
+}
+@namespace("x_pack.watcher.input")
+class SearchInput {
+	extract: string[];
+	request: SearchInputRequest;
+	timeout: Time;
 }
 @namespace("search.suggesters.term_suggester")
-@custom_json()
 class TermSuggester {
 	text: string;
 	shard_size: integer;
 	prefix_length: integer;
-	@custom_json()
 	suggest_mode: SuggestMode;
 	min_word_length: integer;
 	max_edits: integer;
@@ -1935,7 +2249,6 @@ class TermSuggester {
 	string_distance: StringDistance;
 }
 @namespace("search.suggesters.phrase_suggester")
-@custom_json()
 class PhraseSuggester {
 	text: string;
 	shard_size: integer;
@@ -1950,85 +2263,42 @@ class PhraseSuggester {
 	smoothing: SmoothingModelContainer;
 }
 @namespace("search.suggesters.completion_suggester")
-@custom_json()
 class CompletionSuggester {
 	prefix: string;
 	regex: string;
 	fuzzy: FuzzySuggester;
 	contexts: Map<string, SuggestContextQuery[]>;
 }
-@namespace("common_abstractions.response")
-class Response {
-	server_error: ServerError;
-}
-@namespace("search.search.hits")
-class Hit<TDocument> {
-	score: double;
-	fields: Map<string, LazyDocument>;
-	sorts: any[];
-	highlights: Map<string, HighlightHit>;
-	explanation: Explanation;
-	matched_queries: string[];
-	inner_hits: Map<string, InnerHitsResult>;
-}
-@namespace("x_pack.machine_learning.job.config")
-@custom_json()
-class ModelPlotConfig {
-	terms: Field[];
-}
-@namespace("x_pack.watcher.schedule")
-@custom_json()
-class ScheduleTriggerEvent {
-	triggered_time: Union<Date, string>;
-	scheduled_time: Union<Date, string>;
-}
 @namespace("x_pack.watcher.input")
-@custom_json()
-class HttpInput {
-	extract: string[];
-	request: HttpInputRequest;
-	response_content_type: ResponseContentType;
-}
-@namespace("x_pack.watcher.input")
-@custom_json()
-class SearchInput {
-	extract: string[];
-	request: SearchInputRequest;
-	timeout: Time;
-}
-@namespace("x_pack.watcher.input")
-@custom_json()
+@class_serializer("SimpleInputJsonConverter")
 class SimpleInput {
 	payload: Map<string, any>;
 }
 @namespace("x_pack.watcher.input")
-@custom_json()
+@class_serializer("ChainInputJsonConverter")
 class ChainInput {
 	inputs: Map<string, InputContainer>;
 }
 @namespace("x_pack.watcher.condition")
-@custom_json()
 class AlwaysCondition {
 }
 @namespace("x_pack.watcher.condition")
-@custom_json()
 class NeverCondition {
 }
 @namespace("x_pack.watcher.condition")
-@custom_json()
+@class_serializer("CompareConditionConverter")
 class CompareCondition {
 	path: string;
 	comparison: string;
 	value: any;
 }
 @namespace("x_pack.watcher.condition")
-@custom_json()
+@class_serializer("ScriptConditionJsonConverter")
 class ScriptCondition {
 	lang: string;
 	params: Map<string, any>;
 }
 @namespace("x_pack.watcher.schedule")
-@custom_json()
 class HourlySchedule {
 	minute: integer[];
 }
@@ -2037,178 +2307,28 @@ class DailySchedule {
 	at: Union<string[], TimeOfDay>;
 }
 @namespace("x_pack.watcher.transform")
-@custom_json()
 class SearchTransform {
 	request: SearchInputRequest;
 	timeout: Time;
 }
 @namespace("x_pack.watcher.transform")
-@custom_json()
+@class_serializer("ScriptTransformJsonConverter")
 class ScriptTransform {
-	@custom_json()
 	params: Map<string, any>;
 	lang: string;
 }
 @namespace("x_pack.watcher.transform")
-@custom_json()
+@class_serializer("ChainTransformJsonConverter")
 class ChainTransform {
 	transforms: TransformContainer[];
 }
-@namespace("query_dsl.term_level.term")
-@custom_json()
-class TermQuery {
-	@custom_json()
-	value: any;
+@namespace("modules.indices.fielddata.numeric")
+class NumericFielddata {
+	format: NumericFielddataFormat;
 }
-@namespace("query_dsl.full_text.match")
-@custom_json()
-class MatchQuery {
-	query: string;
-	analyzer: string;
-	fuzzy_rewrite: MultiTermQueryRewrite;
-	fuzziness: Fuzziness;
-	fuzzy_transpositions: boolean;
-	cutoff_frequency: double;
-	prefix_length: integer;
-	max_expansions: integer;
-	lenient: boolean;
-	minimum_should_match: MinimumShouldMatch;
-	operator: Operator;
-	zero_terms_query: ZeroTermsQuery;
-}
-@namespace("query_dsl.full_text.match_phrase")
-@custom_json()
-class MatchPhraseQuery {
-	query: string;
-	analyzer: string;
-	slop: integer;
-}
-@namespace("query_dsl.full_text.match_phrase_prefix")
-@custom_json()
-class MatchPhrasePrefixQuery {
-	query: string;
-	analyzer: string;
-	max_expansions: integer;
-	slop: integer;
-}
-@namespace("query_dsl.term_level.fuzzy")
-@custom_json()
-class FuzzyQuery {
-	prefix_length: integer;
-	rewrite: MultiTermQueryRewrite;
-	max_expansions: integer;
-	transpositions: boolean;
-}
-@namespace("query_dsl.geo.shape")
-@custom_json()
-class GeoShapeQuery {
-	relation: GeoShapeRelation;
-}
-@namespace("query_dsl.full_text.common_terms")
-@custom_json()
-class CommonTermsQuery {
-	query: string;
-	cutoff_frequency: double;
-	@custom_json()
-	low_freq_operator: Operator;
-	@custom_json()
-	high_freq_operator: Operator;
-	minimum_should_match: MinimumShouldMatch;
-	analyzer: string;
-}
-@namespace("query_dsl.term_level.terms")
-@custom_json()
-class TermsQuery {
-	terms: any[];
-	terms_lookup: FieldLookup;
-}
-@namespace("query_dsl.term_level.range")
-@custom_json()
-class RangeQuery {
-}
-@namespace("query_dsl.term_level.regexp")
-@custom_json()
-class RegexpQuery {
-	value: string;
-	flags: string;
-	max_determinized_states: integer;
-}
-@namespace("query_dsl.span.first")
-@custom_json()
-class SpanFirstQuery {
-	match: SpanQuery;
-	end: integer;
-}
-@namespace("query_dsl.span.near")
-@custom_json()
-class SpanNearQuery {
-	clauses: SpanQuery[];
-	slop: integer;
-	in_order: boolean;
-}
-@namespace("query_dsl.span.or")
-@custom_json()
-class SpanOrQuery {
-	clauses: SpanQuery[];
-}
-@namespace("query_dsl.span.not")
-@custom_json()
-class SpanNotQuery {
-	include: SpanQuery;
-	exclude: SpanQuery;
-	pre: integer;
-	post: integer;
-	dist: integer;
-}
-@namespace("query_dsl.span.containing")
-@custom_json()
-class SpanContainingQuery {
-	little: SpanQuery;
-	big: SpanQuery;
-}
-@namespace("query_dsl.span.within")
-@custom_json()
-class SpanWithinQuery {
-	little: SpanQuery;
-	big: SpanQuery;
-}
-@namespace("query_dsl.span.multi_term")
-@custom_json()
-class SpanMultiTermQuery {
-	match: QueryContainer;
-}
-@namespace("query_dsl.span.field_masking")
-@custom_json()
-class SpanFieldMaskingQuery {
-	field: Field;
-	query: SpanQuery;
-}
-@namespace("query_dsl.geo.bounding_box")
-@custom_json()
-class GeoBoundingBoxQuery {
-	bounding_box: BoundingBox;
-	type: GeoExecution;
-	validation_method: GeoValidationMethod;
-}
-@namespace("query_dsl.geo.distance")
-@custom_json()
-class GeoDistanceQuery {
-	location: GeoLocation;
-	distance: Distance;
-	distance_type: GeoDistanceType;
-	validation_method: GeoValidationMethod;
-}
-@namespace("query_dsl.geo.polygon")
-@custom_json()
-class GeoPolygonQuery {
-	points: GeoLocation[];
-	validation_method: GeoValidationMethod;
-}
-@namespace("indices.index_settings.update_index_settings")
-@custom_json()
-class UpdateIndexSettingsRequest {
-	index_settings: Map<string, any>;
-	index: Indices;
+@namespace("modules.indices.fielddata.string")
+class StringFielddata {
+	format: StringFielddataFormat;
 }
 @namespace("aggregations.metric.average")
 class AverageAggregation {
@@ -2252,6 +2372,146 @@ class FiltersAggregation {
 	filters: Union<Map<string, QueryContainer>, QueryContainer[]>;
 	other_bucket: boolean;
 	other_bucket_key: string;
+}
+@namespace("query_dsl.term_level.term")
+@class_serializer("FieldNameQueryJsonConverter`1")
+class TermQuery {
+	@prop_serializer("SourceValueWriteConverter")
+	value: any;
+}
+@namespace("query_dsl.full_text.match")
+@class_serializer("FieldNameQueryJsonConverter`1")
+class MatchQuery {
+	query: string;
+	analyzer: string;
+	fuzzy_rewrite: MultiTermQueryRewrite;
+	fuzziness: Fuzziness;
+	fuzzy_transpositions: boolean;
+	cutoff_frequency: double;
+	prefix_length: integer;
+	max_expansions: integer;
+	lenient: boolean;
+	minimum_should_match: MinimumShouldMatch;
+	operator: Operator;
+	zero_terms_query: ZeroTermsQuery;
+}
+@namespace("query_dsl.full_text.match_phrase")
+@class_serializer("FieldNameQueryJsonConverter`1")
+class MatchPhraseQuery {
+	query: string;
+	analyzer: string;
+	slop: integer;
+}
+@namespace("query_dsl.full_text.match_phrase_prefix")
+@class_serializer("FieldNameQueryJsonConverter`1")
+class MatchPhrasePrefixQuery {
+	query: string;
+	analyzer: string;
+	max_expansions: integer;
+	slop: integer;
+}
+@namespace("query_dsl.term_level.fuzzy")
+@class_serializer("FuzzyQueryJsonConverter")
+class FuzzyQuery {
+	prefix_length: integer;
+	rewrite: MultiTermQueryRewrite;
+	max_expansions: integer;
+	transpositions: boolean;
+}
+@namespace("query_dsl.geo.shape")
+@class_serializer("CompositeJsonConverter`2")
+class GeoShapeQuery {
+	relation: GeoShapeRelation;
+}
+@namespace("query_dsl.full_text.common_terms")
+@class_serializer("FieldNameQueryJsonConverter`1")
+class CommonTermsQuery {
+	query: string;
+	cutoff_frequency: double;
+	low_freq_operator: Operator;
+	high_freq_operator: Operator;
+	minimum_should_match: MinimumShouldMatch;
+	analyzer: string;
+}
+@namespace("query_dsl.term_level.terms")
+@class_serializer("TermsQueryJsonConverter")
+class TermsQuery {
+	terms: any[];
+	terms_lookup: FieldLookup;
+}
+@namespace("query_dsl.term_level.range")
+@class_serializer("RangeQueryJsonConverter")
+class RangeQuery {
+}
+@namespace("query_dsl.term_level.regexp")
+@class_serializer("FieldNameQueryJsonConverter`1")
+class RegexpQuery {
+	value: string;
+	flags: string;
+	max_determinized_states: integer;
+}
+@namespace("query_dsl.span.first")
+class SpanFirstQuery {
+	match: SpanQuery;
+	end: integer;
+}
+@namespace("query_dsl.span.near")
+class SpanNearQuery {
+	clauses: SpanQuery[];
+	slop: integer;
+	in_order: boolean;
+}
+@namespace("query_dsl.span.or")
+class SpanOrQuery {
+	clauses: SpanQuery[];
+}
+@namespace("query_dsl.span.not")
+class SpanNotQuery {
+	include: SpanQuery;
+	exclude: SpanQuery;
+	pre: integer;
+	post: integer;
+	dist: integer;
+}
+@namespace("query_dsl.span.containing")
+class SpanContainingQuery {
+	little: SpanQuery;
+	big: SpanQuery;
+}
+@namespace("query_dsl.span.within")
+class SpanWithinQuery {
+	little: SpanQuery;
+	big: SpanQuery;
+}
+@namespace("query_dsl.span.multi_term")
+class SpanMultiTermQuery {
+	match: QueryContainer;
+}
+@namespace("query_dsl.span.field_masking")
+class SpanFieldMaskingQuery {
+	field: Field;
+	query: SpanQuery;
+}
+@namespace("query_dsl.geo.bounding_box")
+@class_serializer("VariableFieldNameQueryJsonConverter`2")
+class GeoBoundingBoxQuery {
+	bounding_box: BoundingBox;
+	type: GeoExecution;
+	validation_method: GeoValidationMethod;
+}
+@namespace("query_dsl.geo.distance")
+@class_serializer("VariableFieldNameQueryJsonConverter`2")
+class GeoDistanceQuery {
+	location: GeoLocation;
+	distance: Distance;
+	distance_type: GeoDistanceType;
+	validation_method: GeoValidationMethod;
+}
+@namespace("query_dsl.geo.polygon")
+@class_serializer("VariableFieldNameQueryJsonConverter`2")
+class GeoPolygonQuery {
+	points: GeoLocation[];
+	validation_method: GeoValidationMethod;
 }
 @namespace("aggregations.bucket.geo_distance")
 class GeoDistanceAggregation {
@@ -2374,7 +2634,6 @@ class TopHitsAggregation {
 	_source: Union<boolean, SourceFilter>;
 	highlight: Highlight;
 	explain: boolean;
-	@custom_json()
 	script_fields: Map<string, ScriptField>;
 	stored_fields: Field[];
 	version: boolean;
@@ -2458,40 +2717,34 @@ class MatrixStatsAggregation {
 class AdjacencyMatrixAggregation {
 	filters: Map<string, QueryContainer>;
 }
+@namespace("indices.index_settings.update_index_settings")
+@class_serializer("IndexSettingsConverter")
+class UpdateIndexSettingsRequest {
+	index_settings: Map<string, any>;
+	index: Indices;
+}
 @namespace("x_pack.watcher.put_watch")
 class PutWatchRequest {
 	trigger: TriggerContainer;
 	input: InputContainer;
 	condition: ConditionContainer;
 	actions: Map<string, Action>;
-	@custom_json()
 	metadata: Map<string, any>;
 	throttle_period: string;
 	transform: TransformContainer;
 	id: Id;
 }
 @namespace("query_dsl.term_level.wildcard")
-@custom_json()
+@class_serializer("FieldNameQueryJsonConverter`1")
 class WildcardQuery {
 	rewrite: MultiTermQueryRewrite;
 }
 @namespace("query_dsl.term_level.prefix")
-@custom_json()
+@class_serializer("FieldNameQueryJsonConverter`1")
 class PrefixQuery {
 	rewrite: MultiTermQueryRewrite;
 }
-@namespace("search.search_template")
-@custom_json()
-class SearchTemplateRequest {
-	params: Map<string, any>;
-	source: string;
-	inline: string;
-	id: string;
-	index: Indices;
-	type: Types;
-}
 @namespace("search.search")
-@custom_json()
 class SearchRequest {
 	timeout: string;
 	from: integer;
@@ -2502,7 +2755,6 @@ class SearchRequest {
 	profile: boolean;
 	min_score: double;
 	terminate_after: long;
-	@custom_json()
 	indices_boost: Map<IndexName, double>;
 	sort: Sort[];
 	search_after: any[];
@@ -2523,12 +2775,26 @@ class SearchRequest {
 	@request_parameter()
 	docvalue_fields: Field[];
 }
+@namespace("search.search_template")
+class SearchTemplateRequest {
+	params: Map<string, any>;
+	source: string;
+	inline: string;
+	id: string;
+	index: Indices;
+	type: Types;
+}
 @namespace("query_dsl.span.term")
-@custom_json()
+@class_serializer("FieldNameQueryJsonConverter`1")
 class SpanTermQuery {
 }
+@namespace("modules.indices.fielddata")
+class FielddataSettings {
+	cache_size: string;
+	cache_expire: Time;
+}
 @namespace("common_abstractions.union")
-@custom_json()
+@class_serializer("UnionJsonConverter")
 class Union<TFirst, TSecond> {
 }
 @namespace("cluster.cluster_allocation_explain")
@@ -2581,7 +2847,6 @@ class IndexHealthStats {
 	relocating_shards: integer;
 	initializing_shards: integer;
 	unassigned_shards: integer;
-	@custom_json()
 	shards: Map<string, ShardHealthStats>;
 }
 @namespace("cluster.cluster_health")
@@ -2606,7 +2871,6 @@ class ClusterRerouteState {
 	version: integer;
 	master_node: string;
 	blocks: BlockState;
-	@custom_json()
 	nodes: Map<string, NodeState>;
 	routing_table: RoutingTableState;
 	routing_nodes: RoutingNodesState;
@@ -2619,17 +2883,14 @@ class BlockState {
 class NodeState {
 	name: string;
 	transport_address: string;
-	@custom_json()
 	attributes: Map<string, string>;
 }
 @namespace("cluster.cluster_state")
 class RoutingTableState {
-	@custom_json()
 	indices: Map<string, IndexRoutingTable>;
 }
 @namespace("cluster.cluster_state")
 class IndexRoutingTable {
-	@custom_json()
 	shards: Map<string, RoutingShard[]>;
 }
 @namespace("cluster.cluster_state")
@@ -2674,199 +2935,16 @@ class ClusterRerouteDecision {
 }
 @namespace("cluster.cluster_state")
 class MetadataState {
-	@custom_json()
 	templates: Map<string, TemplateMapping>;
 	cluster_uuid: string;
-	@custom_json()
 	indices: Map<string, MetadataIndexState>;
 }
 @namespace("cluster.cluster_state")
 class MetadataIndexState {
 	state: string;
-	@custom_json()
 	settings: string[];
 	mappings: Map<TypeName, TypeMapping>;
 	aliases: string[];
-}
-@namespace("cluster")
-class NodeStatistics {
-	total: integer;
-	successful: integer;
-	failed: integer;
-}
-@namespace("cluster.cluster_stats")
-class ClusterIndicesStats {
-	completion: CompletionStats;
-	count: long;
-	docs: DocStats;
-	fielddata: FielddataStats;
-	query_cache: QueryCacheStats;
-	segments: SegmentsStats;
-	shards: ClusterIndicesShardsStats;
-	store: StoreStats;
-}
-@namespace("common_options.stats")
-class CompletionStats {
-	size: string;
-	size_in_bytes: long;
-}
-@namespace("common_options.stats")
-class DocStats {
-	count: long;
-	deleted: long;
-}
-@namespace("common_options.stats")
-class FielddataStats {
-	evictions: long;
-	memory_size: string;
-	memory_size_in_bytes: long;
-}
-@namespace("common_options.stats")
-class QueryCacheStats {
-	memory_size: string;
-	memory_size_in_bytes: long;
-	total_count: long;
-	hit_count: long;
-	miss_count: long;
-	cache_size: long;
-	cache_count: long;
-	evictions: long;
-}
-@namespace("common_options.stats")
-class SegmentsStats {
-	count: long;
-	doc_values_memory: string;
-	doc_values_memory_in_bytes: long;
-	fixed_bit_set_memory: string;
-	fixed_bit_set_memory_in_bytes: long;
-	index_writer_max_memory: string;
-	index_writer_max_memory_in_bytes: long;
-	index_writer_memory: string;
-	index_writer_memory_in_bytes: long;
-	memory: string;
-	memory_in_bytes: long;
-	norms_memory: string;
-	norms_memory_in_bytes: long;
-	points_memory: string;
-	points_memory_in_bytes: long;
-	stored_fields_memory: string;
-	stored_fields_memory_in_bytes: long;
-	term_vectors_memory: string;
-	term_vectors_memory_in_bytes: long;
-	terms_memory: string;
-	terms_memory_in_bytes: long;
-	version_map_memory: string;
-	version_map_memory_in_bytes: long;
-}
-@namespace("cluster.cluster_stats")
-class ClusterIndicesShardsStats {
-	total: double;
-	primaries: double;
-	replication: double;
-	index: ClusterIndicesShardsIndexStats;
-}
-@namespace("cluster.cluster_stats")
-class ClusterIndicesShardsIndexStats {
-	shards: ClusterShardMetrics;
-	primaries: ClusterShardMetrics;
-	replication: ClusterShardMetrics;
-}
-@namespace("cluster.cluster_stats")
-class ClusterShardMetrics {
-	min: double;
-	max: double;
-	avg: double;
-}
-@namespace("common_options.stats")
-class StoreStats {
-	size: string;
-	size_in_bytes: double;
-}
-@namespace("cluster.cluster_stats")
-class ClusterNodesStats {
-	count: ClusterNodeCount;
-	versions: string[];
-	os: ClusterOperatingSystemStats;
-	process: ClusterProcess;
-	jvm: ClusterJvm;
-	fs: ClusterFileSystem;
-	plugins: PluginStats[];
-}
-@namespace("cluster.cluster_stats")
-class ClusterNodeCount {
-	total: integer;
-	coordinating_only: integer;
-	master: integer;
-	data: integer;
-	ingest: integer;
-}
-@namespace("cluster.cluster_stats")
-class ClusterOperatingSystemStats {
-	available_processors: integer;
-	allocated_processors: integer;
-	names: ClusterOperatingSystemName[];
-}
-@namespace("cluster.cluster_stats")
-class ClusterOperatingSystemName {
-	count: integer;
-	name: string;
-}
-@namespace("cluster.cluster_stats")
-class ClusterProcess {
-	cpu: ClusterProcessCpu;
-	open_file_descriptors: ClusterProcessOpenFileDescriptors;
-}
-@namespace("cluster.cluster_stats")
-class ClusterProcessCpu {
-	percent: integer;
-}
-@namespace("cluster.cluster_stats")
-class ClusterProcessOpenFileDescriptors {
-	min: long;
-	max: long;
-	avg: long;
-}
-@namespace("cluster.cluster_stats")
-class ClusterJvm {
-	max_uptime: string;
-	max_uptime_in_millis: long;
-	versions: ClusterJvmVersion[];
-	mem: ClusterJvmMemory;
-	threads: long;
-}
-@namespace("cluster.cluster_stats")
-class ClusterJvmVersion {
-	version: string;
-	vm_name: string;
-	vm_version: string;
-	vm_vendor: string;
-	count: integer;
-}
-@namespace("cluster.cluster_stats")
-class ClusterJvmMemory {
-	heap_used: string;
-	heap_used_in_bytes: long;
-	heap_max: string;
-	heap_max_in_bytes: long;
-}
-@namespace("cluster.cluster_stats")
-class ClusterFileSystem {
-	total: string;
-	total_in_bytes: long;
-	free: string;
-	free_in_bytes: long;
-	available: string;
-	available_in_bytes: long;
-}
-@namespace("common_options.stats")
-class PluginStats {
-	name: string;
-	version: string;
-	description: string;
-	classname: string;
-	jvm: boolean;
-	isolated: boolean;
-	site: boolean;
 }
 @namespace("cluster.nodes_hot_threads")
 class HotThreadInformation {
@@ -2875,348 +2953,11 @@ class HotThreadInformation {
 	threads: string[];
 	hosts: string[];
 }
-@namespace("cluster.nodes_info")
-class NodeInfo {
-	name: string;
-	transport_address: string;
-	host: string;
-	ip: string;
-	version: string;
-	build_hash: string;
-	roles: NodeRole[];
-	@custom_json()
-	settings: string[];
-	os: NodeOperatingSystemInfo;
-	process: NodeProcessInfo;
-	jvm: NodeJvmInfo;
-	@custom_json()
-	thread_pool: Map<string, NodeThreadPoolInfo>;
-	network: NodeInfoNetwork;
-	transport: NodeInfoTransport;
-	http: NodeInfoHttp;
-	plugins: PluginStats[];
-}
-@namespace("cluster.nodes_info")
-class NodeOperatingSystemInfo {
-	name: string;
-	arch: string;
-	version: string;
-	refresh_interval_in_millis: integer;
-	available_processors: integer;
-	cpu: NodeInfoOSCPU;
-	mem: NodeInfoMemory;
-	swap: NodeInfoMemory;
-}
-@namespace("cluster.nodes_info")
-class NodeInfoOSCPU {
-	vendor: string;
-	model: string;
-	mhz: integer;
-	total_cores: integer;
-	total_sockets: integer;
-	cores_per_socket: integer;
-	cache_size: string;
-	cache_size_in_bytes: integer;
-}
-@namespace("cluster.nodes_info")
-class NodeInfoMemory {
-	total: string;
-	total_in_bytes: long;
-}
-@namespace("cluster.nodes_info")
-class NodeProcessInfo {
-	refresh_interval_in_millis: long;
-	id: long;
-	mlockall: boolean;
-}
-@namespace("cluster.nodes_info")
-class NodeJvmInfo {
-	pid: integer;
-	version: string;
-	vm_name: string;
-	vm_version: string;
-	vm_vendor: string;
-	memory_pools: string[];
-	gc_collectors: string[];
-	start_time_in_millis: long;
-	mem: NodeInfoJVMMemory;
-}
-@namespace("cluster.nodes_info")
-class NodeInfoJVMMemory {
-	heap_init: string;
-	heap_init_in_bytes: long;
-	heap_max: string;
-	heap_max_in_bytes: long;
-	non_heap_init: string;
-	non_heap_init_in_bytes: long;
-	non_heap_max: string;
-	non_heap_max_in_bytes: long;
-	direct_max: string;
-	direct_max_in_bytes: long;
-}
-@namespace("cluster.nodes_info")
-class NodeThreadPoolInfo {
-	type: string;
-	min: integer;
-	max: integer;
-	queue_size: integer;
-	keep_alive: string;
-}
-@namespace("cluster.nodes_info")
-class NodeInfoNetwork {
-	refresh_interval: integer;
-	primary_interface: NodeInfoNetworkInterface;
-}
-@namespace("cluster.nodes_info")
-class NodeInfoNetworkInterface {
-	address: string;
-	name: string;
-	mac_address: string;
-}
-@namespace("cluster.nodes_info")
-class NodeInfoTransport {
-	bound_address: string[];
-	publish_address: string;
-}
-@namespace("cluster.nodes_info")
-class NodeInfoHttp {
-	bound_address: string[];
-	publish_address: string;
-	max_content_length: string;
-	max_content_length_in_bytes: long;
-}
-@namespace("cluster.nodes_stats")
-class NodeStats {
-	timestamp: long;
-	name: string;
-	transport_address: string;
-	host: string;
-	@custom_json()
-	ip: string[];
-	roles: NodeRole[];
-	indices: IndexStats;
-	os: OperatingSystemStats;
-	process: ProcessStats;
-	script: ScriptStats;
-	jvm: NodeJvmStats;
-	@custom_json()
-	thread_pool: Map<string, ThreadCountStats>;
-	@custom_json()
-	breakers: Map<string, BreakerStats>;
-	fs: FileSystemStats;
-	transport: TransportStats;
-	http: HttpStats;
-}
-@namespace("indices.monitoring.indices_stats")
-class IndexStats {
-	docs: DocStats;
-	store: StoreStats;
-	indexing: IndexingStats;
-	get: GetStats;
-	search: SearchStats;
-	merges: MergesStats;
-	refresh: RefreshStats;
-	flush: FlushStats;
-	warmer: WarmerStats;
-	query_cache: QueryCacheStats;
-	fielddata: FielddataStats;
-	completion: CompletionStats;
-	segments: SegmentsStats;
-	translog: TranslogStats;
-	request_cache: RequestCacheStats;
-	recovery: RecoveryStats;
-}
-@namespace("common_options.stats")
-class IndexingStats {
-	delete_current: long;
-	delete_time: string;
-	delete_time_in_millis: long;
-	delete_total: long;
-	index_current: long;
-	index_time: string;
-	index_time_in_millis: long;
-	index_total: long;
-	is_throttled: boolean;
-	noop_update_total: long;
-	throttle_time: string;
-	throttle_time_in_millis: long;
-	@custom_json()
-	types: Map<string, IndexingStats>;
-}
-@namespace("common_options.stats")
-class GetStats {
-	current: long;
-	exists_time: string;
-	exists_time_in_millis: long;
-	exists_total: long;
-	missing_time: string;
-	missing_time_in_millis: long;
-	missing_total: long;
-	time: string;
-	time_in_millis: long;
-	total: long;
-}
-@namespace("common_options.stats")
-class SearchStats {
-	open_contexts: long;
-	fetch_current: long;
-	fetch_time_in_millis: long;
-	fetch_total: long;
-	query_current: long;
-	query_time_in_millis: long;
-	query_total: long;
-	scroll_current: long;
-	scroll_time_in_millis: long;
-	scroll_total: long;
-	suggest_current: long;
-	suggest_time_in_millis: long;
-	suggest_total: long;
-}
-@namespace("common_options.stats")
-class MergesStats {
-	current: long;
-	current_docs: long;
-	current_size: string;
-	current_size_in_bytes: long;
-	total: long;
-	total_auto_throttle: string;
-	total_auto_throttle_in_bytes: long;
-	total_docs: long;
-	total_size: string;
-	total_size_in_bytes: string;
-	total_stopped_time: string;
-	total__stopped_time_in_millis: long;
-	total_throttled_time: string;
-	total_throttled_time_in_millis: long;
-	total_time: string;
-	total_time_in_millis: long;
-}
-@namespace("common_options.stats")
-class RefreshStats {
-	total: long;
-	total_time: string;
-	total_time_in_millis: long;
-}
-@namespace("common_options.stats")
-class FlushStats {
-	total: long;
-	total_time: string;
-	total_time_in_millis: long;
-}
-@namespace("common_options.stats")
-class WarmerStats {
-	current: long;
-	total: long;
-	total_time: string;
-	total_time_in_millis: long;
-}
-@namespace("common_options.stats")
-class TranslogStats {
-	operations: long;
-	size: string;
-	size_in_bytes: long;
-}
-@namespace("common_options.stats")
-class RequestCacheStats {
-	evictions: long;
-	hit_count: long;
-	memory_size: string;
-	memory_size_in_bytes: long;
-	miss_count: long;
-}
-@namespace("common_options.stats")
-class RecoveryStats {
-	current_as_source: long;
-	current_as_target: long;
-	throttle_time: string;
-	throttle_time_in_millis: long;
-}
-@namespace("cluster.nodes_stats")
-class OperatingSystemStats {
-	timestamp: long;
-	mem: ExtendedMemoryStats;
-	swap: MemoryStats;
-	cpu: CPUStats;
-}
-@namespace("cluster.nodes_stats")
-class ProcessStats {
-	timestamp: long;
-	open_file_descriptors: integer;
-	cpu: CPUStats;
-	mem: MemoryStats;
-}
-@namespace("cluster.nodes_stats")
-class ScriptStats {
-	cache_evictions: long;
-	compilations: long;
-}
-@namespace("cluster.nodes_stats")
-class NodeJvmStats {
-	timestamp: long;
-	uptime: string;
-	uptime_in_millis: long;
-	mem: MemoryStats;
-	threads: ThreadStats;
-	gc: GarbageCollectionStats;
-	@custom_json()
-	buffer_pools: Map<string, NodeBufferPool>;
-	classes: JvmClassesStats;
-}
-@namespace("cluster.nodes_stats")
-class ThreadCountStats {
-	threads: long;
-	queue: long;
-	active: long;
-	rejected: long;
-	largest: long;
-	completed: long;
-}
-@namespace("cluster.nodes_stats")
-class BreakerStats {
-	estimated_size: string;
-	estimated_size_in_bytes: long;
-	limit_size: string;
-	limit_size_in_bytes: long;
-	overhead: float;
-	tripped: float;
-}
-@namespace("cluster.nodes_stats")
-class FileSystemStats {
-	timestamp: long;
-	total: TotalFileSystemStats;
-	data: DataPathStats[];
-}
-@namespace("cluster.nodes_stats")
-class TransportStats {
-	server_open: integer;
-	rx_count: long;
-	rx_size: string;
-	rx_size_in_bytes: long;
-	tx_count: long;
-	tx_size: string;
-	tx_size_in_bytes: long;
-}
-@namespace("cluster.nodes_stats")
-class HttpStats {
-	current_open: integer;
-	total_opened: long;
-}
-@namespace("cluster.nodes_usage")
-class NodeUsageInformation {
-	@custom_json()
-	timestamp: Date;
-	@custom_json()
-	since: Date;
-	rest_actions: Map<string, integer>;
-}
-@namespace("cluster.remote_info")
-class RemoteInfo {
-	connected: boolean;
-	num_nodes_connected: long;
-	max_connections_per_cluster: integer;
-	initial_connect_timeout: Time;
-	seeds: string[];
-	http_addresses: string[];
+@namespace("cluster")
+class NodeStatistics {
+	total: integer;
+	successful: integer;
+	failed: integer;
 }
 @namespace("common_abstractions.response")
 class ElasticsearchVersionInfo {
@@ -3320,10 +3061,6 @@ class Token {
 	position: integer;
 	start_offset: integer;
 }
-@namespace("document.multiple.reindex_on_server")
-@custom_json()
-class ReindexRouting {
-}
 @namespace("document.multiple.reindex_rethrottle")
 class ReindexNode {
 	name: string;
@@ -3331,9 +3068,7 @@ class ReindexNode {
 	host: string;
 	ip: string;
 	roles: string[];
-	@custom_json()
 	attributes: Map<string, string>;
-	@custom_json()
 	tasks: Map<TaskId, ReindexTask>;
 }
 @namespace("document.multiple.reindex_rethrottle")
@@ -3365,26 +3100,9 @@ class ReindexStatus {
 @namespace("search.explain")
 class InstantGet<TDocument> {
 	found: boolean;
-	@custom_json()
+	@prop_serializer("SourceConverter")
 	_source: TDocument;
 	fields: Map<string, LazyDocument>;
-}
-@namespace("indices.alias_management.get_alias")
-class IndexAliases {
-	aliases: Map<string, AliasDefinition>;
-}
-@namespace("indices.alias_management")
-class AliasDefinition {
-	filter: QueryContainer;
-	routing: string;
-	index_routing: string;
-	search_routing: string;
-}
-@namespace("common_options.geo")
-@custom_json()
-class Distance {
-	precision: double;
-	unit: DistanceUnit;
 }
 @namespace("indices.analyze")
 class AnalyzeToken {
@@ -3424,95 +3142,16 @@ class ExplainAnalyzeToken {
 	keyword: boolean;
 	bytes: string;
 }
-@namespace("indices.mapping_management.get_field_mapping")
-class TypeFieldMappings {
-	@custom_json()
-	mappings: Map<TypeName, Map<Field, FieldMapping>>;
-}
-@namespace("indices.mapping_management.get_mapping")
-class IndexMappings {
-	mappings: Map<TypeName, TypeMapping>;
-	item: TypeMapping;
-}
-@namespace("indices.monitoring.indices_recovery")
-class RecoveryStatus {
-	shards: ShardRecovery[];
-}
-@namespace("indices.monitoring.indices_recovery")
-class ShardRecovery {
-	id: long;
-	type: string;
-	stage: string;
-	primary: boolean;
-	start_time: Date;
-	stop_time: Date;
-	total_time_in_millis: long;
-	source: RecoveryOrigin;
-	target: RecoveryOrigin;
-	index: RecoveryIndexStatus;
-	translog: RecoveryTranslogStatus;
-	start: RecoveryStartStatus;
-}
-@namespace("indices.monitoring.indices_recovery")
-class RecoveryOrigin {
-	id: string;
-	hostname: string;
-	ip: string;
-	name: string;
-}
-@namespace("indices.monitoring.indices_recovery")
-class RecoveryIndexStatus {
-	total_time_in_millis: long;
-	bytes: RecoveryBytes;
-	files: RecoveryFiles;
-}
-@namespace("indices.monitoring.indices_recovery")
-class RecoveryBytes {
-	total: long;
-	reused: long;
-	recovered: long;
-	percent: string;
-}
-@namespace("indices.monitoring.indices_recovery")
-class RecoveryFiles {
-	total: long;
-	reused: long;
-	recovered: long;
-	percent: string;
-	details: RecoveryFileDetails[];
-}
-@namespace("indices.monitoring.indices_recovery")
-class RecoveryFileDetails {
-	name: string;
-	length: long;
-	recovered: long;
-}
-@namespace("indices.monitoring.indices_recovery")
-class RecoveryTranslogStatus {
-	recovered: long;
-	total: long;
-	percent: string;
-	total_on_start: long;
-	total_time: string;
-	total_time_in_millis: long;
-}
-@namespace("indices.monitoring.indices_recovery")
-class RecoveryStartStatus {
-	check_index_time: long;
-	total_time_in_millis: string;
-}
 @namespace("indices.monitoring.indices_segments")
 class IndexSegment {
-	@custom_json()
 	shards: Map<string, ShardsSegment>;
 }
 @namespace("indices.monitoring.indices_segments")
-@custom_json()
+@class_serializer("Json")
 class ShardsSegment {
 	num_committed_segments: integer;
 	num_search_segments: integer;
 	routing: ShardSegmentRouting;
-	@custom_json()
 	segments: Map<string, Segment>;
 }
 @namespace("indices.monitoring.indices_segments")
@@ -3533,7 +3172,6 @@ class Segment {
 }
 @namespace("indices.monitoring.indices_shard_stores")
 class IndicesShardStores {
-	@custom_json()
 	shards: Map<string, ShardStoreWrapper>;
 }
 @namespace("indices.monitoring.indices_shard_stores")
@@ -3541,7 +3179,7 @@ class ShardStoreWrapper {
 	stores: ShardStore[];
 }
 @namespace("indices.monitoring.indices_shard_stores")
-@custom_json()
+@class_serializer("ShardStoreJsonConverter")
 class ShardStore {
 	id: string;
 	name: string;
@@ -3550,7 +3188,6 @@ class ShardStore {
 	allocation_id: string;
 	store_exception: ShardStoreException;
 	allocation: ShardStoreAllocation;
-	@custom_json()
 	attributes: Map<string, any>;
 }
 @namespace("indices.monitoring.indices_shard_stores")
@@ -3562,6 +3199,187 @@ class ShardStoreException {
 class IndicesStats {
 	primaries: IndexStats;
 	total: IndexStats;
+}
+@namespace("indices.monitoring.indices_stats")
+class IndexStats {
+	docs: DocStats;
+	store: StoreStats;
+	indexing: IndexingStats;
+	get: GetStats;
+	search: SearchStats;
+	merges: MergesStats;
+	refresh: RefreshStats;
+	flush: FlushStats;
+	warmer: WarmerStats;
+	query_cache: QueryCacheStats;
+	fielddata: FielddataStats;
+	completion: CompletionStats;
+	segments: SegmentsStats;
+	translog: TranslogStats;
+	request_cache: RequestCacheStats;
+	recovery: RecoveryStats;
+}
+@namespace("common_options.stats")
+class DocStats {
+	count: long;
+	deleted: long;
+}
+@namespace("common_options.stats")
+class StoreStats {
+	size: string;
+	size_in_bytes: double;
+}
+@namespace("common_options.stats")
+class IndexingStats {
+	delete_current: long;
+	delete_time: string;
+	delete_time_in_millis: long;
+	delete_total: long;
+	index_current: long;
+	index_time: string;
+	index_time_in_millis: long;
+	index_total: long;
+	is_throttled: boolean;
+	noop_update_total: long;
+	throttle_time: string;
+	throttle_time_in_millis: long;
+	types: Map<string, IndexingStats>;
+}
+@namespace("common_options.stats")
+class GetStats {
+	current: long;
+	exists_time: string;
+	exists_time_in_millis: long;
+	exists_total: long;
+	missing_time: string;
+	missing_time_in_millis: long;
+	missing_total: long;
+	time: string;
+	time_in_millis: long;
+	total: long;
+}
+@namespace("common_options.stats")
+class SearchStats {
+	open_contexts: long;
+	fetch_current: long;
+	fetch_time_in_millis: long;
+	fetch_total: long;
+	query_current: long;
+	query_time_in_millis: long;
+	query_total: long;
+	scroll_current: long;
+	scroll_time_in_millis: long;
+	scroll_total: long;
+	suggest_current: long;
+	suggest_time_in_millis: long;
+	suggest_total: long;
+}
+@namespace("common_options.stats")
+class MergesStats {
+	current: long;
+	current_docs: long;
+	current_size: string;
+	current_size_in_bytes: long;
+	total: long;
+	total_auto_throttle: string;
+	total_auto_throttle_in_bytes: long;
+	total_docs: long;
+	total_size: string;
+	total_size_in_bytes: string;
+	total_stopped_time: string;
+	total__stopped_time_in_millis: long;
+	total_throttled_time: string;
+	total_throttled_time_in_millis: long;
+	total_time: string;
+	total_time_in_millis: long;
+}
+@namespace("common_options.stats")
+class RefreshStats {
+	total: long;
+	total_time: string;
+	total_time_in_millis: long;
+}
+@namespace("common_options.stats")
+class FlushStats {
+	total: long;
+	total_time: string;
+	total_time_in_millis: long;
+}
+@namespace("common_options.stats")
+class WarmerStats {
+	current: long;
+	total: long;
+	total_time: string;
+	total_time_in_millis: long;
+}
+@namespace("common_options.stats")
+class QueryCacheStats {
+	memory_size: string;
+	memory_size_in_bytes: long;
+	total_count: long;
+	hit_count: long;
+	miss_count: long;
+	cache_size: long;
+	cache_count: long;
+	evictions: long;
+}
+@namespace("common_options.stats")
+class FielddataStats {
+	evictions: long;
+	memory_size: string;
+	memory_size_in_bytes: long;
+}
+@namespace("common_options.stats")
+class CompletionStats {
+	size: string;
+	size_in_bytes: long;
+}
+@namespace("common_options.stats")
+class SegmentsStats {
+	count: long;
+	doc_values_memory: string;
+	doc_values_memory_in_bytes: long;
+	fixed_bit_set_memory: string;
+	fixed_bit_set_memory_in_bytes: long;
+	index_writer_max_memory: string;
+	index_writer_max_memory_in_bytes: long;
+	index_writer_memory: string;
+	index_writer_memory_in_bytes: long;
+	memory: string;
+	memory_in_bytes: long;
+	norms_memory: string;
+	norms_memory_in_bytes: long;
+	points_memory: string;
+	points_memory_in_bytes: long;
+	stored_fields_memory: string;
+	stored_fields_memory_in_bytes: long;
+	term_vectors_memory: string;
+	term_vectors_memory_in_bytes: long;
+	terms_memory: string;
+	terms_memory_in_bytes: long;
+	version_map_memory: string;
+	version_map_memory_in_bytes: long;
+}
+@namespace("common_options.stats")
+class TranslogStats {
+	operations: long;
+	size: string;
+	size_in_bytes: long;
+}
+@namespace("common_options.stats")
+class RequestCacheStats {
+	evictions: long;
+	hit_count: long;
+	memory_size: string;
+	memory_size_in_bytes: long;
+	miss_count: long;
+}
+@namespace("common_options.stats")
+class RecoveryStats {
+	current_as_source: long;
+	current_as_target: long;
+	throttle_time: string;
+	throttle_time_in_millis: long;
 }
 @namespace("indices.status_management.upgrade.upgrade_status")
 class UpgradeStatus {
@@ -3590,11 +3408,6 @@ class DocumentSimulation {
 @namespace("ingest.simulate_pipeline")
 class Ingest {
 	timestamp: Date;
-}
-@namespace("modules.indices.fielddata")
-class FielddataSettings {
-	cache_size: string;
-	cache_expire: Time;
 }
 @namespace("modules.snapshot_and_restore.repositories.verify_repository")
 class CompactNodeInfo {
@@ -3673,81 +3486,6 @@ class FieldCapabilities {
 	indices: Indices;
 	non_searchable_indices: Indices;
 	non_aggregatable_indices: Indices;
-}
-@namespace("aggregations.bucket.histogram")
-@custom_json()
-class HistogramOrder {
-	key: string;
-	order: SortOrder;
-	count_ascending: HistogramOrder;
-	count_descending: HistogramOrder;
-	key_ascending: HistogramOrder;
-	key_descending: HistogramOrder;
-}
-@namespace("aggregations.bucket.histogram")
-class ExtendedBounds<T> {
-	min: T;
-	max: T;
-}
-@namespace("aggregations.bucket.terms")
-@custom_json()
-class TermsOrder {
-	key: string;
-	order: SortOrder;
-	count_ascending: TermsOrder;
-	count_descending: TermsOrder;
-	term_ascending: TermsOrder;
-	term_descending: TermsOrder;
-	key_ascending: TermsOrder;
-	key_descending: TermsOrder;
-}
-@namespace("aggregations.bucket.terms")
-@custom_json()
-class TermsInclude {
-	pattern: string;
-	values: string[];
-	partition: long;
-	num_partitions: long;
-}
-@namespace("aggregations.bucket.terms")
-@custom_json()
-class TermsExclude {
-	pattern: string;
-	values: string[];
-}
-@namespace("DefaultLanguageConstruct")
-@custom_json()
-class SignificantTermsIncludeExclude {
-	pattern: string;
-	values: string[];
-}
-@namespace("search.search.hits")
-class InnerHitsResult {
-	hits: InnerHitsMetadata;
-}
-@namespace("search.search.hits")
-class InnerHitsMetadata {
-	total: long;
-	max_score: double;
-	hits: Hit<LazyDocument>[];
-}
-@namespace("search.search.hits")
-class NestedIdentity {
-	field: Field;
-	offset: integer;
-	_nested: NestedIdentity;
-}
-@namespace("search.search.highlighting")
-class HighlightHit {
-	document_id: string;
-	field: string;
-	highlights: string[];
-}
-@namespace("search.explain")
-class Explanation {
-	value: float;
-	description: string;
-	details: ExplanationDetail[];
 }
 @namespace("search.search_shards")
 class SearchShard {
@@ -3836,7 +3574,7 @@ class SuggestOption<TDocument> {
 	_index: IndexName;
 	_type: TypeName;
 	_id: Id;
-	@custom_json()
+	@prop_serializer("SourceConverter")
 	_source: TDocument;
 	contexts: Map<string, Context[]>;
 	highlighted: string;
@@ -3846,7 +3584,35 @@ class SuggestOption<TDocument> {
 class HitsMetadata<T> {
 	total: long;
 	max_score: double;
-	hits: Hit<T>[];
+	//hits: Hit<T>[];
+}
+@namespace("search.search.highlighting")
+class HighlightHit {
+	document_id: string;
+	field: string;
+	highlights: string[];
+}
+@namespace("search.explain")
+class Explanation {
+	value: float;
+	description: string;
+	details: ExplanationDetail[];
+}
+@namespace("search.search.hits")
+class InnerHitsResult {
+	hits: InnerHitsMetadata;
+}
+@namespace("search.search.hits")
+class InnerHitsMetadata {
+	total: long;
+	max_score: double;
+	hits: Hit<LazyDocument>[];
+}
+@namespace("search.search.hits")
+class NestedIdentity {
+	field: Field;
+	offset: integer;
+	_nested: NestedIdentity;
 }
 @namespace("search.validate")
 class ValidationExplanation {
@@ -3861,16 +3627,6 @@ class DeprecationInfo {
 	message: string;
 	url: string;
 	details: string;
-}
-@namespace("x_pack.graph.explore.request")
-class GraphVertexInclude {
-	term: string;
-	boost: double;
-}
-@namespace("x_pack.graph.explore.request")
-class SampleDiversity {
-	field: Field;
-	max_docs_per_value: integer;
 }
 @namespace("x_pack.graph.explore.response")
 class GraphConnection {
@@ -3937,17 +3693,6 @@ class LicenseInformation {
 	issued_to: string;
 	issuer: string;
 }
-@namespace("x_pack.license.get_license")
-class License {
-	uid: string;
-	signature: string;
-	type: LicenseType;
-	issue_date_in_millis: long;
-	expiry_date_in_millis: long;
-	max_nodes: long;
-	issued_to: string;
-	issuer: string;
-}
 @namespace("x_pack.license.post_license")
 class LicenseAcknowledgement {
 	message: string;
@@ -3963,7 +3708,7 @@ class AnomalyRecord {
 	bucket_span: Time;
 	detector_index: integer;
 	is_interim: boolean;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	timestamp: Date;
 	function: string;
 	function_description: string;
@@ -4004,7 +3749,7 @@ class Influence {
 @namespace("x_pack.machine_learning.job.results")
 class Bucket {
 	job_id: string;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	timestamp: Date;
 	anomaly_score: double;
 	bucket_span: Time;
@@ -4027,7 +3772,7 @@ class BucketInfluencer {
 	probability: double;
 	bucket_span: long;
 	is_interim: boolean;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	timestamp: Date;
 }
 @namespace("x_pack.machine_learning.job.results")
@@ -4060,7 +3805,6 @@ class DiscoveryNode {
 	name: string;
 	ephemeral_id: string;
 	transport_address: string;
-	@custom_json()
 	attributes: Map<string, string>;
 }
 @namespace("x_pack.machine_learning.datafeed")
@@ -4069,15 +3813,68 @@ class DatafeedConfig {
 	aggregations: Map<string, AggregationContainer>;
 	chunking_config: ChunkingConfig;
 	frequency: Time;
-	@custom_json()
+	@prop_serializer("IndicesJsonConverter")
 	indices: Indices;
 	job_id: string;
 	query: QueryContainer;
 	query_delay: Time;
 	script_fields: Map<string, ScriptField>;
 	scroll_size: integer;
-	@custom_json()
+	@prop_serializer("TypesJsonConverter")
 	types: Types;
+}
+@namespace("aggregations.bucket.histogram")
+@class_serializer("KeyValueJsonConverter`2")
+class HistogramOrder {
+	key: string;
+	order: SortOrder;
+	count_ascending: HistogramOrder;
+	count_descending: HistogramOrder;
+	key_ascending: HistogramOrder;
+	key_descending: HistogramOrder;
+}
+@namespace("aggregations.bucket.histogram")
+class ExtendedBounds<T> {
+	min: T;
+	max: T;
+}
+@namespace("common_options.geo")
+@class_serializer("DistanceJsonConverter")
+class Distance {
+	precision: double;
+	unit: DistanceUnit;
+}
+@namespace("aggregations.bucket.terms")
+@class_serializer("KeyValueJsonConverter`2")
+class TermsOrder {
+	key: string;
+	order: SortOrder;
+	count_ascending: TermsOrder;
+	count_descending: TermsOrder;
+	term_ascending: TermsOrder;
+	term_descending: TermsOrder;
+	key_ascending: TermsOrder;
+	key_descending: TermsOrder;
+}
+@namespace("aggregations.bucket.terms")
+@class_serializer("TermsIncludeJsonConverter")
+class TermsInclude {
+	pattern: string;
+	values: string[];
+	partition: long;
+	num_partitions: long;
+}
+@namespace("aggregations.bucket.terms")
+@class_serializer("TermsExcludeJsonConverter")
+class TermsExclude {
+	pattern: string;
+	values: string[];
+}
+@namespace("common")
+@class_serializer("SignificantTermsIncludeExcludeJsonConverter")
+class SignificantTermsIncludeExclude {
+	pattern: string;
+	values: string[];
 }
 @namespace("x_pack.machine_learning.job.config")
 class JobStats {
@@ -4102,15 +3899,15 @@ class DataCounts {
 	empty_bucket_count: long;
 	sparse_bucket_count: long;
 	bucket_count: long;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	earliest_record_timestamp: Date;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	latest_record_timestamp: Date;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	latest_empty_bucket_timestamp: Date;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	last_data_time: Date;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	latest_sparse_bucket_timestamp: Date;
 	input_record_count: long;
 }
@@ -4124,9 +3921,9 @@ class ModelSizeStats {
 	total_partition_field_count: long;
 	bucket_allocation_failures_count: long;
 	memory_status: MemoryStatus;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	log_time: Date;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	timestamp: Date;
 }
 @namespace("x_pack.info.x_pack_usage")
@@ -4134,9 +3931,9 @@ class Job {
 	job_id: string;
 	job_type: string;
 	description: string;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	create_time: Date;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	finished_time: Date;
 	analysis_config: AnalysisConfig;
 	analysis_limits: AnalysisLimits;
@@ -4152,15 +3949,15 @@ class Job {
 @namespace("x_pack.machine_learning.job.process")
 class ModelSnapshot {
 	job_id: string;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	timestamp: Date;
 	description: string;
 	snapshot_id: string;
 	snapshot_doc_count: long;
 	model_size_stats: ModelSizeStats;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	latest_record_time_stamp: Date;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	latest_result_time_stamp: Date;
 	retain: boolean;
 }
@@ -4168,39 +3965,13 @@ class ModelSnapshot {
 class SecurityNode {
 	name: string;
 }
-@namespace("x_pack.security.role_mapping.get_role_mapping")
-class XPackRoleMapping {
-	metadata: Map<string, any>;
-	enabled: boolean;
-	roles: string[];
-	rules: RoleMappingRuleBase;
-}
-@namespace("x_pack.security.role_mapping.rules.role")
-@custom_json()
-class RoleMappingRuleBase {
-}
 @namespace("x_pack.security.role_mapping.put_role_mapping")
 class PutRoleMappingStatus {
 	created: boolean;
 }
-@namespace("x_pack.security.role.get_role")
-class XPackRole {
-	cluster: string[];
-	run_as: string[];
-	indices: IndicesPrivileges[];
-	metadata: Map<string, any>;
-}
 @namespace("x_pack.security.role.put_role")
 class PutRoleStatus {
 	created: boolean;
-}
-@namespace("x_pack.security.user.get_user")
-class XPackUser {
-	username: string;
-	roles: string[];
-	full_name: string;
-	email: string;
-	metadata: Map<string, any>;
 }
 @namespace("x_pack.security.user.put_user")
 class PutUserStatus {
@@ -4245,13 +4016,6 @@ class ThrottleState {
 class ActivationStatus {
 	state: ActivationState;
 	actions: Map<string, ActionStatus>;
-}
-@namespace("x_pack.watcher.execution")
-@custom_json()
-class SimulatedActions {
-	use_all: boolean;
-	actions: string[];
-	all: SimulatedActions;
 }
 @namespace("x_pack.watcher.execute_watch")
 class WatchRecord {
@@ -4399,7 +4163,7 @@ class Watch {
 	condition: ConditionContainer;
 	trigger: TriggerContainer;
 	transform: TransformContainer;
-	@custom_json()
+	@prop_serializer("ActionsJsonConverter")
 	actions: Map<string, Action>;
 	status: WatchStatus;
 	throttle_period: string;
@@ -4424,14 +4188,486 @@ class WatchRecordQueuedStats {
 	triggered_time: Date;
 	execution_time: Date;
 }
+@namespace("document.multiple.reindex_on_server")
+@class_serializer("ReindexRoutingJsonConverter")
+class ReindexRouting {
+}
+@namespace("x_pack.license.get_license")
+class License {
+	uid: string;
+	signature: string;
+	type: LicenseType;
+	issue_date_in_millis: long;
+	expiry_date_in_millis: long;
+	max_nodes: long;
+	issued_to: string;
+	issuer: string;
+}
+@namespace("x_pack.security.role_mapping.rules.role")
+@class_serializer("RoleMappingRuleBaseJsonConverter")
+class RoleMappingRuleBase {
+}
+@namespace("x_pack.watcher.execution")
+@class_serializer("SimulatedActionsConverter")
+class SimulatedActions {
+	use_all: boolean;
+	actions: string[];
+	all: SimulatedActions;
+}
+@namespace("cluster.cluster_stats")
+class ClusterIndicesStats {
+	completion: CompletionStats;
+	count: long;
+	docs: DocStats;
+	fielddata: FielddataStats;
+	query_cache: QueryCacheStats;
+	segments: SegmentsStats;
+	shards: ClusterIndicesShardsStats;
+	store: StoreStats;
+}
+@namespace("cluster.cluster_stats")
+class ClusterIndicesShardsStats {
+	total: double;
+	primaries: double;
+	replication: double;
+	index: ClusterIndicesShardsIndexStats;
+}
+@namespace("cluster.cluster_stats")
+class ClusterIndicesShardsIndexStats {
+	shards: ClusterShardMetrics;
+	primaries: ClusterShardMetrics;
+	replication: ClusterShardMetrics;
+}
+@namespace("cluster.cluster_stats")
+class ClusterShardMetrics {
+	min: double;
+	max: double;
+	avg: double;
+}
+@namespace("cluster.cluster_stats")
+class ClusterNodesStats {
+	count: ClusterNodeCount;
+	versions: string[];
+	os: ClusterOperatingSystemStats;
+	process: ClusterProcess;
+	jvm: ClusterJvm;
+	fs: ClusterFileSystem;
+	plugins: PluginStats[];
+}
+@namespace("cluster.cluster_stats")
+class ClusterNodeCount {
+	total: integer;
+	coordinating_only: integer;
+	master: integer;
+	data: integer;
+	ingest: integer;
+}
+@namespace("cluster.cluster_stats")
+class ClusterOperatingSystemStats {
+	available_processors: integer;
+	allocated_processors: integer;
+	names: ClusterOperatingSystemName[];
+}
+@namespace("cluster.cluster_stats")
+class ClusterOperatingSystemName {
+	count: integer;
+	name: string;
+}
+@namespace("cluster.cluster_stats")
+class ClusterProcess {
+	cpu: ClusterProcessCpu;
+	open_file_descriptors: ClusterProcessOpenFileDescriptors;
+}
+@namespace("cluster.cluster_stats")
+class ClusterProcessCpu {
+	percent: integer;
+}
+@namespace("cluster.cluster_stats")
+class ClusterProcessOpenFileDescriptors {
+	min: long;
+	max: long;
+	avg: long;
+}
+@namespace("cluster.cluster_stats")
+class ClusterJvm {
+	max_uptime: string;
+	max_uptime_in_millis: long;
+	versions: ClusterJvmVersion[];
+	mem: ClusterJvmMemory;
+	threads: long;
+}
+@namespace("cluster.cluster_stats")
+class ClusterJvmVersion {
+	version: string;
+	vm_name: string;
+	vm_version: string;
+	vm_vendor: string;
+	count: integer;
+}
+@namespace("cluster.cluster_stats")
+class ClusterJvmMemory {
+	heap_used: string;
+	heap_used_in_bytes: long;
+	heap_max: string;
+	heap_max_in_bytes: long;
+}
+@namespace("cluster.cluster_stats")
+class ClusterFileSystem {
+	total: string;
+	total_in_bytes: long;
+	free: string;
+	free_in_bytes: long;
+	available: string;
+	available_in_bytes: long;
+}
+@namespace("common_options.stats")
+class PluginStats {
+	name: string;
+	version: string;
+	description: string;
+	classname: string;
+	jvm: boolean;
+	isolated: boolean;
+	site: boolean;
+}
+@namespace("cluster.nodes_info")
+class NodeInfo {
+	name: string;
+	transport_address: string;
+	host: string;
+	ip: string;
+	version: string;
+	build_hash: string;
+	roles: NodeRole[];
+	settings: string[];
+	os: NodeOperatingSystemInfo;
+	process: NodeProcessInfo;
+	jvm: NodeJvmInfo;
+	thread_pool: Map<string, NodeThreadPoolInfo>;
+	network: NodeInfoNetwork;
+	transport: NodeInfoTransport;
+	http: NodeInfoHttp;
+	plugins: PluginStats[];
+}
+@namespace("cluster.nodes_info")
+class NodeOperatingSystemInfo {
+	name: string;
+	arch: string;
+	version: string;
+	refresh_interval_in_millis: integer;
+	available_processors: integer;
+	cpu: NodeInfoOSCPU;
+	mem: NodeInfoMemory;
+	swap: NodeInfoMemory;
+}
+@namespace("cluster.nodes_info")
+class NodeInfoOSCPU {
+	vendor: string;
+	model: string;
+	mhz: integer;
+	total_cores: integer;
+	total_sockets: integer;
+	cores_per_socket: integer;
+	cache_size: string;
+	cache_size_in_bytes: integer;
+}
+@namespace("cluster.nodes_info")
+class NodeInfoMemory {
+	total: string;
+	total_in_bytes: long;
+}
+@namespace("cluster.nodes_info")
+class NodeProcessInfo {
+	refresh_interval_in_millis: long;
+	id: long;
+	mlockall: boolean;
+}
+@namespace("cluster.nodes_info")
+class NodeJvmInfo {
+	pid: integer;
+	version: string;
+	vm_name: string;
+	vm_version: string;
+	vm_vendor: string;
+	memory_pools: string[];
+	gc_collectors: string[];
+	start_time_in_millis: long;
+	mem: NodeInfoJVMMemory;
+}
+@namespace("cluster.nodes_info")
+class NodeInfoJVMMemory {
+	heap_init: string;
+	heap_init_in_bytes: long;
+	heap_max: string;
+	heap_max_in_bytes: long;
+	non_heap_init: string;
+	non_heap_init_in_bytes: long;
+	non_heap_max: string;
+	non_heap_max_in_bytes: long;
+	direct_max: string;
+	direct_max_in_bytes: long;
+}
+@namespace("cluster.nodes_info")
+class NodeThreadPoolInfo {
+	type: string;
+	min: integer;
+	max: integer;
+	queue_size: integer;
+	keep_alive: string;
+}
+@namespace("cluster.nodes_info")
+class NodeInfoNetwork {
+	refresh_interval: integer;
+	primary_interface: NodeInfoNetworkInterface;
+}
+@namespace("cluster.nodes_info")
+class NodeInfoNetworkInterface {
+	address: string;
+	name: string;
+	mac_address: string;
+}
+@namespace("cluster.nodes_info")
+class NodeInfoTransport {
+	bound_address: string[];
+	publish_address: string;
+}
+@namespace("cluster.nodes_info")
+class NodeInfoHttp {
+	bound_address: string[];
+	publish_address: string;
+	max_content_length: string;
+	max_content_length_in_bytes: long;
+}
+@namespace("cluster.nodes_stats")
+class NodeStats {
+	timestamp: long;
+	name: string;
+	transport_address: string;
+	host: string;
+	@prop_serializer("ReadSingleOrEnumerableJsonConverter`1")
+	ip: string[];
+	roles: NodeRole[];
+	indices: IndexStats;
+	os: OperatingSystemStats;
+	process: ProcessStats;
+	script: ScriptStats;
+	jvm: NodeJvmStats;
+	thread_pool: Map<string, ThreadCountStats>;
+	breakers: Map<string, BreakerStats>;
+	fs: FileSystemStats;
+	transport: TransportStats;
+	http: HttpStats;
+}
+@namespace("cluster.nodes_stats")
+class OperatingSystemStats {
+	timestamp: long;
+	mem: ExtendedMemoryStats;
+	swap: MemoryStats;
+	cpu: CPUStats;
+}
+@namespace("cluster.nodes_stats")
+class ProcessStats {
+	timestamp: long;
+	open_file_descriptors: integer;
+	cpu: CPUStats;
+	mem: MemoryStats;
+}
+@namespace("cluster.nodes_stats")
+class ScriptStats {
+	cache_evictions: long;
+	compilations: long;
+}
+@namespace("cluster.nodes_stats")
+class NodeJvmStats {
+	timestamp: long;
+	uptime: string;
+	uptime_in_millis: long;
+	mem: MemoryStats;
+	threads: ThreadStats;
+	gc: GarbageCollectionStats;
+	buffer_pools: Map<string, NodeBufferPool>;
+	classes: JvmClassesStats;
+}
+@namespace("cluster.nodes_stats")
+class ThreadCountStats {
+	threads: long;
+	queue: long;
+	active: long;
+	rejected: long;
+	largest: long;
+	completed: long;
+}
+@namespace("cluster.nodes_stats")
+class BreakerStats {
+	estimated_size: string;
+	estimated_size_in_bytes: long;
+	limit_size: string;
+	limit_size_in_bytes: long;
+	overhead: float;
+	tripped: float;
+}
+@namespace("cluster.nodes_stats")
+class FileSystemStats {
+	timestamp: long;
+	total: TotalFileSystemStats;
+	data: DataPathStats[];
+}
+@namespace("cluster.nodes_stats")
+class TransportStats {
+	server_open: integer;
+	rx_count: long;
+	rx_size: string;
+	rx_size_in_bytes: long;
+	tx_count: long;
+	tx_size: string;
+	tx_size_in_bytes: long;
+}
+@namespace("cluster.nodes_stats")
+class HttpStats {
+	current_open: integer;
+	total_opened: long;
+}
+@namespace("cluster.nodes_usage")
+class NodeUsageInformation {
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
+	timestamp: Date;
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
+	since: Date;
+	rest_actions: Map<string, integer>;
+}
+@namespace("cluster.remote_info")
+class RemoteInfo {
+	connected: boolean;
+	num_nodes_connected: long;
+	max_connections_per_cluster: integer;
+	initial_connect_timeout: Time;
+	seeds: string[];
+	http_addresses: string[];
+}
+@namespace("indices.alias_management.get_alias")
+class IndexAliases {
+	aliases: Map<string, AliasDefinition>;
+}
+@namespace("indices.alias_management")
+class AliasDefinition {
+	filter: QueryContainer;
+	routing: string;
+	index_routing: string;
+	search_routing: string;
+}
+@namespace("indices.mapping_management.get_field_mapping")
+class TypeFieldMappings {
+	@prop_serializer("ResolvableDictionaryJsonConverter`2")
+	mappings: Map<TypeName, Map<Field, FieldMapping>>;
+}
+@namespace("indices.mapping_management.get_mapping")
+class IndexMappings {
+	mappings: Map<TypeName, TypeMapping>;
+	item: TypeMapping;
+}
+@namespace("indices.monitoring.indices_recovery")
+class RecoveryStatus {
+	shards: ShardRecovery[];
+}
+@namespace("indices.monitoring.indices_recovery")
+class ShardRecovery {
+	id: long;
+	type: string;
+	stage: string;
+	primary: boolean;
+	start_time: Date;
+	stop_time: Date;
+	total_time_in_millis: long;
+	source: RecoveryOrigin;
+	target: RecoveryOrigin;
+	index: RecoveryIndexStatus;
+	translog: RecoveryTranslogStatus;
+	start: RecoveryStartStatus;
+}
+@namespace("indices.monitoring.indices_recovery")
+class RecoveryOrigin {
+	id: string;
+	hostname: string;
+	ip: string;
+	name: string;
+}
+@namespace("indices.monitoring.indices_recovery")
+class RecoveryIndexStatus {
+	total_time_in_millis: long;
+	bytes: RecoveryBytes;
+	files: RecoveryFiles;
+}
+@namespace("indices.monitoring.indices_recovery")
+class RecoveryBytes {
+	total: long;
+	reused: long;
+	recovered: long;
+	percent: string;
+}
+@namespace("indices.monitoring.indices_recovery")
+class RecoveryFiles {
+	total: long;
+	reused: long;
+	recovered: long;
+	percent: string;
+	details: RecoveryFileDetails[];
+}
+@namespace("indices.monitoring.indices_recovery")
+class RecoveryFileDetails {
+	name: string;
+	length: long;
+	recovered: long;
+}
+@namespace("indices.monitoring.indices_recovery")
+class RecoveryTranslogStatus {
+	recovered: long;
+	total: long;
+	percent: string;
+	total_on_start: long;
+	total_time: string;
+	total_time_in_millis: long;
+}
+@namespace("indices.monitoring.indices_recovery")
+class RecoveryStartStatus {
+	check_index_time: long;
+	total_time_in_millis: string;
+}
+@namespace("x_pack.graph.explore.request")
+class GraphVertexInclude {
+	term: string;
+	boost: double;
+}
+@namespace("x_pack.graph.explore.request")
+class SampleDiversity {
+	field: Field;
+	max_docs_per_value: integer;
+}
+@namespace("x_pack.security.role_mapping.get_role_mapping")
+class XPackRoleMapping {
+	metadata: Map<string, any>;
+	enabled: boolean;
+	roles: string[];
+	rules: RoleMappingRuleBase;
+}
+@namespace("x_pack.security.role.get_role")
+class XPackRole {
+	cluster: string[];
+	run_as: string[];
+	indices: IndicesPrivileges[];
+	metadata: Map<string, any>;
+}
+@namespace("x_pack.security.user.get_user")
+class XPackUser {
+	username: string;
+	roles: string[];
+	full_name: string;
+	email: string;
+	metadata: Map<string, any>;
+}
 @namespace("analysis.analyzers")
 class AnalyzerBase {
 	version: string;
 	type: string;
-}
-@namespace("analysis")
-@custom_json()
-class StopWords extends Union<string, string[]> {
 }
 @namespace("analysis.char_filters")
 class CharFilterBase {
@@ -4448,6 +4684,17 @@ class TokenizerBase {
 	version: string;
 	type: string;
 }
+@namespace("modules.indices")
+class IndicesModuleSettings {
+	qeueries_cache_size: string;
+	circuit_breaker_settings: CircuitBreakerSettings;
+	fielddata_settings: FielddataSettings;
+	recovery_settings: IndicesRecoverySettings;
+}
+@namespace("analysis")
+@class_serializer("UnionJsonConverter")
+class StopWords extends Union<string, string[]> {
+}
 @namespace("indices.index_settings.index_templates.get_index_template")
 class TemplateMapping {
 	index_patterns: string[];
@@ -4457,47 +4704,11 @@ class TemplateMapping {
 	aliases: Map<IndexName, Alias>;
 	version: integer;
 }
-@namespace("common_options.minimum_should_match")
-@custom_json()
-class MinimumShouldMatch extends Union<integer, string> {
-}
-@namespace("query_dsl.multi_term_query_rewrite")
-@custom_json()
-class MultiTermQueryRewrite {
-	rewrite: RewriteMultiTerm;
-	size: integer;
-	constant_score: MultiTermQueryRewrite;
-	scoring_boolean: MultiTermQueryRewrite;
-	constant_score_boolean: MultiTermQueryRewrite;
-}
-@namespace("query_dsl.specialized.more_like_this.like")
-@custom_json()
-class Like extends Union<string, LikeDocument> {
-}
-@namespace("index_modules.index_settings")
-@custom_json()
-class IndexState {
-	settings: Map<string, any>;
-	mappings: Map<TypeName, TypeMapping>;
-	aliases: Map<IndexName, Alias>;
-}
-@namespace("modules.indices")
-class IndicesModuleSettings {
-	qeueries_cache_size: string;
-	circuit_breaker_settings: CircuitBreakerSettings;
-	fielddata_settings: FielddataSettings;
-	recovery_settings: IndicesRecoverySettings;
-}
 @namespace("search.suggesters.context_suggester")
-@custom_json()
+@class_serializer("UnionJsonConverter")
 class Context extends Union<string, GeoLocation> {
 	category: string;
 	geo: GeoLocation;
-}
-@namespace("common_options.date_math")
-@custom_json()
-class DateMath {
-	now: DateMathExpression;
 }
 @namespace("x_pack.info.x_pack_usage")
 class MonitoringUsage extends XPackUsage {
@@ -4523,14 +4734,34 @@ class SecurityUsage extends XPackUsage {
 	roles: Map<string, RoleUsage>;
 	realms: Map<string, RealmUsage>;
 }
+@namespace("common_options.date_math")
+@class_serializer("Json")
+class DateMath {
+	now: DateMathExpression;
+}
+@namespace("common_options.minimum_should_match")
+@class_serializer("UnionJsonConverter")
+class MinimumShouldMatch extends Union<integer, string> {
+}
+@namespace("query_dsl.multi_term_query_rewrite")
+@class_serializer("MultiTermQueryRewriteConverter")
+class MultiTermQueryRewrite {
+	rewrite: RewriteMultiTerm;
+	size: integer;
+	constant_score: MultiTermQueryRewrite;
+	scoring_boolean: MultiTermQueryRewrite;
+	constant_score_boolean: MultiTermQueryRewrite;
+}
+@namespace("query_dsl.specialized.more_like_this.like")
+@class_serializer("UnionJsonConverter")
+class Like extends Union<string, LikeDocument> {
+}
 @namespace("x_pack.watcher.action.email")
-@custom_json()
 class EmailBody {
 	text: string;
 	html: string;
 }
 @namespace("x_pack.watcher.action.pager_duty")
-@custom_json()
 class PagerDutyEvent {
 	account: string;
 	description: string;
@@ -4548,21 +4779,32 @@ class ScheduleBase {
 class WatchRecordStats extends WatchRecordQueuedStats {
 	execution_phase: ExecutionPhase;
 }
-@namespace("analysis.token_filters")
-class KeepTypesTokenFilter extends TokenFilterBase {
-	types: string[];
-}
-@namespace("DefaultLanguageConstruct")
-class Request {
+@namespace("index_modules.index_settings")
+class IndexState {
+	settings: Map<string, any>;
+	mappings: Map<TypeName, TypeMapping>;
+	aliases: Map<IndexName, Alias>;
 }
 @namespace("common_options.time_unit")
-@custom_json()
+@class_serializer("TimeJsonConverter")
 class Time {
 	factor: double;
 	interval: TimeUnit;
 	milliseconds: double;
 	minus_one: Time;
 	zero: Time;
+}
+@namespace("analysis.token_filters")
+class KeepTypesTokenFilter extends TokenFilterBase {
+	types: string[];
+}
+@namespace("common")
+class Request {
+}
+@namespace("common_abstractions.infer.property_name")
+class PropertyName {
+	name: string;
+	cacheable_expression: boolean;
 }
 @namespace("common_abstractions.infer.index_name")
 class IndexName {
@@ -4573,30 +4815,15 @@ class IndexName {
 class TypeName {
 	name: string;
 }
-@namespace("common_abstractions.infer.property_name")
-class PropertyName {
-	name: string;
-	cacheable_expression: boolean;
-}
 @namespace("common_abstractions.infer.join_field_routing")
-@custom_json()
+@class_serializer("RoutingJsonConverter")
 class Routing {
-}
-@namespace("common_abstractions.infer.field")
-class Field {
-	name: string;
-	boost: double;
-	cachable_expression: boolean;
 }
 @namespace("common_abstractions.infer.task_id")
 class TaskId {
 	node_id: string;
 	task_number: long;
 	fully_qualified_id: string;
-}
-@namespace("common_abstractions.infer.id")
-@custom_json()
-class Id {
 }
 @namespace("common_options.failures")
 class BulkError extends Error {
@@ -4609,14 +4836,33 @@ class BulkIndexFailureCause extends Error {
 	shard: integer;
 	index: string;
 }
+@namespace("common_abstractions.infer.field")
+class Field {
+	name: string;
+	boost: double;
+	cachable_expression: boolean;
+}
 @namespace("common_abstractions.infer.indices")
-@custom_json()
+@class_serializer("UnionJsonConverter")
 class Indices extends Union<AllIndicesMarker, ManyIndices> {
 	all: Indices;
 	all_indices: Indices;
 }
+@namespace("common_abstractions.infer.id")
+@class_serializer("IdJsonConverter")
+class Id {
+}
+@namespace("query_dsl.geo")
+class GeoLocation {
+	lat: double;
+	lon: double;
+}
+@namespace("common_options.date_math")
+@class_serializer("Json")
+class DateMathExpression extends DateMath {
+}
 @namespace("common_abstractions.infer.types")
-@custom_json()
+@class_serializer("UnionJsonConverter")
 class Types extends Union<AllTypesMarker, ManyTypes> {
 	all: AllTypesMarker;
 	all_types: AllTypesMarker;
@@ -4625,22 +4871,11 @@ class Types extends Union<AllTypesMarker, ManyTypes> {
 class RelationName {
 	name: string;
 }
-@namespace("query_dsl.geo")
-class GeoLocation {
-	lat: double;
-	lon: double;
+@namespace("x_pack.watcher.execution")
+class HttpInputRequestResult extends HttpInputRequest {
 }
 @namespace("search.suggesters.phrase_suggester.smoothing_model")
-@custom_json()
 class SmoothingModelContainer {
-}
-@namespace("common_options.date_math")
-@custom_json()
-class DateMathExpression extends DateMath {
-}
-@namespace("x_pack.watcher.execution")
-@custom_json()
-class HttpInputRequestResult extends HttpInputRequest {
 }
 @namespace("analysis.analyzers")
 class CustomAnalyzer extends AnalyzerBase {
@@ -4654,7 +4889,7 @@ class FingerprintAnalyzer extends AnalyzerBase {
 	separator: string;
 	max_output_size: integer;
 	preserve_original: boolean;
-	@custom_json()
+	@prop_serializer("StopWordsJsonConverter")
 	stopwords: StopWords;
 	stopwords_path: string;
 }
@@ -4664,7 +4899,7 @@ class KeywordAnalyzer extends AnalyzerBase {
 @namespace("analysis.analyzers")
 class LanguageAnalyzer extends AnalyzerBase {
 	type: string;
-	@custom_json()
+	@prop_serializer("StopWordsJsonConverter")
 	stopwords: StopWords;
 	stem_exclusion: string[];
 	language: Language;
@@ -4675,7 +4910,7 @@ class PatternAnalyzer extends AnalyzerBase {
 	lowercase: boolean;
 	pattern: string;
 	flags: string;
-	@custom_json()
+	@prop_serializer("StopWordsJsonConverter")
 	stopwords: StopWords;
 }
 @namespace("analysis.analyzers")
@@ -4684,18 +4919,18 @@ class SimpleAnalyzer extends AnalyzerBase {
 @namespace("analysis.analyzers")
 class SnowballAnalyzer extends AnalyzerBase {
 	language: SnowballLanguage;
-	@custom_json()
+	@prop_serializer("StopWordsJsonConverter")
 	stopwords: StopWords;
 }
 @namespace("analysis.analyzers")
 class StandardAnalyzer extends AnalyzerBase {
-	@custom_json()
+	@prop_serializer("StopWordsJsonConverter")
 	stopwords: StopWords;
 	max_token_length: integer;
 }
 @namespace("analysis.analyzers")
 class StopAnalyzer extends AnalyzerBase {
-	@custom_json()
+	@prop_serializer("StopWordsJsonConverter")
 	stopwords: StopWords;
 	stopwords_path: string;
 }
@@ -4792,7 +5027,7 @@ class AsciiFoldingTokenFilter extends TokenFilterBase {
 }
 @namespace("analysis.token_filters")
 class CommonGramsTokenFilter extends TokenFilterBase {
-	@custom_json()
+	@prop_serializer("ReadSingleOrEnumerableJsonConverter`1")
 	common_words: string[];
 	common_words_path: string;
 	ignore_case: boolean;
@@ -4912,7 +5147,7 @@ class StemmerTokenFilter extends TokenFilterBase {
 }
 @namespace("analysis.token_filters.stop")
 class StopTokenFilter extends TokenFilterBase {
-	@custom_json()
+	@prop_serializer("StopWordsJsonConverter")
 	stopwords: StopWords;
 	ignore_case: boolean;
 	stopwords_path: string;
@@ -5043,7 +5278,7 @@ class PropertyBase {
 	local_metadata: Map<string, any>;
 }
 @namespace("x_pack.watcher.schedule")
-@custom_json()
+@class_serializer("CronExpressionJsonConverter")
 class CronExpression extends ScheduleBase {
 }
 @namespace("cat")
@@ -5089,7 +5324,7 @@ class ClusterHealthResponse extends Response {
 	initializing_shards: integer;
 	unassigned_shards: integer;
 	number_of_pending_tasks: integer;
-	@custom_json()
+	@prop_serializer("ResolvableDictionaryJsonConverter`2")
 	indices: Map<IndexName, IndexHealthStats>;
 }
 @namespace("cluster.cluster_pending_tasks")
@@ -5118,26 +5353,22 @@ class ClusterStateResponse extends Response {
 	master_node: string;
 	state_uuid: string;
 	version: long;
-	@custom_json()
 	nodes: Map<string, NodeState>;
 	metadata: MetadataState;
 	routing_table: RoutingTableState;
 	routing_nodes: RoutingNodesState;
 	blocks: BlockState;
 }
-@namespace("cluster")
-class NodesResponseBase extends Response {
-	node_statistics: NodeStatistics;
-}
 @namespace("cluster.nodes_hot_threads")
 class NodesHotThreadsResponse extends Response {
 	hot_threads: HotThreadInformation[];
 }
+@namespace("cluster")
+class NodesResponseBase extends Response {
+	node_statistics: NodeStatistics;
+}
 @namespace("cluster.ping")
 class PingResponse extends Response {
-}
-@namespace("common_abstractions.response")
-class DictionaryResponseBase<TKey, TValue> extends Response {
 }
 @namespace("cluster.root_node_info")
 class RootNodeInfoResponse extends Response {
@@ -5165,6 +5396,9 @@ class ListTasksResponse extends Response {
 @namespace("common_abstractions.response")
 class AcknowledgedResponseBase extends Response {
 	acknowledged: boolean;
+}
+@namespace("common_abstractions.response")
+class DictionaryResponseBase<TKey, TValue> extends Response {
 }
 @namespace("common_abstractions.response")
 class IndicesResponseBase extends Response {
@@ -5208,7 +5442,7 @@ class MultiGetResponse extends Response {
 }
 @namespace("document.multiple.multi_term_vectors")
 class MultiTermVectorsResponse extends Response {
-	@custom_json()
+	@prop_serializer("ReadOnlyCollectionJsonConverter`2")
 	docs: TermVectors[];
 }
 @namespace("document.multiple.reindex_on_server")
@@ -5228,7 +5462,6 @@ class ReindexOnServerResponse extends Response {
 }
 @namespace("document.multiple.reindex_rethrottle")
 class ReindexRethrottleResponse extends Response {
-	@custom_json()
 	nodes: Map<string, ReindexNode>;
 }
 @namespace("document.multiple.update_by_query")
@@ -5275,7 +5508,7 @@ class GetResponse<TDocument> extends Response {
 	_id: string;
 	_version: long;
 	found: boolean;
-	@custom_json()
+	@prop_serializer("SourceConverter")
 	_source: TDocument;
 	fields: Map<string, LazyDocument>;
 	_parent: string;
@@ -5324,19 +5557,16 @@ class ExistsResponse extends Response {
 @namespace("indices.monitoring.indices_segments")
 class SegmentsResponse extends Response {
 	_shards: ShardStatistics;
-	@custom_json()
 	indices: Map<string, IndexSegment>;
 }
 @namespace("indices.monitoring.indices_shard_stores")
 class IndicesShardStoresResponse extends Response {
-	@custom_json()
 	indices: Map<string, IndicesShardStores>;
 }
 @namespace("indices.monitoring.indices_stats")
 class IndicesStatsResponse extends Response {
 	_shards: ShardStatistics;
 	_all: IndicesStats;
-	@custom_json()
 	indices: Map<string, IndicesStats>;
 }
 @namespace("indices.status_management.upgrade")
@@ -5344,9 +5574,8 @@ class UpgradeResponse extends Response {
 	_shards: ShardStatistics;
 }
 @namespace("indices.status_management.upgrade.upgrade_status")
-@custom_json()
+@class_serializer("UpgradeStatusResponseJsonConverter")
 class UpgradeStatusResponse extends Response {
-	@custom_json()
 	upgrades: Map<string, UpgradeStatus>;
 	size_in_bytes: long;
 	size_to_upgrade_in_bytes: string;
@@ -5365,13 +5594,12 @@ class GetScriptResponse extends Response {
 	script: StoredScript;
 }
 @namespace("modules.snapshot_and_restore.repositories.get_repository")
-@custom_json()
+@class_serializer("GetRepositoryResponseJsonConverter")
 class GetRepositoryResponse extends Response {
 	repositories: Map<string, SnapshotRepository>;
 }
 @namespace("modules.snapshot_and_restore.repositories.verify_repository")
 class VerifyRepositoryResponse extends Response {
-	@custom_json()
 	nodes: Map<string, CompactNodeInfo>;
 }
 @namespace("modules.snapshot_and_restore.restore")
@@ -5441,7 +5669,7 @@ class SearchResponse<T> extends Response {
 	total: long;
 	max_score: double;
 	documents: T[];
-	hits: Hit<T>[];
+	//hits: Hit<T>[];
 	fields: Map<string, LazyDocument>;
 }
 @namespace("search.validate")
@@ -5567,7 +5795,7 @@ class PostJobDataResponse extends Response {
 	empty_bucket_count: long;
 	sparse_bucket_count: long;
 	bucket_count: long;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	last_data_time: Date;
 	input_record_count: long;
 }
@@ -5581,14 +5809,14 @@ class PutDatafeedResponse extends Response {
 	aggregations: Map<string, AggregationContainer>;
 	chunking_config: ChunkingConfig;
 	frequency: Time;
-	@custom_json()
+	@prop_serializer("IndicesJsonConverter")
 	indices: Indices;
 	job_id: string;
 	query: QueryContainer;
 	query_delay: Time;
 	script_fields: Map<string, ScriptField>;
 	scroll_size: integer;
-	@custom_json()
+	@prop_serializer("TypesJsonConverter")
 	types: Types;
 }
 @namespace("x_pack.machine_learning.put_job")
@@ -5596,7 +5824,7 @@ class PutJobResponse extends Response {
 	job_id: string;
 	job_type: string;
 	description: string;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	create_time: Date;
 	analysis_config: AnalysisConfig;
 	analysis_limits: AnalysisLimits;
@@ -5623,14 +5851,14 @@ class UpdateDatafeedResponse extends Response {
 	aggregations: Map<string, AggregationContainer>;
 	chunking_config: ChunkingConfig;
 	frequency: Time;
-	@custom_json()
+	@prop_serializer("IndicesJsonConverter")
 	indices: Indices;
 	job_id: string;
 	query: QueryContainer;
 	query_delay: Time;
 	script_fields: Map<string, ScriptField>;
 	scroll_size: integer;
-	@custom_json()
+	@prop_serializer("TypesJsonConverter")
 	types: Types;
 }
 @namespace("x_pack.machine_learning.update_job")
@@ -5730,13 +5958,12 @@ class GetWatchResponse extends Response {
 	watch: Watch;
 }
 @namespace("x_pack.watcher.schedule")
-@custom_json()
+@class_serializer("IntervalJsonConverter")
 class Interval extends ScheduleBase {
 	factor: long;
 	unit: IntervalUnit;
 }
 @namespace("x_pack.watcher.put_watch")
-@custom_json()
 class PutWatchResponse extends Response {
 	_id: string;
 	_version: integer;
@@ -6107,7 +6334,6 @@ class CatThreadPoolRequest extends Request {
 	verbose: boolean;
 }
 @namespace("cluster.cluster_allocation_explain")
-@custom_json()
 class ClusterAllocationExplainRequest extends Request {
 	index: IndexName;
 	shard: integer;
@@ -6146,7 +6372,6 @@ class ClusterPendingTasksRequest extends Request {
 	master_timeout: Time;
 }
 @namespace("cluster.cluster_reroute")
-@custom_json()
 class ClusterRerouteRequest extends Request {
 	commands: ClusterRerouteCommand[];
 	@request_parameter()
@@ -6295,7 +6520,7 @@ class ListTasksRequest extends Request {
 	group_by: GroupBy;
 }
 @namespace("document.multiple.bulk")
-@custom_json()
+@class_serializer("BulkRequestJsonConverter")
 class BulkRequest extends Request {
 	operations: BulkOperation[];
 	@request_parameter()
@@ -6387,7 +6612,7 @@ class DeleteByQueryRequest extends Request {
 	slices: long;
 }
 @namespace("document.multiple.multi_get.request")
-@custom_json()
+@class_serializer("MultiGetRequestJsonConverter")
 class MultiGetRequest extends Request {
 	@request_parameter()
 	stored_fields: Field[];
@@ -6441,7 +6666,6 @@ class ReindexOnServerRequest extends Request {
 	dest: ReindexDestination;
 	script: Script;
 	size: long;
-	@custom_json()
 	conflicts: Conflicts;
 	@request_parameter()
 	refresh: boolean;
@@ -6649,7 +6873,7 @@ class SourceRequest extends Request {
 }
 @namespace("document.single.term_vectors")
 class TermVectorsRequest<TDocument> extends Request {
-	@custom_json()
+	@prop_serializer("SourceConverter")
 	doc: TDocument;
 	per_field_analyzer: Map<Field, string>;
 	filter: TermVectorFilter;
@@ -6686,16 +6910,16 @@ class TermVectorsResponse extends Response {
 	_version: long;
 	found: boolean;
 	took: long;
-	@custom_json()
+	@prop_serializer("ResolvableDictionaryJsonConverter`2")
 	term_vectors: Map<Field, TermVector>;
 }
 @namespace("document.single.update")
 class UpdateRequest<TDocument, TPartialDocument> extends Request {
 	script: Script;
-	@custom_json()
+	@prop_serializer("SourceConverter")
 	upsert: TDocument;
 	doc_as_upsert: boolean;
-	@custom_json()
+	@prop_serializer("SourceConverter")
 	doc: TPartialDocument;
 	detect_noop: boolean;
 	scripted_upsert: boolean;
@@ -6769,7 +6993,6 @@ class PutAliasRequest extends Request {
 	master_timeout: Time;
 }
 @namespace("indices.analyze")
-@custom_json()
 class AnalyzeRequest extends Request {
 	tokenizer: Union<string, Tokenizer>;
 	analyzer: string;
@@ -6855,7 +7078,6 @@ class OpenIndexRequest extends Request {
 	expand_wildcards: ExpandWildcards;
 }
 @namespace("indices.index_management.shrink_index")
-@custom_json()
 class ShrinkIndexRequest extends Request {
 	settings: Map<string, any>;
 	aliases: Map<IndexName, Alias>;
@@ -7139,7 +7361,7 @@ class PutScriptRequest extends Request {
 	master_timeout: Time;
 }
 @namespace("modules.snapshot_and_restore.repositories.create_repository")
-@custom_json()
+@class_serializer("CreateRepositoryJsonConverter")
 class CreateRepositoryRequest extends Request {
 	repository: SnapshotRepository;
 	@request_parameter()
@@ -7207,7 +7429,7 @@ class SnapshotStatusRequest extends Request {
 }
 @namespace("modules.snapshot_and_restore.snapshot.snapshot")
 class SnapshotRequest extends Request {
-	@custom_json()
+	@prop_serializer("IndicesMultiSyntaxJsonConverter")
 	indices: Indices;
 	ignore_unavailable: boolean;
 	include_global_state: boolean;
@@ -7218,7 +7440,6 @@ class SnapshotRequest extends Request {
 	wait_for_completion: boolean;
 }
 @namespace("search.count")
-@custom_json()
 class CountRequest extends Request {
 	query: QueryContainer;
 	@request_parameter()
@@ -7290,7 +7511,7 @@ class FieldCapabilitiesRequest extends Request {
 	expand_wildcards: ExpandWildcards;
 }
 @namespace("search.multi_search_template")
-@custom_json()
+@class_serializer("MultiSearchTemplateJsonConverter")
 class MultiSearchTemplateRequest extends Request {
 	operations: Map<string, SearchTemplateRequest>;
 	@request_parameter()
@@ -7301,7 +7522,7 @@ class MultiSearchTemplateRequest extends Request {
 	max_concurrent_searches: long;
 }
 @namespace("search.multi_search")
-@custom_json()
+@class_serializer("MultiSearchJsonConverter")
 class MultiSearchRequest extends Request {
 	operations: Map<string, SearchRequest>;
 	@request_parameter()
@@ -7337,7 +7558,6 @@ class RenderSearchTemplateRequest extends Request {
 	source: string;
 	inline: string;
 	file: string;
-	@custom_json()
 	params: Map<string, any>;
 }
 @namespace("search.validate")
@@ -7422,12 +7642,12 @@ class DeleteModelSnapshotRequest extends Request {
 }
 @namespace("x_pack.machine_learning.flush_job")
 class FlushJobRequest extends Request {
-	@custom_json()
+	@prop_serializer("IsoDateTimeConverter")
 	advance_time: Date;
 	calc_interim: boolean;
-	@custom_json()
+	@prop_serializer("IsoDateTimeConverter")
 	end: Date;
-	@custom_json()
+	@prop_serializer("IsoDateTimeConverter")
 	start: Date;
 	@request_parameter()
 	skip_time: string;
@@ -7436,27 +7656,27 @@ class FlushJobRequest extends Request {
 class GetAnomalyRecordsRequest extends Request {
 	desc: boolean;
 	exclude_interim: boolean;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	end: Date;
 	page: Page;
 	record_score: double;
 	sort: Field;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	start: Date;
 }
 @namespace("x_pack.machine_learning.get_buckets")
 class GetBucketsRequest extends Request {
 	anomaly_score: double;
 	desc: boolean;
-	@custom_json()
+	@prop_serializer("IsoDateTimeConverter")
 	end: Date;
 	exclude_interim: boolean;
 	expand: boolean;
 	page: Page;
 	sort: Field;
-	@custom_json()
+	@prop_serializer("IsoDateTimeConverter")
 	start: Date;
-	@custom_json()
+	@prop_serializer("IsoDateTimeConverter")
 	timestamp: Date;
 }
 @namespace("x_pack.machine_learning.get_categories")
@@ -7472,13 +7692,13 @@ class GetDatafeedsRequest extends Request {
 @namespace("x_pack.machine_learning.get_influencers")
 class GetInfluencersRequest extends Request {
 	descending: boolean;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	end: Date;
 	exclude_interim: boolean;
 	influencer_score: double;
 	page: Page;
 	sort: Field;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	start: Date;
 }
 @namespace("x_pack.machine_learning.get_job_stats")
@@ -7490,11 +7710,11 @@ class GetJobsRequest extends Request {
 @namespace("x_pack.machine_learning.get_model_snapshots")
 class GetModelSnapshotsRequest extends Request {
 	desc: boolean;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	end: Date;
 	page: Page;
 	sort: Field;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	start: Date;
 }
 @namespace("x_pack.machine_learning.open_job")
@@ -7502,7 +7722,7 @@ class OpenJobRequest extends Request {
 	timeout: Time;
 }
 @namespace("x_pack.machine_learning.post_job_data")
-@custom_json()
+@class_serializer("PostJobDataConverter")
 class PostJobDataRequest extends Request {
 	data: any[];
 	@request_parameter()
@@ -7518,14 +7738,14 @@ class PutDatafeedRequest extends Request {
 	aggregations: Map<string, AggregationContainer>;
 	chunking_config: ChunkingConfig;
 	frequency: Time;
-	@custom_json()
+	@prop_serializer("IndicesJsonConverter")
 	indices: Indices;
 	job_id: Id;
 	query: QueryContainer;
 	query_delay: Time;
 	script_fields: Map<string, ScriptField>;
 	scroll_size: integer;
-	@custom_json()
+	@prop_serializer("TypesJsonConverter")
 	types: Types;
 }
 @namespace("x_pack.machine_learning.put_job")
@@ -7545,9 +7765,9 @@ class RevertModelSnapshotRequest extends Request {
 @namespace("x_pack.machine_learning.start_datafeed")
 class StartDatafeedRequest extends Request {
 	timeout: Time;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	start: Date;
-	@custom_json()
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	end: Date;
 }
 @namespace("x_pack.machine_learning.stop_datafeed")
@@ -7560,21 +7780,20 @@ class UpdateDatafeedRequest extends Request {
 	aggregations: Map<string, AggregationContainer>;
 	chunking_config: ChunkingConfig;
 	frequency: Time;
-	@custom_json()
+	@prop_serializer("IndicesJsonConverter")
 	indices: Indices;
 	job_id: Id;
 	query: QueryContainer;
 	query_delay: Time;
 	script_fields: Map<string, ScriptField>;
 	scroll_size: integer;
-	@custom_json()
+	@prop_serializer("TypesJsonConverter")
 	types: Types;
 }
 @namespace("x_pack.machine_learning.update_job")
 class UpdateJobRequest extends Request {
 	analysis_limits: AnalysisMemoryLimit;
 	background_persist_interval: Time;
-	@custom_json()
 	custom_settings: Map<string, any>;
 	description: string;
 	model_plot_config: ModelPlotConfigEnabled;
@@ -7588,7 +7807,7 @@ class UpdateModelSnapshotRequest extends Request {
 	retain: boolean;
 }
 @namespace("x_pack.machine_learning.validate_detector")
-@custom_json()
+@class_serializer("ValidateDetectorRequestConverter")
 class ValidateDetectorRequest extends Request {
 	detector: Detector;
 }
@@ -7621,7 +7840,6 @@ class GetRoleMappingRequest extends Request {
 @namespace("x_pack.security.role_mapping.put_role_mapping")
 class PutRoleMappingRequest extends Request {
 	run_as: string[];
-	@custom_json()
 	metadata: Map<string, any>;
 	enabled: boolean;
 	roles: string[];
@@ -7645,7 +7863,6 @@ class PutRoleRequest extends Request {
 	cluster: string[];
 	run_as: string[];
 	indices: IndicesPrivileges[];
-	@custom_json()
 	metadata: Map<string, any>;
 	@request_parameter()
 	refresh: Refresh;
@@ -7717,9 +7934,7 @@ class ExecuteWatchRequest extends Request {
 	trigger_data: ScheduleTriggerEvent;
 	ignore_condition: boolean;
 	record_execution: boolean;
-	@custom_json()
 	alternative_input: Map<string, any>;
-	@custom_json()
 	action_modes: Map<string, ActionExecutionMode>;
 	simulated_actions: SimulatedActions;
 	watch: PutWatchRequest;
@@ -7754,13 +7969,11 @@ class ClusterStatsResponse extends Response {
 @namespace("cluster.nodes_info")
 class NodesInfoResponse extends Response {
 	cluster_name: string;
-	@custom_json()
 	nodes: Map<string, NodeInfo>;
 }
 @namespace("cluster.nodes_stats")
 class NodesStatsResponse extends Response {
 	cluster_name: string;
-	@custom_json()
 	nodes: Map<string, NodeStats>;
 }
 @namespace("cluster.nodes_usage")
@@ -7769,7 +7982,7 @@ class NodesUsageResponse extends Response {
 	nodes: Map<string, NodeUsageInformation>;
 }
 @namespace("cluster.remote_info")
-@custom_json()
+@class_serializer("DictionaryResponseJsonConverter`3")
 class RemoteInfoResponse extends Response {
 	remotes: Map<string, RemoteInfo>;
 }
@@ -7819,13 +8032,12 @@ class IndexRequest<TDocument> extends Request {
 class BulkAliasResponse extends Response {
 }
 @namespace("indices.alias_management.get_alias")
-@custom_json()
+@class_serializer("ResolvableDictionaryResponseJsonConverter`3")
 class GetAliasResponse extends Response {
 	indices: Map<IndexName, IndexAliases>;
 	is_valid: boolean;
 }
 @namespace("indices.index_management.create_index")
-@custom_json()
 class CreateIndexRequest extends Request {
 	settings: Map<string, any>;
 	mappings: Map<TypeName, TypeMapping>;
@@ -7847,7 +8059,7 @@ class CreateIndexResponse extends Response {
 class DeleteIndexResponse extends Response {
 }
 @namespace("indices.index_management.get_index")
-@custom_json()
+@class_serializer("ResolvableDictionaryResponseJsonConverter`3")
 class GetIndexResponse extends Response {
 	indices: Map<IndexName, IndexState>;
 }
@@ -7858,7 +8070,6 @@ class CloseIndexResponse extends Response {
 class OpenIndexResponse extends Response {
 }
 @namespace("indices.index_management.rollover_index")
-@custom_json()
 class RolloverIndexRequest extends Request {
 	conditions: RolloverConditions;
 	settings: Map<string, any>;
@@ -7887,7 +8098,7 @@ class ShrinkIndexResponse extends Response {
 	shards_acknowledged: boolean;
 }
 @namespace("indices.index_settings.get_index_settings")
-@custom_json()
+@class_serializer("ResolvableDictionaryResponseJsonConverter`3")
 class GetIndexSettingsResponse extends Response {
 	indices: Map<IndexName, IndexState>;
 }
@@ -7895,7 +8106,7 @@ class GetIndexSettingsResponse extends Response {
 class DeleteIndexTemplateResponse extends Response {
 }
 @namespace("indices.index_settings.index_templates.get_index_template")
-@custom_json()
+@class_serializer("DictionaryResponseJsonConverter`3")
 class GetIndexTemplateResponse extends Response {
 	template_mappings: Map<string, TemplateMapping>;
 }
@@ -7923,20 +8134,19 @@ class PutIndexTemplateResponse extends Response {
 class UpdateIndexSettingsResponse extends Response {
 }
 @namespace("indices.mapping_management.get_field_mapping")
-@custom_json()
+@class_serializer("ResolvableDictionaryResponseJsonConverter`3")
 class GetFieldMappingResponse extends Response {
 	indices: Map<IndexName, TypeFieldMappings>;
 	is_valid: boolean;
 }
 @namespace("indices.mapping_management.get_mapping")
-@custom_json()
+@class_serializer("ResolvableDictionaryResponseJsonConverter`3")
 class GetMappingResponse extends Response {
 	indices: Map<IndexName, IndexMappings>;
 	mappings: Map<IndexName, IndexMappings>;
 	mapping: TypeMapping;
 }
 @namespace("indices.mapping_management.put_mapping")
-@custom_json()
 class PutMappingRequest extends Request {
 	all_field: AllField;
 	date_detection: boolean;
@@ -7968,7 +8178,7 @@ class PutMappingRequest extends Request {
 class PutMappingResponse extends Response {
 }
 @namespace("indices.monitoring.indices_recovery")
-@custom_json()
+@class_serializer("ResolvableDictionaryResponseJsonConverter`3")
 class RecoveryStatusResponse extends Response {
 	indices: Map<IndexName, RecoveryStatus>;
 }
@@ -7991,7 +8201,7 @@ class SyncedFlushResponse extends Response {
 class DeletePipelineResponse extends Response {
 }
 @namespace("ingest.get_pipeline")
-@custom_json()
+@class_serializer("DictionaryResponseJsonConverter`3")
 class GetPipelineResponse extends Response {
 	pipelines: Map<string, Pipeline>;
 }
@@ -8063,17 +8273,17 @@ class ValidateDetectorResponse extends Response {
 class ValidateJobResponse extends Response {
 }
 @namespace("x_pack.security.role_mapping.get_role_mapping")
-@custom_json()
+@class_serializer("DictionaryResponseJsonConverter`3")
 class GetRoleMappingResponse extends Response {
 	role_mappings: Map<string, XPackRoleMapping>;
 }
 @namespace("x_pack.security.role.get_role")
-@custom_json()
+@class_serializer("DictionaryResponseJsonConverter`3")
 class GetRoleResponse extends Response {
 	roles: Map<string, XPackRole>;
 }
 @namespace("x_pack.security.user.get_user")
-@custom_json()
+@class_serializer("DictionaryResponseJsonConverter`3")
 class GetUserResponse extends Response {
 	users: Map<string, XPackUser>;
 }
@@ -8092,10 +8302,6 @@ class ObjectProperty extends CorePropertyBase {
 	enabled: boolean;
 	properties: Map<PropertyName, Property>;
 }
-@namespace("mapping.types")
-class DocValuesPropertyBase extends CorePropertyBase {
-	doc_values: boolean;
-}
 @namespace("mapping.types.core.text")
 class TextProperty extends CorePropertyBase {
 	boost: double;
@@ -8111,10 +8317,9 @@ class TextProperty extends CorePropertyBase {
 	search_quote_analyzer: string;
 	term_vector: TermVectorOption;
 }
-@namespace("mapping.types.complex.nested")
-class NestedProperty extends ObjectProperty {
-	include_in_parent: boolean;
-	include_in_root: boolean;
+@namespace("mapping.types")
+class DocValuesPropertyBase extends CorePropertyBase {
+	doc_values: boolean;
 }
 @namespace("mapping.types.core.binary")
 class BinaryProperty extends DocValuesPropertyBase {
@@ -8217,6 +8422,11 @@ class TokenCountProperty extends DocValuesPropertyBase {
 	boost: double;
 	null_value: double;
 }
+@namespace("mapping.types.complex.nested")
+class NestedProperty extends ObjectProperty {
+	include_in_parent: boolean;
+	include_in_root: boolean;
+}
 @namespace("mapping.types.core.range.date_range")
 class DateRangeProperty extends RangePropertyBase {
 	format: string;
@@ -8233,8 +8443,8 @@ class IntegerRangeProperty extends RangePropertyBase {
 @namespace("mapping.types.core.range.long_range")
 class LongRangeProperty extends RangePropertyBase {
 }
-@namespace("DefaultLanguageConstruct")
-@namespace("DefaultLanguageConstruct")
+/** namespace:common **/
+/** namespace:common **/
 enum HttpMethod {
 	GET = 0,
 	POST = 1,
@@ -8242,7 +8452,38 @@ enum HttpMethod {
 	DELETE = 3,
 	HEAD = 4
 }
-@namespace("DefaultLanguageConstruct")
+/** namespace:common **/
+enum Health {
+	green = 0,
+	yellow = 1,
+	red = 2
+}
+/** namespace:common **/
+enum VersionType {
+	internal = 0,
+	external = 1,
+	external_gte = 2,
+	force = 3
+}
+/** namespace:common **/
+enum ExpandWildcards {
+	open = 0,
+	closed = 1,
+	none = 2,
+	all = 3
+}
+/** namespace:common **/
+enum SuggestMode {
+	missing = 0,
+	popular = 1,
+	always = 2
+}
+/** namespace:common **/
+enum SearchType {
+	query_then_fetch = 0,
+	dfs_query_then_fetch = 1
+}
+/** namespace:common **/
 enum Bytes {
 	b = 0,
 	k = 1,
@@ -8256,13 +8497,7 @@ enum Bytes {
 	p = 9,
 	pb = 10
 }
-@namespace("DefaultLanguageConstruct")
-enum Health {
-	green = 0,
-	yellow = 1,
-	red = 2
-}
-@namespace("DefaultLanguageConstruct")
+/** namespace:common **/
 enum Size {
 	Raw = 0,
 	k = 1,
@@ -8271,13 +8506,13 @@ enum Size {
 	t = 4,
 	p = 5
 }
-@namespace("DefaultLanguageConstruct")
+/** namespace:common **/
 enum Level {
 	cluster = 0,
 	indices = 1,
 	shards = 2
 }
-@namespace("DefaultLanguageConstruct")
+/** namespace:common **/
 enum WaitForEvents {
 	immediate = 0,
 	urgent = 1,
@@ -8286,75 +8521,50 @@ enum WaitForEvents {
 	low = 4,
 	languid = 5
 }
-@namespace("DefaultLanguageConstruct")
+/** namespace:common **/
 enum WaitForStatus {
 	green = 0,
 	yellow = 1,
 	red = 2
 }
-@namespace("DefaultLanguageConstruct")
-enum ExpandWildcards {
-	open = 0,
-	closed = 1,
-	none = 2,
-	all = 3
-}
-@namespace("DefaultLanguageConstruct")
+/** namespace:common **/
 enum ThreadType {
 	cpu = 0,
 	wait = 1,
 	block = 2
 }
-@namespace("DefaultLanguageConstruct")
+/** namespace:common **/
 enum GroupBy {
 	nodes = 0,
 	parents = 1
 }
-@namespace("DefaultLanguageConstruct")
+/** namespace:common **/
 enum Refresh {
 	true = 0,
 	false = 1,
 	wait_for = 2
 }
-@namespace("DefaultLanguageConstruct")
-enum VersionType {
-	internal = 0,
-	external = 1,
-	external_gte = 2,
-	force = 3
-}
-@namespace("DefaultLanguageConstruct")
+/** namespace:common **/
 enum DefaultOperator {
 	AND = 0,
 	OR = 1
 }
-@namespace("DefaultLanguageConstruct")
+/** namespace:common **/
 enum Conflicts {
 	abort = 0,
 	proceed = 1
 }
-@namespace("DefaultLanguageConstruct")
-enum SearchType {
-	query_then_fetch = 0,
-	dfs_query_then_fetch = 1
-}
-@namespace("DefaultLanguageConstruct")
+/** namespace:common **/
 enum OpType {
 	index = 0,
 	create = 1
 }
-@namespace("DefaultLanguageConstruct")
+/** namespace:common **/
 enum Format {
 	detailed = 0,
 	text = 1
 }
-@namespace("DefaultLanguageConstruct")
-enum SuggestMode {
-	missing = 0,
-	popular = 1,
-	always = 2
-}
-@namespace("DefaultLanguageConstruct")
+@namespace("common")
 class RequestConfiguration {
 	request_timeout: TimeSpan;
 	ping_timeout: TimeSpan;
@@ -8372,25 +8582,12 @@ class RequestConfiguration {
 	client_certificates: any;
 	throw_exceptions: boolean;
 }
-@namespace("DefaultLanguageConstruct")
-class BasicAuthenticationCredentials {
-	username: string;
-	password: string;
-}
-@namespace("DefaultLanguageConstruct")
+@namespace("common")
 class ServerError {
 	error: Error;
 	status: integer;
 }
-@namespace("DefaultLanguageConstruct")
-class ErrorCause {
-	reason: string;
-	type: string;
-	caused_by: ErrorCause;
-	stack_trace: string;
-	metadata: ErrorCauseMetadata;
-}
-@namespace("DefaultLanguageConstruct")
+@namespace("common")
 class ShardFailure {
 	reason: ErrorCause;
 	shard: integer;
@@ -8398,17 +8595,12 @@ class ShardFailure {
 	node: string;
 	status: string;
 }
-@namespace("DefaultLanguageConstruct")
-class Error extends ErrorCause {
-	root_cause: ErrorCause[];
-	headers: Map<string, string>;
+@namespace("common")
+class BasicAuthenticationCredentials {
+	username: string;
+	password: string;
 }
-@namespace("DefaultLanguageConstruct")
-class Map<TKey, TValue> {
-	key: TKey;
-	value: TValue;
-}
-@namespace("DefaultLanguageConstruct")
+@namespace("common")
 class ErrorCauseMetadata {
 	licensed_expired_feature: string;
 	index: string;
@@ -8426,6 +8618,80 @@ class ErrorCauseMetadata {
 	script_stack: string[];
 	script: string;
 	language: string;
+}
+@namespace("common")
+class Map<TKey, TValue> {
+	key: TKey;
+	value: TValue;
+}
+@namespace("common_abstractions.infer.indices")
+class AllIndicesMarker {
+}
+@namespace("common_abstractions.infer.indices")
+class ManyIndices {
+	indices: IndexName[];
+}
+@namespace("x_pack.info.x_pack_usage")
+class JobStatistics {
+	total: double;
+	min: double;
+	max: double;
+	avg: double;
+}
+@namespace("x_pack.info.x_pack_usage")
+class DataFeed {
+	count: long;
+}
+@namespace("x_pack.info.x_pack_usage")
+class AlertingExecution {
+	actions: Map<string, ExecutionAction>;
+}
+@namespace("x_pack.info.x_pack_usage")
+class ExecutionAction {
+	total: long;
+	total_in_ms: long;
+}
+@namespace("x_pack.info.x_pack_usage")
+class AlertingCount {
+	total: long;
+	active: long;
+}
+@namespace("x_pack.info.x_pack_usage")
+class SecurityFeatureToggle {
+	enabled: boolean;
+}
+@namespace("x_pack.info.x_pack_usage")
+class SslUsage {
+	http: SecurityFeatureToggle;
+	transport: SecurityFeatureToggle;
+}
+@namespace("x_pack.info.x_pack_usage")
+class IpFilterUsage {
+	http: boolean;
+	transport: boolean;
+}
+@namespace("x_pack.info.x_pack_usage")
+class RoleUsage {
+	dls: boolean;
+	fls: boolean;
+	size: long;
+}
+@namespace("x_pack.info.x_pack_usage")
+class AuditUsage extends SecurityFeatureToggle {
+	outputs: string[];
+}
+@namespace("x_pack.info.x_pack_usage")
+class RealmUsage extends XPackUsage {
+	name: string[];
+	size: long[];
+	order: long[];
+}
+@namespace("common_abstractions.infer.types")
+class AllTypesMarker {
+}
+@namespace("common_abstractions.infer.types")
+class ManyTypes {
+	types: TypeName[];
 }
 @namespace("cluster.nodes_stats")
 class MemoryStats {
@@ -8459,7 +8725,6 @@ class ThreadStats {
 }
 @namespace("cluster.nodes_stats")
 class GarbageCollectionStats {
-	@custom_json()
 	collectors: Map<string, GarbageCollectionGenerationStats>;
 }
 @namespace("cluster.nodes_stats")
@@ -8521,76 +8786,3 @@ class DataPathStats {
 	disk_write_size_in_bytes: long;
 	disk_queue: string;
 }
-@namespace("common_abstractions.infer.indices")
-class AllIndicesMarker {
-}
-@namespace("common_abstractions.infer.indices")
-class ManyIndices {
-	indices: IndexName[];
-}
-@namespace("common_abstractions.infer.types")
-class AllTypesMarker {
-}
-@namespace("common_abstractions.infer.types")
-class ManyTypes {
-	types: TypeName[];
-}
-@namespace("x_pack.info.x_pack_usage")
-class JobStatistics {
-	total: double;
-	min: double;
-	max: double;
-	avg: double;
-}
-@namespace("x_pack.info.x_pack_usage")
-class DataFeed {
-	count: long;
-}
-@namespace("x_pack.info.x_pack_usage")
-class AlertingExecution {
-	actions: Map<string, ExecutionAction>;
-}
-@namespace("x_pack.info.x_pack_usage")
-class ExecutionAction {
-	total: long;
-	total_in_ms: long;
-}
-@namespace("x_pack.info.x_pack_usage")
-class AlertingCount {
-	total: long;
-	active: long;
-}
-@namespace("x_pack.info.x_pack_usage")
-class SecurityFeatureToggle {
-	enabled: boolean;
-}
-@namespace("x_pack.info.x_pack_usage")
-class SslUsage {
-	http: SecurityFeatureToggle;
-	transport: SecurityFeatureToggle;
-}
-@namespace("x_pack.info.x_pack_usage")
-class IpFilterUsage {
-	http: boolean;
-	transport: boolean;
-}
-@namespace("x_pack.info.x_pack_usage")
-class RoleUsage {
-	dls: boolean;
-	fls: boolean;
-	size: long;
-}
-@namespace("x_pack.info.x_pack_usage")
-class AuditUsage extends SecurityFeatureToggle {
-	outputs: string[];
-}
-@namespace("x_pack.info.x_pack_usage")
-class RealmUsage extends XPackUsage {
-	name: string[];
-	size: long[];
-	order: long[];
-}
-
-function custom_json() { return function(...args : any[]){}}
-function request_parameter() {return function (...args : any[]){}}
-function namespace(ns: string) {return function (...args : any[]){}}
