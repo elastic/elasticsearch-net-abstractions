@@ -203,6 +203,7 @@ namespace Nest.TypescriptGenerator
 			type = (Type) converter.GetType().GetProperty("ConverterType").GetGetMethod().Invoke(converter, new object[] { });
 			if (type.Name.StartsWith("ReadAsTypeJsonConverter")) return true;
 			if (type.Name.StartsWith("VerbatimDictionary")) return true;
+			if (type.Name.Contains("DictionaryResponse")) return true;
 			if (type.Name.StartsWith("StringEnum")) return true;
 			if (type.Name.StartsWith("Reserialize")) return true;
 			return false;
@@ -349,13 +350,26 @@ namespace Nest.TypescriptGenerator
 			if (typeof(ResponseBase) == classModel.Type)
 				return new TsClass(typeof(Response));
 
-			if (classModel.BaseType != null)
-			{
-				if (typeof(IRequest).IsAssignableFrom(classModel.BaseType.Type))
-					classModel.BaseType = new TsClass(typeof(Request));
+			if (classModel.BaseType == null) return classModel;
 
-				if (typeof(IResponse).IsAssignableFrom(classModel.BaseType.Type))
-					classModel.BaseType = new TsClass(typeof(Response));
+			var baseType = classModel.BaseType.Type;
+			if (typeof(IRequest).IsAssignableFrom(baseType))
+				classModel.BaseType = new TsClass(typeof(Request));
+
+			if (typeof(IResponse).IsAssignableFrom(baseType))
+			{
+				if (baseType.IsGenericType)
+				{
+					var t = baseType.GetGenericTypeDefinition();
+					if (t == typeof(DictionaryResponseBase<,>)) return classModel;
+				}
+
+				if (baseType == typeof(ShardsOperationResponseBase)) return classModel;
+				if (baseType == typeof(AcknowledgedResponseBase)) return classModel;
+				if (baseType == typeof(IndicesResponseBase)) return classModel;
+
+
+				classModel.BaseType = new TsClass(typeof(Response));
 			}
 
 			return classModel;

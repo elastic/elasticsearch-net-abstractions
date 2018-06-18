@@ -1537,10 +1537,8 @@ class HipChatMessage {
 	color: HipChatMessageColor;
 	notify: boolean;
 	from: string;
-	@prop_serializer("ReadSingleOrEnumerableJsonConverter`1")
-	room: string[];
-	@prop_serializer("ReadSingleOrEnumerableJsonConverter`1")
-	user: string[];
+	room: string | string[];
+	user: string | string[];
 }
 @namespace("x_pack.watcher.action.slack")
 class SlackMessage {
@@ -1736,26 +1734,19 @@ class TimeOfDay {
 }
 @namespace("x_pack.watcher.schedule")
 class TimeOfWeek {
-	@prop_serializer("ReadSingleOrEnumerableJsonConverter`1")
-	on: Day[];
-	@prop_serializer("ReadSingleOrEnumerableJsonConverter`1")
-	at: string[];
+	on: Day | Day[];
+	at: string | string[];
 }
 @namespace("x_pack.watcher.schedule")
 class TimeOfMonth {
-	@prop_serializer("ReadSingleOrEnumerableJsonConverter`1")
-	on: integer[];
-	@prop_serializer("ReadSingleOrEnumerableJsonConverter`1")
-	at: string[];
+	on: integer | integer[];
+	at: string | string[];
 }
 @namespace("x_pack.watcher.schedule")
 class TimeOfYear {
-	@prop_serializer("ReadSingleOrEnumerableJsonConverter`1")
-	int: Month[];
-	@prop_serializer("ReadSingleOrEnumerableJsonConverter`1")
-	on: integer[];
-	@prop_serializer("ReadSingleOrEnumerableJsonConverter`1")
-	at: string[];
+	int: Month | Month[];
+	on: integer | integer[];
+	at: string | string[];
 }
 @namespace("x_pack.watcher.transform")
 class TransformContainer {
@@ -4444,8 +4435,7 @@ class NodeStats {
 	name: string;
 	transport_address: string;
 	host: string;
-	@prop_serializer("ReadSingleOrEnumerableJsonConverter`1")
-	ip: string[];
+	ip: string | string[];
 	roles: NodeRole[];
 	indices: IndexStats;
 	os: OperatingSystemStats;
@@ -5027,8 +5017,7 @@ class AsciiFoldingTokenFilter extends TokenFilterBase {
 }
 @namespace("analysis.token_filters")
 class CommonGramsTokenFilter extends TokenFilterBase {
-	@prop_serializer("ReadSingleOrEnumerableJsonConverter`1")
-	common_words: string[];
+	common_words: string | string[];
 	common_words_path: string;
 	ignore_case: boolean;
 	query_mode: boolean;
@@ -7982,8 +7971,7 @@ class NodesUsageResponse extends Response {
 	nodes: Map<string, NodeUsageInformation>;
 }
 @namespace("cluster.remote_info")
-@class_serializer("DictionaryResponseJsonConverter`3")
-class RemoteInfoResponse extends Response {
+class RemoteInfoResponse extends DictionaryResponseBase<string, RemoteInfo> {
 	remotes: Map<string, RemoteInfo>;
 }
 @namespace("document.single.create")
@@ -8029,11 +8017,10 @@ class IndexRequest<TDocument> extends Request {
 	pipeline: string;
 }
 @namespace("indices.alias_management.alias")
-class BulkAliasResponse extends Response {
+class BulkAliasResponse extends AcknowledgedResponseBase {
 }
 @namespace("indices.alias_management.get_alias")
-@class_serializer("ResolvableDictionaryResponseJsonConverter`3")
-class GetAliasResponse extends Response {
+class GetAliasResponse extends DictionaryResponseBase<IndexName, IndexAliases> {
 	indices: Map<IndexName, IndexAliases>;
 	is_valid: boolean;
 }
@@ -8052,22 +8039,21 @@ class CreateIndexRequest extends Request {
 	update_all_types: boolean;
 }
 @namespace("indices.index_management.create_index")
-class CreateIndexResponse extends Response {
+class CreateIndexResponse extends AcknowledgedResponseBase {
 	shards_acknowledged: boolean;
 }
 @namespace("indices.index_management.delete_index")
-class DeleteIndexResponse extends Response {
+class DeleteIndexResponse extends IndicesResponseBase {
 }
 @namespace("indices.index_management.get_index")
-@class_serializer("ResolvableDictionaryResponseJsonConverter`3")
-class GetIndexResponse extends Response {
+class GetIndexResponse extends DictionaryResponseBase<IndexName, IndexState> {
 	indices: Map<IndexName, IndexState>;
 }
 @namespace("indices.index_management.open_close_index.close_index")
-class CloseIndexResponse extends Response {
+class CloseIndexResponse extends AcknowledgedResponseBase {
 }
 @namespace("indices.index_management.open_close_index.open_index")
-class OpenIndexResponse extends Response {
+class OpenIndexResponse extends AcknowledgedResponseBase {
 }
 @namespace("indices.index_management.rollover_index")
 class RolloverIndexRequest extends Request {
@@ -8085,7 +8071,7 @@ class RolloverIndexRequest extends Request {
 	wait_for_active_shards: string;
 }
 @namespace("indices.index_management.rollover_index")
-class RolloverIndexResponse extends Response {
+class RolloverIndexResponse extends AcknowledgedResponseBase {
 	dry_run: boolean;
 	new_index: string;
 	old_index: string;
@@ -8094,20 +8080,18 @@ class RolloverIndexResponse extends Response {
 	shards_acknowledged: boolean;
 }
 @namespace("indices.index_management.shrink_index")
-class ShrinkIndexResponse extends Response {
+class ShrinkIndexResponse extends AcknowledgedResponseBase {
 	shards_acknowledged: boolean;
 }
 @namespace("indices.index_settings.get_index_settings")
-@class_serializer("ResolvableDictionaryResponseJsonConverter`3")
-class GetIndexSettingsResponse extends Response {
+class GetIndexSettingsResponse extends DictionaryResponseBase<IndexName, IndexState> {
 	indices: Map<IndexName, IndexState>;
 }
 @namespace("indices.index_settings.index_templates.delete_index_template")
-class DeleteIndexTemplateResponse extends Response {
+class DeleteIndexTemplateResponse extends AcknowledgedResponseBase {
 }
 @namespace("indices.index_settings.index_templates.get_index_template")
-@class_serializer("DictionaryResponseJsonConverter`3")
-class GetIndexTemplateResponse extends Response {
+class GetIndexTemplateResponse extends DictionaryResponseBase<string, TemplateMapping> {
 	template_mappings: Map<string, TemplateMapping>;
 }
 @namespace("indices.index_settings.index_templates.put_index_template")
@@ -8128,20 +8112,18 @@ class PutIndexTemplateRequest extends Request {
 	flat_settings: boolean;
 }
 @namespace("indices.index_settings.index_templates.put_index_template")
-class PutIndexTemplateResponse extends Response {
+class PutIndexTemplateResponse extends AcknowledgedResponseBase {
 }
 @namespace("indices.index_settings.update_index_settings")
-class UpdateIndexSettingsResponse extends Response {
+class UpdateIndexSettingsResponse extends AcknowledgedResponseBase {
 }
 @namespace("indices.mapping_management.get_field_mapping")
-@class_serializer("ResolvableDictionaryResponseJsonConverter`3")
-class GetFieldMappingResponse extends Response {
+class GetFieldMappingResponse extends DictionaryResponseBase<IndexName, TypeFieldMappings> {
 	indices: Map<IndexName, TypeFieldMappings>;
 	is_valid: boolean;
 }
 @namespace("indices.mapping_management.get_mapping")
-@class_serializer("ResolvableDictionaryResponseJsonConverter`3")
-class GetMappingResponse extends Response {
+class GetMappingResponse extends DictionaryResponseBase<IndexName, IndexMappings> {
 	indices: Map<IndexName, IndexMappings>;
 	mappings: Map<IndexName, IndexMappings>;
 	mapping: TypeMapping;
@@ -8175,34 +8157,32 @@ class PutMappingRequest extends Request {
 	update_all_types: boolean;
 }
 @namespace("indices.mapping_management.put_mapping")
-class PutMappingResponse extends Response {
+class PutMappingResponse extends IndicesResponseBase {
 }
 @namespace("indices.monitoring.indices_recovery")
-@class_serializer("ResolvableDictionaryResponseJsonConverter`3")
-class RecoveryStatusResponse extends Response {
+class RecoveryStatusResponse extends DictionaryResponseBase<IndexName, RecoveryStatus> {
 	indices: Map<IndexName, RecoveryStatus>;
 }
 @namespace("indices.status_management.clear_cache")
-class ClearCacheResponse extends Response {
+class ClearCacheResponse extends ShardsOperationResponseBase {
 }
 @namespace("indices.status_management.flush")
-class FlushResponse extends Response {
+class FlushResponse extends ShardsOperationResponseBase {
 }
 @namespace("indices.status_management.force_merge")
-class ForceMergeResponse extends Response {
+class ForceMergeResponse extends ShardsOperationResponseBase {
 }
 @namespace("indices.status_management.refresh")
-class RefreshResponse extends Response {
+class RefreshResponse extends ShardsOperationResponseBase {
 }
 @namespace("indices.status_management.synced_flush")
-class SyncedFlushResponse extends Response {
+class SyncedFlushResponse extends ShardsOperationResponseBase {
 }
 @namespace("ingest.delete_pipeline")
-class DeletePipelineResponse extends Response {
+class DeletePipelineResponse extends AcknowledgedResponseBase {
 }
 @namespace("ingest.get_pipeline")
-@class_serializer("DictionaryResponseJsonConverter`3")
-class GetPipelineResponse extends Response {
+class GetPipelineResponse extends DictionaryResponseBase<string, Pipeline> {
 	pipelines: Map<string, Pipeline>;
 }
 @namespace("ingest.put_pipeline")
@@ -8216,22 +8196,22 @@ class PutPipelineRequest extends Request {
 	timeout: Time;
 }
 @namespace("ingest.put_pipeline")
-class PutPipelineResponse extends Response {
+class PutPipelineResponse extends AcknowledgedResponseBase {
 }
 @namespace("modules.scripting.delete_script")
-class DeleteScriptResponse extends Response {
+class DeleteScriptResponse extends AcknowledgedResponseBase {
 }
 @namespace("modules.scripting.put_script")
-class PutScriptResponse extends Response {
+class PutScriptResponse extends AcknowledgedResponseBase {
 }
 @namespace("modules.snapshot_and_restore.repositories.create_repository")
-class CreateRepositoryResponse extends Response {
+class CreateRepositoryResponse extends AcknowledgedResponseBase {
 }
 @namespace("modules.snapshot_and_restore.repositories.delete_repository")
-class DeleteRepositoryResponse extends Response {
+class DeleteRepositoryResponse extends AcknowledgedResponseBase {
 }
 @namespace("modules.snapshot_and_restore.snapshot.delete_snapshot")
-class DeleteSnapshotResponse extends Response {
+class DeleteSnapshotResponse extends AcknowledgedResponseBase {
 }
 @namespace("search.scroll.scroll")
 class ScrollRequest extends Request {
@@ -8250,51 +8230,48 @@ class GraphExploreRequest extends Request {
 	timeout: Time;
 }
 @namespace("x_pack.machine_learning.delete_datafeed")
-class DeleteDatafeedResponse extends Response {
+class DeleteDatafeedResponse extends AcknowledgedResponseBase {
 }
 @namespace("x_pack.machine_learning.delete_job")
-class DeleteJobResponse extends Response {
+class DeleteJobResponse extends AcknowledgedResponseBase {
 }
 @namespace("x_pack.machine_learning.delete_model_snapshot")
-class DeleteModelSnapshotResponse extends Response {
+class DeleteModelSnapshotResponse extends AcknowledgedResponseBase {
 }
 @namespace("x_pack.machine_learning.revert_model_snapshot")
-class RevertModelSnapshotResponse extends Response {
+class RevertModelSnapshotResponse extends AcknowledgedResponseBase {
 	model: ModelSnapshot;
 }
 @namespace("x_pack.machine_learning.update_model_snapshot")
-class UpdateModelSnapshotResponse extends Response {
+class UpdateModelSnapshotResponse extends AcknowledgedResponseBase {
 	model: ModelSnapshot;
 }
 @namespace("x_pack.machine_learning.validate_detector")
-class ValidateDetectorResponse extends Response {
+class ValidateDetectorResponse extends AcknowledgedResponseBase {
 }
 @namespace("x_pack.machine_learning.validate_job")
-class ValidateJobResponse extends Response {
+class ValidateJobResponse extends AcknowledgedResponseBase {
 }
 @namespace("x_pack.security.role_mapping.get_role_mapping")
-@class_serializer("DictionaryResponseJsonConverter`3")
-class GetRoleMappingResponse extends Response {
+class GetRoleMappingResponse extends DictionaryResponseBase<string, XPackRoleMapping> {
 	role_mappings: Map<string, XPackRoleMapping>;
 }
 @namespace("x_pack.security.role.get_role")
-@class_serializer("DictionaryResponseJsonConverter`3")
-class GetRoleResponse extends Response {
+class GetRoleResponse extends DictionaryResponseBase<string, XPackRole> {
 	roles: Map<string, XPackRole>;
 }
 @namespace("x_pack.security.user.get_user")
-@class_serializer("DictionaryResponseJsonConverter`3")
-class GetUserResponse extends Response {
+class GetUserResponse extends DictionaryResponseBase<string, XPackUser> {
 	users: Map<string, XPackUser>;
 }
 @namespace("x_pack.watcher.restart_watcher")
-class RestartWatcherResponse extends Response {
+class RestartWatcherResponse extends AcknowledgedResponseBase {
 }
 @namespace("x_pack.watcher.start_watcher")
-class StartWatcherResponse extends Response {
+class StartWatcherResponse extends AcknowledgedResponseBase {
 }
 @namespace("x_pack.watcher.stop_watcher")
-class StopWatcherResponse extends Response {
+class StopWatcherResponse extends AcknowledgedResponseBase {
 }
 @namespace("mapping.types.complex.object")
 class ObjectProperty extends CorePropertyBase {

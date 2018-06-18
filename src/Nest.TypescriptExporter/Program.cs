@@ -105,6 +105,53 @@ namespace Nest.TypescriptGenerator
 
 			var file = "typedefinitions.ts";
 			File.WriteAllText(file, definitions.Generate());
+			LineBasedHacks(file);
+			PrependDefinitions(file);
+		}
+
+		private static void LineBasedHacks(string file)
+		{
+			var lines = File.ReadAllLines(file);
+			var newLines = new List<string>();
+			var skipTillNextBracket = false;
+			var singleOrArray = false;
+			foreach (var l in lines)
+			{
+				if (l.Contains("ReadSingleOrEnumerable"))
+				{
+					singleOrArray = true;
+					continue;
+				}
+
+				if (singleOrArray)
+				{
+					var ll = Regex.Replace(l, @"^(.+?): (.+?)\[\];", "$1: $2 | $2[];");
+					newLines.Add(ll);
+					singleOrArray = false;
+					continue;
+				}
+
+				if (l == "}" && skipTillNextBracket)
+				{
+					skipTillNextBracket = false;
+					continue;
+				}
+
+				if (l.StartsWith("class ErrorCause ")
+					|| l.StartsWith("class Error extends"))
+				{
+					newLines.RemoveAt(newLines.Count -1);
+					skipTillNextBracket = true;
+				}
+				if (skipTillNextBracket) continue;
+
+				newLines.Add(l);
+			}
+			File.WriteAllLines(file, newLines);
+		}
+
+		private static void PrependDefinitions(string file)
+		{
 			var errorCauseDef = @"@namespace(""common"")
 class ErrorCause {
 	reason: string;
@@ -114,7 +161,7 @@ class ErrorCause {
 	metadata: ErrorCauseMetadata;
 }
 ";
-		var errorDef = @"@namespace(""common"")
+			var errorDef = @"@namespace(""common"")
 class Error extends ErrorCause {
 	root_cause: ErrorCause[];
 	headers: Map<string, string>;
@@ -138,8 +185,6 @@ interface SourceDocument {}
 				.Replace(errorCauseDef, "")
 				.Replace(errorDef, "")
 				.Replace("\thits: Hit<T>[];", "\t//hits: Hit<T>[];");
-
-
 			File.WriteAllText(file, hack);
 			File.AppendAllText(file, contents);
 		}
