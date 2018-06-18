@@ -1,33 +1,31 @@
 using System.Collections.Generic;
 using Elasticsearch.Net;
-using Nest;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
 using TypeLite;
 using TypeLite.TsModels;
 
 namespace Nest.TypescriptGenerator
 {
-	public class MachineApiGenerator : TsGenerator
+	public class ClientTypescriptGenerator : TsGenerator
 	{
-		private readonly Dictionary<string, string> _namespaceMapping;
-		public TypeConvertorCollection Converters => base._typeConvertors;
-
-		public MachineApiGenerator(Dictionary<string, string> namespaceMapping) : base()
+		private readonly CsharpTypeInfoProvider _typeInfoProvider;
+		private readonly CSharpSourceDirectory _sourceDirectory;
+		public ClientTypescriptGenerator(CsharpTypeInfoProvider typeInfoProvider, CSharpSourceDirectory sourceDirectory)
 		{
-			_namespaceMapping = namespaceMapping;
+			_typeInfoProvider = typeInfoProvider;
+			_sourceDirectory = sourceDirectory;
 		}
 
-		public Dictionary<string, string> TypeRenames => new Dictionary<string, string>
+		public static Dictionary<string, string> TypeRenames => new Dictionary<string, string>
 		{
 			{"KeyValuePair", "Map"}
 		};
 
-		public HashSet<string> Appended = new HashSet<string>();
+		private readonly HashSet<string> _appended = new HashSet<string>();
 		private readonly HashSet<Type> _propertyTypesToIgnore = new HashSet<Type>(new[]
 			{
 				typeof (PropertyInfo),
@@ -52,16 +50,12 @@ namespace Nest.TypescriptGenerator
 		};
 
 
-		public bool PropertyTypesToIgnore(Type propertyType)
+		private bool PropertyTypesToIgnore(Type propertyType)
 		{
-			if (propertyType.Name.Contains("DynamicMapping"))
-			{
-
-			}
 			return _propertyTypesToIgnore.Contains(propertyType) || (propertyType.BaseType != null && propertyType.BaseType == typeof (MulticastDelegate));
 		}
 
-		protected virtual void AppendClassDefinition(TsClass classModel, ScriptBuilder sb, TsGeneratorOutput generatorOutput)
+		protected override void AppendClassDefinition(TsClass classModel, ScriptBuilder sb, TsGeneratorOutput generatorOutput)
 		{
 			AddNamespaceHeader(classModel.Name, sb);
 
@@ -73,9 +67,7 @@ namespace Nest.TypescriptGenerator
 
 			sb.AppendFormatIndented("{0}class {1}", visibility, typeName);
 			if (classModel.BaseType != null)
-			{
 				sb.AppendFormat(" extends {0}", this.GetFullyQualifiedTypeName(classModel.BaseType));
-			}
 
 			if (classModel.Interfaces.Count > 0)
 			{
@@ -106,9 +98,7 @@ namespace Nest.TypescriptGenerator
 					if (property.IsIgnored ||
 						PropertyTypesToIgnore(property.PropertyType.Type) ||
 						(_typesPropertiesToIgnore.ContainsKey(classModel.Type) && _typesPropertiesToIgnore[classModel.Type].Contains(property.Name)))
-					{
 						continue;
-					}
 
 					AddDocCommentForCustomJsonConverter(sb, property);
 					_docAppender.AppendPropertyDoc(sb, property, this.GetPropertyName(property), this.GetPropertyType(property));
@@ -117,21 +107,15 @@ namespace Nest.TypescriptGenerator
 			}
 
 			sb.AppendLineIndented("}");
-
 			_generatedClasses.Add(classModel);
 		}
 		private bool AddNamespaceHeaderEnum(string name, string ns, ScriptBuilder sb)
 		{
 			if (!ns.StartsWith("Nest") && !ns.StartsWith("Elasticsearch.Net")) return false;
 
-			if (name == "ParserTimeZone")
-			{
-
-			}
-
 			var n = "common";
-			if (this._namespaceMapping.TryGetValue(name, out var fullNs))
-				n = string.Join('.', fullNs.Split(".").Select(Program.SnakeCase));
+			if (this._sourceDirectory.TypeNameToNamespaceMapping.TryGetValue(name, out var fullNs))
+				n = string.Join('.', fullNs.Split(".").Select(StringExtensions.SnakeCase));
 
 			sb.AppendLineIndented($"/** namespace:{n} **/");
 			return true;
@@ -140,8 +124,8 @@ namespace Nest.TypescriptGenerator
 		private void AddNamespaceHeader(string name, ScriptBuilder sb)
 		{
 			var n = "common";
-			if (this._namespaceMapping.TryGetValue(name, out var ns))
-				n = string.Join('.', ns.Split(".").Select(Program.SnakeCase));
+			if (this._sourceDirectory.TypeNameToNamespaceMapping.TryGetValue(name, out var ns))
+				n = string.Join('.', ns.Split(".").Select(StringExtensions.SnakeCase));
 
 			sb.AppendLineIndented($"@namespace(\"{n}\")");
 		}
@@ -159,16 +143,12 @@ namespace Nest.TypescriptGenerator
 			attributes.AddRange(property.MemberInfo.GetCustomAttributes());
 
 			var isRequest = declaringType.Name.Contains("Request");
-			if (isRequest)
-			{
+			var nonGenericTypeName = ClientTypesExporter.RemoveGeneric.Replace(declaringType.Name, "$1");
+			if (ClientTypesExporter.InterfaceRegex.IsMatch(nonGenericTypeName)) nonGenericTypeName = nonGenericTypeName.Substring(1);
 
-			}
-			var nonGenericTypeName = Program.RemoveGeneric.Replace(declaringType.Name, "$1");
-			if (Program.InterfaceRegex.IsMatch(nonGenericTypeName)) nonGenericTypeName = nonGenericTypeName.Substring(1);
-
-			if (isRequest && Program.RequestParameters.ContainsKey(nonGenericTypeName))
+			if (isRequest && this._typeInfoProvider.RequestParameters.ContainsKey(nonGenericTypeName))
 			{
-				var rp = Program.RequestParameters[nonGenericTypeName];
+				var rp = this._typeInfoProvider.RequestParameters[nonGenericTypeName];
 				var prop = rp.GetProperty(propertyName);
 				if (prop != null)
 					sb.AppendLineIndented("@request_parameter()");
@@ -182,7 +162,7 @@ namespace Nest.TypescriptGenerator
 			}
 		}
 
-		private void AddDocCommentForCustomJsonConverter(ScriptBuilder sb, TsClass classModel)
+		private static void AddDocCommentForCustomJsonConverter(ScriptBuilder sb, TsClass classModel)
 		{
 			var iface = classModel.Type.GetInterfaces().FirstOrDefault(i => i.Name == "I" + classModel.Type.Name);
 
@@ -224,12 +204,12 @@ namespace Nest.TypescriptGenerator
 
 			using (sb.IncreaseIndentation())
 			{
-				int i = 1;
+				var i = 1;
 				foreach (var v in enumModel.Values)
 				{
 					_docAppender.AppendEnumValueDoc(sb, v);
 					var enumMemberAttribute = v.Field.GetCustomAttribute<EnumMemberAttribute>();
-					var name = Program.QuoteMaybe(!string.IsNullOrEmpty(enumMemberAttribute?.Value) ? enumMemberAttribute.Value : v.Name);
+					var name = (!string.IsNullOrEmpty(enumMemberAttribute?.Value) ? enumMemberAttribute.Value : v.Name).QuoteMaybe();
 
 					sb.AppendLineIndented(string.Format(i < enumModel.Values.Count ? "{0} = {1}," : "{0} = {1}", name, v.Value));
 					i++;
@@ -272,10 +252,10 @@ namespace Nest.TypescriptGenerator
 				{
 					var c = ReMapClass(classModel);
 					if (Ignore(c)) continue;
-					if (this.Appended.Contains(c.Name)) continue;
-					if (this.Appended.Contains("I" + c.Name)) continue;
+					if (this._appended.Contains(c.Name)) continue;
+					if (this._appended.Contains("I" + c.Name)) continue;
 					this.AppendClassDefinition(c, sb, generatorOutput);
-					this.Appended.Add(c.Name);
+					this._appended.Add(c.Name);
 				}
 			}
 
@@ -327,28 +307,26 @@ namespace Nest.TypescriptGenerator
 
 		protected bool Ignore(TsClass classModel)
 		{
-			if (this.TypeRenames.ContainsKey(classModel.Name)) return false;
+			if (TypeRenames.ContainsKey(classModel.Name)) return false;
 			if (typeof(IRequestParameters).IsAssignableFrom(classModel.Type)) return true;
 			if (IsClrType(classModel.Type)) return true;
 			if (_typesToIgnore.Contains(classModel.Type)) return true;
 			return false;
 		}
 
-		protected bool Ignore(TsEnum enumModel) => IsClrType(enumModel.Type);
+		private bool Ignore(TsEnum enumModel) => IsClrType(enumModel.Type);
 
-		protected bool IsClrType(Type type)
+		private bool IsClrType(Type type)
 		{
 			var name = type.FullName ?? type.DeclaringType?.FullName;
 			return name != null && !name.StartsWith("Nest.") && !name.StartsWith("Elasticsearch.Net.");
 		}
 
-		protected TsClass ReMapClass(TsClass classModel)
+		private static TsClass ReMapClass(TsClass classModel)
 		{
-			if (typeof(RequestBase<>) == classModel.Type)
-				return new TsClass(typeof(Request));
+			if (typeof(RequestBase<>) == classModel.Type) return new TsClass(typeof(Request));
 
-			if (typeof(ResponseBase) == classModel.Type)
-				return new TsClass(typeof(Response));
+			if (typeof(ResponseBase) == classModel.Type) return new TsClass(typeof(Response));
 
 			if (classModel.BaseType == null) return classModel;
 
@@ -375,12 +353,8 @@ namespace Nest.TypescriptGenerator
 			return classModel;
 		}
 	}
-
 	public class Request { }
 
 	public class Response { }
 
-	public class SourceDocument { }
-
-	public class Map<TKey, TValue> { }
 }
