@@ -4,7 +4,7 @@ using System.Linq;
 using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.FileSystem;
 
-namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack
+namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 {
 	public class AddClientCertificateRoleMappingTask : ClusterComposeTask
 	{
@@ -123,9 +123,11 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack
 			if (!Directory.Exists(path))
 				ExecuteBinary(config, writer, binary, "generating ssl certificates for this session",
 					"-in", silentModeConfigFile, "-out", @out);
-			if (config.Version.Major < 6)
+
+			var badLocation = Path.Combine(config.FileSystem.ElasticsearchHome, "config", "x-pack", @out);
+			//not necessary anymore now that we patch .in.bat i think
+			if (config.Version.Major < 6 && File.Exists(badLocation))
 			{
-				var badLocation = Path.Combine(config.FileSystem.ElasticsearchHome, "config", "x-pack", @out);
 				writer.WriteDiagnostic($"{{{nameof(GenerateCertificatesTask)}}} moving {badLocation} to {@out}");
 				File.Move(badLocation, zipLocation);
 			}

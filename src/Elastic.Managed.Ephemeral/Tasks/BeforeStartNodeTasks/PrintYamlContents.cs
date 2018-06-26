@@ -2,7 +2,7 @@ using System.IO;
 using System.Linq;
 using Elastic.Managed.ConsoleWriters;
 
-namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
+namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks
 {
 	public class PrintYamlContents : ClusterComposeTask
 	{

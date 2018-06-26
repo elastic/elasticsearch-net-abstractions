@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Elastic.Managed.ConsoleWriters;
 
-namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack
+namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 {
 	public class EnsureSecurityUsersInDefaultRealmAreAdded : ClusterComposeTask
 	{
@@ -23,7 +23,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack
 			var usersRolesFile = Path.Combine(xpackConfigFolder, "users_roles");
 			var usersRolesFileCached = usersRolesFile.Replace(xpackConfigFolder, xpackConfigFolderCached);
 
-			if (File.Exists(usersFileCached))
+			if (File.Exists(usersFileCached) && cluster.ClusterConfiguration.CacheEsHomeInstallation)
 			{
 				cluster.Writer?.WriteDiagnostic($"{{{nameof(EnsureSecurityUsersInDefaultRealmAreAdded)}}} using cached users and users_roles files from {{{xpackConfigFolderCached}}}");
 				if (!Directory.Exists(xpackConfigFolder)) Directory.CreateDirectory(xpackConfigFolder);
@@ -33,12 +33,8 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack
 			}
 			else
 			{
-				var folder = v.Major >= 5
-					? v >= "6.3.0" ? string.Empty : "x-pack"
-					: "shield";
-				var binary = v.Major >= 5
-					? v >= "6.3.0" ? "elasticsearch-users" : "users"
-					: "esusers";
+				var folder = v.Major >= 5 ? v >= "6.3.0" ? string.Empty : "x-pack" : "shield";
+				var binary = v.Major >= 5 ? v >= "6.3.0" ? "elasticsearch-users" : "users" : "esusers";
 
 				var h = fileSystem.ElasticsearchHome;
 				var pluginFolder = v >= "6.3.0" ? Path.Combine(h, "bin") : Path.Combine(h, "bin", folder);
@@ -49,9 +45,10 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack
 
 				if (!Directory.Exists(xpackConfigFolderCached)) Directory.CreateDirectory(xpackConfigFolderCached);
 
-				File.Copy(usersFile, usersFileCached);
-				File.Copy(usersRolesFile, usersRolesFileCached);
+				if (!File.Exists(usersFileCached)) File.Copy(usersFile, usersFileCached);
+				if (!File.Exists(usersRolesFileCached)) File.Copy(usersRolesFile, usersRolesFileCached);
 			}
 		}
+
 	}
 }

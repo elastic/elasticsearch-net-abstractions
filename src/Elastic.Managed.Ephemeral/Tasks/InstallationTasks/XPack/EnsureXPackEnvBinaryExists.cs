@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using Elastic.Managed.ConsoleWriters;
+using Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks.XPack;
 
 namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack
 {

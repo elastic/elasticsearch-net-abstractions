@@ -1,9 +1,8 @@
 using System.IO;
 using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.FileSystem;
-using static System.IO.Directory;
 
-namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
+namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks
 {
 	public class CreateEphemeralDirectory : ClusterComposeTask
 	{
@@ -18,12 +17,12 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 
 			cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateEphemeralDirectory)}}} creating {{{f.TempFolder}}}");
 
-			CreateDirectory(f.TempFolder);
+			Directory.CreateDirectory(f.TempFolder);
 
-			if (!Exists(f.ConfigPath))
+			if (!Directory.Exists(f.ConfigPath))
 			{
 				cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateEphemeralDirectory)}}} creating config folder {{{f.ConfigPath}}}");
-				CreateDirectory(f.ConfigPath);
+				Directory.CreateDirectory(f.ConfigPath);
 
 			}
 
@@ -38,7 +37,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 
 			var homeSource = cluster.ClusterConfiguration.CacheEsHomeInstallation && File.Exists(cachedElasticsearchYaml) ? cachedEsHomeFolder : fs.ElasticsearchHome;
 			var source = Path.Combine(homeSource, "config");
-			if (!Exists(source))
+			if (!Directory.Exists(source))
 			{
 				cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateEphemeralDirectory)}}} source config {{{source}}} does not exist nothing to copy");
 				return;

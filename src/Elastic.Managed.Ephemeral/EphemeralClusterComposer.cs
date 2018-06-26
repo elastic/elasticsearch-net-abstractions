@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using Elastic.Managed.Ephemeral.Tasks;
 using Elastic.Managed.Ephemeral.Tasks.AfterNodeStoppedTasks;
 using Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks;
+using Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks.XPack;
 using Elastic.Managed.Ephemeral.Tasks.InstallationTasks;
 using Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack;
 using Elastic.Managed.Ephemeral.Tasks.ValidationTasks;
@@ -26,6 +27,7 @@ namespace Elastic.Managed.Ephemeral
 
 			new EnsureElasticsearchBatWorksAcrossDrives(),
 			new EnsureXPackEnvBinaryExists(),
+			new PathXPackInBatFile()
 		};
 
 		protected static IEnumerable<IClusterComposeTask> BeforeStart { get; } = new List<IClusterComposeTask>
@@ -65,7 +67,7 @@ namespace Elastic.Managed.Ephemeral
 
 		private bool NodeStarted { get; set; }
 
-		public void OnStop() => Itterate(NodeStoppedTasks, (t, c, fs) => t.Run(c, this.NodeStarted));
+		public void OnStop() => Itterate(NodeStoppedTasks, (t, c, fs) => t.Run(c, this.NodeStarted), callOnStop: false);
 
 		public void Install() => Itterate(InstallationTasks, (t, c, fs) => t.Run(c));
 
@@ -94,14 +96,23 @@ namespace Elastic.Managed.Ephemeral
 		}
 
 		private readonly object _lock = new object();
-		private void Itterate<T>(IEnumerable<T> collection, Action<T, IEphemeralCluster<TConfiguration>, INodeFileSystem> act)
+		private void Itterate<T>(IEnumerable<T> collection, Action<T, IEphemeralCluster<TConfiguration>, INodeFileSystem> act, bool callOnStop = true)
 		{
 			lock (_lock)
 			{
 				var cluster = this.Cluster;
 				foreach (var task in collection)
 				{
-					act(task, cluster, cluster.FileSystem);
+					try
+					{
+						act(task, cluster, cluster.FileSystem);
+					}
+					catch (Exception e)
+					{
+						Console.WriteLine(e);
+						if (callOnStop) this.OnStop();
+						throw;
+					}
 				}
 			}
 		}

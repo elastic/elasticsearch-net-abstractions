@@ -13,7 +13,7 @@ namespace ScratchPad
 	{
 		public static int Main()
 		{
-			ElasticsearchVersion version = "6.3.0";
+			ElasticsearchVersion version = "5.6.10";
 
 
 //			var clusterConfiguration = new EphemeralClusterConfiguration("6.0.0", numberOfNodes: 2);
@@ -44,8 +44,8 @@ namespace ScratchPad
 			var config = new EphemeralClusterConfiguration(version, XPack | Security | SSL, plugins, 1)
 			{
 				ShowElasticsearchOutputAfterStarted = true,
-				PrintYamlFilesInConfigFolder = true,
-				CacheEsHomeInstallation = true,
+				PrintYamlFilesInConfigFolder = false,
+				CacheEsHomeInstallation = false,
 			};
 
 			using (var cluster = new EphemeralCluster(config))
@@ -63,7 +63,6 @@ namespace ScratchPad
 				var client = new ElasticClient(settings);
 
 				Console.Write(client.XPackInfo().DebugInformation);
-				Console.ReadKey();
 			}
 //
 //			Console.WriteLine($".. DONE ...");
