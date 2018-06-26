@@ -62,6 +62,8 @@ namespace Nest.TypescriptGenerator
 			var typeName = this.GetTypeName(classModel);
 			var visibility = this.GetTypeVisibility(classModel, typeName) ? "export " : "";
 
+			AddRequestRenameInformation(sb, classModel);
+
 			AddDocCommentForCustomJsonConverter(sb, classModel);
 			_docAppender.AppendClassDoc(sb, classModel, typeName);
 
@@ -161,6 +163,24 @@ namespace Nest.TypescriptGenerator
 				sb.AppendLineIndented($"@prop_serializer(\"{type.Name}\")");
 			}
 		}
+		private static void AddRequestRenameInformation(ScriptBuilder sb, TsClass classModel)
+		{
+			if (classModel.Name.Contains("Request")) return;
+
+			var iface = classModel.Type.GetInterfaces().FirstOrDefault(i => i.Name == "I" + classModel.Type.Name);
+
+			var attributes = new List<Attribute>();
+			if (iface != null) attributes.AddRange(iface.GetCustomAttributes());
+			attributes.AddRange(classModel.Type.GetCustomAttributes());
+
+			var renameAtt = attributes.FirstOrDefault(a => a.TypeId.ToString() == "Nest.DescriptorForAttribute");
+			var originalSpec = GetDescriptorFor(renameAtt, classModel.Name);
+			if (!string.IsNullOrWhiteSpace(originalSpec))
+			{
+				sb.AppendLineIndented($"@rest_spec_name(\"{originalSpec}\")");
+			}
+			else throw new Exception($"Could not get {classModel.Name} original rest spec file name");
+		}
 
 		private static void AddDocCommentForCustomJsonConverter(ScriptBuilder sb, TsClass classModel)
 		{
@@ -176,6 +196,12 @@ namespace Nest.TypescriptGenerator
 				if (GetConverter(converter, out var type)) return;
 				sb.AppendLineIndented($"@class_serializer(\"{type.Name}\")");
 			}
+		}
+
+		private static string GetDescriptorFor(Attribute attribute, string classModelName)
+		{
+			if (attribute == null) classModelName.SnakeCase().Replace();
+
 		}
 
 		private static bool GetConverter(Attribute converter, out Type type)
@@ -300,7 +326,6 @@ namespace Nest.TypescriptGenerator
 
 			var baseTypesCount = GetParentTypes(c.Type).Count();
 			weigth += baseTypesCount;
-			if (c.Type.Name == "Error") weigth = 2;
 
 			return weigth;
 		}
@@ -324,15 +349,13 @@ namespace Nest.TypescriptGenerator
 
 		private static TsClass ReMapClass(TsClass classModel)
 		{
-			if (typeof(RequestBase<>) == classModel.Type) return new TsClass(typeof(Request));
-
-			if (typeof(ResponseBase) == classModel.Type) return new TsClass(typeof(Response));
+			if (typeof(RequestBase<>) == classModel.Type) return new TsClass(typeof(RequestBase));
 
 			if (classModel.BaseType == null) return classModel;
 
 			var baseType = classModel.BaseType.Type;
 			if (typeof(IRequest).IsAssignableFrom(baseType))
-				classModel.BaseType = new TsClass(typeof(Request));
+				classModel.BaseType = new TsClass(typeof(RequestBase));
 
 			if (typeof(IResponse).IsAssignableFrom(baseType))
 			{
@@ -346,15 +369,13 @@ namespace Nest.TypescriptGenerator
 				if (baseType == typeof(AcknowledgedResponseBase)) return classModel;
 				if (baseType == typeof(IndicesResponseBase)) return classModel;
 
-
-				classModel.BaseType = new TsClass(typeof(Response));
+				classModel.BaseType = new TsClass(typeof(ResponseBase));
 			}
 
 			return classModel;
 		}
 	}
-	public class Request { }
+	public class RequestBase { }
 
-	public class Response { }
-
+	public class MainError { }
 }

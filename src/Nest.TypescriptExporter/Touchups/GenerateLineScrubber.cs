@@ -11,8 +11,9 @@ namespace Nest.TypescriptGenerator.Touchups
 		{
 			var lines = File.ReadAllLines(file);
 			var newLines = new List<string>();
-			List<string> errorCause = new List<string>(), error = new List<string>();
-			bool readingError = false, readingErrorCause = false;
+			List<string> errorCause = new List<string>(), error = new List<string>(), ignore = new List<string>();
+
+			bool readingError = false, readingErrorCause = false, readingIgnored = false;
 			var singleOrArray = false;
 			foreach (var l in lines)
 			{
@@ -22,6 +23,7 @@ namespace Nest.TypescriptGenerator.Touchups
 				// this removes ErrorCause and Error definitions these are manually added to to top afterwards.
 				if (TryMove(l, "class ErrorCause ", errorCause, newLines, ref readingErrorCause)) continue;
 				if (TryMove(l, "class Error extends", error, newLines, ref readingError)) continue;
+				if (TryMove(l, "class Response ", ignore, newLines, ref readingIgnored)) continue;
 
 				newLines.Add(l);
 			}

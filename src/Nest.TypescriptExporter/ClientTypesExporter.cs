@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Elasticsearch.Net;
 using TypeLite;
 using TypeLite.TsModels;
 
@@ -34,6 +35,8 @@ namespace Nest.TypescriptGenerator
 
 		private static string FormatMemberType(TsProperty tsProperty, string memberTypeName)
 		{
+			if (memberTypeName == nameof(Error)) return nameof(MainError);
+
 			var asCollection = tsProperty.PropertyType as TsCollection;
 			var isCollection = asCollection != null;
 

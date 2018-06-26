@@ -8,6 +8,7 @@ namespace Nest.TypescriptGenerator.Touchups
 		{
 			var hack = @"
 function class_serializer(ns: string) {return function (ns: any){}}
+function rest_spec_name(ns: string) {return function (ns: any){}}
 function prop_serializer(ns: string) {return function (ns: any, x:any){}}
 function request_parameter() {return function (ns: any, x:any){}}
 function namespace(ns: string) {return function (ns: any){}}
@@ -19,7 +20,9 @@ interface SourceDocument {}
 ";
 			var contents = File.ReadAllText(file);
 			contents = contents
-				.Replace("\thits: Hit<T>[];", "\t//hits: Hit<T>[];");
+				.Replace("\thits: Hit<T>[];", "\t//hits: Hit<T>[];")
+				.Replace("class Error extends ErrorCause", $"class {nameof(MainError)} extends ErrorCause");
+
 			File.WriteAllText(file, hack);
 			File.AppendAllText(file, contents);
 		}

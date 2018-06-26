@@ -17,7 +17,7 @@ class ErrorCause {
 	metadata: ErrorCauseMetadata;
 }
 @namespace("common")
-class Error extends ErrorCause {
+class MainError extends ErrorCause {
 	root_cause: ErrorCause[];
 	headers: Map<string, string>;
 }
@@ -1176,7 +1176,7 @@ class MultiGetHit<TDocument> {
 	id: string;
 	parent: string;
 	routing: string;
-	error: Error;
+	error: MainError;
 }
 @namespace("document.single.term_vectors")
 class TermVectors {
@@ -1989,10 +1989,6 @@ class Property {
 	name: PropertyName;
 	type: string;
 	local_metadata: Map<string, any>;
-}
-@namespace("common_abstractions.response")
-class Response {
-	server_error: ServerError;
 }
 @namespace("search.search.hits")
 class Hit<TDocument> {
@@ -4788,8 +4784,14 @@ class Time {
 class KeepTypesTokenFilter extends TokenFilterBase {
 	types: string[];
 }
-@namespace("common")
-class Request {
+@namespace("common_abstractions.request")
+class RequestBase {
+}
+@namespace("common_abstractions.response")
+class ResponseBase {
+	server_error: ServerError;
+	is_valid: boolean;
+	debug_information: string;
 }
 @namespace("common_abstractions.infer.property_name")
 class PropertyName {
@@ -5254,7 +5256,7 @@ class UaxEmailUrlTokenizer extends TokenizerBase {
 class WhitespaceTokenizer extends TokenizerBase {
 }
 @namespace("common_abstractions.request")
-class PlainRequestBase<TParameters> extends Request {
+class PlainRequestBase<TParameters> extends RequestBase {
 	request_configuration: RequestConfiguration;
 	pretty: boolean;
 	human: boolean;
@@ -5271,11 +5273,11 @@ class PropertyBase {
 class CronExpression extends ScheduleBase {
 }
 @namespace("cat")
-class CatResponse<TCatRecord> extends Response {
+class CatResponse<TCatRecord> extends ResponseBase {
 	records: TCatRecord[];
 }
 @namespace("cluster.cluster_allocation_explain")
-class ClusterAllocationExplainResponse extends Response {
+class ClusterAllocationExplainResponse extends ResponseBase {
 	index: string;
 	shard: integer;
 	primary: boolean;
@@ -5301,7 +5303,7 @@ class ClusterAllocationExplainResponse extends Response {
 	remaining_delay_in_millis: long;
 }
 @namespace("cluster.cluster_health")
-class ClusterHealthResponse extends Response {
+class ClusterHealthResponse extends ResponseBase {
 	cluster_name: string;
 	status: Health;
 	timed_out: boolean;
@@ -5317,27 +5319,27 @@ class ClusterHealthResponse extends Response {
 	indices: Map<IndexName, IndexHealthStats>;
 }
 @namespace("cluster.cluster_pending_tasks")
-class ClusterPendingTasksResponse extends Response {
+class ClusterPendingTasksResponse extends ResponseBase {
 	tasks: PendingTask[];
 }
 @namespace("cluster.cluster_reroute")
-class ClusterRerouteResponse extends Response {
+class ClusterRerouteResponse extends ResponseBase {
 	state: ClusterRerouteState;
 	explanations: ClusterRerouteExplanation[];
 }
 @namespace("cluster.cluster_settings.cluster_get_settings")
-class ClusterGetSettingsResponse extends Response {
+class ClusterGetSettingsResponse extends ResponseBase {
 	persistent: Map<string, any>;
 	transient: Map<string, any>;
 }
 @namespace("cluster.cluster_settings.cluster_put_settings")
-class ClusterPutSettingsResponse extends Response {
+class ClusterPutSettingsResponse extends ResponseBase {
 	acknowledged: boolean;
 	persistent: Map<string, any>;
 	transient: Map<string, any>;
 }
 @namespace("cluster.cluster_state")
-class ClusterStateResponse extends Response {
+class ClusterStateResponse extends ResponseBase {
 	cluster_name: string;
 	master_node: string;
 	state_uuid: string;
@@ -5349,57 +5351,57 @@ class ClusterStateResponse extends Response {
 	blocks: BlockState;
 }
 @namespace("cluster.nodes_hot_threads")
-class NodesHotThreadsResponse extends Response {
+class NodesHotThreadsResponse extends ResponseBase {
 	hot_threads: HotThreadInformation[];
 }
 @namespace("cluster")
-class NodesResponseBase extends Response {
+class NodesResponseBase extends ResponseBase {
 	node_statistics: NodeStatistics;
 }
 @namespace("cluster.ping")
-class PingResponse extends Response {
+class PingResponse extends ResponseBase {
 }
 @namespace("cluster.root_node_info")
-class RootNodeInfoResponse extends Response {
+class RootNodeInfoResponse extends ResponseBase {
 	name: string;
 	tagline: string;
 	version: ElasticsearchVersionInfo;
 }
 @namespace("cluster.task_management.cancel_tasks")
-class CancelTasksResponse extends Response {
+class CancelTasksResponse extends ResponseBase {
 	is_valid: boolean;
 	nodes: Map<string, TaskExecutingNode>;
 	node_failures: ErrorCause[];
 }
 @namespace("cluster.task_management.get_task")
-class GetTaskResponse extends Response {
+class GetTaskResponse extends ResponseBase {
 	completed: boolean;
 	task: TaskInfo;
 }
 @namespace("cluster.task_management.list_tasks")
-class ListTasksResponse extends Response {
+class ListTasksResponse extends ResponseBase {
 	is_valid: boolean;
 	nodes: Map<string, TaskExecutingNode>;
 	node_failures: ErrorCause[];
 }
 @namespace("common_abstractions.response")
-class AcknowledgedResponseBase extends Response {
+class AcknowledgedResponseBase extends ResponseBase {
 	acknowledged: boolean;
 }
 @namespace("common_abstractions.response")
-class DictionaryResponseBase<TKey, TValue> extends Response {
+class DictionaryResponseBase<TKey, TValue> extends ResponseBase {
 }
 @namespace("common_abstractions.response")
-class IndicesResponseBase extends Response {
+class IndicesResponseBase extends ResponseBase {
 	acknowledged: boolean;
 	_shards: ShardStatistics;
 }
 @namespace("common_abstractions.response")
-class ShardsOperationResponseBase extends Response {
+class ShardsOperationResponseBase extends ResponseBase {
 	_shards: ShardStatistics;
 }
 @namespace("document.multiple.bulk")
-class BulkResponse extends Response {
+class BulkResponse extends ResponseBase {
 	is_valid: boolean;
 	took: long;
 	errors: boolean;
@@ -5407,7 +5409,7 @@ class BulkResponse extends Response {
 	items_with_errors: BulkResponseItem[];
 }
 @namespace("document.multiple.delete_by_query")
-class DeleteByQueryResponse extends Response {
+class DeleteByQueryResponse extends ResponseBase {
 	is_valid: boolean;
 	took: long;
 	task: TaskId;
@@ -5425,17 +5427,17 @@ class DeleteByQueryResponse extends Response {
 	failures: BulkIndexByScrollFailure[];
 }
 @namespace("document.multiple.multi_get.response")
-class MultiGetResponse extends Response {
+class MultiGetResponse extends ResponseBase {
 	is_valid: boolean;
 	hits: MultiGetHit<any>[];
 }
 @namespace("document.multiple.multi_term_vectors")
-class MultiTermVectorsResponse extends Response {
+class MultiTermVectorsResponse extends ResponseBase {
 	@prop_serializer("ReadOnlyCollectionJsonConverter`2")
 	docs: TermVectors[];
 }
 @namespace("document.multiple.reindex_on_server")
-class ReindexOnServerResponse extends Response {
+class ReindexOnServerResponse extends ResponseBase {
 	is_valid: boolean;
 	took: Time;
 	task: TaskId;
@@ -5450,11 +5452,11 @@ class ReindexOnServerResponse extends Response {
 	failures: BulkIndexByScrollFailure[];
 }
 @namespace("document.multiple.reindex_rethrottle")
-class ReindexRethrottleResponse extends Response {
+class ReindexRethrottleResponse extends ResponseBase {
 	nodes: Map<string, ReindexNode>;
 }
 @namespace("document.multiple.update_by_query")
-class UpdateByQueryResponse extends Response {
+class UpdateByQueryResponse extends ResponseBase {
 	is_valid: boolean;
 	took: long;
 	task: TaskId;
@@ -5469,7 +5471,7 @@ class UpdateByQueryResponse extends Response {
 	requests_per_second: float;
 }
 @namespace("document.single.create")
-class CreateResponse extends Response {
+class CreateResponse extends ResponseBase {
 	_index: string;
 	_type: string;
 	_id: string;
@@ -5480,7 +5482,7 @@ class CreateResponse extends Response {
 	_primary_term: long;
 }
 @namespace("document.single.delete")
-class DeleteResponse extends Response {
+class DeleteResponse extends ResponseBase {
 	_index: string;
 	_type: string;
 	_id: string;
@@ -5491,7 +5493,7 @@ class DeleteResponse extends Response {
 	_primary_term: long;
 }
 @namespace("document.single.get")
-class GetResponse<TDocument> extends Response {
+class GetResponse<TDocument> extends ResponseBase {
 	_index: string;
 	_type: string;
 	_id: string;
@@ -5504,7 +5506,7 @@ class GetResponse<TDocument> extends Response {
 	_routing: string;
 }
 @namespace("document.single.index")
-class IndexResponse extends Response {
+class IndexResponse extends ResponseBase {
 	_index: string;
 	_type: string;
 	_id: string;
@@ -5515,11 +5517,11 @@ class IndexResponse extends Response {
 	_primary_term: long;
 }
 @namespace("document.single.source")
-class SourceResponse<T> extends Response {
+class SourceResponse<T> extends ResponseBase {
 	body: T;
 }
 @namespace("document.single.update")
-class UpdateResponse<TDocument> extends Response {
+class UpdateResponse<TDocument> extends ResponseBase {
 	_shards: ShardStatistics;
 	_index: string;
 	_type: string;
@@ -5529,121 +5531,121 @@ class UpdateResponse<TDocument> extends Response {
 	result: Result;
 }
 @namespace("indices.alias_management.delete_alias")
-class DeleteAliasResponse extends Response {
+class DeleteAliasResponse extends ResponseBase {
 }
 @namespace("indices.alias_management.put_alias")
-class PutAliasResponse extends Response {
+class PutAliasResponse extends ResponseBase {
 }
 @namespace("indices.analyze")
-class AnalyzeResponse extends Response {
+class AnalyzeResponse extends ResponseBase {
 	tokens: AnalyzeToken[];
 	detail: AnalyzeDetail;
 }
 @namespace("indices.index_management.indices_exists")
-class ExistsResponse extends Response {
+class ExistsResponse extends ResponseBase {
 	exists: boolean;
 }
 @namespace("indices.monitoring.indices_segments")
-class SegmentsResponse extends Response {
+class SegmentsResponse extends ResponseBase {
 	_shards: ShardStatistics;
 	indices: Map<string, IndexSegment>;
 }
 @namespace("indices.monitoring.indices_shard_stores")
-class IndicesShardStoresResponse extends Response {
+class IndicesShardStoresResponse extends ResponseBase {
 	indices: Map<string, IndicesShardStores>;
 }
 @namespace("indices.monitoring.indices_stats")
-class IndicesStatsResponse extends Response {
+class IndicesStatsResponse extends ResponseBase {
 	_shards: ShardStatistics;
 	_all: IndicesStats;
 	indices: Map<string, IndicesStats>;
 }
 @namespace("indices.status_management.upgrade")
-class UpgradeResponse extends Response {
+class UpgradeResponse extends ResponseBase {
 	_shards: ShardStatistics;
 }
 @namespace("indices.status_management.upgrade.upgrade_status")
 @class_serializer("UpgradeStatusResponseJsonConverter")
-class UpgradeStatusResponse extends Response {
+class UpgradeStatusResponse extends ResponseBase {
 	upgrades: Map<string, UpgradeStatus>;
 	size_in_bytes: long;
 	size_to_upgrade_in_bytes: string;
 	size_to_upgrade_ancient_in_bytes: string;
 }
 @namespace("ingest.processor")
-class GrokProcessorPatternsResponse extends Response {
+class GrokProcessorPatternsResponse extends ResponseBase {
 	patterns: Map<string, string>;
 }
 @namespace("ingest.simulate_pipeline")
-class SimulatePipelineResponse extends Response {
+class SimulatePipelineResponse extends ResponseBase {
 	docs: PipelineSimulation[];
 }
 @namespace("modules.scripting.get_script")
-class GetScriptResponse extends Response {
+class GetScriptResponse extends ResponseBase {
 	script: StoredScript;
 }
 @namespace("modules.snapshot_and_restore.repositories.get_repository")
 @class_serializer("GetRepositoryResponseJsonConverter")
-class GetRepositoryResponse extends Response {
+class GetRepositoryResponse extends ResponseBase {
 	repositories: Map<string, SnapshotRepository>;
 }
 @namespace("modules.snapshot_and_restore.repositories.verify_repository")
-class VerifyRepositoryResponse extends Response {
+class VerifyRepositoryResponse extends ResponseBase {
 	nodes: Map<string, CompactNodeInfo>;
 }
 @namespace("modules.snapshot_and_restore.restore")
-class RestoreResponse extends Response {
+class RestoreResponse extends ResponseBase {
 	snapshot: SnapshotRestore;
 }
 @namespace("modules.snapshot_and_restore.snapshot.get_sapshot")
-class GetSnapshotResponse extends Response {
+class GetSnapshotResponse extends ResponseBase {
 	snapshots: Snapshot[];
 }
 @namespace("modules.snapshot_and_restore.snapshot.snapshot_status")
-class SnapshotStatusResponse extends Response {
+class SnapshotStatusResponse extends ResponseBase {
 	snapshots: SnapshotStatus[];
 }
 @namespace("modules.snapshot_and_restore.snapshot.snapshot")
-class SnapshotResponse extends Response {
+class SnapshotResponse extends ResponseBase {
 	accepted: boolean;
 	snapshot: Snapshot;
 }
 @namespace("search.count")
-class CountResponse extends Response {
+class CountResponse extends ResponseBase {
 	count: long;
 	_shards: ShardStatistics;
 }
 @namespace("search.explain")
-class ExplainResponse<TDocument> extends Response {
+class ExplainResponse<TDocument> extends ResponseBase {
 	matched: boolean;
 	explanation: ExplanationDetail;
 	get: InstantGet<TDocument>;
 }
 @namespace("search.field_capabilities")
-class FieldCapabilitiesResponse extends Response {
+class FieldCapabilitiesResponse extends ResponseBase {
 	shards: ShardStatistics;
 	fields: Map<Field, Map<string, FieldCapabilities>>;
 }
 @namespace("search.multi_search")
-class MultiSearchResponse extends Response {
+class MultiSearchResponse extends ResponseBase {
 	is_valid: boolean;
 	total_responses: integer;
 	all_responses: Response[];
 }
 @namespace("search.scroll.clear_scroll")
-class ClearScrollResponse extends Response {
+class ClearScrollResponse extends ResponseBase {
 }
 @namespace("search.search_shards")
-class SearchShardsResponse extends Response {
+class SearchShardsResponse extends ResponseBase {
 	shards: SearchShard[][];
 	nodes: Map<string, SearchNode>;
 }
 @namespace("search.search_template.render_search_template")
-class RenderSearchTemplateResponse extends Response {
+class RenderSearchTemplateResponse extends ResponseBase {
 	template_output: LazyDocument;
 }
 @namespace("search.search")
-class SearchResponse<T> extends Response {
+class SearchResponse<T> extends ResponseBase {
 	_shards: ShardStatistics;
 	aggregations: Map<string, Aggregate>;
 	aggs: Map<string, Aggregate>;
@@ -5662,19 +5664,19 @@ class SearchResponse<T> extends Response {
 	fields: Map<string, LazyDocument>;
 }
 @namespace("search.validate")
-class ValidateQueryResponse extends Response {
+class ValidateQueryResponse extends ResponseBase {
 	valid: boolean;
 	_shards: ShardStatistics;
 	explanations: ValidationExplanation[];
 }
 @namespace("x_pack.migration.deprecation_info")
-class DeprecationInfoResponse extends Response {
+class DeprecationInfoResponse extends ResponseBase {
 	cluster_settings: DeprecationInfo[];
 	node_settings: DeprecationInfo[];
 	index_settings: Map<string, DeprecationInfo[]>;
 }
 @namespace("x_pack.graph.explore")
-class GraphExploreResponse extends Response {
+class GraphExploreResponse extends ResponseBase {
 	took: long;
 	timed_out: boolean;
 	connections: GraphConnection[];
@@ -5682,14 +5684,14 @@ class GraphExploreResponse extends Response {
 	failures: ShardFailure[];
 }
 @namespace("x_pack.info.x_pack_info")
-class XPackInfoResponse extends Response {
+class XPackInfoResponse extends ResponseBase {
 	build: XPackBuildInformation;
 	license: MinimalLicenseInformation;
 	features: XPackFeatures;
 	tagline: string;
 }
 @namespace("x_pack.info.x_pack_usage")
-class XPackUsageResponse extends Response {
+class XPackUsageResponse extends ResponseBase {
 	graph: XPackUsage;
 	monitoring: MonitoringUsage;
 	ml: MachineLearningUsage;
@@ -5697,82 +5699,82 @@ class XPackUsageResponse extends Response {
 	security: SecurityUsage;
 }
 @namespace("x_pack.license.delete_license")
-class DeleteLicenseResponse extends Response {
+class DeleteLicenseResponse extends ResponseBase {
 }
 @namespace("x_pack.license.get_license")
-class GetLicenseResponse extends Response {
+class GetLicenseResponse extends ResponseBase {
 	is_valid: boolean;
 	license: LicenseInformation;
 }
 @namespace("x_pack.license.post_license")
-class PostLicenseResponse extends Response {
+class PostLicenseResponse extends ResponseBase {
 	acknowledged: boolean;
 	license_status: LicenseStatus;
 	acknowledge: LicenseAcknowledgement;
 }
 @namespace("x_pack.machine_learning.close_job")
-class CloseJobResponse extends Response {
+class CloseJobResponse extends ResponseBase {
 	closed: boolean;
 }
 @namespace("x_pack.machine_learning.delete_expired_data")
-class DeleteExpiredDataResponse extends Response {
+class DeleteExpiredDataResponse extends ResponseBase {
 	deleted: boolean;
 }
 @namespace("x_pack.machine_learning.flush_job")
-class FlushJobResponse extends Response {
+class FlushJobResponse extends ResponseBase {
 	flushed: boolean;
 }
 @namespace("x_pack.machine_learning.get_anomaly_records")
-class GetAnomalyRecordsResponse extends Response {
+class GetAnomalyRecordsResponse extends ResponseBase {
 	count: long;
 	records: AnomalyRecord[];
 }
 @namespace("x_pack.machine_learning.get_buckets")
-class GetBucketsResponse extends Response {
+class GetBucketsResponse extends ResponseBase {
 	count: long;
 	buckets: Bucket[];
 }
 @namespace("x_pack.machine_learning.get_categories")
-class GetCategoriesResponse extends Response {
+class GetCategoriesResponse extends ResponseBase {
 	count: long;
 	categories: CategoryDefinition[];
 }
 @namespace("x_pack.machine_learning.get_datafeed_stats")
-class GetDatafeedStatsResponse extends Response {
+class GetDatafeedStatsResponse extends ResponseBase {
 	count: long;
 	datafeeds: DatafeedStats[];
 }
 @namespace("x_pack.machine_learning.get_datafeeds")
-class GetDatafeedsResponse extends Response {
+class GetDatafeedsResponse extends ResponseBase {
 	count: long;
 	datafeeds: DatafeedConfig[];
 }
 @namespace("x_pack.machine_learning.get_influencers")
-class GetInfluencersResponse extends Response {
+class GetInfluencersResponse extends ResponseBase {
 	count: long;
 	influencers: BucketInfluencer[];
 }
 @namespace("x_pack.machine_learning.get_job_stats")
-class GetJobStatsResponse extends Response {
+class GetJobStatsResponse extends ResponseBase {
 	count: long;
 	jobs: JobStats[];
 }
 @namespace("x_pack.machine_learning.get_jobs")
-class GetJobsResponse extends Response {
+class GetJobsResponse extends ResponseBase {
 	count: long;
 	jobs: Job[];
 }
 @namespace("x_pack.machine_learning.get_model_snapshots")
-class GetModelSnapshotsResponse extends Response {
+class GetModelSnapshotsResponse extends ResponseBase {
 	count: long;
 	model_snapshots: ModelSnapshot[];
 }
 @namespace("x_pack.machine_learning.open_job")
-class OpenJobResponse extends Response {
+class OpenJobResponse extends ResponseBase {
 	opened: boolean;
 }
 @namespace("x_pack.machine_learning.post_job_data")
-class PostJobDataResponse extends Response {
+class PostJobDataResponse extends ResponseBase {
 	job_id: string;
 	processed_record_count: long;
 	processed_field_count: long;
@@ -5789,11 +5791,11 @@ class PostJobDataResponse extends Response {
 	input_record_count: long;
 }
 @namespace("x_pack.machine_learning.preview_datafeed")
-class PreviewDatafeedResponse<T> extends Response {
+class PreviewDatafeedResponse<T> extends ResponseBase {
 	data: T[];
 }
 @namespace("x_pack.machine_learning.put_datafeed")
-class PutDatafeedResponse extends Response {
+class PutDatafeedResponse extends ResponseBase {
 	datafeed_id: string;
 	aggregations: Map<string, AggregationContainer>;
 	chunking_config: ChunkingConfig;
@@ -5809,7 +5811,7 @@ class PutDatafeedResponse extends Response {
 	types: Types;
 }
 @namespace("x_pack.machine_learning.put_job")
-class PutJobResponse extends Response {
+class PutJobResponse extends ResponseBase {
 	job_id: string;
 	job_type: string;
 	description: string;
@@ -5827,15 +5829,15 @@ class PutJobResponse extends Response {
 	results_retention_days: long;
 }
 @namespace("x_pack.machine_learning.start_datafeed")
-class StartDatafeedResponse extends Response {
+class StartDatafeedResponse extends ResponseBase {
 	started: boolean;
 }
 @namespace("x_pack.machine_learning.stop_datafeed")
-class StopDatafeedResponse extends Response {
+class StopDatafeedResponse extends ResponseBase {
 	stopped: boolean;
 }
 @namespace("x_pack.machine_learning.update_data_feed")
-class UpdateDatafeedResponse extends Response {
+class UpdateDatafeedResponse extends ResponseBase {
 	datafeed_id: string;
 	aggregations: Map<string, AggregationContainer>;
 	chunking_config: ChunkingConfig;
@@ -5851,10 +5853,10 @@ class UpdateDatafeedResponse extends Response {
 	types: Types;
 }
 @namespace("x_pack.machine_learning.update_job")
-class UpdateJobResponse extends Response {
+class UpdateJobResponse extends ResponseBase {
 }
 @namespace("x_pack.security.authenticate")
-class AuthenticateResponse extends Response {
+class AuthenticateResponse extends ResponseBase {
 	username: string;
 	roles: string[];
 	full_name: string;
@@ -5862,85 +5864,85 @@ class AuthenticateResponse extends Response {
 	metadata: Map<string, any>;
 }
 @namespace("x_pack.security.clear_cached_realms")
-class ClearCachedRealmsResponse extends Response {
+class ClearCachedRealmsResponse extends ResponseBase {
 	cluster_name: string;
 	nodes: Map<string, SecurityNode>;
 }
 @namespace("x_pack.security.role_mapping.delete_role_mapping")
-class DeleteRoleMappingResponse extends Response {
+class DeleteRoleMappingResponse extends ResponseBase {
 	found: boolean;
 }
 @namespace("x_pack.security.role_mapping.put_role_mapping")
-class PutRoleMappingResponse extends Response {
+class PutRoleMappingResponse extends ResponseBase {
 	role_mapping: PutRoleMappingStatus;
 	created: boolean;
 }
 @namespace("x_pack.security.role.clear_cached_roles")
-class ClearCachedRolesResponse extends Response {
+class ClearCachedRolesResponse extends ResponseBase {
 	cluster_name: string;
 	nodes: Map<string, SecurityNode>;
 }
 @namespace("x_pack.security.role.delete_role")
-class DeleteRoleResponse extends Response {
+class DeleteRoleResponse extends ResponseBase {
 	found: boolean;
 }
 @namespace("x_pack.security.role.put_role")
-class PutRoleResponse extends Response {
+class PutRoleResponse extends ResponseBase {
 	role: PutRoleStatus;
 }
 @namespace("x_pack.security.user.change_password")
-class ChangePasswordResponse extends Response {
+class ChangePasswordResponse extends ResponseBase {
 }
 @namespace("x_pack.security.user.delete_user")
-class DeleteUserResponse extends Response {
+class DeleteUserResponse extends ResponseBase {
 	found: boolean;
 }
 @namespace("x_pack.security.user.disable_user")
-class DisableUserResponse extends Response {
+class DisableUserResponse extends ResponseBase {
 }
 @namespace("x_pack.security.user.enable_user")
-class EnableUserResponse extends Response {
+class EnableUserResponse extends ResponseBase {
 }
 @namespace("x_pack.security.user.get_user_access_token")
-class GetUserAccessTokenResponse extends Response {
+class GetUserAccessTokenResponse extends ResponseBase {
 	access_token: string;
 	type: string;
 	expires_in: long;
 	scope: string;
 }
 @namespace("x_pack.security.user.invalidate_user_access_token")
-class InvalidateUserAccessTokenResponse extends Response {
+class InvalidateUserAccessTokenResponse extends ResponseBase {
 	created: boolean;
 }
 @namespace("x_pack.security.user.put_user")
-class PutUserResponse extends Response {
+class PutUserResponse extends ResponseBase {
 	user: PutUserStatus;
 }
 @namespace("x_pack.watcher.acknowledge_watch")
-class AcknowledgeWatchResponse extends Response {
+class AcknowledgeWatchResponse extends ResponseBase {
 	status: WatchStatus;
 }
 @namespace("x_pack.watcher.activate_watch")
-class ActivateWatchResponse extends Response {
+class ActivateWatchResponse extends ResponseBase {
 	status: ActivationStatus;
 }
 @namespace("x_pack.watcher.deactivate_watch")
-class DeactivateWatchResponse extends Response {
+class DeactivateWatchResponse extends ResponseBase {
 	status: ActivationStatus;
 }
 @namespace("x_pack.watcher.delete_watch")
-class DeleteWatchResponse extends Response {
+class DeleteWatchResponse extends ResponseBase {
 	_id: string;
 	_version: integer;
 	found: boolean;
 }
 @namespace("x_pack.watcher.execute_watch")
-class ExecuteWatchResponse extends Response {
+class ExecuteWatchResponse extends ResponseBase {
 	_id: string;
 	watch_record: WatchRecord;
 }
 @namespace("x_pack.watcher.get_watch")
-class GetWatchResponse extends Response {
+class GetWatchResponse extends ResponseBase {
 	found: boolean;
 	_id: string;
 	status: WatchStatus;
@@ -5953,13 +5955,13 @@ class Interval extends ScheduleBase {
 	unit: IntervalUnit;
 }
 @namespace("x_pack.watcher.put_watch")
-class PutWatchResponse extends Response {
+class PutWatchResponse extends ResponseBase {
 	_id: string;
 	_version: integer;
 	created: boolean;
 }
 @namespace("x_pack.watcher.watcher_stats")
-class WatcherStatsResponse extends Response {
+class WatcherStatsResponse extends ResponseBase {
 	stats: WatcherNodeStats[];
 	manually_stopped: boolean;
 	cluster_name: string;
@@ -5971,7 +5973,7 @@ class DictionaryDecompounderTokenFilter extends CompoundWordTokenFilterBase {
 class HyphenationDecompounderTokenFilter extends CompoundWordTokenFilterBase {
 }
 @namespace("cat.cat_aliases")
-class CatAliasesRequest extends Request {
+class CatAliasesRequest extends RequestBase {
 	@request_parameter()
 	format: string;
 	@request_parameter()
@@ -5988,7 +5990,7 @@ class CatAliasesRequest extends Request {
 	verbose: boolean;
 }
 @namespace("cat.cat_allocation")
-class CatAllocationRequest extends Request {
+class CatAllocationRequest extends RequestBase {
 	@request_parameter()
 	format: string;
 	@request_parameter()
@@ -6007,7 +6009,7 @@ class CatAllocationRequest extends Request {
 	verbose: boolean;
 }
 @namespace("cat.cat_count")
-class CatCountRequest extends Request {
+class CatCountRequest extends RequestBase {
 	@request_parameter()
 	format: string;
 	@request_parameter()
@@ -6024,7 +6026,7 @@ class CatCountRequest extends Request {
 	verbose: boolean;
 }
 @namespace("cat.cat_fielddata")
-class CatFielddataRequest extends Request {
+class CatFielddataRequest extends RequestBase {
 	@request_parameter()
 	format: string;
 	@request_parameter()
@@ -6043,7 +6045,7 @@ class CatFielddataRequest extends Request {
 	verbose: boolean;
 }
 @namespace("cat.cat_health")
-class CatHealthRequest extends Request {
+class CatHealthRequest extends RequestBase {
 	@request_parameter()
 	format: string;
 	@request_parameter()
@@ -6062,14 +6064,14 @@ class CatHealthRequest extends Request {
 	verbose: boolean;
 }
 @namespace("cat.cat_help")
-class CatHelpRequest extends Request {
+class CatHelpRequest extends RequestBase {
 	@request_parameter()
 	help: boolean;
 	@request_parameter()
 	sort_by_columns: string[];
 }
 @namespace("cat.cat_indices")
-class CatIndicesRequest extends Request {
+class CatIndicesRequest extends RequestBase {
 	@request_parameter()
 	format: string;
 	@request_parameter()
@@ -6092,7 +6094,7 @@ class CatIndicesRequest extends Request {
 	verbose: boolean;
 }
 @namespace("cat.cat_master")
-class CatMasterRequest extends Request {
+class CatMasterRequest extends RequestBase {
 	@request_parameter()
 	format: string;
 	@request_parameter()
@@ -6109,7 +6111,7 @@ class CatMasterRequest extends Request {
 	verbose: boolean;
 }
 @namespace("cat.cat_node_attributes")
-class CatNodeAttributesRequest extends Request {
+class CatNodeAttributesRequest extends RequestBase {
 	@request_parameter()
 	format: string;
 	@request_parameter()
@@ -6126,7 +6128,7 @@ class CatNodeAttributesRequest extends Request {
 	verbose: boolean;
 }
 @namespace("cat.cat_nodes")
-class CatNodesRequest extends Request {
+class CatNodesRequest extends RequestBase {
 	@request_parameter()
 	format: string;
 	@request_parameter()
@@ -6145,7 +6147,7 @@ class CatNodesRequest extends Request {
 	verbose: boolean;
 }
 @namespace("cat.cat_pending_tasks")
-class CatPendingTasksRequest extends Request {
+class CatPendingTasksRequest extends RequestBase {
 	@request_parameter()
 	format: string;
 	@request_parameter()
@@ -6162,7 +6164,7 @@ class CatPendingTasksRequest extends Request {
 	verbose: boolean;
 }
 @namespace("cat.cat_plugins")
-class CatPluginsRequest extends Request {
+class CatPluginsRequest extends RequestBase {
 	@request_parameter()
 	format: string;
 	@request_parameter()
@@ -6179,7 +6181,7 @@ class CatPluginsRequest extends Request {
 	verbose: boolean;
 }
 @namespace("cat.cat_recovery")
-class CatRecoveryRequest extends Request {
+class CatRecoveryRequest extends RequestBase {
 	@request_parameter()
 	format: string;
 	@request_parameter()
@@ -6196,7 +6198,7 @@ class CatRecoveryRequest extends Request {
 	verbose: boolean;
 }
 @namespace("cat.cat_repositories")
-class CatRepositoriesRequest extends Request {
+class CatRepositoriesRequest extends RequestBase {
 	@request_parameter()
 	format: string;
 	@request_parameter()
@@ -6213,7 +6215,7 @@ class CatRepositoriesRequest extends Request {
 	verbose: boolean;
 }
 @namespace("cat.cat_segments")
-class CatSegmentsRequest extends Request {
+class CatSegmentsRequest extends RequestBase {
 	@request_parameter()
 	format: string;
 	@request_parameter()
@@ -6228,7 +6230,7 @@ class CatSegmentsRequest extends Request {
 	verbose: boolean;
 }
 @namespace("cat.cat_shards")
-class CatShardsRequest extends Request {
+class CatShardsRequest extends RequestBase {
 	@request_parameter()
 	format: string;
 	@request_parameter()
@@ -6247,7 +6249,7 @@ class CatShardsRequest extends Request {
 	verbose: boolean;
 }
 @namespace("cat.cat_snapshots")
-class CatSnapshotsRequest extends Request {
+class CatSnapshotsRequest extends RequestBase {
 	@request_parameter()
 	format: string;
 	@request_parameter()
@@ -6264,7 +6266,7 @@ class CatSnapshotsRequest extends Request {
 	verbose: boolean;
 }
 @namespace("cat.cat_tasks")
-class CatTasksRequest extends Request {
+class CatTasksRequest extends RequestBase {
 	@request_parameter()
 	format: string;
 	@request_parameter()
@@ -6287,7 +6289,7 @@ class CatTasksRequest extends Request {
 	verbose: boolean;
 }
 @namespace("cat.cat_templates")
-class CatTemplatesRequest extends Request {
+class CatTemplatesRequest extends RequestBase {
 	@request_parameter()
 	format: string;
 	@request_parameter()
@@ -6304,7 +6306,7 @@ class CatTemplatesRequest extends Request {
 	verbose: boolean;
 }
 @namespace("cat.cat_thread_pool")
-class CatThreadPoolRequest extends Request {
+class CatThreadPoolRequest extends RequestBase {
 	@request_parameter()
 	format: string;
 	@request_parameter()
@@ -6323,7 +6325,7 @@ class CatThreadPoolRequest extends Request {
 	verbose: boolean;
 }
 @namespace("cluster.cluster_allocation_explain")
-class ClusterAllocationExplainRequest extends Request {
+class ClusterAllocationExplainRequest extends RequestBase {
 	index: IndexName;
 	shard: integer;
 	primary: boolean;
@@ -6333,7 +6335,7 @@ class ClusterAllocationExplainRequest extends Request {
 	include_disk_info: boolean;
 }
 @namespace("cluster.cluster_health")
-class ClusterHealthRequest extends Request {
+class ClusterHealthRequest extends RequestBase {
 	@request_parameter()
 	level: Level;
 	@request_parameter()
@@ -6354,14 +6356,14 @@ class ClusterHealthRequest extends Request {
 	wait_for_status: WaitForStatus;
 }
 @namespace("cluster.cluster_pending_tasks")
-class ClusterPendingTasksRequest extends Request {
+class ClusterPendingTasksRequest extends RequestBase {
 	@request_parameter()
 	local: boolean;
 	@request_parameter()
 	master_timeout: Time;
 }
 @namespace("cluster.cluster_reroute")
-class ClusterRerouteRequest extends Request {
+class ClusterRerouteRequest extends RequestBase {
 	commands: ClusterRerouteCommand[];
 	@request_parameter()
 	dry_run: boolean;
@@ -6377,7 +6379,7 @@ class ClusterRerouteRequest extends Request {
 	timeout: Time;
 }
 @namespace("cluster.cluster_settings.cluster_get_settings")
-class ClusterGetSettingsRequest extends Request {
+class ClusterGetSettingsRequest extends RequestBase {
 	@request_parameter()
 	flat_settings: boolean;
 	@request_parameter()
@@ -6388,7 +6390,7 @@ class ClusterGetSettingsRequest extends Request {
 	include_defaults: boolean;
 }
 @namespace("cluster.cluster_settings.cluster_put_settings")
-class ClusterPutSettingsRequest extends Request {
+class ClusterPutSettingsRequest extends RequestBase {
 	persistent: Map<string, any>;
 	transient: Map<string, any>;
 	@request_parameter()
@@ -6399,7 +6401,7 @@ class ClusterPutSettingsRequest extends Request {
 	timeout: Time;
 }
 @namespace("cluster.cluster_state")
-class ClusterStateRequest extends Request {
+class ClusterStateRequest extends RequestBase {
 	@request_parameter()
 	local: boolean;
 	@request_parameter()
@@ -6414,14 +6416,14 @@ class ClusterStateRequest extends Request {
 	expand_wildcards: ExpandWildcards;
 }
 @namespace("cluster.cluster_stats")
-class ClusterStatsRequest extends Request {
+class ClusterStatsRequest extends RequestBase {
 	@request_parameter()
 	flat_settings: boolean;
 	@request_parameter()
 	timeout: Time;
 }
 @namespace("cluster.nodes_hot_threads")
-class NodesHotThreadsRequest extends Request {
+class NodesHotThreadsRequest extends RequestBase {
 	@request_parameter()
 	interval: Time;
 	@request_parameter()
@@ -6436,14 +6438,14 @@ class NodesHotThreadsRequest extends Request {
 	timeout: Time;
 }
 @namespace("cluster.nodes_info")
-class NodesInfoRequest extends Request {
+class NodesInfoRequest extends RequestBase {
 	@request_parameter()
 	flat_settings: boolean;
 	@request_parameter()
 	timeout: Time;
 }
 @namespace("cluster.nodes_stats")
-class NodesStatsRequest extends Request {
+class NodesStatsRequest extends RequestBase {
 	@request_parameter()
 	completion_fields: Field[];
 	@request_parameter()
@@ -6462,21 +6464,21 @@ class NodesStatsRequest extends Request {
 	include_segment_file_sizes: boolean;
 }
 @namespace("cluster.nodes_usage")
-class NodesUsageRequest extends Request {
+class NodesUsageRequest extends RequestBase {
 	@request_parameter()
 	timeout: Time;
 }
 @namespace("cluster.ping")
-class PingRequest extends Request {
+class PingRequest extends RequestBase {
 }
 @namespace("cluster.remote_info")
-class RemoteInfoRequest extends Request {
+class RemoteInfoRequest extends RequestBase {
 }
 @namespace("cluster.root_node_info")
-class RootNodeInfoRequest extends Request {
+class RootNodeInfoRequest extends RequestBase {
 }
 @namespace("cluster.task_management.cancel_tasks")
-class CancelTasksRequest extends Request {
+class CancelTasksRequest extends RequestBase {
 	@request_parameter()
 	nodes: string[];
 	@request_parameter()
@@ -6487,12 +6489,12 @@ class CancelTasksRequest extends Request {
 	parent_task_id: string;
 }
 @namespace("cluster.task_management.get_task")
-class GetTaskRequest extends Request {
+class GetTaskRequest extends RequestBase {
 	@request_parameter()
 	wait_for_completion: boolean;
 }
 @namespace("cluster.task_management.list_tasks")
-class ListTasksRequest extends Request {
+class ListTasksRequest extends RequestBase {
 	@request_parameter()
 	nodes: string[];
 	@request_parameter()
@@ -6510,7 +6512,7 @@ class ListTasksRequest extends Request {
 }
 @namespace("document.multiple.bulk")
 @class_serializer("BulkRequestJsonConverter")
-class BulkRequest extends Request {
+class BulkRequest extends RequestBase {
 	operations: BulkOperation[];
 	@request_parameter()
 	wait_for_active_shards: string;
@@ -6532,7 +6534,7 @@ class BulkRequest extends Request {
 	pipeline: string;
 }
 @namespace("document.multiple.delete_by_query")
-class DeleteByQueryRequest extends Request {
+class DeleteByQueryRequest extends RequestBase {
 	query: QueryContainer;
 	slice: SlicedScroll;
 	@request_parameter()
@@ -6602,7 +6604,7 @@ class DeleteByQueryRequest extends Request {
 }
 @namespace("document.multiple.multi_get.request")
 @class_serializer("MultiGetRequestJsonConverter")
-class MultiGetRequest extends Request {
+class MultiGetRequest extends RequestBase {
 	@request_parameter()
 	stored_fields: Field[];
 	docs: MultiGetOperation[];
@@ -6622,7 +6624,7 @@ class MultiGetRequest extends Request {
 	source_include: Field[];
 }
 @namespace("document.multiple.multi_term_vectors")
-class MultiTermVectorsRequest extends Request {
+class MultiTermVectorsRequest extends RequestBase {
 	docs: MultiTermVectorOperation[];
 	@request_parameter()
 	term_statistics: boolean;
@@ -6650,7 +6652,7 @@ class MultiTermVectorsRequest extends Request {
 	version_type: VersionType;
 }
 @namespace("document.multiple.reindex_on_server")
-class ReindexOnServerRequest extends Request {
+class ReindexOnServerRequest extends RequestBase {
 	source: ReindexSource;
 	dest: ReindexDestination;
 	script: Script;
@@ -6670,12 +6672,12 @@ class ReindexOnServerRequest extends Request {
 	slices: long;
 }
 @namespace("document.multiple.reindex_rethrottle")
-class ReindexRethrottleRequest extends Request {
+class ReindexRethrottleRequest extends RequestBase {
 	@request_parameter()
 	requests_per_second: long;
 }
 @namespace("document.multiple.update_by_query")
-class UpdateByQueryRequest extends Request {
+class UpdateByQueryRequest extends RequestBase {
 	query: QueryContainer;
 	script: Script;
 	@request_parameter()
@@ -6748,7 +6750,7 @@ class UpdateByQueryRequest extends Request {
 	slices: long;
 }
 @namespace("document.single.delete")
-class DeleteRequest extends Request {
+class DeleteRequest extends RequestBase {
 	@request_parameter()
 	wait_for_active_shards: string;
 	@request_parameter()
@@ -6765,7 +6767,7 @@ class DeleteRequest extends Request {
 	version_type: VersionType;
 }
 @namespace("document.single.exists")
-class DocumentExistsRequest extends Request {
+class DocumentExistsRequest extends RequestBase {
 	@request_parameter()
 	stored_fields: Field[];
 	@request_parameter()
@@ -6790,7 +6792,7 @@ class DocumentExistsRequest extends Request {
 	version_type: VersionType;
 }
 @namespace("document.single.get")
-class GetRequest extends Request {
+class GetRequest extends RequestBase {
 	@request_parameter()
 	stored_fields: Field[];
 	@request_parameter()
@@ -6815,7 +6817,7 @@ class GetRequest extends Request {
 	version_type: VersionType;
 }
 @namespace("document.single.source_exists")
-class SourceExistsRequest extends Request {
+class SourceExistsRequest extends RequestBase {
 	@request_parameter()
 	parent: string;
 	@request_parameter()
@@ -6838,7 +6840,7 @@ class SourceExistsRequest extends Request {
 	version_type: VersionType;
 }
 @namespace("document.single.source")
-class SourceRequest extends Request {
+class SourceRequest extends RequestBase {
 	@request_parameter()
 	parent: string;
 	@request_parameter()
@@ -6861,7 +6863,7 @@ class SourceRequest extends Request {
 	version_type: VersionType;
 }
 @namespace("document.single.term_vectors")
-class TermVectorsRequest<TDocument> extends Request {
+class TermVectorsRequest<TDocument> extends RequestBase {
 	@prop_serializer("SourceConverter")
 	doc: TDocument;
 	per_field_analyzer: Map<Field, string>;
@@ -6892,7 +6894,7 @@ class TermVectorsRequest<TDocument> extends Request {
 	version_type: VersionType;
 }
 @namespace("document.single.term_vectors")
-class TermVectorsResponse extends Response {
+class TermVectorsResponse extends ResponseBase {
 	_index: string;
 	_type: string;
 	_id: string;
@@ -6903,7 +6905,7 @@ class TermVectorsResponse extends Response {
 	term_vectors: Map<Field, TermVector>;
 }
 @namespace("document.single.update")
-class UpdateRequest<TDocument, TPartialDocument> extends Request {
+class UpdateRequest<TDocument, TPartialDocument> extends RequestBase {
 	script: Script;
 	@prop_serializer("SourceConverter")
 	upsert: TDocument;
@@ -6936,7 +6938,7 @@ class UpdateRequest<TDocument, TPartialDocument> extends Request {
 	version_type: VersionType;
 }
 @namespace("indices.alias_management.alias_exists")
-class AliasExistsRequest extends Request {
+class AliasExistsRequest extends RequestBase {
 	@request_parameter()
 	ignore_unavailable: boolean;
 	@request_parameter()
@@ -6947,7 +6949,7 @@ class AliasExistsRequest extends Request {
 	local: boolean;
 }
 @namespace("indices.alias_management.alias")
-class BulkAliasRequest extends Request {
+class BulkAliasRequest extends RequestBase {
 	actions: AliasAction[];
 	@request_parameter()
 	timeout: Time;
@@ -6955,14 +6957,14 @@ class BulkAliasRequest extends Request {
 	master_timeout: Time;
 }
 @namespace("indices.alias_management.delete_alias")
-class DeleteAliasRequest extends Request {
+class DeleteAliasRequest extends RequestBase {
 	@request_parameter()
 	timeout: Time;
 	@request_parameter()
 	master_timeout: Time;
 }
 @namespace("indices.alias_management.get_alias")
-class GetAliasRequest extends Request {
+class GetAliasRequest extends RequestBase {
 	@request_parameter()
 	ignore_unavailable: boolean;
 	@request_parameter()
@@ -6973,7 +6975,7 @@ class GetAliasRequest extends Request {
 	local: boolean;
 }
 @namespace("indices.alias_management.put_alias")
-class PutAliasRequest extends Request {
+class PutAliasRequest extends RequestBase {
 	routing: Routing;
 	filter: QueryContainer;
 	@request_parameter()
@@ -6982,7 +6984,7 @@ class PutAliasRequest extends Request {
 	master_timeout: Time;
 }
 @namespace("indices.analyze")
-class AnalyzeRequest extends Request {
+class AnalyzeRequest extends RequestBase {
 	tokenizer: Union<string, Tokenizer>;
 	analyzer: string;
 	explain: boolean;
@@ -6998,7 +7000,7 @@ class AnalyzeRequest extends Request {
 	format: Format;
 }
 @namespace("indices.index_management.delete_index")
-class DeleteIndexRequest extends Request {
+class DeleteIndexRequest extends RequestBase {
 	@request_parameter()
 	timeout: Time;
 	@request_parameter()
@@ -7011,7 +7013,7 @@ class DeleteIndexRequest extends Request {
 	expand_wildcards: ExpandWildcards;
 }
 @namespace("indices.index_management.get_index")
-class GetIndexRequest extends Request {
+class GetIndexRequest extends RequestBase {
 	@request_parameter()
 	local: boolean;
 	@request_parameter()
@@ -7026,7 +7028,7 @@ class GetIndexRequest extends Request {
 	include_defaults: boolean;
 }
 @namespace("indices.index_management.indices_exists")
-class IndexExistsRequest extends Request {
+class IndexExistsRequest extends RequestBase {
 	@request_parameter()
 	local: boolean;
 	@request_parameter()
@@ -7041,7 +7043,7 @@ class IndexExistsRequest extends Request {
 	include_defaults: boolean;
 }
 @namespace("indices.index_management.open_close_index.close_index")
-class CloseIndexRequest extends Request {
+class CloseIndexRequest extends RequestBase {
 	@request_parameter()
 	timeout: Time;
 	@request_parameter()
@@ -7054,7 +7056,7 @@ class CloseIndexRequest extends Request {
 	expand_wildcards: ExpandWildcards;
 }
 @namespace("indices.index_management.open_close_index.open_index")
-class OpenIndexRequest extends Request {
+class OpenIndexRequest extends RequestBase {
 	@request_parameter()
 	timeout: Time;
 	@request_parameter()
@@ -7067,7 +7069,7 @@ class OpenIndexRequest extends Request {
 	expand_wildcards: ExpandWildcards;
 }
 @namespace("indices.index_management.shrink_index")
-class ShrinkIndexRequest extends Request {
+class ShrinkIndexRequest extends RequestBase {
 	settings: Map<string, any>;
 	aliases: Map<IndexName, Alias>;
 	@request_parameter()
@@ -7078,7 +7080,7 @@ class ShrinkIndexRequest extends Request {
 	wait_for_active_shards: string;
 }
 @namespace("indices.index_management.types_exists")
-class TypeExistsRequest extends Request {
+class TypeExistsRequest extends RequestBase {
 	@request_parameter()
 	ignore_unavailable: boolean;
 	@request_parameter()
@@ -7089,7 +7091,7 @@ class TypeExistsRequest extends Request {
 	local: boolean;
 }
 @namespace("indices.index_settings.get_index_settings")
-class GetIndexSettingsRequest extends Request {
+class GetIndexSettingsRequest extends RequestBase {
 	@request_parameter()
 	ignore_unavailable: boolean;
 	@request_parameter()
@@ -7104,14 +7106,14 @@ class GetIndexSettingsRequest extends Request {
 	include_defaults: boolean;
 }
 @namespace("indices.index_settings.index_templates.delete_index_template")
-class DeleteIndexTemplateRequest extends Request {
+class DeleteIndexTemplateRequest extends RequestBase {
 	@request_parameter()
 	timeout: Time;
 	@request_parameter()
 	master_timeout: Time;
 }
 @namespace("indices.index_settings.index_templates.get_index_template")
-class GetIndexTemplateRequest extends Request {
+class GetIndexTemplateRequest extends RequestBase {
 	@request_parameter()
 	flat_settings: boolean;
 	@request_parameter()
@@ -7120,7 +7122,7 @@ class GetIndexTemplateRequest extends Request {
 	local: boolean;
 }
 @namespace("indices.index_settings.index_templates.index_template_exists")
-class IndexTemplateExistsRequest extends Request {
+class IndexTemplateExistsRequest extends RequestBase {
 	@request_parameter()
 	flat_settings: boolean;
 	@request_parameter()
@@ -7129,7 +7131,7 @@ class IndexTemplateExistsRequest extends Request {
 	local: boolean;
 }
 @namespace("indices.mapping_management.get_field_mapping")
-class GetFieldMappingRequest extends Request {
+class GetFieldMappingRequest extends RequestBase {
 	@request_parameter()
 	include_defaults: boolean;
 	@request_parameter()
@@ -7142,7 +7144,7 @@ class GetFieldMappingRequest extends Request {
 	local: boolean;
 }
 @namespace("indices.mapping_management.get_mapping")
-class GetMappingRequest extends Request {
+class GetMappingRequest extends RequestBase {
 	@request_parameter()
 	ignore_unavailable: boolean;
 	@request_parameter()
@@ -7153,14 +7155,14 @@ class GetMappingRequest extends Request {
 	local: boolean;
 }
 @namespace("indices.monitoring.indices_recovery")
-class RecoveryStatusRequest extends Request {
+class RecoveryStatusRequest extends RequestBase {
 	@request_parameter()
 	detailed: boolean;
 	@request_parameter()
 	active_only: boolean;
 }
 @namespace("indices.monitoring.indices_segments")
-class SegmentsRequest extends Request {
+class SegmentsRequest extends RequestBase {
 	@request_parameter()
 	ignore_unavailable: boolean;
 	@request_parameter()
@@ -7173,7 +7175,7 @@ class SegmentsRequest extends Request {
 	verbose: boolean;
 }
 @namespace("indices.monitoring.indices_shard_stores")
-class IndicesShardStoresRequest extends Request {
+class IndicesShardStoresRequest extends RequestBase {
 	types: TypeName[];
 	@request_parameter()
 	status: string[];
@@ -7187,7 +7189,7 @@ class IndicesShardStoresRequest extends Request {
 	operation_threading: string;
 }
 @namespace("indices.monitoring.indices_stats")
-class IndicesStatsRequest extends Request {
+class IndicesStatsRequest extends RequestBase {
 	types: TypeName[];
 	@request_parameter()
 	completion_fields: Field[];
@@ -7203,7 +7205,7 @@ class IndicesStatsRequest extends Request {
 	include_segment_file_sizes: boolean;
 }
 @namespace("indices.status_management.clear_cache")
-class ClearCacheRequest extends Request {
+class ClearCacheRequest extends RequestBase {
 	@request_parameter()
 	fielddata: boolean;
 	@request_parameter()
@@ -7224,7 +7226,7 @@ class ClearCacheRequest extends Request {
 	request: boolean;
 }
 @namespace("indices.status_management.flush")
-class FlushRequest extends Request {
+class FlushRequest extends RequestBase {
 	@request_parameter()
 	force: boolean;
 	@request_parameter()
@@ -7237,7 +7239,7 @@ class FlushRequest extends Request {
 	expand_wildcards: ExpandWildcards;
 }
 @namespace("indices.status_management.force_merge")
-class ForceMergeRequest extends Request {
+class ForceMergeRequest extends RequestBase {
 	@request_parameter()
 	flush: boolean;
 	@request_parameter()
@@ -7256,7 +7258,7 @@ class ForceMergeRequest extends Request {
 	wait_for_merge: boolean;
 }
 @namespace("indices.status_management.refresh")
-class RefreshRequest extends Request {
+class RefreshRequest extends RequestBase {
 	@request_parameter()
 	ignore_unavailable: boolean;
 	@request_parameter()
@@ -7265,7 +7267,7 @@ class RefreshRequest extends Request {
 	expand_wildcards: ExpandWildcards;
 }
 @namespace("indices.status_management.synced_flush")
-class SyncedFlushRequest extends Request {
+class SyncedFlushRequest extends RequestBase {
 	@request_parameter()
 	ignore_unavailable: boolean;
 	@request_parameter()
@@ -7274,7 +7276,7 @@ class SyncedFlushRequest extends Request {
 	expand_wildcards: ExpandWildcards;
 }
 @namespace("indices.status_management.upgrade")
-class UpgradeRequest extends Request {
+class UpgradeRequest extends RequestBase {
 	@request_parameter()
 	allow_no_indices: boolean;
 	@request_parameter()
@@ -7287,7 +7289,7 @@ class UpgradeRequest extends Request {
 	only_ancient_segments: boolean;
 }
 @namespace("indices.status_management.upgrade.upgrade_status")
-class UpgradeStatusRequest extends Request {
+class UpgradeStatusRequest extends RequestBase {
 	@request_parameter()
 	ignore_unavailable: boolean;
 	@request_parameter()
@@ -7296,22 +7298,22 @@ class UpgradeStatusRequest extends Request {
 	expand_wildcards: ExpandWildcards;
 }
 @namespace("ingest.delete_pipeline")
-class DeletePipelineRequest extends Request {
+class DeletePipelineRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
 	@request_parameter()
 	timeout: Time;
 }
 @namespace("ingest.get_pipeline")
-class GetPipelineRequest extends Request {
+class GetPipelineRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
 }
 @namespace("ingest.processor")
-class GrokProcessorPatternsRequest extends Request {
+class GrokProcessorPatternsRequest extends RequestBase {
 }
 @namespace("ingest.simulate_pipeline")
-class SimulatePipelineRequest extends Request {
+class SimulatePipelineRequest extends RequestBase {
 	pipeline: Pipeline;
 	docs: SimulatePipelineDocument[];
 	@request_parameter()
@@ -7332,17 +7334,17 @@ class JoinProperty extends PropertyBase {
 class PercolatorProperty extends PropertyBase {
 }
 @namespace("modules.scripting.delete_script")
-class DeleteScriptRequest extends Request {
+class DeleteScriptRequest extends RequestBase {
 	@request_parameter()
 	timeout: Time;
 	@request_parameter()
 	master_timeout: Time;
 }
 @namespace("modules.scripting.get_script")
-class GetScriptRequest extends Request {
+class GetScriptRequest extends RequestBase {
 }
 @namespace("modules.scripting.put_script")
-class PutScriptRequest extends Request {
+class PutScriptRequest extends RequestBase {
 	script: StoredScript;
 	@request_parameter()
 	timeout: Time;
@@ -7351,7 +7353,7 @@ class PutScriptRequest extends Request {
 }
 @namespace("modules.snapshot_and_restore.repositories.create_repository")
 @class_serializer("CreateRepositoryJsonConverter")
-class CreateRepositoryRequest extends Request {
+class CreateRepositoryRequest extends RequestBase {
 	repository: SnapshotRepository;
 	@request_parameter()
 	master_timeout: Time;
@@ -7361,28 +7363,28 @@ class CreateRepositoryRequest extends Request {
 	verify: boolean;
 }
 @namespace("modules.snapshot_and_restore.repositories.delete_repository")
-class DeleteRepositoryRequest extends Request {
+class DeleteRepositoryRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
 	@request_parameter()
 	timeout: Time;
 }
 @namespace("modules.snapshot_and_restore.repositories.get_repository")
-class GetRepositoryRequest extends Request {
+class GetRepositoryRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
 	@request_parameter()
 	local: boolean;
 }
 @namespace("modules.snapshot_and_restore.repositories.verify_repository")
-class VerifyRepositoryRequest extends Request {
+class VerifyRepositoryRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
 	@request_parameter()
 	timeout: Time;
 }
 @namespace("modules.snapshot_and_restore.restore")
-class RestoreRequest extends Request {
+class RestoreRequest extends RequestBase {
 	indices: Indices;
 	ignore_unavailable: boolean;
 	include_global_state: boolean;
@@ -7396,12 +7398,12 @@ class RestoreRequest extends Request {
 	wait_for_completion: boolean;
 }
 @namespace("modules.snapshot_and_restore.snapshot.delete_snapshot")
-class DeleteSnapshotRequest extends Request {
+class DeleteSnapshotRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
 }
 @namespace("modules.snapshot_and_restore.snapshot.get_sapshot")
-class GetSnapshotRequest extends Request {
+class GetSnapshotRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
 	@request_parameter()
@@ -7410,14 +7412,14 @@ class GetSnapshotRequest extends Request {
 	verbose: boolean;
 }
 @namespace("modules.snapshot_and_restore.snapshot.snapshot_status")
-class SnapshotStatusRequest extends Request {
+class SnapshotStatusRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
 	@request_parameter()
 	ignore_unavailable: boolean;
 }
 @namespace("modules.snapshot_and_restore.snapshot.snapshot")
-class SnapshotRequest extends Request {
+class SnapshotRequest extends RequestBase {
 	@prop_serializer("IndicesMultiSyntaxJsonConverter")
 	indices: Indices;
 	ignore_unavailable: boolean;
@@ -7429,7 +7431,7 @@ class SnapshotRequest extends Request {
 	wait_for_completion: boolean;
 }
 @namespace("search.count")
-class CountRequest extends Request {
+class CountRequest extends RequestBase {
 	query: QueryContainer;
 	@request_parameter()
 	ignore_unavailable: boolean;
@@ -7459,7 +7461,7 @@ class CountRequest extends Request {
 	terminate_after: long;
 }
 @namespace("search.explain")
-class ExplainRequest<TDocument> extends Request {
+class ExplainRequest<TDocument> extends RequestBase {
 	@request_parameter()
 	stored_fields: Field[];
 	query: QueryContainer;
@@ -7489,7 +7491,7 @@ class ExplainRequest<TDocument> extends Request {
 	source_include: Field[];
 }
 @namespace("search.field_capabilities")
-class FieldCapabilitiesRequest extends Request {
+class FieldCapabilitiesRequest extends RequestBase {
 	@request_parameter()
 	fields: Field[];
 	@request_parameter()
@@ -7501,7 +7503,7 @@ class FieldCapabilitiesRequest extends Request {
 }
 @namespace("search.multi_search_template")
 @class_serializer("MultiSearchTemplateJsonConverter")
-class MultiSearchTemplateRequest extends Request {
+class MultiSearchTemplateRequest extends RequestBase {
 	operations: Map<string, SearchTemplateRequest>;
 	@request_parameter()
 	search_type: SearchType;
@@ -7512,7 +7514,7 @@ class MultiSearchTemplateRequest extends Request {
 }
 @namespace("search.multi_search")
 @class_serializer("MultiSearchJsonConverter")
-class MultiSearchRequest extends Request {
+class MultiSearchRequest extends RequestBase {
 	operations: Map<string, SearchRequest>;
 	@request_parameter()
 	search_type: SearchType;
@@ -7524,11 +7526,11 @@ class MultiSearchRequest extends Request {
 	pre_filter_shard_size: long;
 }
 @namespace("search.scroll.clear_scroll")
-class ClearScrollRequest extends Request {
+class ClearScrollRequest extends RequestBase {
 	scroll_id: string[];
 }
 @namespace("search.search_shards")
-class SearchShardsRequest extends Request {
+class SearchShardsRequest extends RequestBase {
 	@request_parameter()
 	preference: string;
 	@request_parameter()
@@ -7543,14 +7545,14 @@ class SearchShardsRequest extends Request {
 	expand_wildcards: ExpandWildcards;
 }
 @namespace("search.search_template.render_search_template")
-class RenderSearchTemplateRequest extends Request {
+class RenderSearchTemplateRequest extends RequestBase {
 	source: string;
 	inline: string;
 	file: string;
 	params: Map<string, any>;
 }
 @namespace("search.validate")
-class ValidateQueryRequest extends Request {
+class ValidateQueryRequest extends RequestBase {
 	query: QueryContainer;
 	@request_parameter()
 	explain: boolean;
@@ -7580,57 +7582,57 @@ class ValidateQueryRequest extends Request {
 	all_shards: boolean;
 }
 @namespace("x_pack.migration.deprecation_info")
-class DeprecationInfoRequest extends Request {
+class DeprecationInfoRequest extends RequestBase {
 }
 @namespace("x_pack.info.x_pack_info")
-class XPackInfoRequest extends Request {
+class XPackInfoRequest extends RequestBase {
 	@request_parameter()
 	categories: string[];
 }
 @namespace("x_pack.info.x_pack_usage")
-class XPackUsageRequest extends Request {
+class XPackUsageRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
 }
 @namespace("x_pack.license.delete_license")
-class DeleteLicenseRequest extends Request {
+class DeleteLicenseRequest extends RequestBase {
 }
 @namespace("x_pack.license.get_license")
-class GetLicenseRequest extends Request {
+class GetLicenseRequest extends RequestBase {
 	@request_parameter()
 	local: boolean;
 }
 @namespace("x_pack.license.post_license")
-class PostLicenseRequest extends Request {
+class PostLicenseRequest extends RequestBase {
 	license: License;
 	@request_parameter()
 	acknowledge: boolean;
 }
 @namespace("x_pack.machine_learning.close_job")
-class CloseJobRequest extends Request {
+class CloseJobRequest extends RequestBase {
 	@request_parameter()
 	force: boolean;
 	@request_parameter()
 	timeout: Time;
 }
 @namespace("x_pack.machine_learning.delete_datafeed")
-class DeleteDatafeedRequest extends Request {
+class DeleteDatafeedRequest extends RequestBase {
 	@request_parameter()
 	force: boolean;
 }
 @namespace("x_pack.machine_learning.delete_expired_data")
-class DeleteExpiredDataRequest extends Request {
+class DeleteExpiredDataRequest extends RequestBase {
 }
 @namespace("x_pack.machine_learning.delete_job")
-class DeleteJobRequest extends Request {
+class DeleteJobRequest extends RequestBase {
 	@request_parameter()
 	force: boolean;
 }
 @namespace("x_pack.machine_learning.delete_model_snapshot")
-class DeleteModelSnapshotRequest extends Request {
+class DeleteModelSnapshotRequest extends RequestBase {
 }
 @namespace("x_pack.machine_learning.flush_job")
-class FlushJobRequest extends Request {
+class FlushJobRequest extends RequestBase {
 	@prop_serializer("IsoDateTimeConverter")
 	advance_time: Date;
 	calc_interim: boolean;
@@ -7642,7 +7644,7 @@ class FlushJobRequest extends Request {
 	skip_time: string;
 }
 @namespace("x_pack.machine_learning.get_anomaly_records")
-class GetAnomalyRecordsRequest extends Request {
+class GetAnomalyRecordsRequest extends RequestBase {
 	desc: boolean;
 	exclude_interim: boolean;
 	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
@@ -7654,7 +7656,7 @@ class GetAnomalyRecordsRequest extends Request {
 	start: Date;
 }
 @namespace("x_pack.machine_learning.get_buckets")
-class GetBucketsRequest extends Request {
+class GetBucketsRequest extends RequestBase {
 	anomaly_score: double;
 	desc: boolean;
 	@prop_serializer("IsoDateTimeConverter")
@@ -7669,17 +7671,17 @@ class GetBucketsRequest extends Request {
 	timestamp: Date;
 }
 @namespace("x_pack.machine_learning.get_categories")
-class GetCategoriesRequest extends Request {
+class GetCategoriesRequest extends RequestBase {
 	page: Page;
 }
 @namespace("x_pack.machine_learning.get_datafeed_stats")
-class GetDatafeedStatsRequest extends Request {
+class GetDatafeedStatsRequest extends RequestBase {
 }
 @namespace("x_pack.machine_learning.get_datafeeds")
-class GetDatafeedsRequest extends Request {
+class GetDatafeedsRequest extends RequestBase {
 }
 @namespace("x_pack.machine_learning.get_influencers")
-class GetInfluencersRequest extends Request {
+class GetInfluencersRequest extends RequestBase {
 	descending: boolean;
 	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	end: Date;
@@ -7691,13 +7693,13 @@ class GetInfluencersRequest extends Request {
 	start: Date;
 }
 @namespace("x_pack.machine_learning.get_job_stats")
-class GetJobStatsRequest extends Request {
+class GetJobStatsRequest extends RequestBase {
 }
 @namespace("x_pack.machine_learning.get_jobs")
-class GetJobsRequest extends Request {
+class GetJobsRequest extends RequestBase {
 }
 @namespace("x_pack.machine_learning.get_model_snapshots")
-class GetModelSnapshotsRequest extends Request {
+class GetModelSnapshotsRequest extends RequestBase {
 	desc: boolean;
 	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	end: Date;
@@ -7707,12 +7709,12 @@ class GetModelSnapshotsRequest extends Request {
 	start: Date;
 }
 @namespace("x_pack.machine_learning.open_job")
-class OpenJobRequest extends Request {
+class OpenJobRequest extends RequestBase {
 	timeout: Time;
 }
 @namespace("x_pack.machine_learning.post_job_data")
 @class_serializer("PostJobDataConverter")
-class PostJobDataRequest extends Request {
+class PostJobDataRequest extends RequestBase {
 	data: any[];
 	@request_parameter()
 	reset_start: Date;
@@ -7720,10 +7722,10 @@ class PostJobDataRequest extends Request {
 	reset_end: Date;
 }
 @namespace("x_pack.machine_learning.preview_datafeed")
-class PreviewDatafeedRequest extends Request {
+class PreviewDatafeedRequest extends RequestBase {
 }
 @namespace("x_pack.machine_learning.put_datafeed")
-class PutDatafeedRequest extends Request {
+class PutDatafeedRequest extends RequestBase {
 	aggregations: Map<string, AggregationContainer>;
 	chunking_config: ChunkingConfig;
 	frequency: Time;
@@ -7738,7 +7740,7 @@ class PutDatafeedRequest extends Request {
 	types: Types;
 }
 @namespace("x_pack.machine_learning.put_job")
-class PutJobRequest extends Request {
+class PutJobRequest extends RequestBase {
 	analysis_config: AnalysisConfig;
 	analysis_limits: AnalysisLimits;
 	data_description: DataDescription;
@@ -7748,11 +7750,11 @@ class PutJobRequest extends Request {
 	results_index_name: IndexName;
 }
 @namespace("x_pack.machine_learning.revert_model_snapshot")
-class RevertModelSnapshotRequest extends Request {
+class RevertModelSnapshotRequest extends RequestBase {
 	delete_intervening_results: boolean;
 }
 @namespace("x_pack.machine_learning.start_datafeed")
-class StartDatafeedRequest extends Request {
+class StartDatafeedRequest extends RequestBase {
 	timeout: Time;
 	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	start: Date;
@@ -7760,12 +7762,12 @@ class StartDatafeedRequest extends Request {
 	end: Date;
 }
 @namespace("x_pack.machine_learning.stop_datafeed")
-class StopDatafeedRequest extends Request {
+class StopDatafeedRequest extends RequestBase {
 	timeout: Time;
 	force: boolean;
 }
 @namespace("x_pack.machine_learning.update_data_feed")
-class UpdateDatafeedRequest extends Request {
+class UpdateDatafeedRequest extends RequestBase {
 	aggregations: Map<string, AggregationContainer>;
 	chunking_config: ChunkingConfig;
 	frequency: Time;
@@ -7780,7 +7782,7 @@ class UpdateDatafeedRequest extends Request {
 	types: Types;
 }
 @namespace("x_pack.machine_learning.update_job")
-class UpdateJobRequest extends Request {
+class UpdateJobRequest extends RequestBase {
 	analysis_limits: AnalysisMemoryLimit;
 	background_persist_interval: Time;
 	custom_settings: Map<string, any>;
@@ -7791,17 +7793,17 @@ class UpdateJobRequest extends Request {
 	results_retention_days: long;
 }
 @namespace("x_pack.machine_learning.update_model_snapshot")
-class UpdateModelSnapshotRequest extends Request {
+class UpdateModelSnapshotRequest extends RequestBase {
 	description: string;
 	retain: boolean;
 }
 @namespace("x_pack.machine_learning.validate_detector")
 @class_serializer("ValidateDetectorRequestConverter")
-class ValidateDetectorRequest extends Request {
+class ValidateDetectorRequest extends RequestBase {
 	detector: Detector;
 }
 @namespace("x_pack.machine_learning.validate_job")
-class ValidateJobRequest extends Request {
+class ValidateJobRequest extends RequestBase {
 	analysis_config: AnalysisConfig;
 	analysis_limits: AnalysisLimits;
 	data_description: DataDescription;
@@ -7811,23 +7813,23 @@ class ValidateJobRequest extends Request {
 	results_index_name: IndexName;
 }
 @namespace("x_pack.security.authenticate")
-class AuthenticateRequest extends Request {
+class AuthenticateRequest extends RequestBase {
 }
 @namespace("x_pack.security.clear_cached_realms")
-class ClearCachedRealmsRequest extends Request {
+class ClearCachedRealmsRequest extends RequestBase {
 	@request_parameter()
 	usernames: string[];
 }
 @namespace("x_pack.security.role_mapping.delete_role_mapping")
-class DeleteRoleMappingRequest extends Request {
+class DeleteRoleMappingRequest extends RequestBase {
 	@request_parameter()
 	refresh: Refresh;
 }
 @namespace("x_pack.security.role_mapping.get_role_mapping")
-class GetRoleMappingRequest extends Request {
+class GetRoleMappingRequest extends RequestBase {
 }
 @namespace("x_pack.security.role_mapping.put_role_mapping")
-class PutRoleMappingRequest extends Request {
+class PutRoleMappingRequest extends RequestBase {
 	run_as: string[];
 	metadata: Map<string, any>;
 	enabled: boolean;
@@ -7837,18 +7839,18 @@ class PutRoleMappingRequest extends Request {
 	refresh: Refresh;
 }
 @namespace("x_pack.security.role.clear_cached_roles")
-class ClearCachedRolesRequest extends Request {
+class ClearCachedRolesRequest extends RequestBase {
 }
 @namespace("x_pack.security.role.delete_role")
-class DeleteRoleRequest extends Request {
+class DeleteRoleRequest extends RequestBase {
 	@request_parameter()
 	refresh: Refresh;
 }
 @namespace("x_pack.security.role.get_role")
-class GetRoleRequest extends Request {
+class GetRoleRequest extends RequestBase {
 }
 @namespace("x_pack.security.role.put_role")
-class PutRoleRequest extends Request {
+class PutRoleRequest extends RequestBase {
 	cluster: string[];
 	run_as: string[];
 	indices: IndicesPrivileges[];
@@ -7857,39 +7859,39 @@ class PutRoleRequest extends Request {
 	refresh: Refresh;
 }
 @namespace("x_pack.security.user.change_password")
-class ChangePasswordRequest extends Request {
+class ChangePasswordRequest extends RequestBase {
 	password: string;
 	@request_parameter()
 	refresh: Refresh;
 }
 @namespace("x_pack.security.user.delete_user")
-class DeleteUserRequest extends Request {
+class DeleteUserRequest extends RequestBase {
 	@request_parameter()
 	refresh: Refresh;
 }
 @namespace("x_pack.security.user.disable_user")
-class DisableUserRequest extends Request {
+class DisableUserRequest extends RequestBase {
 	@request_parameter()
 	refresh: Refresh;
 }
 @namespace("x_pack.security.user.enable_user")
-class EnableUserRequest extends Request {
+class EnableUserRequest extends RequestBase {
 	@request_parameter()
 	refresh: Refresh;
 }
 @namespace("x_pack.security.user.get_user_access_token")
-class GetUserAccessTokenRequest extends Request {
+class GetUserAccessTokenRequest extends RequestBase {
 	grant_type: AccessTokenGrantType;
 	scope: string;
 }
 @namespace("x_pack.security.user.get_user")
-class GetUserRequest extends Request {
+class GetUserRequest extends RequestBase {
 }
 @namespace("x_pack.security.user.invalidate_user_access_token")
-class InvalidateUserAccessTokenRequest extends Request {
+class InvalidateUserAccessTokenRequest extends RequestBase {
 }
 @namespace("x_pack.security.user.put_user")
-class PutUserRequest extends Request {
+class PutUserRequest extends RequestBase {
 	password: string;
 	roles: string[];
 	full_name: string;
@@ -7899,27 +7901,27 @@ class PutUserRequest extends Request {
 	refresh: Refresh;
 }
 @namespace("x_pack.watcher.acknowledge_watch")
-class AcknowledgeWatchRequest extends Request {
+class AcknowledgeWatchRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
 }
 @namespace("x_pack.watcher.activate_watch")
-class ActivateWatchRequest extends Request {
+class ActivateWatchRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
 }
 @namespace("x_pack.watcher.deactivate_watch")
-class DeactivateWatchRequest extends Request {
+class DeactivateWatchRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
 }
 @namespace("x_pack.watcher.delete_watch")
-class DeleteWatchRequest extends Request {
+class DeleteWatchRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
 }
 @namespace("x_pack.watcher.execute_watch")
-class ExecuteWatchRequest extends Request {
+class ExecuteWatchRequest extends RequestBase {
 	trigger_data: ScheduleTriggerEvent;
 	ignore_condition: boolean;
 	record_execution: boolean;
@@ -7931,24 +7933,24 @@ class ExecuteWatchRequest extends Request {
 	debug: boolean;
 }
 @namespace("x_pack.watcher.get_watch")
-class GetWatchRequest extends Request {
+class GetWatchRequest extends RequestBase {
 }
 @namespace("x_pack.watcher.restart_watcher")
-class RestartWatcherRequest extends Request {
+class RestartWatcherRequest extends RequestBase {
 }
 @namespace("x_pack.watcher.start_watcher")
-class StartWatcherRequest extends Request {
+class StartWatcherRequest extends RequestBase {
 }
 @namespace("x_pack.watcher.stop_watcher")
-class StopWatcherRequest extends Request {
+class StopWatcherRequest extends RequestBase {
 }
 @namespace("x_pack.watcher.watcher_stats")
-class WatcherStatsRequest extends Request {
+class WatcherStatsRequest extends RequestBase {
 	@request_parameter()
 	emit_stacktraces: boolean;
 }
 @namespace("cluster.cluster_stats")
-class ClusterStatsResponse extends Response {
+class ClusterStatsResponse extends ResponseBase {
 	cluster_name: string;
 	timestamp: long;
 	status: ClusterStatus;
@@ -7956,17 +7958,17 @@ class ClusterStatsResponse extends Response {
 	nodes: ClusterNodesStats;
 }
 @namespace("cluster.nodes_info")
-class NodesInfoResponse extends Response {
+class NodesInfoResponse extends ResponseBase {
 	cluster_name: string;
 	nodes: Map<string, NodeInfo>;
 }
 @namespace("cluster.nodes_stats")
-class NodesStatsResponse extends Response {
+class NodesStatsResponse extends ResponseBase {
 	cluster_name: string;
 	nodes: Map<string, NodeStats>;
 }
 @namespace("cluster.nodes_usage")
-class NodesUsageResponse extends Response {
+class NodesUsageResponse extends ResponseBase {
 	cluster_name: string;
 	nodes: Map<string, NodeUsageInformation>;
 }
@@ -7975,7 +7977,7 @@ class RemoteInfoResponse extends DictionaryResponseBase<string, RemoteInfo> {
 	remotes: Map<string, RemoteInfo>;
 }
 @namespace("document.single.create")
-class CreateRequest<TDocument> extends Request {
+class CreateRequest<TDocument> extends RequestBase {
 	document: TDocument;
 	@request_parameter()
 	wait_for_active_shards: string;
@@ -7995,7 +7997,7 @@ class CreateRequest<TDocument> extends Request {
 	pipeline: string;
 }
 @namespace("document.single.index")
-class IndexRequest<TDocument> extends Request {
+class IndexRequest<TDocument> extends RequestBase {
 	document: TDocument;
 	@request_parameter()
 	wait_for_active_shards: string;
@@ -8025,7 +8027,7 @@ class GetAliasResponse extends DictionaryResponseBase<IndexName, IndexAliases> {
 	is_valid: boolean;
 }
 @namespace("indices.index_management.create_index")
-class CreateIndexRequest extends Request {
+class CreateIndexRequest extends RequestBase {
 	settings: Map<string, any>;
 	mappings: Map<TypeName, TypeMapping>;
 	aliases: Map<IndexName, Alias>;
@@ -8056,7 +8058,7 @@ class CloseIndexResponse extends AcknowledgedResponseBase {
 class OpenIndexResponse extends AcknowledgedResponseBase {
 }
 @namespace("indices.index_management.rollover_index")
-class RolloverIndexRequest extends Request {
+class RolloverIndexRequest extends RequestBase {
 	conditions: RolloverConditions;
 	settings: Map<string, any>;
 	aliases: Map<IndexName, Alias>;
@@ -8095,7 +8097,7 @@ class GetIndexTemplateResponse extends DictionaryResponseBase<string, TemplateMa
 	template_mappings: Map<string, TemplateMapping>;
 }
 @namespace("indices.index_settings.index_templates.put_index_template")
-class PutIndexTemplateRequest extends Request {
+class PutIndexTemplateRequest extends RequestBase {
 	index_patterns: string[];
 	order: integer;
 	version: integer;
@@ -8129,7 +8131,7 @@ class GetMappingResponse extends DictionaryResponseBase<IndexName, IndexMappings
 	mapping: TypeMapping;
 }
 @namespace("indices.mapping_management.put_mapping")
-class PutMappingRequest extends Request {
+class PutMappingRequest extends RequestBase {
 	all_field: AllField;
 	date_detection: boolean;
 	dynamic_date_formats: string[];
@@ -8186,7 +8188,7 @@ class GetPipelineResponse extends DictionaryResponseBase<string, Pipeline> {
 	pipelines: Map<string, Pipeline>;
 }
 @namespace("ingest.put_pipeline")
-class PutPipelineRequest extends Request {
+class PutPipelineRequest extends RequestBase {
 	description: string;
 	processors: Processor[];
 	on_failure: Processor[];
@@ -8214,12 +8216,12 @@ class DeleteRepositoryResponse extends AcknowledgedResponseBase {
 class DeleteSnapshotResponse extends AcknowledgedResponseBase {
 }
 @namespace("search.scroll.scroll")
-class ScrollRequest extends Request {
+class ScrollRequest extends RequestBase {
 	scroll: Time;
 	scroll_id: string;
 }
 @namespace("x_pack.graph.explore")
-class GraphExploreRequest extends Request {
+class GraphExploreRequest extends RequestBase {
 	query: QueryContainer;
 	vertices: GraphVertexDefinition[];
 	connections: Hop;
@@ -8561,7 +8563,7 @@ class RequestConfiguration {
 }
 @namespace("common")
 class ServerError {
-	error: Error;
+	error: MainError;
 	status: integer;
 }
 @namespace("common")

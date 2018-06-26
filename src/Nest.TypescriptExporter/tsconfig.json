@@ -2,6 +2,6 @@
     "compilerOptions": {
       "experimentalDecorators": true,
       "skipLibCheck": true,
-      "noLib": true
+      "noLib": false
     }
   }
