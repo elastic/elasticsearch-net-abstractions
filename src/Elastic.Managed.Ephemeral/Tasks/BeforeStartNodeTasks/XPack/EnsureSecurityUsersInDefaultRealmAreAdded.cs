@@ -22,14 +22,14 @@ namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 			var usersFileCached = usersFile.Replace(xpackConfigFolder, xpackConfigFolderCached);
 			var usersRolesFile = Path.Combine(xpackConfigFolder, "users_roles");
 			var usersRolesFileCached = usersRolesFile.Replace(xpackConfigFolder, xpackConfigFolderCached);
+			var userCachedFileInfo = new FileInfo(usersFileCached);
 
-			if (File.Exists(usersFileCached) && cluster.ClusterConfiguration.CacheEsHomeInstallation)
+			if (userCachedFileInfo.Exists && userCachedFileInfo.Length > 0 && cluster.ClusterConfiguration.CacheEsHomeInstallation)
 			{
 				cluster.Writer?.WriteDiagnostic($"{{{nameof(EnsureSecurityUsersInDefaultRealmAreAdded)}}} using cached users and users_roles files from {{{xpackConfigFolderCached}}}");
 				if (!Directory.Exists(xpackConfigFolder)) Directory.CreateDirectory(xpackConfigFolder);
 				if (!File.Exists(usersFile)) File.Copy(usersFileCached, usersFile);
 				if (!File.Exists(usersRolesFile)) File.Copy(usersRolesFileCached, usersRolesFile);
-
 			}
 			else
 			{
@@ -49,6 +49,5 @@ namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 				if (!File.Exists(usersRolesFileCached)) File.Copy(usersRolesFile, usersRolesFileCached);
 			}
 		}
-
 	}
 }
