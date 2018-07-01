@@ -1,47 +1,42 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Reflection.Metadata;
 using System.Text.RegularExpressions;
 
 namespace Nest.TypescriptGenerator
 {
-	public class RestSpec
-	{
-		private readonly IList<FileInfo> _jsonFiles;
-
-		public RestSpec(string nestSourceFolder)
-		{
-			var specFolder = Path.GetFullPath(Path.Combine(nestSourceFolder, "..", "CodeGeneration", "ApiGenerator", "RestSpecification"));
-
-			this._jsonFiles = Directory.GetFiles(specFolder, $"*.json", SearchOption.AllDirectories)
-				.Select(f => new FileInfo(f))
-				.ToList();
-		}
-		public Dictionary<string, FileInfo> GetSpecFiles() => this._jsonFiles.ToDictionary(f=>Path.GetFileNameWithoutExtension(f.Name), f=>f);
-	}
-
-
-
 	public class TypescriptDumpSplitter
 	{
 		private readonly string _definitionFile;
-		private readonly Dictionary<string, FileInfo> _restSpec;
+		private readonly RestSpec _restSpec;
 		private readonly string _outFolder;
 
-		public TypescriptDumpSplitter(string definitionFile, string nestSourceFolder, string outFolder)
+		public TypescriptDumpSplitter(string definitionFile, RestSpec restSpec, string outFolder)
 		{
 			this._definitionFile = definitionFile;
+			this._restSpec = restSpec;
 			this._outFolder = Path.GetFullPath(outFolder);
-			this._restSpec = new RestSpec(nestSourceFolder).GetSpecFiles();
 		}
 
 		public int Split()
+		{
+			Directory.Delete(this._outFolder, true);
+			Directory.CreateDirectory(this._outFolder);
+			var additionalLines = SplitDeclarationDumpFile();
+			DumpRemainder(additionalLines);
+			CopyTsConfig();
+
+			return 0;
+		}
+
+		private List<string> SplitDeclarationDumpFile()
 		{
 			var lines = File.ReadAllLines(this._definitionFile);
 			var additionalLines = new List<string>();
 			var symbolContents = new Queue<string>();
 			var readingType = false;
 			string currentNamespace = null;
+			string currentSpecName = null;
 			string currentSymbol = null;
 			foreach (var l in lines)
 			{
@@ -51,6 +46,12 @@ namespace Nest.TypescriptGenerator
 					readingType = true;
 					continue;
 				}
+
+				if (TryGetRequestSpecName(l, out var n))
+				{
+					currentSpecName = n;
+				}
+
 				if (TryGetSymbol(l, out var s))
 					currentSymbol = s;
 
@@ -60,14 +61,21 @@ namespace Nest.TypescriptGenerator
 				if (l == "}" && readingType)
 				{
 					readingType = false;
-					DumpFile(currentNamespace, currentSymbol, symbolContents);
+					DumpFile(currentNamespace, currentSymbol, symbolContents, currentSpecName);
 					symbolContents.Clear();
+					currentSpecName = null;
 				}
 			}
 
-			DumpRemainder(additionalLines);
+			return additionalLines;
+		}
 
-			return 0;
+		private void CopyTsConfig()
+		{
+			var tsconfigJson = "tsconfig.json";
+			var config = Path.Combine(new FileInfo(this._definitionFile).Directory.FullName, tsconfigJson);
+			var target = Path.Combine(this._outFolder, tsconfigJson);
+			File.Copy(config, target);
 		}
 
 		private void DumpRemainder(List<string> additionalLines)
@@ -76,12 +84,21 @@ namespace Nest.TypescriptGenerator
 			File.WriteAllLines(path, additionalLines);
 		}
 
-		private void DumpFile(string currentNamespace, string currentSymbol, Queue<string> symbolContents)
+		private void DumpFile(string currentNamespace, string currentSymbol, Queue<string> symbolContents, string currentSpecName)
 		{
 			var folder = _outFolder + Path.DirectorySeparatorChar + NamespaceToFolder(currentNamespace);
 			var path = Path.Combine(folder, ToFilename(currentSymbol));
 			Directory.CreateDirectory(folder);
 			File.WriteAllLines(path, symbolContents);
+
+			if (!string.IsNullOrWhiteSpace(currentSpecName))
+			{
+				var name = currentSpecName + ".json";
+				var source = this._restSpec.SpecificationFiles[currentSpecName].FullName;
+				var target = Path.Combine(folder, name);
+				File.Copy(source, target);
+			}
+
 		}
 
 		private static readonly Regex NamespaceRe = new Regex(@"^(?:@namespace\(""(?<namespace>.+?)""\)|\/\*\* namespace:(?<namespace>\S+))");
@@ -92,6 +109,16 @@ namespace Nest.TypescriptGenerator
 			if (!namespaceMatch.Success) return false;
 
 			ns = namespaceMatch.Groups["namespace"].Value;
+			return true;
+		}
+		private static readonly Regex RequestSpecName = new Regex(@"^@rest_spec_name\(""(?<name>.+?)""\)");
+		private static bool TryGetRequestSpecName(string l, out string ns)
+		{
+			ns = null;
+			var namespaceMatch = RequestSpecName.Match(l);
+			if (!namespaceMatch.Success) return false;
+
+			ns = namespaceMatch.Groups["name"].Value;
 			return true;
 		}
 

@@ -20,9 +20,13 @@ namespace Nest.TypescriptGenerator
 			switch (command)
 			{
 				case "generate": return Generate(definitionFile, nestSourceFolder);
+				case "both":
 				case "split":
 					var outFolder = args.Length > 3 ? args[3] : @"..\..\..\elastic-client-generator\specification\specs2";
-					return Split(definitionFile, nestSourceFolder, outFolder);
+					var r = 0;
+					if (command == "both") r += Generate(definitionFile, nestSourceFolder);
+					r += Split(definitionFile, nestSourceFolder, outFolder);
+					return r;
 				default:
 					Console.Error.WriteLine("Unknown command for generator, valid are generate|split");
 					return 2;
@@ -31,7 +35,8 @@ namespace Nest.TypescriptGenerator
 
 		private static int Split(string definitionFile, string nestSourceFolder, string outFolder)
 		{
-			var splitter = new TypescriptDumpSplitter(definitionFile, nestSourceFolder, outFolder);
+			var restSpec = new RestSpec(nestSourceFolder);
+			var splitter = new TypescriptDumpSplitter(definitionFile, restSpec, outFolder);
 			return splitter.Split();
 		}
 
@@ -39,7 +44,8 @@ namespace Nest.TypescriptGenerator
 		{
 			var sourceDirectory = new CSharpSourceDirectory(nestSourceFolder);
 			var typeInfoProvider = new CsharpTypeInfoProvider();
-			var scriptGenerator = new ClientTypescriptGenerator(typeInfoProvider, sourceDirectory);
+			var restSpec = new RestSpec(nestSourceFolder);
+			var scriptGenerator = new ClientTypescriptGenerator(typeInfoProvider, sourceDirectory, restSpec);
 			var generator = new ClientTypesExporter(typeInfoProvider, scriptGenerator);
 			File.WriteAllText(definitionFile, generator.Generate());
 			GenerateLineScrubber.LineBasedHacks(definitionFile);

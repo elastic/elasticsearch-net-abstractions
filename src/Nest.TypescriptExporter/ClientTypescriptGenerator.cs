@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using Elasticsearch.Net;
 using System;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using TypeLite;
 using TypeLite.TsModels;
 
@@ -14,10 +16,13 @@ namespace Nest.TypescriptGenerator
 	{
 		private readonly CsharpTypeInfoProvider _typeInfoProvider;
 		private readonly CSharpSourceDirectory _sourceDirectory;
-		public ClientTypescriptGenerator(CsharpTypeInfoProvider typeInfoProvider, CSharpSourceDirectory sourceDirectory)
+		private readonly RestSpec _restSpec;
+
+		public ClientTypescriptGenerator(CsharpTypeInfoProvider typeInfoProvider, CSharpSourceDirectory sourceDirectory, RestSpec restSpec)
 		{
 			_typeInfoProvider = typeInfoProvider;
 			_sourceDirectory = sourceDirectory;
+			_restSpec = restSpec;
 		}
 
 		public static Dictionary<string, string> TypeRenames => new Dictionary<string, string>
@@ -163,23 +168,27 @@ namespace Nest.TypescriptGenerator
 				sb.AppendLineIndented($"@prop_serializer(\"{type.Name}\")");
 			}
 		}
-		private static void AddRequestRenameInformation(ScriptBuilder sb, TsClass classModel)
+
+		private void AddRequestRenameInformation(ScriptBuilder sb, TsClass classModel)
 		{
-			if (classModel.Name.Contains("Request")) return;
+			if (this._restSpec.SkipRequest(classModel.Name)) return;
 
-			var iface = classModel.Type.GetInterfaces().FirstOrDefault(i => i.Name == "I" + classModel.Type.Name);
-
-			var attributes = new List<Attribute>();
-			if (iface != null) attributes.AddRange(iface.GetCustomAttributes());
-			attributes.AddRange(classModel.Type.GetCustomAttributes());
-
-			var renameAtt = attributes.FirstOrDefault(a => a.TypeId.ToString() == "Nest.DescriptorForAttribute");
-			var originalSpec = GetDescriptorFor(renameAtt, classModel.Name);
-			if (!string.IsNullOrWhiteSpace(originalSpec))
+			var i = classModel.Name;
+			if (!ClientTypesExporter.InterfaceRegex.IsMatch(i)) i = $"I{i}";
+			if (!this._restSpec.Requests.TryGetValue(i, out var mapping))
 			{
-				sb.AppendLineIndented($"@rest_spec_name(\"{originalSpec}\")");
+				throw new Exception($"Could not get {i} original rest spec file name");
 			}
-			else throw new Exception($"Could not get {classModel.Name} original rest spec file name");
+
+			var originalSpec = Path.GetFileNameWithoutExtension(mapping.Json.Name);
+			sb.AppendLineIndented($"@rest_spec_name(\"{originalSpec}\")");
+		}
+
+		private static IEnumerable<Attribute> GetDescriptorAttributes(Type requestInterface)
+		{
+			var descriptorName = Regex.Replace(requestInterface.Name, "^I(.+)Request$", "$1Descriptor");
+			var type = requestInterface.Assembly.GetType($"Nest.{descriptorName}");
+			return type?.GetCustomAttributes() ?? Enumerable.Empty<Attribute>();
 		}
 
 		private static void AddDocCommentForCustomJsonConverter(ScriptBuilder sb, TsClass classModel)
@@ -200,8 +209,8 @@ namespace Nest.TypescriptGenerator
 
 		private static string GetDescriptorFor(Attribute attribute, string classModelName)
 		{
-			if (attribute == null) classModelName.SnakeCase().Replace();
-
+			if (attribute == null) return classModelName.SnakeCase().Replace("_","");
+			return classModelName;
 		}
 
 		private static bool GetConverter(Attribute converter, out Type type)

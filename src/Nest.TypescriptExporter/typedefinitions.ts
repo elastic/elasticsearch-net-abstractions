@@ -1,5 +1,6 @@
 
 function class_serializer(ns: string) {return function (ns: any){}}
+function rest_spec_name(ns: string) {return function (ns: any){}}
 function prop_serializer(ns: string) {return function (ns: any, x:any){}}
 function request_parameter() {return function (ns: any, x:any){}}
 function namespace(ns: string) {return function (ns: any){}}
@@ -2705,12 +2706,14 @@ class AdjacencyMatrixAggregation {
 	filters: Map<string, QueryContainer>;
 }
 @namespace("indices.index_settings.update_index_settings")
+@rest_spec_name("indices.put_settings")
 @class_serializer("IndexSettingsConverter")
 class UpdateIndexSettingsRequest {
 	index_settings: Map<string, any>;
 	index: Indices;
 }
 @namespace("x_pack.watcher.put_watch")
+@rest_spec_name("xpack.watcher.put_watch")
 class PutWatchRequest {
 	trigger: TriggerContainer;
 	input: InputContainer;
@@ -2732,6 +2735,7 @@ class PrefixQuery {
 	rewrite: MultiTermQueryRewrite;
 }
 @namespace("search.search")
+@rest_spec_name("search")
 class SearchRequest {
 	timeout: string;
 	from: integer;
@@ -2763,6 +2767,7 @@ class SearchRequest {
 	docvalue_fields: Field[];
 }
 @namespace("search.search_template")
+@rest_spec_name("search_template")
 class SearchTemplateRequest {
 	params: Map<string, any>;
 	source: string;
@@ -5973,6 +5978,7 @@ class DictionaryDecompounderTokenFilter extends CompoundWordTokenFilterBase {
 class HyphenationDecompounderTokenFilter extends CompoundWordTokenFilterBase {
 }
 @namespace("cat.cat_aliases")
+@rest_spec_name("cat.aliases")
 class CatAliasesRequest extends RequestBase {
 	@request_parameter()
 	format: string;
@@ -5990,6 +5996,7 @@ class CatAliasesRequest extends RequestBase {
 	verbose: boolean;
 }
 @namespace("cat.cat_allocation")
+@rest_spec_name("cat.allocation")
 class CatAllocationRequest extends RequestBase {
 	@request_parameter()
 	format: string;
@@ -6009,6 +6016,7 @@ class CatAllocationRequest extends RequestBase {
 	verbose: boolean;
 }
 @namespace("cat.cat_count")
+@rest_spec_name("cat.count")
 class CatCountRequest extends RequestBase {
 	@request_parameter()
 	format: string;
@@ -6026,6 +6034,7 @@ class CatCountRequest extends RequestBase {
 	verbose: boolean;
 }
 @namespace("cat.cat_fielddata")
+@rest_spec_name("cat.fielddata")
 class CatFielddataRequest extends RequestBase {
 	@request_parameter()
 	format: string;
@@ -6045,6 +6054,7 @@ class CatFielddataRequest extends RequestBase {
 	verbose: boolean;
 }
 @namespace("cat.cat_health")
+@rest_spec_name("cat.health")
 class CatHealthRequest extends RequestBase {
 	@request_parameter()
 	format: string;
@@ -6064,6 +6074,7 @@ class CatHealthRequest extends RequestBase {
 	verbose: boolean;
 }
 @namespace("cat.cat_help")
+@rest_spec_name("cat.help")
 class CatHelpRequest extends RequestBase {
 	@request_parameter()
 	help: boolean;
@@ -6071,6 +6082,7 @@ class CatHelpRequest extends RequestBase {
 	sort_by_columns: string[];
 }
 @namespace("cat.cat_indices")
+@rest_spec_name("cat.indices")
 class CatIndicesRequest extends RequestBase {
 	@request_parameter()
 	format: string;
@@ -6094,6 +6106,7 @@ class CatIndicesRequest extends RequestBase {
 	verbose: boolean;
 }
 @namespace("cat.cat_master")
+@rest_spec_name("cat.master")
 class CatMasterRequest extends RequestBase {
 	@request_parameter()
 	format: string;
@@ -6111,6 +6124,7 @@ class CatMasterRequest extends RequestBase {
 	verbose: boolean;
 }
 @namespace("cat.cat_node_attributes")
+@rest_spec_name("cat.nodeattrs")
 class CatNodeAttributesRequest extends RequestBase {
 	@request_parameter()
 	format: string;
@@ -6128,6 +6142,7 @@ class CatNodeAttributesRequest extends RequestBase {
 	verbose: boolean;
 }
 @namespace("cat.cat_nodes")
+@rest_spec_name("cat.nodes")
 class CatNodesRequest extends RequestBase {
 	@request_parameter()
 	format: string;
@@ -6147,6 +6162,7 @@ class CatNodesRequest extends RequestBase {
 	verbose: boolean;
 }
 @namespace("cat.cat_pending_tasks")
+@rest_spec_name("cat.pending_tasks")
 class CatPendingTasksRequest extends RequestBase {
 	@request_parameter()
 	format: string;
@@ -6164,6 +6180,7 @@ class CatPendingTasksRequest extends RequestBase {
 	verbose: boolean;
 }
 @namespace("cat.cat_plugins")
+@rest_spec_name("cat.plugins")
 class CatPluginsRequest extends RequestBase {
 	@request_parameter()
 	format: string;
@@ -6181,6 +6198,7 @@ class CatPluginsRequest extends RequestBase {
 	verbose: boolean;
 }
 @namespace("cat.cat_recovery")
+@rest_spec_name("cat.recovery")
 class CatRecoveryRequest extends RequestBase {
 	@request_parameter()
 	format: string;
@@ -6198,6 +6216,7 @@ class CatRecoveryRequest extends RequestBase {
 	verbose: boolean;
 }
 @namespace("cat.cat_repositories")
+@rest_spec_name("cat.repositories")
 class CatRepositoriesRequest extends RequestBase {
 	@request_parameter()
 	format: string;
@@ -6215,6 +6234,7 @@ class CatRepositoriesRequest extends RequestBase {
 	verbose: boolean;
 }
 @namespace("cat.cat_segments")
+@rest_spec_name("cat.segments")
 class CatSegmentsRequest extends RequestBase {
 	@request_parameter()
 	format: string;
@@ -6230,6 +6250,7 @@ class CatSegmentsRequest extends RequestBase {
 	verbose: boolean;
 }
 @namespace("cat.cat_shards")
+@rest_spec_name("cat.shards")
 class CatShardsRequest extends RequestBase {
 	@request_parameter()
 	format: string;
@@ -6249,6 +6270,7 @@ class CatShardsRequest extends RequestBase {
 	verbose: boolean;
 }
 @namespace("cat.cat_snapshots")
+@rest_spec_name("cat.snapshots")
 class CatSnapshotsRequest extends RequestBase {
 	@request_parameter()
 	format: string;
@@ -6266,6 +6288,7 @@ class CatSnapshotsRequest extends RequestBase {
 	verbose: boolean;
 }
 @namespace("cat.cat_tasks")
+@rest_spec_name("cat.tasks")
 class CatTasksRequest extends RequestBase {
 	@request_parameter()
 	format: string;
@@ -6289,6 +6312,7 @@ class CatTasksRequest extends RequestBase {
 	verbose: boolean;
 }
 @namespace("cat.cat_templates")
+@rest_spec_name("cat.templates")
 class CatTemplatesRequest extends RequestBase {
 	@request_parameter()
 	format: string;
@@ -6306,6 +6330,7 @@ class CatTemplatesRequest extends RequestBase {
 	verbose: boolean;
 }
 @namespace("cat.cat_thread_pool")
+@rest_spec_name("cat.thread_pool")
 class CatThreadPoolRequest extends RequestBase {
 	@request_parameter()
 	format: string;
@@ -6325,6 +6350,7 @@ class CatThreadPoolRequest extends RequestBase {
 	verbose: boolean;
 }
 @namespace("cluster.cluster_allocation_explain")
+@rest_spec_name("cluster.allocation_explain")
 class ClusterAllocationExplainRequest extends RequestBase {
 	index: IndexName;
 	shard: integer;
@@ -6335,6 +6361,7 @@ class ClusterAllocationExplainRequest extends RequestBase {
 	include_disk_info: boolean;
 }
 @namespace("cluster.cluster_health")
+@rest_spec_name("cluster.health")
 class ClusterHealthRequest extends RequestBase {
 	@request_parameter()
 	level: Level;
@@ -6356,6 +6383,7 @@ class ClusterHealthRequest extends RequestBase {
 	wait_for_status: WaitForStatus;
 }
 @namespace("cluster.cluster_pending_tasks")
+@rest_spec_name("cluster.pending_tasks")
 class ClusterPendingTasksRequest extends RequestBase {
 	@request_parameter()
 	local: boolean;
@@ -6363,6 +6391,7 @@ class ClusterPendingTasksRequest extends RequestBase {
 	master_timeout: Time;
 }
 @namespace("cluster.cluster_reroute")
+@rest_spec_name("cluster.reroute")
 class ClusterRerouteRequest extends RequestBase {
 	commands: ClusterRerouteCommand[];
 	@request_parameter()
@@ -6379,6 +6408,7 @@ class ClusterRerouteRequest extends RequestBase {
 	timeout: Time;
 }
 @namespace("cluster.cluster_settings.cluster_get_settings")
+@rest_spec_name("cluster.get_settings")
 class ClusterGetSettingsRequest extends RequestBase {
 	@request_parameter()
 	flat_settings: boolean;
@@ -6390,6 +6420,7 @@ class ClusterGetSettingsRequest extends RequestBase {
 	include_defaults: boolean;
 }
 @namespace("cluster.cluster_settings.cluster_put_settings")
+@rest_spec_name("cluster.put_settings")
 class ClusterPutSettingsRequest extends RequestBase {
 	persistent: Map<string, any>;
 	transient: Map<string, any>;
@@ -6401,6 +6432,7 @@ class ClusterPutSettingsRequest extends RequestBase {
 	timeout: Time;
 }
 @namespace("cluster.cluster_state")
+@rest_spec_name("cluster.state")
 class ClusterStateRequest extends RequestBase {
 	@request_parameter()
 	local: boolean;
@@ -6416,6 +6448,7 @@ class ClusterStateRequest extends RequestBase {
 	expand_wildcards: ExpandWildcards;
 }
 @namespace("cluster.cluster_stats")
+@rest_spec_name("cluster.stats")
 class ClusterStatsRequest extends RequestBase {
 	@request_parameter()
 	flat_settings: boolean;
@@ -6423,6 +6456,7 @@ class ClusterStatsRequest extends RequestBase {
 	timeout: Time;
 }
 @namespace("cluster.nodes_hot_threads")
+@rest_spec_name("nodes.hot_threads")
 class NodesHotThreadsRequest extends RequestBase {
 	@request_parameter()
 	interval: Time;
@@ -6438,6 +6472,7 @@ class NodesHotThreadsRequest extends RequestBase {
 	timeout: Time;
 }
 @namespace("cluster.nodes_info")
+@rest_spec_name("nodes.info")
 class NodesInfoRequest extends RequestBase {
 	@request_parameter()
 	flat_settings: boolean;
@@ -6445,6 +6480,7 @@ class NodesInfoRequest extends RequestBase {
 	timeout: Time;
 }
 @namespace("cluster.nodes_stats")
+@rest_spec_name("nodes.stats")
 class NodesStatsRequest extends RequestBase {
 	@request_parameter()
 	completion_fields: Field[];
@@ -6464,20 +6500,25 @@ class NodesStatsRequest extends RequestBase {
 	include_segment_file_sizes: boolean;
 }
 @namespace("cluster.nodes_usage")
+@rest_spec_name("nodes.usage")
 class NodesUsageRequest extends RequestBase {
 	@request_parameter()
 	timeout: Time;
 }
 @namespace("cluster.ping")
+@rest_spec_name("ping")
 class PingRequest extends RequestBase {
 }
 @namespace("cluster.remote_info")
+@rest_spec_name("cluster.remote_info")
 class RemoteInfoRequest extends RequestBase {
 }
 @namespace("cluster.root_node_info")
+@rest_spec_name("info")
 class RootNodeInfoRequest extends RequestBase {
 }
 @namespace("cluster.task_management.cancel_tasks")
+@rest_spec_name("tasks.cancel")
 class CancelTasksRequest extends RequestBase {
 	@request_parameter()
 	nodes: string[];
@@ -6489,11 +6530,13 @@ class CancelTasksRequest extends RequestBase {
 	parent_task_id: string;
 }
 @namespace("cluster.task_management.get_task")
+@rest_spec_name("tasks.get")
 class GetTaskRequest extends RequestBase {
 	@request_parameter()
 	wait_for_completion: boolean;
 }
 @namespace("cluster.task_management.list_tasks")
+@rest_spec_name("tasks.list")
 class ListTasksRequest extends RequestBase {
 	@request_parameter()
 	nodes: string[];
@@ -6511,6 +6554,7 @@ class ListTasksRequest extends RequestBase {
 	group_by: GroupBy;
 }
 @namespace("document.multiple.bulk")
+@rest_spec_name("bulk")
 @class_serializer("BulkRequestJsonConverter")
 class BulkRequest extends RequestBase {
 	operations: BulkOperation[];
@@ -6534,6 +6578,7 @@ class BulkRequest extends RequestBase {
 	pipeline: string;
 }
 @namespace("document.multiple.delete_by_query")
+@rest_spec_name("delete_by_query")
 class DeleteByQueryRequest extends RequestBase {
 	query: QueryContainer;
 	slice: SlicedScroll;
@@ -6603,6 +6648,7 @@ class DeleteByQueryRequest extends RequestBase {
 	slices: long;
 }
 @namespace("document.multiple.multi_get.request")
+@rest_spec_name("mget")
 @class_serializer("MultiGetRequestJsonConverter")
 class MultiGetRequest extends RequestBase {
 	@request_parameter()
@@ -6624,6 +6670,7 @@ class MultiGetRequest extends RequestBase {
 	source_include: Field[];
 }
 @namespace("document.multiple.multi_term_vectors")
+@rest_spec_name("mtermvectors")
 class MultiTermVectorsRequest extends RequestBase {
 	docs: MultiTermVectorOperation[];
 	@request_parameter()
@@ -6652,6 +6699,7 @@ class MultiTermVectorsRequest extends RequestBase {
 	version_type: VersionType;
 }
 @namespace("document.multiple.reindex_on_server")
+@rest_spec_name("reindex")
 class ReindexOnServerRequest extends RequestBase {
 	source: ReindexSource;
 	dest: ReindexDestination;
@@ -6672,11 +6720,13 @@ class ReindexOnServerRequest extends RequestBase {
 	slices: long;
 }
 @namespace("document.multiple.reindex_rethrottle")
+@rest_spec_name("reindex_rethrottle")
 class ReindexRethrottleRequest extends RequestBase {
 	@request_parameter()
 	requests_per_second: long;
 }
 @namespace("document.multiple.update_by_query")
+@rest_spec_name("update_by_query")
 class UpdateByQueryRequest extends RequestBase {
 	query: QueryContainer;
 	script: Script;
@@ -6750,6 +6800,7 @@ class UpdateByQueryRequest extends RequestBase {
 	slices: long;
 }
 @namespace("document.single.delete")
+@rest_spec_name("delete")
 class DeleteRequest extends RequestBase {
 	@request_parameter()
 	wait_for_active_shards: string;
@@ -6767,6 +6818,7 @@ class DeleteRequest extends RequestBase {
 	version_type: VersionType;
 }
 @namespace("document.single.exists")
+@rest_spec_name("exists")
 class DocumentExistsRequest extends RequestBase {
 	@request_parameter()
 	stored_fields: Field[];
@@ -6792,6 +6844,7 @@ class DocumentExistsRequest extends RequestBase {
 	version_type: VersionType;
 }
 @namespace("document.single.get")
+@rest_spec_name("get")
 class GetRequest extends RequestBase {
 	@request_parameter()
 	stored_fields: Field[];
@@ -6817,6 +6870,7 @@ class GetRequest extends RequestBase {
 	version_type: VersionType;
 }
 @namespace("document.single.source_exists")
+@rest_spec_name("exists_source")
 class SourceExistsRequest extends RequestBase {
 	@request_parameter()
 	parent: string;
@@ -6840,6 +6894,7 @@ class SourceExistsRequest extends RequestBase {
 	version_type: VersionType;
 }
 @namespace("document.single.source")
+@rest_spec_name("get_source")
 class SourceRequest extends RequestBase {
 	@request_parameter()
 	parent: string;
@@ -6863,6 +6918,7 @@ class SourceRequest extends RequestBase {
 	version_type: VersionType;
 }
 @namespace("document.single.term_vectors")
+@rest_spec_name("termvectors")
 class TermVectorsRequest<TDocument> extends RequestBase {
 	@prop_serializer("SourceConverter")
 	doc: TDocument;
@@ -6905,6 +6961,7 @@ class TermVectorsResponse extends ResponseBase {
 	term_vectors: Map<Field, TermVector>;
 }
 @namespace("document.single.update")
+@rest_spec_name("update")
 class UpdateRequest<TDocument, TPartialDocument> extends RequestBase {
 	script: Script;
 	@prop_serializer("SourceConverter")
@@ -6938,6 +6995,7 @@ class UpdateRequest<TDocument, TPartialDocument> extends RequestBase {
 	version_type: VersionType;
 }
 @namespace("indices.alias_management.alias_exists")
+@rest_spec_name("indices.exists_alias")
 class AliasExistsRequest extends RequestBase {
 	@request_parameter()
 	ignore_unavailable: boolean;
@@ -6949,6 +7007,7 @@ class AliasExistsRequest extends RequestBase {
 	local: boolean;
 }
 @namespace("indices.alias_management.alias")
+@rest_spec_name("indices.update_aliases")
 class BulkAliasRequest extends RequestBase {
 	actions: AliasAction[];
 	@request_parameter()
@@ -6957,6 +7016,7 @@ class BulkAliasRequest extends RequestBase {
 	master_timeout: Time;
 }
 @namespace("indices.alias_management.delete_alias")
+@rest_spec_name("indices.delete_alias")
 class DeleteAliasRequest extends RequestBase {
 	@request_parameter()
 	timeout: Time;
@@ -6964,6 +7024,7 @@ class DeleteAliasRequest extends RequestBase {
 	master_timeout: Time;
 }
 @namespace("indices.alias_management.get_alias")
+@rest_spec_name("indices.get_alias")
 class GetAliasRequest extends RequestBase {
 	@request_parameter()
 	ignore_unavailable: boolean;
@@ -6975,6 +7036,7 @@ class GetAliasRequest extends RequestBase {
 	local: boolean;
 }
 @namespace("indices.alias_management.put_alias")
+@rest_spec_name("indices.put_alias")
 class PutAliasRequest extends RequestBase {
 	routing: Routing;
 	filter: QueryContainer;
@@ -6984,6 +7046,7 @@ class PutAliasRequest extends RequestBase {
 	master_timeout: Time;
 }
 @namespace("indices.analyze")
+@rest_spec_name("indices.analyze")
 class AnalyzeRequest extends RequestBase {
 	tokenizer: Union<string, Tokenizer>;
 	analyzer: string;
@@ -7000,6 +7063,7 @@ class AnalyzeRequest extends RequestBase {
 	format: Format;
 }
 @namespace("indices.index_management.delete_index")
+@rest_spec_name("indices.delete")
 class DeleteIndexRequest extends RequestBase {
 	@request_parameter()
 	timeout: Time;
@@ -7013,6 +7077,7 @@ class DeleteIndexRequest extends RequestBase {
 	expand_wildcards: ExpandWildcards;
 }
 @namespace("indices.index_management.get_index")
+@rest_spec_name("indices.get")
 class GetIndexRequest extends RequestBase {
 	@request_parameter()
 	local: boolean;
@@ -7028,6 +7093,7 @@ class GetIndexRequest extends RequestBase {
 	include_defaults: boolean;
 }
 @namespace("indices.index_management.indices_exists")
+@rest_spec_name("indices.exists")
 class IndexExistsRequest extends RequestBase {
 	@request_parameter()
 	local: boolean;
@@ -7043,6 +7109,7 @@ class IndexExistsRequest extends RequestBase {
 	include_defaults: boolean;
 }
 @namespace("indices.index_management.open_close_index.close_index")
+@rest_spec_name("indices.close")
 class CloseIndexRequest extends RequestBase {
 	@request_parameter()
 	timeout: Time;
@@ -7056,6 +7123,7 @@ class CloseIndexRequest extends RequestBase {
 	expand_wildcards: ExpandWildcards;
 }
 @namespace("indices.index_management.open_close_index.open_index")
+@rest_spec_name("indices.open")
 class OpenIndexRequest extends RequestBase {
 	@request_parameter()
 	timeout: Time;
@@ -7069,6 +7137,7 @@ class OpenIndexRequest extends RequestBase {
 	expand_wildcards: ExpandWildcards;
 }
 @namespace("indices.index_management.shrink_index")
+@rest_spec_name("indices.shrink")
 class ShrinkIndexRequest extends RequestBase {
 	settings: Map<string, any>;
 	aliases: Map<IndexName, Alias>;
@@ -7080,6 +7149,7 @@ class ShrinkIndexRequest extends RequestBase {
 	wait_for_active_shards: string;
 }
 @namespace("indices.index_management.types_exists")
+@rest_spec_name("indices.exists_type")
 class TypeExistsRequest extends RequestBase {
 	@request_parameter()
 	ignore_unavailable: boolean;
@@ -7091,6 +7161,7 @@ class TypeExistsRequest extends RequestBase {
 	local: boolean;
 }
 @namespace("indices.index_settings.get_index_settings")
+@rest_spec_name("indices.get_settings")
 class GetIndexSettingsRequest extends RequestBase {
 	@request_parameter()
 	ignore_unavailable: boolean;
@@ -7106,6 +7177,7 @@ class GetIndexSettingsRequest extends RequestBase {
 	include_defaults: boolean;
 }
 @namespace("indices.index_settings.index_templates.delete_index_template")
+@rest_spec_name("indices.delete_template")
 class DeleteIndexTemplateRequest extends RequestBase {
 	@request_parameter()
 	timeout: Time;
@@ -7113,6 +7185,7 @@ class DeleteIndexTemplateRequest extends RequestBase {
 	master_timeout: Time;
 }
 @namespace("indices.index_settings.index_templates.get_index_template")
+@rest_spec_name("indices.get_template")
 class GetIndexTemplateRequest extends RequestBase {
 	@request_parameter()
 	flat_settings: boolean;
@@ -7122,6 +7195,7 @@ class GetIndexTemplateRequest extends RequestBase {
 	local: boolean;
 }
 @namespace("indices.index_settings.index_templates.index_template_exists")
+@rest_spec_name("indices.exists_template")
 class IndexTemplateExistsRequest extends RequestBase {
 	@request_parameter()
 	flat_settings: boolean;
@@ -7131,6 +7205,7 @@ class IndexTemplateExistsRequest extends RequestBase {
 	local: boolean;
 }
 @namespace("indices.mapping_management.get_field_mapping")
+@rest_spec_name("indices.get_field_mapping")
 class GetFieldMappingRequest extends RequestBase {
 	@request_parameter()
 	include_defaults: boolean;
@@ -7144,6 +7219,7 @@ class GetFieldMappingRequest extends RequestBase {
 	local: boolean;
 }
 @namespace("indices.mapping_management.get_mapping")
+@rest_spec_name("indices.get_mapping")
 class GetMappingRequest extends RequestBase {
 	@request_parameter()
 	ignore_unavailable: boolean;
@@ -7155,6 +7231,7 @@ class GetMappingRequest extends RequestBase {
 	local: boolean;
 }
 @namespace("indices.monitoring.indices_recovery")
+@rest_spec_name("indices.recovery")
 class RecoveryStatusRequest extends RequestBase {
 	@request_parameter()
 	detailed: boolean;
@@ -7162,6 +7239,7 @@ class RecoveryStatusRequest extends RequestBase {
 	active_only: boolean;
 }
 @namespace("indices.monitoring.indices_segments")
+@rest_spec_name("indices.segments")
 class SegmentsRequest extends RequestBase {
 	@request_parameter()
 	ignore_unavailable: boolean;
@@ -7175,6 +7253,7 @@ class SegmentsRequest extends RequestBase {
 	verbose: boolean;
 }
 @namespace("indices.monitoring.indices_shard_stores")
+@rest_spec_name("indices.shard_stores")
 class IndicesShardStoresRequest extends RequestBase {
 	types: TypeName[];
 	@request_parameter()
@@ -7189,6 +7268,7 @@ class IndicesShardStoresRequest extends RequestBase {
 	operation_threading: string;
 }
 @namespace("indices.monitoring.indices_stats")
+@rest_spec_name("indices.stats")
 class IndicesStatsRequest extends RequestBase {
 	types: TypeName[];
 	@request_parameter()
@@ -7205,6 +7285,7 @@ class IndicesStatsRequest extends RequestBase {
 	include_segment_file_sizes: boolean;
 }
 @namespace("indices.status_management.clear_cache")
+@rest_spec_name("indices.clear_cache")
 class ClearCacheRequest extends RequestBase {
 	@request_parameter()
 	fielddata: boolean;
@@ -7226,6 +7307,7 @@ class ClearCacheRequest extends RequestBase {
 	request: boolean;
 }
 @namespace("indices.status_management.flush")
+@rest_spec_name("indices.flush")
 class FlushRequest extends RequestBase {
 	@request_parameter()
 	force: boolean;
@@ -7239,6 +7321,7 @@ class FlushRequest extends RequestBase {
 	expand_wildcards: ExpandWildcards;
 }
 @namespace("indices.status_management.force_merge")
+@rest_spec_name("indices.forcemerge")
 class ForceMergeRequest extends RequestBase {
 	@request_parameter()
 	flush: boolean;
@@ -7258,6 +7341,7 @@ class ForceMergeRequest extends RequestBase {
 	wait_for_merge: boolean;
 }
 @namespace("indices.status_management.refresh")
+@rest_spec_name("indices.refresh")
 class RefreshRequest extends RequestBase {
 	@request_parameter()
 	ignore_unavailable: boolean;
@@ -7267,6 +7351,7 @@ class RefreshRequest extends RequestBase {
 	expand_wildcards: ExpandWildcards;
 }
 @namespace("indices.status_management.synced_flush")
+@rest_spec_name("indices.flush_synced")
 class SyncedFlushRequest extends RequestBase {
 	@request_parameter()
 	ignore_unavailable: boolean;
@@ -7276,6 +7361,7 @@ class SyncedFlushRequest extends RequestBase {
 	expand_wildcards: ExpandWildcards;
 }
 @namespace("indices.status_management.upgrade")
+@rest_spec_name("indices.upgrade")
 class UpgradeRequest extends RequestBase {
 	@request_parameter()
 	allow_no_indices: boolean;
@@ -7289,6 +7375,7 @@ class UpgradeRequest extends RequestBase {
 	only_ancient_segments: boolean;
 }
 @namespace("indices.status_management.upgrade.upgrade_status")
+@rest_spec_name("indices.get_upgrade")
 class UpgradeStatusRequest extends RequestBase {
 	@request_parameter()
 	ignore_unavailable: boolean;
@@ -7298,6 +7385,7 @@ class UpgradeStatusRequest extends RequestBase {
 	expand_wildcards: ExpandWildcards;
 }
 @namespace("ingest.delete_pipeline")
+@rest_spec_name("ingest.delete_pipeline")
 class DeletePipelineRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
@@ -7305,14 +7393,17 @@ class DeletePipelineRequest extends RequestBase {
 	timeout: Time;
 }
 @namespace("ingest.get_pipeline")
+@rest_spec_name("ingest.get_pipeline")
 class GetPipelineRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
 }
 @namespace("ingest.processor")
+@rest_spec_name("ingest.processor_grok")
 class GrokProcessorPatternsRequest extends RequestBase {
 }
 @namespace("ingest.simulate_pipeline")
+@rest_spec_name("ingest.simulate")
 class SimulatePipelineRequest extends RequestBase {
 	pipeline: Pipeline;
 	docs: SimulatePipelineDocument[];
@@ -7334,6 +7425,7 @@ class JoinProperty extends PropertyBase {
 class PercolatorProperty extends PropertyBase {
 }
 @namespace("modules.scripting.delete_script")
+@rest_spec_name("delete_script")
 class DeleteScriptRequest extends RequestBase {
 	@request_parameter()
 	timeout: Time;
@@ -7341,9 +7433,11 @@ class DeleteScriptRequest extends RequestBase {
 	master_timeout: Time;
 }
 @namespace("modules.scripting.get_script")
+@rest_spec_name("get_script")
 class GetScriptRequest extends RequestBase {
 }
 @namespace("modules.scripting.put_script")
+@rest_spec_name("put_script")
 class PutScriptRequest extends RequestBase {
 	script: StoredScript;
 	@request_parameter()
@@ -7352,6 +7446,7 @@ class PutScriptRequest extends RequestBase {
 	master_timeout: Time;
 }
 @namespace("modules.snapshot_and_restore.repositories.create_repository")
+@rest_spec_name("snapshot.create_repository")
 @class_serializer("CreateRepositoryJsonConverter")
 class CreateRepositoryRequest extends RequestBase {
 	repository: SnapshotRepository;
@@ -7363,6 +7458,7 @@ class CreateRepositoryRequest extends RequestBase {
 	verify: boolean;
 }
 @namespace("modules.snapshot_and_restore.repositories.delete_repository")
+@rest_spec_name("snapshot.delete_repository")
 class DeleteRepositoryRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
@@ -7370,6 +7466,7 @@ class DeleteRepositoryRequest extends RequestBase {
 	timeout: Time;
 }
 @namespace("modules.snapshot_and_restore.repositories.get_repository")
+@rest_spec_name("snapshot.get_repository")
 class GetRepositoryRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
@@ -7377,6 +7474,7 @@ class GetRepositoryRequest extends RequestBase {
 	local: boolean;
 }
 @namespace("modules.snapshot_and_restore.repositories.verify_repository")
+@rest_spec_name("snapshot.verify_repository")
 class VerifyRepositoryRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
@@ -7384,6 +7482,7 @@ class VerifyRepositoryRequest extends RequestBase {
 	timeout: Time;
 }
 @namespace("modules.snapshot_and_restore.restore")
+@rest_spec_name("snapshot.restore")
 class RestoreRequest extends RequestBase {
 	indices: Indices;
 	ignore_unavailable: boolean;
@@ -7398,11 +7497,13 @@ class RestoreRequest extends RequestBase {
 	wait_for_completion: boolean;
 }
 @namespace("modules.snapshot_and_restore.snapshot.delete_snapshot")
+@rest_spec_name("snapshot.delete")
 class DeleteSnapshotRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
 }
 @namespace("modules.snapshot_and_restore.snapshot.get_sapshot")
+@rest_spec_name("snapshot.get")
 class GetSnapshotRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
@@ -7412,6 +7513,7 @@ class GetSnapshotRequest extends RequestBase {
 	verbose: boolean;
 }
 @namespace("modules.snapshot_and_restore.snapshot.snapshot_status")
+@rest_spec_name("snapshot.status")
 class SnapshotStatusRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
@@ -7419,6 +7521,7 @@ class SnapshotStatusRequest extends RequestBase {
 	ignore_unavailable: boolean;
 }
 @namespace("modules.snapshot_and_restore.snapshot.snapshot")
+@rest_spec_name("snapshot.create")
 class SnapshotRequest extends RequestBase {
 	@prop_serializer("IndicesMultiSyntaxJsonConverter")
 	indices: Indices;
@@ -7431,6 +7534,7 @@ class SnapshotRequest extends RequestBase {
 	wait_for_completion: boolean;
 }
 @namespace("search.count")
+@rest_spec_name("count")
 class CountRequest extends RequestBase {
 	query: QueryContainer;
 	@request_parameter()
@@ -7461,6 +7565,7 @@ class CountRequest extends RequestBase {
 	terminate_after: long;
 }
 @namespace("search.explain")
+@rest_spec_name("explain")
 class ExplainRequest<TDocument> extends RequestBase {
 	@request_parameter()
 	stored_fields: Field[];
@@ -7491,6 +7596,7 @@ class ExplainRequest<TDocument> extends RequestBase {
 	source_include: Field[];
 }
 @namespace("search.field_capabilities")
+@rest_spec_name("field_caps")
 class FieldCapabilitiesRequest extends RequestBase {
 	@request_parameter()
 	fields: Field[];
@@ -7502,6 +7608,7 @@ class FieldCapabilitiesRequest extends RequestBase {
 	expand_wildcards: ExpandWildcards;
 }
 @namespace("search.multi_search_template")
+@rest_spec_name("msearch_template")
 @class_serializer("MultiSearchTemplateJsonConverter")
 class MultiSearchTemplateRequest extends RequestBase {
 	operations: Map<string, SearchTemplateRequest>;
@@ -7513,6 +7620,7 @@ class MultiSearchTemplateRequest extends RequestBase {
 	max_concurrent_searches: long;
 }
 @namespace("search.multi_search")
+@rest_spec_name("msearch")
 @class_serializer("MultiSearchJsonConverter")
 class MultiSearchRequest extends RequestBase {
 	operations: Map<string, SearchRequest>;
@@ -7526,10 +7634,12 @@ class MultiSearchRequest extends RequestBase {
 	pre_filter_shard_size: long;
 }
 @namespace("search.scroll.clear_scroll")
+@rest_spec_name("clear_scroll")
 class ClearScrollRequest extends RequestBase {
 	scroll_id: string[];
 }
 @namespace("search.search_shards")
+@rest_spec_name("search_shards")
 class SearchShardsRequest extends RequestBase {
 	@request_parameter()
 	preference: string;
@@ -7545,6 +7655,7 @@ class SearchShardsRequest extends RequestBase {
 	expand_wildcards: ExpandWildcards;
 }
 @namespace("search.search_template.render_search_template")
+@rest_spec_name("render_search_template")
 class RenderSearchTemplateRequest extends RequestBase {
 	source: string;
 	inline: string;
@@ -7552,6 +7663,7 @@ class RenderSearchTemplateRequest extends RequestBase {
 	params: Map<string, any>;
 }
 @namespace("search.validate")
+@rest_spec_name("indices.validate_query")
 class ValidateQueryRequest extends RequestBase {
 	query: QueryContainer;
 	@request_parameter()
@@ -7582,33 +7694,40 @@ class ValidateQueryRequest extends RequestBase {
 	all_shards: boolean;
 }
 @namespace("x_pack.migration.deprecation_info")
+@rest_spec_name("xpack.migration.deprecations")
 class DeprecationInfoRequest extends RequestBase {
 }
 @namespace("x_pack.info.x_pack_info")
+@rest_spec_name("xpack.info")
 class XPackInfoRequest extends RequestBase {
 	@request_parameter()
 	categories: string[];
 }
 @namespace("x_pack.info.x_pack_usage")
+@rest_spec_name("xpack.usage")
 class XPackUsageRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
 }
 @namespace("x_pack.license.delete_license")
+@rest_spec_name("xpack.license.delete")
 class DeleteLicenseRequest extends RequestBase {
 }
 @namespace("x_pack.license.get_license")
+@rest_spec_name("xpack.license.get")
 class GetLicenseRequest extends RequestBase {
 	@request_parameter()
 	local: boolean;
 }
 @namespace("x_pack.license.post_license")
+@rest_spec_name("xpack.license.post")
 class PostLicenseRequest extends RequestBase {
 	license: License;
 	@request_parameter()
 	acknowledge: boolean;
 }
 @namespace("x_pack.machine_learning.close_job")
+@rest_spec_name("xpack.ml.close_job")
 class CloseJobRequest extends RequestBase {
 	@request_parameter()
 	force: boolean;
@@ -7616,22 +7735,27 @@ class CloseJobRequest extends RequestBase {
 	timeout: Time;
 }
 @namespace("x_pack.machine_learning.delete_datafeed")
+@rest_spec_name("xpack.ml.delete_datafeed")
 class DeleteDatafeedRequest extends RequestBase {
 	@request_parameter()
 	force: boolean;
 }
 @namespace("x_pack.machine_learning.delete_expired_data")
+@rest_spec_name("xpack.ml.delete_expired_data")
 class DeleteExpiredDataRequest extends RequestBase {
 }
 @namespace("x_pack.machine_learning.delete_job")
+@rest_spec_name("xpack.ml.delete_job")
 class DeleteJobRequest extends RequestBase {
 	@request_parameter()
 	force: boolean;
 }
 @namespace("x_pack.machine_learning.delete_model_snapshot")
+@rest_spec_name("xpack.ml.delete_model_snapshot")
 class DeleteModelSnapshotRequest extends RequestBase {
 }
 @namespace("x_pack.machine_learning.flush_job")
+@rest_spec_name("xpack.ml.flush_job")
 class FlushJobRequest extends RequestBase {
 	@prop_serializer("IsoDateTimeConverter")
 	advance_time: Date;
@@ -7644,6 +7768,7 @@ class FlushJobRequest extends RequestBase {
 	skip_time: string;
 }
 @namespace("x_pack.machine_learning.get_anomaly_records")
+@rest_spec_name("xpack.ml.get_records")
 class GetAnomalyRecordsRequest extends RequestBase {
 	desc: boolean;
 	exclude_interim: boolean;
@@ -7656,6 +7781,7 @@ class GetAnomalyRecordsRequest extends RequestBase {
 	start: Date;
 }
 @namespace("x_pack.machine_learning.get_buckets")
+@rest_spec_name("xpack.ml.get_buckets")
 class GetBucketsRequest extends RequestBase {
 	anomaly_score: double;
 	desc: boolean;
@@ -7671,16 +7797,20 @@ class GetBucketsRequest extends RequestBase {
 	timestamp: Date;
 }
 @namespace("x_pack.machine_learning.get_categories")
+@rest_spec_name("xpack.ml.get_categories")
 class GetCategoriesRequest extends RequestBase {
 	page: Page;
 }
 @namespace("x_pack.machine_learning.get_datafeed_stats")
+@rest_spec_name("xpack.ml.get_datafeed_stats")
 class GetDatafeedStatsRequest extends RequestBase {
 }
 @namespace("x_pack.machine_learning.get_datafeeds")
+@rest_spec_name("xpack.ml.get_datafeeds")
 class GetDatafeedsRequest extends RequestBase {
 }
 @namespace("x_pack.machine_learning.get_influencers")
+@rest_spec_name("xpack.ml.get_influencers")
 class GetInfluencersRequest extends RequestBase {
 	descending: boolean;
 	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
@@ -7693,12 +7823,15 @@ class GetInfluencersRequest extends RequestBase {
 	start: Date;
 }
 @namespace("x_pack.machine_learning.get_job_stats")
+@rest_spec_name("xpack.ml.get_job_stats")
 class GetJobStatsRequest extends RequestBase {
 }
 @namespace("x_pack.machine_learning.get_jobs")
+@rest_spec_name("xpack.ml.get_jobs")
 class GetJobsRequest extends RequestBase {
 }
 @namespace("x_pack.machine_learning.get_model_snapshots")
+@rest_spec_name("xpack.ml.get_model_snapshots")
 class GetModelSnapshotsRequest extends RequestBase {
 	desc: boolean;
 	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
@@ -7709,10 +7842,12 @@ class GetModelSnapshotsRequest extends RequestBase {
 	start: Date;
 }
 @namespace("x_pack.machine_learning.open_job")
+@rest_spec_name("xpack.ml.open_job")
 class OpenJobRequest extends RequestBase {
 	timeout: Time;
 }
 @namespace("x_pack.machine_learning.post_job_data")
+@rest_spec_name("xpack.ml.post_data")
 @class_serializer("PostJobDataConverter")
 class PostJobDataRequest extends RequestBase {
 	data: any[];
@@ -7722,9 +7857,11 @@ class PostJobDataRequest extends RequestBase {
 	reset_end: Date;
 }
 @namespace("x_pack.machine_learning.preview_datafeed")
+@rest_spec_name("xpack.ml.preview_datafeed")
 class PreviewDatafeedRequest extends RequestBase {
 }
 @namespace("x_pack.machine_learning.put_datafeed")
+@rest_spec_name("xpack.ml.put_datafeed")
 class PutDatafeedRequest extends RequestBase {
 	aggregations: Map<string, AggregationContainer>;
 	chunking_config: ChunkingConfig;
@@ -7740,6 +7877,7 @@ class PutDatafeedRequest extends RequestBase {
 	types: Types;
 }
 @namespace("x_pack.machine_learning.put_job")
+@rest_spec_name("xpack.ml.put_job")
 class PutJobRequest extends RequestBase {
 	analysis_config: AnalysisConfig;
 	analysis_limits: AnalysisLimits;
@@ -7750,10 +7888,12 @@ class PutJobRequest extends RequestBase {
 	results_index_name: IndexName;
 }
 @namespace("x_pack.machine_learning.revert_model_snapshot")
+@rest_spec_name("xpack.ml.revert_model_snapshot")
 class RevertModelSnapshotRequest extends RequestBase {
 	delete_intervening_results: boolean;
 }
 @namespace("x_pack.machine_learning.start_datafeed")
+@rest_spec_name("xpack.ml.start_datafeed")
 class StartDatafeedRequest extends RequestBase {
 	timeout: Time;
 	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
@@ -7762,11 +7902,13 @@ class StartDatafeedRequest extends RequestBase {
 	end: Date;
 }
 @namespace("x_pack.machine_learning.stop_datafeed")
+@rest_spec_name("xpack.ml.stop_datafeed")
 class StopDatafeedRequest extends RequestBase {
 	timeout: Time;
 	force: boolean;
 }
 @namespace("x_pack.machine_learning.update_data_feed")
+@rest_spec_name("xpack.ml.update_datafeed")
 class UpdateDatafeedRequest extends RequestBase {
 	aggregations: Map<string, AggregationContainer>;
 	chunking_config: ChunkingConfig;
@@ -7782,6 +7924,7 @@ class UpdateDatafeedRequest extends RequestBase {
 	types: Types;
 }
 @namespace("x_pack.machine_learning.update_job")
+@rest_spec_name("xpack.ml.update_job")
 class UpdateJobRequest extends RequestBase {
 	analysis_limits: AnalysisMemoryLimit;
 	background_persist_interval: Time;
@@ -7793,16 +7936,19 @@ class UpdateJobRequest extends RequestBase {
 	results_retention_days: long;
 }
 @namespace("x_pack.machine_learning.update_model_snapshot")
+@rest_spec_name("xpack.ml.update_model_snapshot")
 class UpdateModelSnapshotRequest extends RequestBase {
 	description: string;
 	retain: boolean;
 }
 @namespace("x_pack.machine_learning.validate_detector")
+@rest_spec_name("xpack.ml.validate_detector")
 @class_serializer("ValidateDetectorRequestConverter")
 class ValidateDetectorRequest extends RequestBase {
 	detector: Detector;
 }
 @namespace("x_pack.machine_learning.validate_job")
+@rest_spec_name("xpack.ml.validate")
 class ValidateJobRequest extends RequestBase {
 	analysis_config: AnalysisConfig;
 	analysis_limits: AnalysisLimits;
@@ -7813,22 +7959,27 @@ class ValidateJobRequest extends RequestBase {
 	results_index_name: IndexName;
 }
 @namespace("x_pack.security.authenticate")
+@rest_spec_name("xpack.security.authenticate")
 class AuthenticateRequest extends RequestBase {
 }
 @namespace("x_pack.security.clear_cached_realms")
+@rest_spec_name("xpack.security.clear_cached_realms")
 class ClearCachedRealmsRequest extends RequestBase {
 	@request_parameter()
 	usernames: string[];
 }
 @namespace("x_pack.security.role_mapping.delete_role_mapping")
+@rest_spec_name("xpack.security.delete_role_mapping")
 class DeleteRoleMappingRequest extends RequestBase {
 	@request_parameter()
 	refresh: Refresh;
 }
 @namespace("x_pack.security.role_mapping.get_role_mapping")
+@rest_spec_name("xpack.security.get_role_mapping")
 class GetRoleMappingRequest extends RequestBase {
 }
 @namespace("x_pack.security.role_mapping.put_role_mapping")
+@rest_spec_name("xpack.security.put_role_mapping")
 class PutRoleMappingRequest extends RequestBase {
 	run_as: string[];
 	metadata: Map<string, any>;
@@ -7839,17 +7990,21 @@ class PutRoleMappingRequest extends RequestBase {
 	refresh: Refresh;
 }
 @namespace("x_pack.security.role.clear_cached_roles")
+@rest_spec_name("xpack.security.clear_cached_roles")
 class ClearCachedRolesRequest extends RequestBase {
 }
 @namespace("x_pack.security.role.delete_role")
+@rest_spec_name("xpack.security.delete_role")
 class DeleteRoleRequest extends RequestBase {
 	@request_parameter()
 	refresh: Refresh;
 }
 @namespace("x_pack.security.role.get_role")
+@rest_spec_name("xpack.security.get_role")
 class GetRoleRequest extends RequestBase {
 }
 @namespace("x_pack.security.role.put_role")
+@rest_spec_name("xpack.security.put_role")
 class PutRoleRequest extends RequestBase {
 	cluster: string[];
 	run_as: string[];
@@ -7859,38 +8014,46 @@ class PutRoleRequest extends RequestBase {
 	refresh: Refresh;
 }
 @namespace("x_pack.security.user.change_password")
+@rest_spec_name("xpack.security.change_password")
 class ChangePasswordRequest extends RequestBase {
 	password: string;
 	@request_parameter()
 	refresh: Refresh;
 }
 @namespace("x_pack.security.user.delete_user")
+@rest_spec_name("xpack.security.delete_user")
 class DeleteUserRequest extends RequestBase {
 	@request_parameter()
 	refresh: Refresh;
 }
 @namespace("x_pack.security.user.disable_user")
+@rest_spec_name("xpack.security.disable_user")
 class DisableUserRequest extends RequestBase {
 	@request_parameter()
 	refresh: Refresh;
 }
 @namespace("x_pack.security.user.enable_user")
+@rest_spec_name("xpack.security.enable_user")
 class EnableUserRequest extends RequestBase {
 	@request_parameter()
 	refresh: Refresh;
 }
 @namespace("x_pack.security.user.get_user_access_token")
+@rest_spec_name("xpack.security.get_token")
 class GetUserAccessTokenRequest extends RequestBase {
 	grant_type: AccessTokenGrantType;
 	scope: string;
 }
 @namespace("x_pack.security.user.get_user")
+@rest_spec_name("xpack.security.get_user")
 class GetUserRequest extends RequestBase {
 }
 @namespace("x_pack.security.user.invalidate_user_access_token")
+@rest_spec_name("xpack.security.invalidate_token")
 class InvalidateUserAccessTokenRequest extends RequestBase {
 }
 @namespace("x_pack.security.user.put_user")
+@rest_spec_name("xpack.security.put_user")
 class PutUserRequest extends RequestBase {
 	password: string;
 	roles: string[];
@@ -7901,26 +8064,31 @@ class PutUserRequest extends RequestBase {
 	refresh: Refresh;
 }
 @namespace("x_pack.watcher.acknowledge_watch")
+@rest_spec_name("xpack.watcher.ack_watch")
 class AcknowledgeWatchRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
 }
 @namespace("x_pack.watcher.activate_watch")
+@rest_spec_name("xpack.watcher.activate_watch")
 class ActivateWatchRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
 }
 @namespace("x_pack.watcher.deactivate_watch")
+@rest_spec_name("xpack.watcher.deactivate_watch")
 class DeactivateWatchRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
 }
 @namespace("x_pack.watcher.delete_watch")
+@rest_spec_name("xpack.watcher.delete_watch")
 class DeleteWatchRequest extends RequestBase {
 	@request_parameter()
 	master_timeout: Time;
 }
 @namespace("x_pack.watcher.execute_watch")
+@rest_spec_name("xpack.watcher.execute_watch")
 class ExecuteWatchRequest extends RequestBase {
 	trigger_data: ScheduleTriggerEvent;
 	ignore_condition: boolean;
@@ -7933,18 +8101,23 @@ class ExecuteWatchRequest extends RequestBase {
 	debug: boolean;
 }
 @namespace("x_pack.watcher.get_watch")
+@rest_spec_name("xpack.watcher.get_watch")
 class GetWatchRequest extends RequestBase {
 }
 @namespace("x_pack.watcher.restart_watcher")
+@rest_spec_name("xpack.watcher.restart")
 class RestartWatcherRequest extends RequestBase {
 }
 @namespace("x_pack.watcher.start_watcher")
+@rest_spec_name("xpack.watcher.start")
 class StartWatcherRequest extends RequestBase {
 }
 @namespace("x_pack.watcher.stop_watcher")
+@rest_spec_name("xpack.watcher.stop")
 class StopWatcherRequest extends RequestBase {
 }
 @namespace("x_pack.watcher.watcher_stats")
+@rest_spec_name("xpack.watcher.stats")
 class WatcherStatsRequest extends RequestBase {
 	@request_parameter()
 	emit_stacktraces: boolean;
@@ -7977,6 +8150,7 @@ class RemoteInfoResponse extends DictionaryResponseBase<string, RemoteInfo> {
 	remotes: Map<string, RemoteInfo>;
 }
 @namespace("document.single.create")
+@rest_spec_name("create")
 class CreateRequest<TDocument> extends RequestBase {
 	document: TDocument;
 	@request_parameter()
@@ -7997,6 +8171,7 @@ class CreateRequest<TDocument> extends RequestBase {
 	pipeline: string;
 }
 @namespace("document.single.index")
+@rest_spec_name("index")
 class IndexRequest<TDocument> extends RequestBase {
 	document: TDocument;
 	@request_parameter()
@@ -8027,6 +8202,7 @@ class GetAliasResponse extends DictionaryResponseBase<IndexName, IndexAliases> {
 	is_valid: boolean;
 }
 @namespace("indices.index_management.create_index")
+@rest_spec_name("indices.create")
 class CreateIndexRequest extends RequestBase {
 	settings: Map<string, any>;
 	mappings: Map<TypeName, TypeMapping>;
@@ -8058,6 +8234,7 @@ class CloseIndexResponse extends AcknowledgedResponseBase {
 class OpenIndexResponse extends AcknowledgedResponseBase {
 }
 @namespace("indices.index_management.rollover_index")
+@rest_spec_name("indices.rollover")
 class RolloverIndexRequest extends RequestBase {
 	conditions: RolloverConditions;
 	settings: Map<string, any>;
@@ -8097,6 +8274,7 @@ class GetIndexTemplateResponse extends DictionaryResponseBase<string, TemplateMa
 	template_mappings: Map<string, TemplateMapping>;
 }
 @namespace("indices.index_settings.index_templates.put_index_template")
+@rest_spec_name("indices.put_template")
 class PutIndexTemplateRequest extends RequestBase {
 	index_patterns: string[];
 	order: integer;
@@ -8131,6 +8309,7 @@ class GetMappingResponse extends DictionaryResponseBase<IndexName, IndexMappings
 	mapping: TypeMapping;
 }
 @namespace("indices.mapping_management.put_mapping")
+@rest_spec_name("indices.put_mapping")
 class PutMappingRequest extends RequestBase {
 	all_field: AllField;
 	date_detection: boolean;
@@ -8188,6 +8367,7 @@ class GetPipelineResponse extends DictionaryResponseBase<string, Pipeline> {
 	pipelines: Map<string, Pipeline>;
 }
 @namespace("ingest.put_pipeline")
+@rest_spec_name("ingest.put_pipeline")
 class PutPipelineRequest extends RequestBase {
 	description: string;
 	processors: Processor[];
@@ -8216,11 +8396,13 @@ class DeleteRepositoryResponse extends AcknowledgedResponseBase {
 class DeleteSnapshotResponse extends AcknowledgedResponseBase {
 }
 @namespace("search.scroll.scroll")
+@rest_spec_name("scroll")
 class ScrollRequest extends RequestBase {
 	scroll: Time;
 	scroll_id: string;
 }
 @namespace("x_pack.graph.explore")
+@rest_spec_name("xpack.graph.explore")
 class GraphExploreRequest extends RequestBase {
 	query: QueryContainer;
 	vertices: GraphVertexDefinition[];
