@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Nest.TypescriptGenerator.Touchups;
+using ShellProgressBar;
 
 namespace Nest.TypescriptGenerator
 {
@@ -17,15 +18,16 @@ namespace Nest.TypescriptGenerator
 			var command = args.Length > 0 ? args[0] : "generate";
 			var definitionFile = args.Length > 1 ? args[1] : defaultTsFile;
 			var nestSourceFolder = args.Length > 2 ? args[2] : defaultNestSourceFolder;
+			var restSpec = new RestSpec(nestSourceFolder);
 			switch (command)
 			{
-				case "generate": return Generate(definitionFile, nestSourceFolder);
+				case "generate": return Generate(definitionFile, nestSourceFolder, restSpec);
 				case "both":
 				case "split":
-					var outFolder = args.Length > 3 ? args[3] : @"..\..\..\elastic-client-generator\specification\specs2";
+					var outFolder = args.Length > 3 ? args[3] : @"..\..\..\elastic-client-generator\specification\specs";
 					var r = 0;
-					if (command == "both") r += Generate(definitionFile, nestSourceFolder);
-					r += Split(definitionFile, nestSourceFolder, outFolder);
+					if (command == "both") r += Generate(definitionFile, nestSourceFolder, restSpec);
+					r += Split(definitionFile, restSpec, outFolder);
 					return r;
 				default:
 					Console.Error.WriteLine("Unknown command for generator, valid are generate|split");
@@ -33,24 +35,29 @@ namespace Nest.TypescriptGenerator
 			}
 		}
 
-		private static int Split(string definitionFile, string nestSourceFolder, string outFolder)
+		private static int Split(string definitionFile, RestSpec restSpec, string outFolder)
 		{
-			var restSpec = new RestSpec(nestSourceFolder);
 			var splitter = new TypescriptDumpSplitter(definitionFile, restSpec, outFolder);
 			return splitter.Split();
 		}
 
-		private static int Generate(string definitionFile, string nestSourceFolder)
+		private static int Generate(string definitionFile, string nestSourceFolder, RestSpec restSpec)
 		{
 			var sourceDirectory = new CSharpSourceDirectory(nestSourceFolder);
 			var typeInfoProvider = new CsharpTypeInfoProvider();
-			var restSpec = new RestSpec(nestSourceFolder);
 			var scriptGenerator = new ClientTypescriptGenerator(typeInfoProvider, sourceDirectory, restSpec);
-			var generator = new ClientTypesExporter(typeInfoProvider, scriptGenerator);
-			File.WriteAllText(definitionFile, generator.Generate());
-			GenerateLineScrubber.LineBasedHacks(definitionFile);
-			GeneratePrependDefinitions.PrependDefinitions(definitionFile);
-			return 0;
+
+			using (var pbar = new ProgressBar(3, "Generating typescript information from NEST sources/code", new ProgressBarOptions {ForegroundColor = ConsoleColor.Yellow}))
+			{
+				var generator = new ClientTypesExporter(typeInfoProvider, scriptGenerator);
+				File.WriteAllText(definitionFile, generator.Generate());
+				pbar.Tick($"Generated {definitionFile}");
+				GenerateLineScrubber.LineBasedHacks(definitionFile);
+				pbar.Tick($"Performed line based scrubber over {definitionFile}");
+				GeneratePrependDefinitions.PrependDefinitions(definitionFile);
+				pbar.Tick($"Prepended known types and annotations {definitionFile}");
+				return 0;
+			}
 		}
 	}
 }

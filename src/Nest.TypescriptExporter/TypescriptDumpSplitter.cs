@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection.Metadata;
 using System.Text.RegularExpressions;
+using ShellProgressBar;
 
 namespace Nest.TypescriptGenerator
 {
@@ -20,13 +22,25 @@ namespace Nest.TypescriptGenerator
 
 		public int Split()
 		{
-			Directory.Delete(this._outFolder, true);
-			Directory.CreateDirectory(this._outFolder);
-			var additionalLines = SplitDeclarationDumpFile();
-			DumpRemainder(additionalLines);
-			CopyTsConfig();
+			using (var pbar = new ProgressBar(5, "splitting local typedefinitions.ts to elastic-client-generator", new ProgressBarOptions {ForegroundColor = ConsoleColor.Blue}))
+			{
+				if (Directory.Exists(this._outFolder))
+				{
+					Directory.Delete(this._outFolder, true);
+					pbar.Tick($"Deleted {this._outFolder}");
+				}
+				else pbar.Tick($"{this._outFolder} does not exist yet");
 
-			return 0;
+				Directory.CreateDirectory(this._outFolder);
+				pbar.Tick($"{this._outFolder} created");
+				var additionalLines = SplitDeclarationDumpFile();
+				pbar.Tick($"split typedefinitions.ts");
+				DumpRemainder(additionalLines);
+				pbar.Tick($"written common.ts");
+				CopyTsConfig();
+				pbar.Tick($"copied tsconfig.json");
+				return 0;
+			}
 		}
 
 		private List<string> SplitDeclarationDumpFile()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using ShellProgressBar;
 
 namespace Nest.TypescriptGenerator
 {
@@ -19,31 +20,36 @@ namespace Nest.TypescriptGenerator
 
 		public RestSpec(string nestSourceFolder)
 		{
-			this.RestSpecificationFolder = Path.GetFullPath(Path.Combine(nestSourceFolder, "..", "CodeGeneration", "ApiGenerator", "RestSpecification"));
+			using (var pbar = new ProgressBar(2, "reading NEST's REST API spec folder"))
+			{
 
-			var jsonFiles = Directory.GetFiles(this.RestSpecificationFolder, $"*.json", SearchOption.AllDirectories)
-				.Where(f=>!f.EndsWith(".patch.json") && !f.EndsWith("_common.json"))
-				.Select(f => new FileInfo(f))
-				.ToList();
+				this.RestSpecificationFolder = Path.GetFullPath(Path.Combine(nestSourceFolder, "..", "CodeGeneration", "ApiGenerator", "RestSpecification"));
 
-			this.SpecificationFiles = jsonFiles
-				.ToDictionary(f=>Path.GetFileNameWithoutExtension(f.Name), f=>f);
+				var jsonFiles = Directory.GetFiles(this.RestSpecificationFolder, $"*.json", SearchOption.AllDirectories)
+					.Where(f => !f.EndsWith(".patch.json") && !f.EndsWith("_common.json"))
+					.Select(f => new FileInfo(f))
+					.ToList();
 
-			this.Requests = Directory.GetFiles(nestSourceFolder, $"*Request.cs", SearchOption.AllDirectories)
-				.Select(f => new FileInfo(f))
-				.Select(CreateMapping)
-				.Where(m=>m != null)
-				.ToDictionary(m=> m.TypeName);
+				this.SpecificationFiles = jsonFiles.ToDictionary(f => Path.GetFileNameWithoutExtension(f.Name), f => f);
+				pbar.Tick("read all json files");
 
-			var requestFileNames = this.Requests.Values.Select(v => v.Json.Name).ToList();
-			var notFound = this.SpecificationFiles.Values
-				.Select(v => v.Name)
-				.ToList()
-				.Except(requestFileNames)
-				.Except(_ignoredApis)
-				.ToList();
+				this.Requests = Directory.GetFiles(nestSourceFolder, $"*Request.cs", SearchOption.AllDirectories)
+					.Select(f => new FileInfo(f))
+					.Select(CreateMapping)
+					.Where(m => m != null)
+					.ToDictionary(m => m.TypeName);
 
-			//TODO expose and report on notFound
+				pbar.Tick("mapped all json files to their *Request.cs counterparts in NEST's codebase");
+
+				var requestFileNames = this.Requests.Values.Select(v => v.Json.Name).ToList();
+				var notFound = this.SpecificationFiles.Values
+					.Select(v => v.Name)
+					.ToList()
+					.Except(requestFileNames)
+					.Except(_ignoredApis)
+					.ToList();
+			}
+
 		}
 
 		public Dictionary<string, RestSpecMapping> Requests { get; }
@@ -86,7 +92,6 @@ namespace Nest.TypescriptGenerator
 					return new RestSpecMapping {TypeName = $"I{typeName}", Json = f};
 			}
 			while (TryGetSpecTarget(specFileName, out specFileName));
-
 
 			throw new Exception($"{typeName} is not a known request in {this.RestSpecificationFolder}");
 		}
