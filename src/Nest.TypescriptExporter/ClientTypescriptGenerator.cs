@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using TypeLite;
@@ -27,7 +28,7 @@ namespace Nest.TypescriptGenerator
 
 		public static Dictionary<string, string> TypeRenames => new Dictionary<string, string>
 		{
-			{"KeyValuePair", "Map"}
+			{"KeyValuePair", "Dictionary"}
 		};
 
 		private readonly HashSet<string> _appended = new HashSet<string>();
@@ -46,7 +47,12 @@ namespace Nest.TypescriptGenerator
 				typeof (IApiCallDetails),
 				typeof (Node),
 				typeof (Audit),
-				typeof (AuditEvent)
+				typeof (AuditEvent),
+				typeof (Types.AllTypesMarker),
+				typeof (Indices.AllIndicesMarker),
+				typeof (AllField),
+				typeof (Indices.ManyIndices),
+				typeof (Types.ManyTypes),
 			});
 
 		private readonly Dictionary<Type, string[]> _typesPropertiesToIgnore = new Dictionary<Type, string[]>
@@ -62,27 +68,31 @@ namespace Nest.TypescriptGenerator
 
 		protected override void AppendClassDefinition(TsClass classModel, ScriptBuilder sb, TsGeneratorOutput generatorOutput)
 		{
-			AddNamespaceHeader(classModel.Name, sb);
+			if (classModel.Type.IsInterface && CsharpTypeInfoProvider.ExposedInterfaces.Contains(classModel.Type))
+			{
+				AppendInterfaceDef(classModel, sb, generatorOutput);
+			}
+			else AppendClassDef(classModel, sb, generatorOutput);
+
+		}
+		private void AppendInterfaceDef(TsClass classModel, ScriptBuilder sb, TsGeneratorOutput generatorOutput)
+		{
+			AddNamespaceHeaderEnum(classModel.Name,classModel.Type.Assembly.FullName, sb);
 
 			var typeName = this.GetTypeName(classModel);
 			var visibility = this.GetTypeVisibility(classModel, typeName) ? "export " : "";
 
-			AddRequestRenameInformation(sb, classModel);
-
-			AddDocCommentForCustomJsonConverter(sb, classModel);
 			_docAppender.AppendClassDoc(sb, classModel, typeName);
 
-			sb.AppendFormatIndented("{0}class {1}", visibility, typeName);
+			sb.AppendFormatIndented("{0}interface {1}", visibility, typeName);
 			if (classModel.BaseType != null)
 				sb.AppendFormat(" extends {0}", this.GetFullyQualifiedTypeName(classModel.BaseType));
 
-			if (classModel.Interfaces.Count > 0)
+			var interfaces = classModel.Interfaces.Where(m => CsharpTypeInfoProvider.ExposedInterfaces.Contains(m.Type)).ToList();
+			if (interfaces.Count > 0)
 			{
-				var implementations = classModel.Interfaces.Select(GetFullyQualifiedTypeName).ToArray();
-
-				var prefixFormat = classModel.Type.IsInterface ? " extends {0}"
-					: classModel.BaseType != null ? " , {0}"
-					: " extends {0}";
+				var implementations = interfaces.Select(GetFullyQualifiedTypeName).ToArray();
+				var prefixFormat = " implements {0}";
 
 				sb.AppendFormat(prefixFormat, string.Join(" ,", implementations));
 			}
@@ -94,17 +104,21 @@ namespace Nest.TypescriptGenerator
 			{
 				members.AddRange(classModel.Properties);
 			}
+
 			if ((generatorOutput & TsGeneratorOutput.Fields) == TsGeneratorOutput.Fields)
 			{
 				members.AddRange(classModel.Fields);
 			}
+
+			if (classModel.Type == typeof(PropertyBase))
+
 			using (sb.IncreaseIndentation())
 			{
 				foreach (var property in members)
 				{
 					if (property.IsIgnored ||
-						PropertyTypesToIgnore(property.PropertyType.Type) ||
-						(_typesPropertiesToIgnore.ContainsKey(classModel.Type) && _typesPropertiesToIgnore[classModel.Type].Contains(property.Name)))
+					    PropertyTypesToIgnore(property.PropertyType.Type) ||
+					    (_typesPropertiesToIgnore.ContainsKey(classModel.Type) && _typesPropertiesToIgnore[classModel.Type].Contains(property.Name)))
 						continue;
 
 					AddDocCommentForCustomJsonConverter(sb, property);
@@ -116,6 +130,101 @@ namespace Nest.TypescriptGenerator
 			sb.AppendLineIndented("}");
 			_generatedClasses.Add(classModel);
 		}
+
+		private void AppendClassDef(TsClass classModel, ScriptBuilder sb, TsGeneratorOutput generatorOutput)
+		{
+			AddNamespaceHeader(classModel.Name, sb);
+
+			var typeName = this.GetTypeName(classModel);
+			var visibility = this.GetTypeVisibility(classModel, typeName) ? "export " : "";
+
+			AddRequestRenameInformation(sb, classModel);
+			AddDocCommentForCustomJsonConverter(sb, classModel);
+			_docAppender.AppendClassDoc(sb, classModel, typeName);
+
+			sb.AppendFormatIndented("{0}class {1}", visibility, typeName);
+			if (CsharpTypeInfoProvider.StringAbstractions.Contains(classModel.Type))
+			{
+				sb.AppendLineIndented(" extends String {}");
+				return;
+			}
+
+			void EnforceBaseClass<TInterface, TBase>()
+			{
+				if (classModel.BaseType != null) return;
+				if (classModel.Type == typeof(TBase)) return;
+				if (typeof(TInterface).IsAssignableFrom(classModel.Type)) classModel.BaseType = new TsClass(typeof(TBase));
+			}
+
+			EnforceBaseClass<IAnalyzer, AnalyzerBase>();
+			EnforceBaseClass<ITokenizer, TokenizerBase>();
+			EnforceBaseClass<ITokenFilter, TokenFilterBase>();
+			EnforceBaseClass<ICharFilter, CharFilterBase>();
+			EnforceBaseClass<IProperty, PropertyBase>();
+			EnforceBaseClass<IResponse, ResponseBase>();
+
+			if (classModel.BaseType != null)
+			{
+				sb.AppendFormat(" extends {0}", this.GetFullyQualifiedTypeName(classModel.BaseType));
+			}
+
+			var interfaces = classModel.Interfaces.Where(m => CsharpTypeInfoProvider.ExposedInterfaces.Contains(m.Type)).ToList();
+			if (interfaces.Count > 0)
+			{
+				var implementations = interfaces.Select(GetFullyQualifiedTypeName).ToArray();
+				var prefixFormat = " implements {0}";
+
+				sb.AppendFormat(prefixFormat, string.Join(" ,", implementations));
+			}
+
+			sb.AppendLine(" {");
+
+			var members = new List<TsProperty>();
+			if ((generatorOutput & TsGeneratorOutput.Properties) == TsGeneratorOutput.Properties)
+			{
+				members.AddRange(classModel.Properties);
+			}
+
+			if ((generatorOutput & TsGeneratorOutput.Fields) == TsGeneratorOutput.Fields)
+			{
+				members.AddRange(classModel.Fields);
+			}
+
+			using (sb.IncreaseIndentation())
+			{
+				foreach (var property in members)
+				{
+					if (property.IsIgnored ||
+					    PropertyTypesToIgnore(property.PropertyType.Type) ||
+					    (_typesPropertiesToIgnore.ContainsKey(classModel.Type) && _typesPropertiesToIgnore[classModel.Type].Contains(property.Name)))
+						continue;
+
+					AddDocCommentForCustomJsonConverter(sb, property);
+					_docAppender.AppendPropertyDoc(sb, property, this.GetPropertyName(property), this.GetPropertyType(property));
+					sb.AppendLineIndented($"{this.GetPropertyName(property)}: {this.GetPropertyType(property)};");
+				}
+				if (classModel.Type == typeof(PropertyBase)) sb.AppendLineIndented($"type: string;");
+			}
+
+			sb.AppendLineIndented("}");
+			_generatedClasses.Add(classModel);
+
+			//generate a closed cat response type (NEST uses catresponse<TRecord> for all)
+			if (typeof(ICatRecord).IsAssignableFrom(classModel.Type))
+			{
+				var catResponseName = classModel.Type.Name.Replace("Record", "Response");
+				AddNamespaceHeader(classModel.Name, sb);
+				sb.AppendLineIndented($"class {catResponseName} extends ResponseBase {{");
+				using (sb.IncreaseIndentation())
+					sb.AppendLineIndented($"records: {typeName}[];");
+				sb.AppendLineIndented("}");
+
+
+			}
+
+
+		}
+
 		private bool AddNamespaceHeaderEnum(string name, string ns, ScriptBuilder sb)
 		{
 			if (!ns.StartsWith("Nest") && !ns.StartsWith("Elasticsearch.Net")) return false;
@@ -171,7 +280,7 @@ namespace Nest.TypescriptGenerator
 
 		private void AddRequestRenameInformation(ScriptBuilder sb, TsClass classModel)
 		{
-			if (this._restSpec.SkipRequest(classModel.Name)) return;
+			if (this._restSpec.SkipRequestImplementation(classModel.Name)) return;
 
 			var i = classModel.Name;
 			if (!ClientTypesExporter.InterfaceRegex.IsMatch(i)) i = $"I{i}";
@@ -280,11 +389,15 @@ namespace Nest.TypescriptGenerator
 				|| (generatorOutput & TsGeneratorOutput.Fields) == TsGeneratorOutput.Fields)
 			{
 				var cc = classes.Select(c => new {c, order = OrderTypes(c)}).ToList();
-
-				var orderedClasses = cc.OrderBy(c=>c.order).Select(c=>c.c).ToList();
-				var temp = cc.OrderBy(c=>c.order).Select(c => $"{c.order} - {c.c.Type.FullName}").ToList();
-				foreach (var classModel in orderedClasses)
+				var orderedClasses = cc.OrderBy(c => c.order).ToList();
+				foreach (var oc in orderedClasses)
 				{
+					var classModel = oc.c;
+					var t = classModel.Type;
+//					var x = $"// {oc.order} - {oc.c.Type.FullName}";
+//					sb.AppendIndented(x);
+					if (t.IsInterface && !CsharpTypeInfoProvider.ExposedInterfaces.Contains(t) && CsharpTypeInfoProvider.ExposedInterfaces.Any(i=>i.IsAssignableFrom(t)))
+						continue;
 					var c = ReMapClass(classModel);
 					if (Ignore(c)) continue;
 					if (this._appended.Contains(c.Name)) continue;
@@ -329,14 +442,17 @@ namespace Nest.TypescriptGenerator
 
 		private static int OrderTypes(TsClass c)
 		{
-			var weigth = 0;
-			if (c.Type.Namespace.StartsWith("Nest")) weigth += 100;
-			if (!c.Type.IsInterface) weigth += 50;
+			var t = c.Type;
+			var weight = 0;
+			if (c.Type.Namespace.StartsWith("Nest")) weight += 100;
+			if (c.Type.IsInterface || c.Type.IsAbstract)
+			{
+				if (!t.Name.Contains("Base")) weight += 20;
+				weight += GetParentTypes(t).Count();
+			}
+			else weight += 100 + GetParentTypes(t).Count();
 
-			var baseTypesCount = GetParentTypes(c.Type).Count();
-			weigth += baseTypesCount;
-
-			return weigth;
+			return weight;
 		}
 
 		protected bool Ignore(TsClass classModel)
@@ -377,6 +493,7 @@ namespace Nest.TypescriptGenerator
 				if (baseType == typeof(ShardsOperationResponseBase)) return classModel;
 				if (baseType == typeof(AcknowledgedResponseBase)) return classModel;
 				if (baseType == typeof(IndicesResponseBase)) return classModel;
+				if (baseType == typeof(NodesResponseBase)) return classModel;
 
 				classModel.BaseType = new TsClass(typeof(ResponseBase));
 			}

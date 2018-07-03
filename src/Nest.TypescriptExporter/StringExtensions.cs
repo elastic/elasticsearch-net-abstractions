@@ -11,6 +11,7 @@ namespace Nest.TypescriptGenerator
 			//this is dumb on purpose
 			if (s.Contains('-')) return $"\'{s}\'";
 			if (s.Contains('+')) return $"\'{s}\'";
+			if (s.Contains('.')) return $"\'{s}\'";
 			if (Regex.IsMatch(s, @"^\d")) return $"\'{s}\'";
 			return s;
 		}

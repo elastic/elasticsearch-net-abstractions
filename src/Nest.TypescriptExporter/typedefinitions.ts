@@ -20,7 +20,7 @@ class ErrorCause {
 @namespace("common")
 class MainError extends ErrorCause {
 	root_cause: ErrorCause[];
-	headers: Map<string, string>;
+	headers: Dictionary<string, string>[];
 }
 interface short {}
 interface byte {}
@@ -182,15 +182,15 @@ enum IcuCollationStrength {
 	identical = 4
 }
 /** namespace:analysis.plugins.icu.normalization **/
-enum IcuNormalizationMode {
-	decompose = 0,
-	compose = 1
-}
-/** namespace:analysis.plugins.icu.normalization **/
 enum IcuNormalizationType {
 	nfc = 0,
 	nfkc = 1,
 	nfkc_cf = 2
+}
+/** namespace:analysis.plugins.icu.normalization **/
+enum IcuNormalizationMode {
+	decompose = 0,
+	compose = 1
 }
 /** namespace:analysis.plugins.icu.transform **/
 enum IcuTransformDirection {
@@ -241,6 +241,31 @@ enum TokenChar {
 	punctuation = 3,
 	symbol = 4
 }
+/** namespace:common_options.time_unit **/
+enum TimeUnit {
+	nanos = 0,
+	micros = 1,
+	ms = 2,
+	s = 3,
+	m = 4,
+	h = 5,
+	d = 6
+}
+/** namespace:cluster.cluster_allocation_explain **/
+enum UnassignedInformationReason {
+	INDEX_CREATED = 0,
+	CLUSTER_RECOVERED = 1,
+	INDEX_REOPENED = 2,
+	DANGLING_INDEX_IMPORTED = 3,
+	NEW_INDEX_RESTORED = 4,
+	EXISTING_INDEX_RESTORED = 5,
+	REPLICA_ADDED = 6,
+	ALLOCATION_FAILED = 7,
+	NODE_LEFT = 8,
+	REROUTE_CANCELLED = 9,
+	REINITIALIZED = 10,
+	REALLOCATED_REPLICA = 11
+}
 /** namespace:cluster.cluster_allocation_explain **/
 enum AllocationExplainDecision {
 	NO = 0,
@@ -262,26 +287,159 @@ enum StoreCopy {
 	STALE = 4,
 	UNKNOWN = 5
 }
-/** namespace:cluster.cluster_allocation_explain **/
-enum UnassignedInformationReason {
-	INDEX_CREATED = 0,
-	CLUSTER_RECOVERED = 1,
-	INDEX_REOPENED = 2,
-	DANGLING_INDEX_IMPORTED = 3,
-	NEW_INDEX_RESTORED = 4,
-	EXISTING_INDEX_RESTORED = 5,
-	REPLICA_ADDED = 6,
-	ALLOCATION_FAILED = 7,
-	NODE_LEFT = 8,
-	REROUTE_CANCELLED = 9,
-	REINITIALIZED = 10,
-	REALLOCATED_REPLICA = 11
-}
 /** namespace:cluster **/
 enum ClusterStatus {
 	green = 0,
 	yellow = 1,
 	red = 2
+}
+/** namespace:query_dsl.multi_term_query_rewrite **/
+enum RewriteMultiTerm {
+	constant_score = 0,
+	scoring_boolean = 1,
+	constant_score_boolean = 2,
+	top_terms_N = 3,
+	top_terms_boost_N = 4,
+	top_terms_blended_freqs_N = 5
+}
+/** namespace:query_dsl.full_text.multi_match **/
+enum TextQueryType {
+	best_fields = 0,
+	most_fields = 1,
+	cross_fields = 2,
+	phrase = 3,
+	phrase_prefix = 4
+}
+/** namespace:query_dsl **/
+enum Operator {
+	and = 0,
+	or = 1
+}
+/** namespace:query_dsl.full_text.multi_match **/
+enum ZeroTermsQuery {
+	all = 0,
+	none = 1
+}
+/** namespace:common_options.geo **/
+enum GeoShapeRelation {
+	intersects = 0,
+	disjoint = 1,
+	within = 2,
+	contains = 3
+}
+/** namespace:search.search.sort **/
+enum SortOrder {
+	asc = 0,
+	desc = 1
+}
+/** namespace:search.search.sort **/
+enum SortMode {
+	min = 0,
+	max = 1,
+	sum = 2,
+	avg = 3
+}
+/** namespace:search.search.highlighting **/
+enum HighlighterOrder {
+	score = 0
+}
+/** namespace:search.search.highlighting **/
+enum HighlighterTagsSchema {
+	styled = 0
+}
+/** namespace:search.search.highlighting **/
+enum BoundaryScanner {
+	chars = 0,
+	sentence = 1,
+	word = 2
+}
+/** namespace:search.search.highlighting **/
+enum HighlighterFragmenter {
+	simple = 0,
+	span = 1
+}
+/** namespace:search.search.highlighting **/
+enum HighlighterEncoder {
+	default = 0,
+	html = 1
+}
+/** namespace:query_dsl.joining.has_child **/
+enum ChildScoreMode {
+	none = 0,
+	avg = 1,
+	sum = 2,
+	max = 3,
+	min = 4
+}
+/** namespace:query_dsl.full_text.simple_query_string **/
+enum SimpleQueryStringFlags {
+	NONE = 1,
+	AND = 2,
+	OR = 4,
+	NOT = 8,
+	PREFIX = 16,
+	PHRASE = 32,
+	PRECEDENCE = 64,
+	ESCAPE = 128,
+	WHITESPACE = 256,
+	FUZZY = 512,
+	NEAR = 1024,
+	SLOP = 2048,
+	ALL = 4096
+}
+/** namespace:query_dsl.joining.nested **/
+enum NestedScoreMode {
+	avg = 0,
+	sum = 1,
+	min = 2,
+	max = 3,
+	none = 4
+}
+/** namespace:query_dsl.compound.function_score.functions **/
+enum FunctionScoreMode {
+	multiply = 0,
+	sum = 1,
+	avg = 2,
+	first = 3,
+	max = 4,
+	min = 5
+}
+/** namespace:query_dsl.compound.function_score.functions **/
+enum FunctionBoostMode {
+	multiply = 0,
+	replace = 1,
+	sum = 2,
+	avg = 3,
+	max = 4,
+	min = 5
+}
+/** namespace:query_dsl.geo.bounding_box **/
+enum GeoExecution {
+	memory = 0,
+	indexed = 1
+}
+/** namespace:query_dsl.geo **/
+enum GeoValidationMethod {
+	coerce = 0,
+	ignore_malformed = 1,
+	strict = 2
+}
+/** namespace:common_options.geo **/
+enum DistanceUnit {
+	in = 0,
+	ft = 1,
+	yd = 2,
+	mi = 3,
+	nmi = 4,
+	km = 5,
+	m = 6,
+	cm = 7,
+	mm = 8
+}
+/** namespace:common_options.geo **/
+enum GeoDistanceType {
+	arc = 0,
+	plane = 1
 }
 /** namespace:cluster.nodes_info **/
 enum NodeRole {
@@ -304,40 +462,6 @@ enum DateMathTimeUnit {
 	w = 4,
 	M = 5,
 	y = 6
-}
-/** namespace:common_options.geo **/
-enum DistanceUnit {
-	in = 0,
-	ft = 1,
-	yd = 2,
-	mi = 3,
-	nmi = 4,
-	km = 5,
-	m = 6,
-	cm = 7,
-	mm = 8
-}
-/** namespace:common_options.geo **/
-enum GeoDistanceType {
-	arc = 0,
-	plane = 1
-}
-/** namespace:common_options.geo **/
-enum GeoShapeRelation {
-	intersects = 0,
-	disjoint = 1,
-	within = 2,
-	contains = 3
-}
-/** namespace:common_options.time_unit **/
-enum TimeUnit {
-	nanos = 0,
-	micros = 1,
-	ms = 2,
-	s = 3,
-	m = 4,
-	h = 5,
-	d = 6
 }
 /** namespace:document **/
 enum Result {
@@ -491,6 +615,23 @@ enum TermVectorOption {
 	with_positions_offsets = 4,
 	with_positions_offsets_payloads = 5
 }
+/** namespace:modules.indices.fielddata.numeric **/
+enum NumericFielddataFormat {
+	array = 0,
+	disabled = 1
+}
+/** namespace:modules.indices.fielddata **/
+enum FielddataLoading {
+	eager = 0,
+	eager_global_ordinals = 1
+}
+/** namespace:mapping.types.core.text **/
+enum IndexOptions {
+	docs = 0,
+	freqs = 1,
+	positions = 2,
+	offsets = 3
+}
 /** namespace:mapping.types.core.number **/
 enum NumberType {
 	float = 0,
@@ -509,13 +650,6 @@ enum RangeType {
 	long_range = 2,
 	double_range = 3,
 	date_range = 4
-}
-/** namespace:mapping.types.core.text **/
-enum IndexOptions {
-	docs = 0,
-	freqs = 1,
-	positions = 2,
-	offsets = 3
 }
 /** namespace:mapping.types **/
 enum FieldType {
@@ -555,14 +689,19 @@ enum GeoOrientation {
 	ccw = 1
 }
 /** namespace:mapping.types.geo.geo_shape **/
+enum GeoTree {
+	geohash = 0,
+	quadtree = 1
+}
+/** namespace:mapping.types.geo.geo_shape **/
 enum GeoStrategy {
 	recursive = 0,
 	term = 1
 }
-/** namespace:mapping.types.geo.geo_shape **/
-enum GeoTree {
-	geohash = 0,
-	quadtree = 1
+/** namespace:modules.indices.fielddata.string **/
+enum StringFielddataFormat {
+	paged_bytes = 0,
+	disabled = 1
 }
 /** namespace:modules.cluster.shard_allocation **/
 enum AllocationEnable {
@@ -584,27 +723,12 @@ enum RebalanceEnable {
 	replicas = 2,
 	none = 3
 }
-/** namespace:modules.indices.fielddata **/
-enum FielddataLoading {
-	eager = 0,
-	eager_global_ordinals = 1
-}
 /** namespace:modules.indices.fielddata.geo_point **/
 enum GeoPointFielddataFormat {
 	array = 0,
 	doc_values = 1,
 	compressed = 2,
 	disabled = 3
-}
-/** namespace:modules.indices.fielddata.numeric **/
-enum NumericFielddataFormat {
-	array = 0,
-	disabled = 1
-}
-/** namespace:modules.indices.fielddata.string **/
-enum StringFielddataFormat {
-	paged_bytes = 0,
-	disabled = 1
 }
 /** namespace:modules.scripting **/
 enum ScriptLang {
@@ -632,94 +756,6 @@ enum FieldValueFactorModifier {
 	sqrt = 8,
 	reciprocal = 9
 }
-/** namespace:query_dsl.compound.function_score.functions **/
-enum FunctionBoostMode {
-	multiply = 0,
-	replace = 1,
-	sum = 2,
-	avg = 3,
-	max = 4,
-	min = 5
-}
-/** namespace:query_dsl.compound.function_score.functions **/
-enum FunctionScoreMode {
-	multiply = 0,
-	sum = 1,
-	avg = 2,
-	first = 3,
-	max = 4,
-	min = 5
-}
-/** namespace:query_dsl.full_text.multi_match **/
-enum TextQueryType {
-	best_fields = 0,
-	most_fields = 1,
-	cross_fields = 2,
-	phrase = 3,
-	phrase_prefix = 4
-}
-/** namespace:query_dsl.full_text.multi_match **/
-enum ZeroTermsQuery {
-	all = 0,
-	none = 1
-}
-/** namespace:query_dsl.full_text.simple_query_string **/
-enum SimpleQueryStringFlags {
-	NONE = 1,
-	AND = 2,
-	OR = 4,
-	NOT = 8,
-	PREFIX = 16,
-	PHRASE = 32,
-	PRECEDENCE = 64,
-	ESCAPE = 128,
-	WHITESPACE = 256,
-	FUZZY = 512,
-	NEAR = 1024,
-	SLOP = 2048,
-	ALL = 4096
-}
-/** namespace:query_dsl.geo.bounding_box **/
-enum GeoExecution {
-	memory = 0,
-	indexed = 1
-}
-/** namespace:query_dsl.geo **/
-enum GeoValidationMethod {
-	coerce = 0,
-	ignore_malformed = 1,
-	strict = 2
-}
-/** namespace:query_dsl.joining.has_child **/
-enum ChildScoreMode {
-	none = 0,
-	avg = 1,
-	sum = 2,
-	max = 3,
-	min = 4
-}
-/** namespace:query_dsl.joining.nested **/
-enum NestedScoreMode {
-	avg = 0,
-	sum = 1,
-	min = 2,
-	max = 3,
-	none = 4
-}
-/** namespace:query_dsl.multi_term_query_rewrite **/
-enum RewriteMultiTerm {
-	constant_score = 0,
-	scoring_boolean = 1,
-	constant_score_boolean = 2,
-	top_terms_N = 3,
-	top_terms_boost_N = 4,
-	top_terms_blended_freqs_N = 5
-}
-/** namespace:query_dsl **/
-enum Operator {
-	and = 0,
-	or = 1
-}
 /** namespace:query_dsl.term_level.range **/
 enum RangeRelation {
 	within = 0,
@@ -738,60 +774,10 @@ enum VisitorScope {
 	NegativeQuery = 7,
 	Span = 8
 }
-/** namespace:search.search.highlighting **/
-enum BoundaryScanner {
-	chars = 0,
-	sentence = 1,
-	word = 2
-}
-/** namespace:search.search.highlighting **/
-enum HighlighterEncoder {
-	default = 0,
-	html = 1
-}
-/** namespace:search.search.highlighting **/
-enum HighlighterFragmenter {
-	simple = 0,
-	span = 1
-}
-/** namespace:search.search.highlighting **/
-enum HighlighterOrder {
-	score = 0
-}
-/** namespace:search.search.highlighting **/
-enum HighlighterTagsSchema {
-	styled = 0
-}
-/** namespace:search.search.highlighting **/
-enum HighlighterType {
-	plain = 0,
-	fvh = 1,
-	unified = 2
-}
-/** namespace:search.search.rescoring **/
-enum ScoreMode {
-	avg = 0,
-	max = 1,
-	min = 2,
-	multiply = 3,
-	total = 4
-}
-/** namespace:search.search.sort **/
-enum SortMode {
-	min = 0,
-	max = 1,
-	sum = 2,
-	avg = 3
-}
-/** namespace:search.search.sort **/
-enum SortOrder {
-	asc = 0,
-	desc = 1
-}
-/** namespace:search.search.sort **/
-enum SortSpecialField {
-	_score = 0,
-	_doc = 1
+/** namespace:search.suggesters.term_suggester **/
+enum SuggestSort {
+	score = 0,
+	frequency = 1
 }
 /** namespace:search.suggesters.term_suggester **/
 enum StringDistance {
@@ -801,10 +787,24 @@ enum StringDistance {
 	jarowinkler = 3,
 	ngram = 4
 }
-/** namespace:search.suggesters.term_suggester **/
-enum SuggestSort {
-	score = 0,
-	frequency = 1
+/** namespace:search.search.rescoring **/
+enum ScoreMode {
+	avg = 0,
+	max = 1,
+	min = 2,
+	multiply = 3,
+	total = 4
+}
+/** namespace:search.search.highlighting **/
+enum HighlighterType {
+	plain = 0,
+	fvh = 1,
+	unified = 2
+}
+/** namespace:search.search.sort **/
+enum SortSpecialField {
+	_score = 0,
+	_doc = 1
 }
 /** namespace:x_pack.migration.deprecation_info **/
 enum DeprecationWarningLevel {
@@ -812,13 +812,6 @@ enum DeprecationWarningLevel {
 	info = 1,
 	warning = 2,
 	critical = 3
-}
-/** namespace:x_pack.license.get_license **/
-enum LicenseStatus {
-	active = 0,
-	valid = 1,
-	invalid = 2,
-	expired = 3
 }
 /** namespace:x_pack.license.get_license **/
 enum LicenseType {
@@ -830,6 +823,13 @@ enum LicenseType {
 	silver = 5,
 	gold = 6,
 	platinum = 7
+}
+/** namespace:x_pack.license.get_license **/
+enum LicenseStatus {
+	active = 0,
+	valid = 1,
+	invalid = 2,
+	expired = 3
 }
 /** namespace:x_pack.machine_learning.datafeed **/
 enum ChunkingMode {
@@ -845,6 +845,12 @@ enum DatafeedState {
 	stopping = 3
 }
 /** namespace:x_pack.machine_learning.job.config **/
+enum MemoryStatus {
+	ok = 0,
+	soft_limit = 1,
+	hard_limit = 2
+}
+/** namespace:x_pack.machine_learning.job.config **/
 enum JobState {
 	closing = 0,
 	closed = 1,
@@ -852,11 +858,12 @@ enum JobState {
 	failed = 3,
 	opening = 4
 }
-/** namespace:x_pack.machine_learning.job.config **/
-enum MemoryStatus {
-	ok = 0,
-	soft_limit = 1,
-	hard_limit = 2
+/** namespace:x_pack.machine_learning.put_job **/
+enum ExcludeFrequent {
+	all = 0,
+	none = 1,
+	by = 2,
+	over = 3
 }
 /** namespace:x_pack.machine_learning.job.detectors **/
 enum CountFunction {
@@ -922,13 +929,6 @@ enum NonNullSumFunction {
 enum TimeFunction {
 	TimeOfDay = 0,
 	TimeOfWeek = 1
-}
-/** namespace:x_pack.machine_learning.put_job **/
-enum ExcludeFrequent {
-	all = 0,
-	none = 1,
-	by = 2,
-	over = 3
 }
 /** namespace:x_pack.security.user.get_user_access_token **/
 enum AccessTokenGrantType {
@@ -1000,17 +1000,6 @@ enum ConditionType {
 	compare = 3,
 	array_compare = 4
 }
-/** namespace:x_pack.watcher.execute_watch **/
-enum ActionExecutionState {
-	awaits_execution = 0,
-	checking = 1,
-	execution_not_needed = 2,
-	throttled = 3,
-	executed = 4,
-	failed = 5,
-	deleted_while_queued = 6,
-	not_executed_already_queued = 7
-}
 /** namespace:x_pack.watcher.execution **/
 enum ActionExecutionMode {
 	simulate = 0,
@@ -1018,38 +1007,6 @@ enum ActionExecutionMode {
 	execute = 2,
 	force_execute = 3,
 	skip = 4
-}
-/** namespace:x_pack.watcher.execution **/
-enum Status {
-	success = 0,
-	failure = 1,
-	simulated = 2,
-	throttled = 3
-}
-/** namespace:x_pack.watcher.input **/
-enum ConnectionScheme {
-	http = 0,
-	https = 1
-}
-/** namespace:x_pack.watcher.input **/
-enum HttpInputMethod {
-	head = 0,
-	get = 1,
-	post = 2,
-	put = 3,
-	delete = 4
-}
-/** namespace:x_pack.watcher.input **/
-enum InputType {
-	http = 0,
-	search = 1,
-	simple = 2
-}
-/** namespace:x_pack.watcher.input **/
-enum ResponseContentType {
-	json = 0,
-	yaml = 1,
-	text = 2
 }
 /** namespace:x_pack.watcher.schedule **/
 enum Day {
@@ -1060,14 +1017,6 @@ enum Day {
 	thursday = 4,
 	friday = 5,
 	saturday = 6
-}
-/** namespace:x_pack.watcher.schedule **/
-enum IntervalUnit {
-	s = 0,
-	m = 1,
-	h = 2,
-	d = 3,
-	w = 4
 }
 /** namespace:x_pack.watcher.schedule **/
 enum Month {
@@ -1084,12 +1033,56 @@ enum Month {
 	november = 10,
 	december = 11
 }
-/** namespace:x_pack.watcher.watcher_stats **/
-enum WatcherState {
-	stopped = 0,
-	starting = 1,
-	started = 2,
-	stopping = 3
+/** namespace:x_pack.watcher.schedule **/
+enum IntervalUnit {
+	s = 0,
+	m = 1,
+	h = 2,
+	d = 3,
+	w = 4
+}
+/** namespace:x_pack.watcher.input **/
+enum ConnectionScheme {
+	http = 0,
+	https = 1
+}
+/** namespace:x_pack.watcher.input **/
+enum HttpInputMethod {
+	head = 0,
+	get = 1,
+	post = 2,
+	put = 3,
+	delete = 4
+}
+/** namespace:x_pack.watcher.input **/
+enum ResponseContentType {
+	json = 0,
+	yaml = 1,
+	text = 2
+}
+/** namespace:x_pack.watcher.input **/
+enum InputType {
+	http = 0,
+	search = 1,
+	simple = 2
+}
+/** namespace:x_pack.watcher.execution **/
+enum Status {
+	success = 0,
+	failure = 1,
+	simulated = 2,
+	throttled = 3
+}
+/** namespace:x_pack.watcher.execute_watch **/
+enum ActionExecutionState {
+	awaits_execution = 0,
+	checking = 1,
+	execution_not_needed = 2,
+	throttled = 3,
+	executed = 4,
+	failed = 5,
+	deleted_while_queued = 6,
+	not_executed_already_queued = 7
 }
 /** namespace:x_pack.watcher.watcher_stats **/
 enum ExecutionPhase {
@@ -1102,23 +1095,131 @@ enum ExecutionPhase {
 	aborted = 6,
 	finished = 7
 }
-@namespace("modules.indices.circuit_breaker")
-class CircuitBreakerSettings {
-	total_limit: string;
-	fielddata_limit: string;
-	fielddata_overhead: float;
-	request_limit: string;
-	request_overhead: float;
+/** namespace:x_pack.watcher.watcher_stats **/
+enum WatcherState {
+	stopped = 0,
+	starting = 1,
+	started = 2,
+	stopping = 3
 }
-@namespace("modules.indices.recovery")
-class IndicesRecoverySettings {
-	concurrent_streams: integer;
-	concurrent_small_file_streams: integer;
-	file_chunk_size: string;
-	translog_operations: integer;
-	translog_size: string;
-	compress: boolean;
-	max_bytes_per_second: string;
+@namespace("x_pack.security.role_mapping.rules.role")
+@class_serializer("RoleMappingRuleBaseJsonConverter")
+class RoleMappingRuleBase {
+}
+@namespace("analysis.analyzers")
+class AnalyzerBase implements IAnalyzer {
+	version: string;
+	type: string;
+}
+@namespace("analysis.char_filters")
+class CharFilterBase implements ICharFilter {
+	version: string;
+	type: string;
+}
+@namespace("analysis.token_filters")
+class TokenFilterBase implements ITokenFilter {
+	version: string;
+	type: string;
+}
+@namespace("analysis.tokenizers")
+class TokenizerBase implements ITokenizer {
+	version: string;
+	type: string;
+}
+@namespace("x_pack.watcher.schedule")
+class ScheduleBase {
+}
+@namespace("common_abstractions.request")
+class RequestBase {
+}
+@namespace("common_abstractions.response")
+class ResponseBase implements IResponse {
+	server_error: ServerError;
+	is_valid: boolean;
+	debug_information: string;
+}
+@namespace("analysis.token_filters.compound_word")
+class CompoundWordTokenFilterBase extends TokenFilterBase {
+	word_list: string[];
+	word_list_path: string;
+	min_word_size: integer;
+	min_subword_size: integer;
+	max_subword_size: integer;
+	only_longest_match: boolean;
+	hyphenation_patterns_path: string;
+}
+@namespace("common_abstractions.request")
+class PlainRequestBase<TParameters> extends RequestBase {
+	request_configuration: RequestConfiguration;
+	pretty: boolean;
+	human: boolean;
+	error_trace: boolean;
+	filter_path: string[];
+}
+@namespace("mapping.types")
+class PropertyBase implements IProperty {
+	name: PropertyName;
+	local_metadata: Dictionary<string, any>[];
+	type: string;
+}
+@namespace("cluster")
+class NodesResponseBase extends ResponseBase {
+	node_statistics: NodeStatistics;
+}
+@namespace("common_abstractions.response")
+class DictionaryResponseBase<TKey, TValue> extends ResponseBase {
+}
+@namespace("common_abstractions.response")
+class AcknowledgedResponseBase extends ResponseBase {
+	acknowledged: boolean;
+}
+@namespace("common_abstractions.response")
+class IndicesResponseBase extends ResponseBase {
+	acknowledged: boolean;
+	_shards: ShardStatistics;
+}
+@namespace("common_abstractions.response")
+class ShardsOperationResponseBase extends ResponseBase {
+	_shards: ShardStatistics;
+}
+@namespace("mapping.types")
+class CorePropertyBase extends PropertyBase {
+	copy_to: Field[];
+	fields: Dictionary<PropertyName, IProperty>[];
+	similarity: Union<SimilarityOption, string>;
+	store: boolean;
+}
+@namespace("mapping.types")
+class DocValuesPropertyBase extends CorePropertyBase {
+	doc_values: boolean;
+}
+@namespace("mapping.types.core.range")
+class RangePropertyBase extends DocValuesPropertyBase {
+	coerce: boolean;
+	boost: double;
+	index: boolean;
+}
+/** namespace:analysis.analyzers **/
+interface IAnalyzer {
+}
+/** namespace:analysis.char_filters **/
+interface ICharFilter {
+}
+/** namespace:analysis.token_filters **/
+interface ITokenFilter {
+}
+/** namespace:analysis.tokenizers **/
+interface ITokenizer {
+}
+/** namespace:cat **/
+interface ICatRecord {
+}
+/** namespace:common_abstractions.request **/
+interface IRequest {
+}
+@namespace("cluster.cluster_reroute.commands")
+class ClusterRerouteCommand {
+	name: string;
 }
 @namespace("mapping")
 class TypeMapping {
@@ -1131,10 +1232,13 @@ class TypeMapping {
 	_index: IndexField;
 	_size: SizeField;
 	_field_names: FieldNamesField;
-	_meta: Map<string, any>;
-	dynamic_templates: Map<string, DynamicTemplate>;
+	_meta: Dictionary<string, any>[];
+	dynamic_templates: Dictionary<string, DynamicTemplate>[];
 	dynamic: Union<boolean, DynamicMapping>;
-	properties: Map<PropertyName, Property>;
+	properties: Dictionary<PropertyName, IProperty>[];
+}
+@namespace("mapping.meta_fields")
+class FieldMapping {
 }
 @namespace("mapping.dynamic_template")
 class DynamicTemplate {
@@ -1143,7 +1247,7 @@ class DynamicTemplate {
 	match_mapping_type: string;
 	path_match: string;
 	path_unmatch: string;
-	mapping: Property;
+	mapping: IProperty;
 }
 @namespace("indices.alias_management")
 class Alias {
@@ -1151,125 +1255,6 @@ class Alias {
 	routing: Routing;
 	index_routing: Routing;
 	search_routing: Routing;
-}
-@namespace("document.multiple.bulk.bulk_response_item")
-@class_serializer("BulkResponseItemJsonConverter")
-class BulkResponseItem {
-	operation: string;
-	_index: string;
-	_type: string;
-	_id: string;
-	_version: long;
-	status: integer;
-	error: BulkError;
-	_shards: ShardStatistics;
-	_seq_no: long;
-	_primary_term: long;
-	is_valid: boolean;
-}
-@namespace("document.multiple.multi_get.response")
-class MultiGetHit<TDocument> {
-	source: TDocument;
-	index: string;
-	found: boolean;
-	type: string;
-	version: long;
-	id: string;
-	parent: string;
-	routing: string;
-	error: MainError;
-}
-@namespace("document.single.term_vectors")
-class TermVectors {
-	index: string;
-	type: string;
-	id: string;
-	version: long;
-	found: boolean;
-	took: long;
-	term_vectors: Map<Field, TermVector>;
-}
-@namespace("common_abstractions.lazy_document")
-class LazyDocument {
-}
-@namespace("modules.scripting")
-class StoredScript {
-	lang: string;
-	source: string;
-}
-@namespace("modules.snapshot_and_restore.repositories")
-class SnapshotRepository {
-	type: string;
-}
-@namespace("aggregations")
-class Aggregate {
-	meta: Map<string, any>;
-}
-@namespace("aggregations")
-class AggregationContainer {
-	meta: Map<string, any>;
-	avg: AverageAggregation;
-	date_histogram: DateHistogramAggregation;
-	percentiles: PercentilesAggregation;
-	date_range: DateRangeAggregation;
-	extended_stats: ExtendedStatsAggregation;
-	filter: FilterAggregation;
-	filters: FiltersAggregation;
-	geo_distance: GeoDistanceAggregation;
-	geohash_grid: GeoHashGridAggregation;
-	geo_bounds: GeoBoundsAggregation;
-	histogram: HistogramAggregation;
-	global: GlobalAggregation;
-	ip_range: IpRangeAggregation;
-	max: MaxAggregation;
-	min: MinAggregation;
-	cardinality: CardinalityAggregation;
-	missing: MissingAggregation;
-	nested: NestedAggregation;
-	reverse_nested: ReverseNestedAggregation;
-	range: RangeAggregation;
-	stats: StatsAggregation;
-	sum: SumAggregation;
-	terms: TermsAggregation;
-	significant_terms: SignificantTermsAggregation;
-	value_count: ValueCountAggregation;
-	percentile_ranks: PercentileRanksAggregation;
-	top_hits: TopHitsAggregation;
-	children: ChildrenAggregation;
-	scripted_metric: ScriptedMetricAggregation;
-	avg_bucket: AverageBucketAggregation;
-	derivative: DerivativeAggregation;
-	max_bucket: MaxBucketAggregation;
-	min_bucket: MinBucketAggregation;
-	sum_bucket: SumBucketAggregation;
-	stats_bucket: StatsBucketAggregation;
-	extended_stats_bucket: ExtendedStatsBucketAggregation;
-	percentiles_bucket: PercentilesBucketAggregation;
-	moving_avg: MovingAverageAggregation;
-	cumulative_sum: CumulativeSumAggregation;
-	serial_diff: SerialDifferencingAggregation;
-	bucket_script: BucketScriptAggregation;
-	bucket_selector: BucketSelectorAggregation;
-	sampler: SamplerAggregation;
-	geo_centroid: GeoCentroidAggregation;
-	matrix_stats: MatrixStatsAggregation;
-	adjacency_matrix: AdjacencyMatrixAggregation;
-	aggs: Map<string, AggregationContainer>;
-}
-@namespace("common_options.scripting")
-@class_serializer("ScriptJsonConverter")
-class Script {
-	params: Map<string, any>;
-	lang: string;
-}
-@namespace("aggregations.metric.percentiles.methods")
-class PercentilesMethod {
-}
-@namespace("aggregations.bucket.date_range")
-class DateRangeExpression {
-	from: DateMath;
-	to: DateMath;
-	key: string;
 }
 @namespace("query_dsl.abstractions.container")
 class QueryContainer {
@@ -1323,6 +1308,15 @@ class QueryContainer {
 	type: TypeQuery;
 	percolate: PercolateQuery;
 }
+@namespace("query_dsl.abstractions.query")
+class Query {
+	_name: string;
+	boost: double;
+	conditionless: boolean;
+	is_verbatim: boolean;
+	is_strict: boolean;
+	is_writable: boolean;
+}
 @namespace("common_options.fuzziness")
 @class_serializer("FuzzinessJsonConverter")
 class Fuzziness {
@@ -1348,7 +1342,7 @@ class InnerHits {
 	explain: boolean;
 	_source: Union<boolean, SourceFilter>;
 	version: boolean;
-	script_fields: Map<string, ScriptField>;
+	script_fields: Dictionary<string, ScriptField>[];
 	docvalue_fields: Field[];
 }
 @namespace("search.search.sort")
@@ -1372,7 +1366,7 @@ class Highlight {
 	encoder: HighlighterEncoder;
 	order: HighlighterOrder;
 	tags_schema: HighlighterTagsSchema;
-	fields: Map<Field, HighlightField>;
+	fields: Dictionary<Field, HighlightField>[];
 	require_field_match: boolean;
 	boundary_chars: string;
 	max_fragment_length: integer;
@@ -1414,6 +1408,12 @@ class SourceFilter {
 class ScriptField {
 	script: Script;
 }
+@namespace("common_options.scripting")
+@class_serializer("ScriptJsonConverter")
+class Script {
+	params: Dictionary<string, any>[];
+	lang: string;
+}
 @namespace("query_dsl.specialized.more_like_this.like")
 class LikeDocument {
 	_index: IndexName;
@@ -1423,7 +1423,7 @@ class LikeDocument {
 	_routing: Routing;
 	@prop_serializer("SourceConverter")
 	doc: any;
-	per_field_analyzer: Map<Field, string>;
+	per_field_analyzer: Dictionary<Field, string>[];
 }
 @namespace("query_dsl.compound.function_score.functions")
 class ScoreFunction {
@@ -1434,6 +1434,395 @@ class ScoreFunction {
 class BoundingBox {
 	top_left: GeoLocation;
 	bottom_right: GeoLocation;
+}
+@namespace("common_abstractions.fluent")
+class Descriptor {
+}
+@namespace("indices.index_settings.index_templates.get_index_template")
+class TemplateMapping {
+	index_patterns: string[];
+	order: integer;
+	settings: Dictionary<string, any>[];
+	mappings: Dictionary<TypeName, TypeMapping>[];
+	aliases: Dictionary<IndexName, Alias>[];
+	version: integer;
+}
+@namespace("document.multiple.bulk.bulk_operation")
+class BulkOperation {
+	operation: string;
+	_index: IndexName;
+	_type: TypeName;
+	_id: Id;
+	version: long;
+	version_type: VersionType;
+	routing: Routing;
+	parent: Id;
+	retry_on_conflict: integer;
+}
+@namespace("document.multiple.bulk.bulk_response_item")
+@class_serializer("BulkResponseItemJsonConverter")
+class BulkResponseItem {
+	operation: string;
+	_index: string;
+	_type: string;
+	_id: string;
+	_version: long;
+	status: integer;
+	error: BulkError;
+	_shards: ShardStatistics;
+	_seq_no: long;
+	_primary_term: long;
+	is_valid: boolean;
+}
+@namespace("search.scroll.scroll")
+class SlicedScroll {
+	id: integer;
+	max: integer;
+	field: Field;
+}
+@namespace("document.multiple.multi_get.request")
+class MultiGetOperation {
+	_index: IndexName;
+	_type: TypeName;
+	_id: Id;
+	stored_fields: Field[];
+	routing: string;
+	_source: Union<boolean, SourceFilter>;
+	version: long;
+	version_type: VersionType;
+	can_be_flattened: boolean;
+}
+@namespace("document.multiple.multi_get.response")
+class MultiGetHit<TDocument> {
+	source: TDocument;
+	index: string;
+	found: boolean;
+	type: string;
+	version: long;
+	id: string;
+	parent: string;
+	routing: string;
+	error: MainError;
+}
+@namespace("document.multiple.multi_term_vectors")
+class MultiTermVectorOperation {
+	_index: IndexName;
+	_type: TypeName;
+	_id: Id;
+	@prop_serializer("SourceConverter")
+	doc: any;
+	fields: Field[];
+	offsets: boolean;
+	payloads: boolean;
+	positions: boolean;
+	term_statistics: boolean;
+	field_statistics: boolean;
+	filter: TermVectorFilter;
+	version: long;
+	version_type: VersionType;
+	routing: Routing;
+}
+@namespace("document.single.term_vectors")
+class TermVectorFilter {
+	max_num_terms: integer;
+	min_term_freq: integer;
+	max_term_freq: integer;
+	min_doc_freq: integer;
+	max_doc_freq: integer;
+	min_word_length: integer;
+	max_word_length: integer;
+}
+@namespace("document.single.term_vectors")
+class TermVectors {
+	index: string;
+	type: string;
+	id: string;
+	version: long;
+	found: boolean;
+	took: long;
+	term_vectors: Dictionary<Field, TermVector>[];
+}
+@namespace("document.multiple.reindex_on_server")
+class ReindexSource {
+	query: QueryContainer;
+	sort: Sort[];
+	index: Indices;
+	type: Types;
+	size: integer;
+	remote: RemoteSource;
+}
+@namespace("document.multiple.reindex_on_server")
+class RemoteSource {
+	host: Uri;
+	username: string;
+	password: string;
+}
+@namespace("document.multiple.reindex_on_server")
+class ReindexDestination {
+	index: IndexName;
+	type: TypeName;
+	routing: ReindexRouting;
+	op_type: OpType;
+	version_type: VersionType;
+}
+@namespace("common_abstractions.lazy_document")
+class LazyDocument {
+}
+@namespace("indices.alias_management.alias.actions")
+class AliasAction {
+}
+@namespace("index_modules.index_settings")
+class IndexState {
+	settings: Dictionary<string, any>[];
+	aliases: Dictionary<IndexName, Alias>[];
+	mappings: Dictionary<TypeName, TypeMapping>[];
+}
+@namespace("indices.index_management.rollover_index")
+class RolloverConditions {
+	max_age: Time;
+	max_docs: long;
+}
+@namespace("ingest")
+@class_serializer("PipelineJsonConverter")
+class Pipeline {
+	description: string;
+	processors: Processor[];
+	on_failure: Processor[];
+}
+@namespace("ingest")
+class Processor {
+	name: string;
+	on_failure: Processor[];
+}
+@namespace("ingest.simulate_pipeline")
+class SimulatePipelineDocument {
+	_index: IndexName;
+	_type: TypeName;
+	_id: Id;
+	@prop_serializer("SourceConverter")
+	_source: any;
+}
+@namespace("mapping.types")
+class PropertyWithClrOrigin {
+}
+@namespace("modules.indices.fielddata")
+class Fielddata {
+	loading: FielddataLoading;
+	filter: FielddataFilter;
+}
+@namespace("modules.indices.fielddata")
+class FielddataFilter {
+	frequency: FielddataFrequencyFilter;
+	regex: FielddataRegexFilter;
+}
+@namespace("modules.indices.fielddata")
+class FielddataFrequencyFilter {
+	min: double;
+	max: double;
+	min_segment_size: integer;
+}
+@namespace("modules.indices.fielddata")
+class FielddataRegexFilter {
+	pattern: string;
+}
+@namespace("search.suggesters.context_suggester")
+@class_serializer("SuggestContextJsonConverter")
+class SuggestContext {
+	name: string;
+	type: string;
+	path: Field;
+}
+@namespace("modules.indices.circuit_breaker")
+class CircuitBreakerSettings {
+	total_limit: string;
+	fielddata_limit: string;
+	fielddata_overhead: float;
+	request_limit: string;
+	request_overhead: float;
+}
+@namespace("modules.indices.recovery")
+class IndicesRecoverySettings {
+	concurrent_streams: integer;
+	concurrent_small_file_streams: integer;
+	file_chunk_size: string;
+	translog_operations: integer;
+	translog_size: string;
+	compress: boolean;
+	max_bytes_per_second: string;
+}
+@namespace("modules.indices")
+class IndicesModuleSettings {
+	qeueries_cache_size: string;
+	circuit_breaker_settings: CircuitBreakerSettings;
+	fielddata_settings: FielddataSettings;
+	recovery_settings: IndicesRecoverySettings;
+}
+@namespace("modules.scripting")
+class StoredScript {
+	lang: string;
+	source: string;
+}
+@namespace("modules.snapshot_and_restore.repositories")
+class SnapshotRepository {
+	type: string;
+}
+@namespace("search")
+class CovariantSearchRequest {
+}
+@namespace("search.suggesters")
+class SuggestBucket {
+	text: string;
+	prefix: string;
+	regex: string;
+	term: TermSuggester;
+	phrase: PhraseSuggester;
+	completion: CompletionSuggester;
+}
+@namespace("search.suggesters")
+class Suggester {
+	field: Field;
+	analyzer: string;
+	size: integer;
+}
+@namespace("search.suggesters.phrase_suggester")
+class DirectGenerator {
+	field: Field;
+	size: integer;
+	prefix_length: integer;
+	suggest_mode: SuggestMode;
+	min_word_length: integer;
+	max_edits: integer;
+	max_inspections: double;
+	min_doc_freq: double;
+	max_term_freq: double;
+	pre_filter: string;
+	post_filter: string;
+}
+@namespace("search.suggesters.phrase_suggester")
+class PhraseSuggestHighlight {
+	pre_tag: string;
+	post_tag: string;
+}
+@namespace("search.suggesters.phrase_suggester")
+class PhraseSuggestCollate {
+	query: PhraseSuggestCollateQuery;
+	prune: boolean;
+	params: Dictionary<string, any>[];
+}
+@namespace("search.suggesters.phrase_suggester")
+class PhraseSuggestCollateQuery {
+	source: string;
+	id: Id;
+}
+@namespace("search.suggesters.phrase_suggester.smoothing_model")
+class SmoothingModelContainer {
+	stupid_backoff: StupidBackoffSmoothingModel;
+	laplace: LaplaceSmoothingModel;
+	linear_interpolation: LinearInterpolationSmoothingModel;
+}
+@namespace("search.suggesters.phrase_suggester.smoothing_model")
+class SmoothingModel {
+}
+@namespace("search.suggesters.completion_suggester")
+class FuzzySuggester {
+	transpositions: boolean;
+	min_length: integer;
+	prefix_length: integer;
+	fuzziness: Fuzziness;
+	unicode_aware: boolean;
+}
+@namespace("search.suggesters.context_suggester")
+class SuggestContextQuery {
+	context: Context;
+	boost: double;
+	prefix: boolean;
+	precision: Union<Distance, integer>;
+	neighbours: Union<Distance[], integer[]>;
+}
+@namespace("search.search.collapsing")
+class FieldCollapse {
+	field: Field;
+	inner_hits: InnerHits;
+	max_concurrent_group_searches: integer;
+}
+@namespace("search.search.rescoring")
+class Rescore {
+	window_size: integer;
+	query: RescoreQuery;
+}
+@namespace("search.search.rescoring")
+class RescoreQuery {
+	rescore_query: QueryContainer;
+	query_weight: double;
+	rescore_query_weight: double;
+	score_mode: ScoreMode;
+}
+@namespace("aggregations")
+class AggregationContainer {
+	meta: Dictionary<string, any>[];
+	avg: AverageAggregation;
+	date_histogram: DateHistogramAggregation;
+	percentiles: PercentilesAggregation;
+	date_range: DateRangeAggregation;
+	extended_stats: ExtendedStatsAggregation;
+	filter: FilterAggregation;
+	filters: FiltersAggregation;
+	geo_distance: GeoDistanceAggregation;
+	geohash_grid: GeoHashGridAggregation;
+	geo_bounds: GeoBoundsAggregation;
+	histogram: HistogramAggregation;
+	global: GlobalAggregation;
+	ip_range: IpRangeAggregation;
+	max: MaxAggregation;
+	min: MinAggregation;
+	cardinality: CardinalityAggregation;
+	missing: MissingAggregation;
+	nested: NestedAggregation;
+	reverse_nested: ReverseNestedAggregation;
+	range: RangeAggregation;
+	stats: StatsAggregation;
+	sum: SumAggregation;
+	terms: TermsAggregation;
+	significant_terms: SignificantTermsAggregation;
+	value_count: ValueCountAggregation;
+	percentile_ranks: PercentileRanksAggregation;
+	top_hits: TopHitsAggregation;
+	children: ChildrenAggregation;
+	scripted_metric: ScriptedMetricAggregation;
+	avg_bucket: AverageBucketAggregation;
+	derivative: DerivativeAggregation;
+	max_bucket: MaxBucketAggregation;
+	min_bucket: MinBucketAggregation;
+	sum_bucket: SumBucketAggregation;
+	stats_bucket: StatsBucketAggregation;
+	extended_stats_bucket: ExtendedStatsBucketAggregation;
+	percentiles_bucket: PercentilesBucketAggregation;
+	moving_avg: MovingAverageAggregation;
+	cumulative_sum: CumulativeSumAggregation;
+	serial_diff: SerialDifferencingAggregation;
+	bucket_script: BucketScriptAggregation;
+	bucket_selector: BucketSelectorAggregation;
+	sampler: SamplerAggregation;
+	geo_centroid: GeoCentroidAggregation;
+	matrix_stats: MatrixStatsAggregation;
+	adjacency_matrix: AdjacencyMatrixAggregation;
+	aggs: Dictionary<string, AggregationContainer>[];
+}
+@namespace("aggregations")
+class Aggregation {
+	name: string;
+	meta: Dictionary<string, any>[];
+}
+@namespace("common_options.date_math")
+class DateMath extends String {}
+@namespace("aggregations.metric.percentiles.methods")
+class PercentilesMethod {
+}
+@namespace("aggregations.bucket.date_range")
+class DateRangeExpression {
+	from: DateMath;
+	to: DateMath;
+	key: string;
 }
 @namespace("common_options.range")
 class AggregationRange {
@@ -1468,9 +1857,55 @@ class PercentageScoreHeuristic {
 class ScriptedHeuristic {
 	script: Script;
 }
+@namespace("aggregations.pipeline")
+@class_serializer("BucketsPathJsonConverter")
+class BucketsPath {
+}
 @namespace("aggregations.pipeline.moving_average.models")
 class MovingAverageModel {
 	name: string;
+}
+@namespace("search.search.hits")
+class HitMetadata<TDocument> {
+	index: string;
+	type: string;
+	version: long;
+	routing: string;
+	id: string;
+	parent: string;
+	@prop_serializer("SourceConverter")
+	source: TDocument;
+}
+@namespace("aggregations")
+class Aggregate {
+	meta: Dictionary<string, any>[];
+}
+@namespace("x_pack.graph.explore.request")
+class GraphVertexDefinition {
+	field: Field;
+	size: integer;
+	min_doc_count: long;
+	shard_min_doc_count: long;
+	exclude: string[];
+	include: GraphVertexInclude[];
+}
+@namespace("x_pack.graph.explore.request")
+class Hop {
+	query: QueryContainer;
+	vertices: GraphVertexDefinition[];
+	connections: Hop;
+}
+@namespace("x_pack.graph.explore.request")
+class GraphExploreControls {
+	use_significance: boolean;
+	sample_size: integer;
+	timeout: Time;
+	sample_diversity: SampleDiversity;
+}
+@namespace("x_pack.machine_learning.job")
+class Page {
+	from: integer;
+	size: integer;
 }
 @namespace("x_pack.machine_learning.datafeed")
 class ChunkingConfig {
@@ -1507,9 +1942,90 @@ class DataDescription {
 	time_field: Field;
 	time_format: string;
 }
+@namespace("x_pack.machine_learning.job.config")
+class ModelPlotConfigEnabled {
+	enabled: boolean;
+}
+@namespace("x_pack.machine_learning.job.config")
+class AnalysisMemoryLimit {
+	model_memory_limit: string;
+}
+@namespace("x_pack.security.role.put_role")
+class IndicesPrivileges {
+	@prop_serializer("IndicesJsonConverter")
+	names: Indices;
+	privileges: string[];
+	field_security: FieldSecurity;
+	query: QueryContainer;
+}
+@namespace("x_pack.security.role")
+class FieldSecurity {
+	grant: Field[];
+	except: Field[];
+}
 @namespace("x_pack.watcher.trigger")
-class TriggerEventContainer {
-	schedule: ScheduleTriggerEvent;
+class TriggerEvent {
+}
+@namespace("x_pack.watcher.trigger")
+class TriggerContainer {
+	schedule: ScheduleContainer;
+}
+@namespace("x_pack.watcher.schedule")
+class ScheduleContainer {
+	hourly: HourlySchedule;
+	daily: DailySchedule;
+	weekly: TimeOfWeek[];
+	monthly: TimeOfMonth[];
+	yearly: TimeOfYear[];
+	cron: CronExpression;
+	interval: Interval;
+}
+@namespace("x_pack.watcher.schedule")
+class Schedule {
+}
+@namespace("x_pack.watcher.schedule")
+class TimeOfDay {
+	hour: integer[];
+	minute: integer[];
+}
+@namespace("x_pack.watcher.schedule")
+class TimeOfWeek {
+	on: Day | Day[];
+	at: string | string[];
+}
+@namespace("x_pack.watcher.schedule")
+class TimeOfMonth {
+	on: integer | integer[];
+	at: string | string[];
+}
+@namespace("x_pack.watcher.schedule")
+class TimeOfYear {
+	int: Month | Month[];
+	on: integer | integer[];
+	at: string | string[];
+}
+@namespace("x_pack.watcher.input")
+class InputContainer {
+	http: HttpInput;
+	search: SearchInput;
+	simple: SimpleInput;
+	chain: ChainInput;
+}
+@namespace("x_pack.watcher.input")
+class HttpInputRequest {
+	scheme: ConnectionScheme;
+	port: integer;
+	host: string;
+	path: string;
+	method: HttpInputMethod;
+	headers: Dictionary<string, string>[];
+	params: Dictionary<string, string>[];
+	url: string;
+	auth: HttpInputAuthentication;
+	proxy: HttpInputProxy;
+	connection_timeout: Time;
+	read_timeout: Time;
+	body: string;
 }
 @namespace("x_pack.watcher.input")
 class HttpInputAuthentication {
@@ -1525,11 +2041,85 @@ class HttpInputProxy {
 	host: string;
 	port: integer;
 }
+@namespace("x_pack.watcher.input")
+class Input {
+}
+@namespace("x_pack.watcher.input")
+class SearchInputRequest {
+	indices: IndexName[];
+	types: TypeName[];
+	search_type: SearchType;
+	indices_options: IndicesOptions;
+	body: SearchRequest;
+	template: SearchTemplateRequest;
+}
+@namespace("x_pack.watcher.input")
+class IndicesOptions {
+	expand_wildcards: ExpandWildcards;
+	ignore_unavailable: boolean;
+	allow_no_indices: boolean;
+}
+@namespace("x_pack.watcher.condition")
+class ConditionContainer {
+	always: AlwaysCondition;
+	never: NeverCondition;
+	compare: CompareCondition;
+	array_compare: ArrayCompareCondition;
+	script: ScriptCondition;
+}
+@namespace("x_pack.watcher.condition")
+class Condition {
+}
+@namespace("x_pack.watcher.condition")
+@class_serializer("ArrayCompareConditionConverter")
+class ArrayCompareCondition {
+	array_path: string;
+	path: string;
+	comparison: string;
+	value: any;
+	quantifier: Quantifier;
+}
+@namespace("x_pack.watcher.action")
+class Action {
+	name: string;
+	action_type: ActionType;
+	transform: TransformContainer;
+	throttle_period: Time;
+}
+@namespace("x_pack.watcher.transform")
+class TransformContainer {
+	search: SearchTransform;
+	script: ScriptTransform;
+	chain: ChainTransform;
+}
+@namespace("x_pack.watcher.transform")
+class Transform {
+}
+@namespace("x_pack.watcher.trigger")
+class TriggerEventContainer {
+	schedule: ScheduleTriggerEvent;
+}
+@namespace("x_pack.watcher.action.email")
+class EmailBody {
+	text: string;
+	html: string;
+}
 @namespace("x_pack.watcher.action.pager_duty")
 class PagerDutyContext {
 	type: PagerDutyContextType;
 	href: string;
 	src: string;
+}
+@namespace("x_pack.watcher.action.pager_duty")
+class PagerDutyEvent {
+	account: string;
+	description: string;
+	event_type: PagerDutyEventType;
+	incident_key: string;
+	client: string;
+	client_url: string;
+	attach_payload: boolean;
+	context: PagerDutyContext[];
 }
 @namespace("x_pack.watcher.action.hip_chat")
 class HipChatMessage {
@@ -1580,373 +2170,8 @@ class SlackDynamicAttachment {
 	list_path: string;
 	attachment_template: SlackAttachment;
 }
-@namespace("x_pack.watcher.input")
-class InputContainer {
-	http: HttpInput;
-	search: SearchInput;
-	simple: SimpleInput;
-	chain: ChainInput;
-}
-@namespace("x_pack.watcher.input")
-class HttpInputRequest {
-	scheme: ConnectionScheme;
-	port: integer;
-	host: string;
-	path: string;
-	method: HttpInputMethod;
-	headers: Map<string, string>;
-	params: Map<string, string>;
-	url: string;
-	auth: HttpInputAuthentication;
-	proxy: HttpInputProxy;
-	connection_timeout: Time;
-	read_timeout: Time;
-	body: string;
-}
-@namespace("x_pack.watcher.input")
-class SearchInputRequest {
-	indices: IndexName[];
-	types: TypeName[];
-	search_type: SearchType;
-	indices_options: IndicesOptions;
-	body: SearchRequest;
-	template: SearchTemplateRequest;
-}
-@namespace("x_pack.watcher.input")
-class IndicesOptions {
-	expand_wildcards: ExpandWildcards;
-	ignore_unavailable: boolean;
-	allow_no_indices: boolean;
-}
-@namespace("search.suggesters")
-class SuggestBucket {
-	text: string;
-	prefix: string;
-	regex: string;
-	term: TermSuggester;
-	phrase: PhraseSuggester;
-	completion: CompletionSuggester;
-}
-@namespace("search.suggesters.phrase_suggester")
-class DirectGenerator {
-	field: Field;
-	size: integer;
-	prefix_length: integer;
-	suggest_mode: SuggestMode;
-	min_word_length: integer;
-	max_edits: integer;
-	max_inspections: double;
-	min_doc_freq: double;
-	max_term_freq: double;
-	pre_filter: string;
-	post_filter: string;
-}
-@namespace("search.suggesters.phrase_suggester")
-class PhraseSuggestHighlight {
-	pre_tag: string;
-	post_tag: string;
-}
-@namespace("search.suggesters.phrase_suggester")
-class PhraseSuggestCollate {
-	query: PhraseSuggestCollateQuery;
-	prune: boolean;
-	params: Map<string, any>;
-}
-@namespace("search.suggesters.phrase_suggester")
-class PhraseSuggestCollateQuery {
-	source: string;
-	id: Id;
-}
-@namespace("search.suggesters.completion_suggester")
-class FuzzySuggester {
-	transpositions: boolean;
-	min_length: integer;
-	prefix_length: integer;
-	fuzziness: Fuzziness;
-	unicode_aware: boolean;
-}
-@namespace("search.suggesters.context_suggester")
-class SuggestContextQuery {
-	context: Context;
-	boost: double;
-	prefix: boolean;
-	precision: Union<Distance, integer>;
-	neighbours: Union<Distance[], integer[]>;
-}
-@namespace("search.search.collapsing")
-class FieldCollapse {
-	field: Field;
-	inner_hits: InnerHits;
-	max_concurrent_group_searches: integer;
-}
-@namespace("search.search.rescoring")
-class Rescore {
-	window_size: integer;
-	query: RescoreQuery;
-}
-@namespace("search.search.rescoring")
-class RescoreQuery {
-	rescore_query: QueryContainer;
-	query_weight: double;
-	rescore_query_weight: double;
-	score_mode: ScoreMode;
-}
-@namespace("search.scroll.scroll")
-class SlicedScroll {
-	id: integer;
-	max: integer;
-	field: Field;
-}
-@namespace("x_pack.watcher.condition")
-class ConditionContainer {
-	always: AlwaysCondition;
-	never: NeverCondition;
-	compare: CompareCondition;
-	array_compare: ArrayCompareCondition;
-	script: ScriptCondition;
-}
-@namespace("x_pack.watcher.condition")
-@class_serializer("ArrayCompareConditionConverter")
-class ArrayCompareCondition {
-	array_path: string;
-	path: string;
-	comparison: string;
-	value: any;
-	quantifier: Quantifier;
-}
-@namespace("x_pack.watcher.trigger")
-class TriggerContainer {
-	schedule: ScheduleContainer;
-}
-@namespace("x_pack.watcher.schedule")
-class ScheduleContainer {
-	hourly: HourlySchedule;
-	daily: DailySchedule;
-	weekly: TimeOfWeek[];
-	monthly: TimeOfMonth[];
-	yearly: TimeOfYear[];
-	cron: CronExpression;
-	interval: Interval;
-}
-@namespace("x_pack.watcher.schedule")
-class TimeOfDay {
-	hour: integer[];
-	minute: integer[];
-}
-@namespace("x_pack.watcher.schedule")
-class TimeOfWeek {
-	on: Day | Day[];
-	at: string | string[];
-}
-@namespace("x_pack.watcher.schedule")
-class TimeOfMonth {
-	on: integer | integer[];
-	at: string | string[];
-}
-@namespace("x_pack.watcher.schedule")
-class TimeOfYear {
-	int: Month | Month[];
-	on: integer | integer[];
-	at: string | string[];
-}
-@namespace("x_pack.watcher.transform")
-class TransformContainer {
-	search: SearchTransform;
-	script: ScriptTransform;
-	chain: ChainTransform;
-}
-@namespace("x_pack.watcher.action")
-class Action {
-	name: string;
-	action_type: ActionType;
-	transform: TransformContainer;
-	throttle_period: Time;
-}
-@namespace("cluster.cluster_reroute.commands")
-class ClusterRerouteCommand {
-	name: string;
-}
-@namespace("document.multiple.bulk.bulk_operation")
-class BulkOperation {
-	operation: string;
-	_index: IndexName;
-	_type: TypeName;
-	_id: Id;
-	version: long;
-	version_type: VersionType;
-	routing: Routing;
-	parent: Id;
-	retry_on_conflict: integer;
-}
-@namespace("document.multiple.multi_get.request")
-class MultiGetOperation {
-	_index: IndexName;
-	_type: TypeName;
-	_id: Id;
-	stored_fields: Field[];
-	routing: string;
-	_source: Union<boolean, SourceFilter>;
-	version: long;
-	version_type: VersionType;
-	can_be_flattened: boolean;
-}
-@namespace("document.multiple.multi_term_vectors")
-class MultiTermVectorOperation {
-	_index: IndexName;
-	_type: TypeName;
-	_id: Id;
-	@prop_serializer("SourceConverter")
-	doc: any;
-	fields: Field[];
-	offsets: boolean;
-	payloads: boolean;
-	positions: boolean;
-	term_statistics: boolean;
-	field_statistics: boolean;
-	filter: TermVectorFilter;
-	version: long;
-	version_type: VersionType;
-	routing: Routing;
-}
-@namespace("document.single.term_vectors")
-class TermVectorFilter {
-	max_num_terms: integer;
-	min_term_freq: integer;
-	max_term_freq: integer;
-	min_doc_freq: integer;
-	max_doc_freq: integer;
-	min_word_length: integer;
-	max_word_length: integer;
-}
-@namespace("document.multiple.reindex_on_server")
-class ReindexSource {
-	query: QueryContainer;
-	sort: Sort[];
-	index: Indices;
-	type: Types;
-	size: integer;
-	remote: RemoteSource;
-}
-@namespace("document.multiple.reindex_on_server")
-class RemoteSource {
-	host: Uri;
-	username: string;
-	password: string;
-}
-@namespace("document.multiple.reindex_on_server")
-class ReindexDestination {
-	index: IndexName;
-	type: TypeName;
-	routing: ReindexRouting;
-	op_type: OpType;
-	version_type: VersionType;
-}
-@namespace("indices.alias_management.alias.actions")
-class AliasAction {
-}
-@namespace("analysis.tokenizers")
-class Tokenizer {
-	version: string;
-	type: string;
-}
-@namespace("analysis.char_filters")
-class CharFilter {
-	version: string;
-	type: string;
-}
-@namespace("analysis.token_filters")
-class TokenFilter {
-	version: string;
-	type: string;
-}
-@namespace("ingest")
-@class_serializer("PipelineJsonConverter")
-class Pipeline {
-	description: string;
-	processors: Processor[];
-	on_failure: Processor[];
-}
-@namespace("ingest")
-class Processor {
-	name: string;
-	on_failure: Processor[];
-}
-@namespace("ingest.simulate_pipeline")
-class SimulatePipelineDocument {
-	_index: IndexName;
-	_type: TypeName;
-	_id: Id;
-	@prop_serializer("SourceConverter")
-	_source: any;
-}
-@namespace("x_pack.machine_learning.job")
-class Page {
-	from: integer;
-	size: integer;
-}
-@namespace("x_pack.machine_learning.job.config")
-class AnalysisMemoryLimit {
-	model_memory_limit: string;
-}
-@namespace("x_pack.machine_learning.job.config")
-class ModelPlotConfigEnabled {
-	enabled: boolean;
-}
-@namespace("x_pack.security.role.put_role")
-class IndicesPrivileges {
-	@prop_serializer("IndicesJsonConverter")
-	names: Indices;
-	privileges: string[];
-	field_security: FieldSecurity;
-	query: QueryContainer;
-}
-@namespace("x_pack.security.role")
-class FieldSecurity {
-	grant: Field[];
-	except: Field[];
-}
-@namespace("indices.index_management.rollover_index")
-class RolloverConditions {
-	max_age: Time;
-	max_docs: long;
-}
-@namespace("mapping.meta_fields")
-class FieldMapping {
-}
-@namespace("x_pack.graph.explore.request")
-class GraphVertexDefinition {
-	field: Field;
-	size: integer;
-	min_doc_count: long;
-	shard_min_doc_count: long;
-	exclude: string[];
-	include: GraphVertexInclude[];
-}
-@namespace("x_pack.graph.explore.request")
-class Hop {
-	query: QueryContainer;
-	vertices: GraphVertexDefinition[];
-	connections: Hop;
-}
-@namespace("x_pack.graph.explore.request")
-class GraphExploreControls {
-	use_significance: boolean;
-	sample_size: integer;
-	timeout: Time;
-	sample_diversity: SampleDiversity;
-}
-@namespace("modules.indices.fielddata")
-class FielddataFrequencyFilter {
-	min: double;
-	max: double;
-	min_segment_size: integer;
-}
-@namespace("search.suggesters.context_suggester")
-@class_serializer("SuggestContextJsonConverter")
-class SuggestContext {
-	name: string;
-	type: string;
-	path: Field;
+/** namespace:common_abstractions.response **/
+interface IResponse {
 }
 @namespace("mapping.meta_fields.source")
 class SourceField {
@@ -1985,21 +2210,8 @@ class SizeField {
 class FieldNamesField {
 	enabled: boolean;
 }
-@namespace("mapping.types")
-class Property {
-	name: PropertyName;
-	type: string;
-	local_metadata: Map<string, any>;
-}
-@namespace("search.search.hits")
-class Hit<TDocument> {
-	score: double;
-	fields: Map<string, LazyDocument>;
-	sorts: any[];
-	highlights: Map<string, HighlightHit>;
-	explanation: Explanation;
-	matched_queries: string[];
-	inner_hits: Map<string, InnerHitsResult>;
+/** namespace:mapping.types **/
+interface IProperty {
 }
 @namespace("query_dsl.nest_specific")
 class RawQuery {
@@ -2020,6 +2232,10 @@ class MatchAllQuery {
 }
 @namespace("query_dsl")
 class MatchNoneQuery {
+}
+@namespace("query_dsl.abstractions.field_name")
+class FieldNameQuery {
+	field: Field;
 }
 @namespace("query_dsl.compound.boosting")
 class BoostingQuery {
@@ -2084,6 +2300,9 @@ class ParentIdQuery {
 	id: Id;
 	ignore_unmapped: boolean;
 }
+@namespace("query_dsl.span")
+class SpanSubQuery {
+}
 @namespace("query_dsl.full_text.simple_query_string")
 class SimpleQueryStringQuery {
 	fields: Field[];
@@ -2136,7 +2355,7 @@ class MoreLikeThisQuery {
 	minimum_should_match: MinimumShouldMatch;
 	boost_terms: double;
 	include: boolean;
-	per_field_analyzer: Map<Field, string>;
+	per_field_analyzer: Dictionary<Field, string>[];
 	version: long;
 	version_type: VersionType;
 	routing: Routing;
@@ -2176,7 +2395,7 @@ class ScriptQuery {
 	source: string;
 	inline: string;
 	id: Id;
-	params: Map<string, any>;
+	params: Dictionary<string, any>[];
 	lang: string;
 }
 @namespace("query_dsl.term_level.exists")
@@ -2200,26 +2419,13 @@ class PercolateQuery {
 	preference: string;
 	version: long;
 }
-@namespace("x_pack.machine_learning.job.config")
-class ModelPlotConfig {
-	terms: Field[];
+@namespace("modules.indices.fielddata.numeric")
+class NumericFielddata {
+	format: NumericFielddataFormat;
 }
-@namespace("x_pack.watcher.schedule")
-class ScheduleTriggerEvent {
-	triggered_time: Union<Date, string>;
-	scheduled_time: Union<Date, string>;
-}
-@namespace("x_pack.watcher.input")
-class HttpInput {
-	extract: string[];
-	request: HttpInputRequest;
-	response_content_type: ResponseContentType;
-}
-@namespace("x_pack.watcher.input")
-class SearchInput {
-	extract: string[];
-	request: SearchInputRequest;
-	timeout: Time;
+@namespace("modules.indices.fielddata.string")
+class StringFielddata {
+	format: StringFielddataFormat;
 }
 @namespace("search.suggesters.term_suggester")
 class TermSuggester {
@@ -2250,22 +2456,96 @@ class PhraseSuggester {
 	collate: PhraseSuggestCollate;
 	smoothing: SmoothingModelContainer;
 }
+@namespace("search.suggesters.phrase_suggester.smoothing_model")
+class StupidBackoffSmoothingModel {
+	discount: double;
+}
+@namespace("search.suggesters.phrase_suggester.smoothing_model")
+class LaplaceSmoothingModel {
+	alpha: double;
+}
+@namespace("search.suggesters.phrase_suggester.smoothing_model")
+class LinearInterpolationSmoothingModel {
+	trigram_lambda: double;
+	bigram_lambda: double;
+	unigram_lambda: double;
+}
 @namespace("search.suggesters.completion_suggester")
 class CompletionSuggester {
 	prefix: string;
 	regex: string;
 	fuzzy: FuzzySuggester;
-	contexts: Map<string, SuggestContextQuery[]>;
+	contexts: Dictionary<string, SuggestContextQuery[]>[];
+}
+@namespace("aggregations.metric")
+class MetricAggregation {
+	field: Field;
+	script: Script;
+	missing: double;
+}
+@namespace("aggregations.bucket")
+class BucketAggregation {
+	aggregations: Dictionary<string, AggregationContainer>[];
+}
+@namespace("aggregations.pipeline")
+class PipelineAggregation {
+	buckets_path: BucketsPath;
+	gap_policy: GapPolicy;
+	format: string;
+}
+@namespace("aggregations.matrix")
+class MatrixAggregation {
+	fields: Field[];
+	missing: Dictionary<Field, double>[];
+}
+@namespace("search.search.hits")
+class Hit<TDocument> {
+	score: double;
+	fields: Dictionary<string, LazyDocument>[];
+	sorts: any[];
+	highlights: Dictionary<string, HighlightHit>[];
+	explanation: Explanation;
+	matched_queries: string[];
+	inner_hits: Dictionary<string, InnerHitsResult>[];
+}
+@namespace("x_pack.machine_learning.job.config")
+class ModelPlotConfig {
+	terms: Field[];
+}
+@namespace("x_pack.watcher.schedule")
+class ScheduleTriggerEvent {
+	triggered_time: Union<Date, string>;
+	scheduled_time: Union<Date, string>;
+}
+@namespace("x_pack.watcher.schedule")
+class HourlySchedule {
+	minute: integer[];
+}
+@namespace("x_pack.watcher.schedule")
+class DailySchedule {
+	at: Union<string[], TimeOfDay>;
+}
+@namespace("x_pack.watcher.input")
+class HttpInput {
+	extract: string[];
+	request: HttpInputRequest;
+	response_content_type: ResponseContentType;
+}
+@namespace("x_pack.watcher.input")
+class SearchInput {
+	extract: string[];
+	request: SearchInputRequest;
+	timeout: Time;
 }
 @namespace("x_pack.watcher.input")
 @class_serializer("SimpleInputJsonConverter")
 class SimpleInput {
-	payload: Map<string, any>;
+	payload: Dictionary<string, any>[];
 }
 @namespace("x_pack.watcher.input")
 @class_serializer("ChainInputJsonConverter")
 class ChainInput {
-	inputs: Map<string, InputContainer>;
+	inputs: Dictionary<string, InputContainer>[];
 }
 @namespace("x_pack.watcher.condition")
 class AlwaysCondition {
@@ -2284,15 +2564,7 @@ class CompareCondition {
 @class_serializer("ScriptConditionJsonConverter")
 class ScriptCondition {
 	lang: string;
-	params: Map<string, any>;
-}
-@namespace("x_pack.watcher.schedule")
-class HourlySchedule {
-	minute: integer[];
-}
-@namespace("x_pack.watcher.schedule")
-class DailySchedule {
-	at: Union<string[], TimeOfDay>;
+	params: Dictionary<string, any>[];
 }
 @namespace("x_pack.watcher.transform")
 class SearchTransform {
@@ -2302,64 +2574,13 @@ class SearchTransform {
 @namespace("x_pack.watcher.transform")
 @class_serializer("ScriptTransformJsonConverter")
 class ScriptTransform {
-	params: Map<string, any>;
+	params: Dictionary<string, any>[];
 	lang: string;
 }
 @namespace("x_pack.watcher.transform")
 @class_serializer("ChainTransformJsonConverter")
 class ChainTransform {
 	transforms: TransformContainer[];
-}
-@namespace("modules.indices.fielddata.numeric")
-class NumericFielddata {
-	format: NumericFielddataFormat;
-}
-@namespace("modules.indices.fielddata.string")
-class StringFielddata {
-	format: StringFielddataFormat;
-}
-@namespace("aggregations.metric.average")
-class AverageAggregation {
-}
-@namespace("aggregations.bucket.date_histogram")
-class DateHistogramAggregation {
-	field: Field;
-	script: Script;
-	params: Map<string, any>;
-	interval: Union<DateInterval, Time>;
-	format: string;
-	min_doc_count: integer;
-	time_zone: string;
-	offset: string;
-	order: HistogramOrder;
-	extended_bounds: ExtendedBounds<DateMath>;
-	missing: Date;
-}
-@namespace("aggregations.metric.percentiles")
-class PercentilesAggregation {
-	percents: double[];
-	method: PercentilesMethod;
-}
-@namespace("aggregations.bucket.date_range")
-class DateRangeAggregation {
-	field: Field;
-	format: string;
-	ranges: DateRangeExpression[];
-	time_zone: string;
-}
-@namespace("aggregations.metric.extended_stats")
-class ExtendedStatsAggregation {
-	sigma: double;
-}
-@namespace("aggregations.bucket.filter")
-class FilterAggregation {
-	filter: QueryContainer;
-}
-@namespace("aggregations.bucket.filters")
-class FiltersAggregation {
-	filters: Union<Map<string, QueryContainer>, QueryContainer[]>;
-	other_bucket: boolean;
-	other_bucket_key: string;
 }
 @namespace("query_dsl.term_level.term")
 @class_serializer("FieldNameQueryJsonConverter`1")
@@ -2501,6 +2722,49 @@ class GeoPolygonQuery {
 	points: GeoLocation[];
 	validation_method: GeoValidationMethod;
 }
+@namespace("aggregations.metric.average")
+class AverageAggregation {
+}
+@namespace("aggregations.bucket.date_histogram")
+class DateHistogramAggregation {
+	field: Field;
+	script: Script;
+	params: Dictionary<string, any>[];
+	interval: Union<DateInterval, Time>;
+	format: string;
+	min_doc_count: integer;
+	time_zone: string;
+	offset: string;
+	order: HistogramOrder;
+	extended_bounds: ExtendedBounds<DateMath>;
+	missing: Date;
+}
+@namespace("aggregations.metric.percentiles")
+class PercentilesAggregation {
+	percents: double[];
+	method: PercentilesMethod;
+}
+@namespace("aggregations.bucket.date_range")
+class DateRangeAggregation {
+	field: Field;
+	format: string;
+	ranges: DateRangeExpression[];
+	time_zone: string;
+}
+@namespace("aggregations.metric.extended_stats")
+class ExtendedStatsAggregation {
+	sigma: double;
+}
+@namespace("aggregations.bucket.filter")
+class FilterAggregation {
+	filter: QueryContainer;
+}
+@namespace("aggregations.bucket.filters")
+class FiltersAggregation {
+	filters: Union<Dictionary<string, QueryContainer>[], QueryContainer[]>;
+	other_bucket: boolean;
+	other_bucket_key: string;
+}
 @namespace("aggregations.bucket.geo_distance")
 class GeoDistanceAggregation {
 	field: Field;
@@ -2622,7 +2886,7 @@ class TopHitsAggregation {
 	_source: Union<boolean, SourceFilter>;
 	highlight: Highlight;
 	explain: boolean;
-	script_fields: Map<string, ScriptField>;
+	script_fields: Dictionary<string, ScriptField>[];
 	stored_fields: Field[];
 	version: boolean;
 	track_scores: boolean;
@@ -2637,7 +2901,7 @@ class ScriptedMetricAggregation {
 	map_script: Script;
 	combine_script: Script;
 	reduce_script: Script;
-	params: Map<string, any>;
+	params: Dictionary<string, any>[];
 }
 @namespace("aggregations.pipeline.average_bucket")
 class AverageBucketAggregation {
@@ -2703,26 +2967,7 @@ class MatrixStatsAggregation {
 }
 @namespace("aggregations.bucket.adjacency_matrix")
 class AdjacencyMatrixAggregation {
-	filters: Map<string, QueryContainer>;
-}
-@namespace("indices.index_settings.update_index_settings")
-@rest_spec_name("indices.put_settings")
-@class_serializer("IndexSettingsConverter")
-class UpdateIndexSettingsRequest {
-	index_settings: Map<string, any>;
-	index: Indices;
-}
-@namespace("x_pack.watcher.put_watch")
-@rest_spec_name("xpack.watcher.put_watch")
-class PutWatchRequest {
-	trigger: TriggerContainer;
-	input: InputContainer;
-	condition: ConditionContainer;
-	actions: Map<string, Action>;
-	metadata: Map<string, any>;
-	throttle_period: string;
-	transform: TransformContainer;
-	id: Id;
+	filters: Dictionary<string, QueryContainer>[];
 }
 @namespace("query_dsl.term_level.wildcard")
 @class_serializer("FieldNameQueryJsonConverter`1")
@@ -2734,60 +2979,47 @@ class WildcardQuery {
 class PrefixQuery {
 	rewrite: MultiTermQueryRewrite;
 }
-@namespace("search.search")
-@rest_spec_name("search")
-class SearchRequest {
-	timeout: string;
-	from: integer;
-	size: integer;
-	explain: boolean;
-	version: boolean;
-	track_scores: boolean;
-	profile: boolean;
-	min_score: double;
-	terminate_after: long;
-	indices_boost: Map<IndexName, double>;
-	sort: Sort[];
-	search_after: any[];
-	suggest: Map<string, SuggestBucket>;
-	highlight: Highlight;
-	collapse: FieldCollapse;
-	rescore: Rescore[];
-	script_fields: Map<string, ScriptField>;
-	_source: Union<boolean, SourceFilter>;
-	aggs: Map<string, AggregationContainer>;
-	slice: SlicedScroll;
-	query: QueryContainer;
-	post_filter: QueryContainer;
-	index: Indices;
-	type: Types;
-	@request_parameter()
-	stored_fields: Field[];
-	@request_parameter()
-	docvalue_fields: Field[];
-}
-@namespace("search.search_template")
-@rest_spec_name("search_template")
-class SearchTemplateRequest {
-	params: Map<string, any>;
-	source: string;
-	inline: string;
-	id: string;
-	index: Indices;
-	type: Types;
-}
 @namespace("query_dsl.span.term")
 @class_serializer("FieldNameQueryJsonConverter`1")
 class SpanTermQuery {
 }
-@namespace("modules.indices.fielddata")
-class FielddataSettings {
-	cache_size: string;
-	cache_expire: Time;
-}
 @namespace("common_abstractions.union")
 @class_serializer("UnionJsonConverter")
 class Union<TFirst, TSecond> {
+}
+@namespace("common_abstractions.request")
+class RouteValues {
+	index: string;
+	type: string;
+	id: string;
+	name: string;
+	field: string;
+	scroll_id: string;
+	node_id: string;
+	fields: string;
+	repository: string;
+	snapshot: string;
+	feature: string;
+	metric: string;
+	index_metric: string;
+	lang: string;
+	task_id: string;
+	realms: string;
+	username: string;
+	target: string;
+	new_index: string;
+	alias: string;
+	watch_id: string;
+	thread_pool_patterns: string;
+	action_id: string;
+	job_id: string;
+	datafeed_id: string;
+	filter_id: string;
+	snapshot_id: string;
+	category_id: string;
+	timestamp: string;
+	context: string;
+	watcher_stats_metric: WatcherStatsMetric;
 }
 @namespace("cluster.cluster_allocation_explain")
 class UnassignedInformation {
@@ -2801,7 +3033,7 @@ class CurrentNode {
 	name: string;
 	transport_address: string;
 	weight_ranking: string;
-	attributes: Map<string, string>;
+	attributes: Dictionary<string, string>[];
 }
 @namespace("cluster.cluster_allocation_explain")
 class AllocationDecision {
@@ -2815,7 +3047,7 @@ class NodeAllocationExplanation {
 	node_name: string;
 	transport_address: string;
 	node_decision: Decision;
-	node_attributes: Map<string, string>;
+	node_attributes: Dictionary<string, string>[];
 	store: AllocationStore;
 	weight_ranking: integer;
 	deciders: AllocationDecision[];
@@ -2839,7 +3071,7 @@ class IndexHealthStats {
 	relocating_shards: integer;
 	initializing_shards: integer;
 	unassigned_shards: integer;
-	shards: Map<string, ShardHealthStats>;
+	shards: Dictionary<string, ShardHealthStats>[];
 }
 @namespace("cluster.cluster_health")
 class ShardHealthStats {
@@ -2863,7 +3095,7 @@ class ClusterRerouteState {
 	version: integer;
 	master_node: string;
 	blocks: BlockState;
-	nodes: Map<string, NodeState>;
+	nodes: Dictionary<string, NodeState>[];
 	routing_table: RoutingTableState;
 	routing_nodes: RoutingNodesState;
 }
@@ -2875,15 +3107,15 @@ class BlockState {
 class NodeState {
 	name: string;
 	transport_address: string;
-	attributes: Map<string, string>;
+	attributes: Dictionary<string, string>[];
 }
 @namespace("cluster.cluster_state")
 class RoutingTableState {
-	indices: Map<string, IndexRoutingTable>;
+	indices: Dictionary<string, IndexRoutingTable>[];
 }
 @namespace("cluster.cluster_state")
 class IndexRoutingTable {
-	shards: Map<string, RoutingShard[]>;
+	shards: Dictionary<string, RoutingShard[]>[];
 }
 @namespace("cluster.cluster_state")
 class RoutingShard {
@@ -2902,7 +3134,7 @@ class AllocationId {
 @namespace("cluster.cluster_state")
 class RoutingNodesState {
 	unassigned: RoutingShard[];
-	nodes: Map<string, RoutingShard[]>;
+	nodes: Dictionary<string, RoutingShard[]>[];
 }
 @namespace("cluster.cluster_reroute")
 class ClusterRerouteExplanation {
@@ -2927,16 +3159,202 @@ class ClusterRerouteDecision {
 }
 @namespace("cluster.cluster_state")
 class MetadataState {
-	templates: Map<string, TemplateMapping>;
+	templates: Dictionary<string, TemplateMapping>[];
 	cluster_uuid: string;
-	indices: Map<string, MetadataIndexState>;
+	indices: Dictionary<string, MetadataIndexState>[];
+}
+@namespace("common_options.geo")
+@class_serializer("DistanceJsonConverter")
+class Distance {
+	precision: double;
+	unit: DistanceUnit;
 }
 @namespace("cluster.cluster_state")
 class MetadataIndexState {
 	state: string;
 	settings: string[];
-	mappings: Map<TypeName, TypeMapping>;
+	mappings: Dictionary<TypeName, TypeMapping>[];
 	aliases: string[];
+}
+@namespace("cluster")
+class NodeStatistics {
+	total: integer;
+	successful: integer;
+	failed: integer;
+}
+@namespace("cluster.cluster_stats")
+class ClusterIndicesStats {
+	completion: CompletionStats;
+	count: long;
+	docs: DocStats;
+	fielddata: FielddataStats;
+	query_cache: QueryCacheStats;
+	segments: SegmentsStats;
+	shards: ClusterIndicesShardsStats;
+	store: StoreStats;
+}
+@namespace("common_options.stats")
+class CompletionStats {
+	size: string;
+	size_in_bytes: long;
+}
+@namespace("common_options.stats")
+class DocStats {
+	count: long;
+	deleted: long;
+}
+@namespace("common_options.stats")
+class FielddataStats {
+	evictions: long;
+	memory_size: string;
+	memory_size_in_bytes: long;
+}
+@namespace("common_options.stats")
+class QueryCacheStats {
+	memory_size: string;
+	memory_size_in_bytes: long;
+	total_count: long;
+	hit_count: long;
+	miss_count: long;
+	cache_size: long;
+	cache_count: long;
+	evictions: long;
+}
+@namespace("common_options.stats")
+class SegmentsStats {
+	count: long;
+	doc_values_memory: string;
+	doc_values_memory_in_bytes: long;
+	fixed_bit_set_memory: string;
+	fixed_bit_set_memory_in_bytes: long;
+	index_writer_max_memory: string;
+	index_writer_max_memory_in_bytes: long;
+	index_writer_memory: string;
+	index_writer_memory_in_bytes: long;
+	memory: string;
+	memory_in_bytes: long;
+	norms_memory: string;
+	norms_memory_in_bytes: long;
+	points_memory: string;
+	points_memory_in_bytes: long;
+	stored_fields_memory: string;
+	stored_fields_memory_in_bytes: long;
+	term_vectors_memory: string;
+	term_vectors_memory_in_bytes: long;
+	terms_memory: string;
+	terms_memory_in_bytes: long;
+	version_map_memory: string;
+	version_map_memory_in_bytes: long;
+}
+@namespace("cluster.cluster_stats")
+class ClusterIndicesShardsStats {
+	total: double;
+	primaries: double;
+	replication: double;
+	index: ClusterIndicesShardsIndexStats;
+}
+@namespace("cluster.cluster_stats")
+class ClusterIndicesShardsIndexStats {
+	shards: ClusterShardMetrics;
+	primaries: ClusterShardMetrics;
+	replication: ClusterShardMetrics;
+}
+@namespace("cluster.cluster_stats")
+class ClusterShardMetrics {
+	min: double;
+	max: double;
+	avg: double;
+}
+@namespace("common_options.stats")
+class StoreStats {
+	size: string;
+	size_in_bytes: double;
+}
+@namespace("cluster.cluster_stats")
+class ClusterNodesStats {
+	count: ClusterNodeCount;
+	versions: string[];
+	os: ClusterOperatingSystemStats;
+	process: ClusterProcess;
+	jvm: ClusterJvm;
+	fs: ClusterFileSystem;
+	plugins: PluginStats[];
+}
+@namespace("cluster.cluster_stats")
+class ClusterNodeCount {
+	total: integer;
+	coordinating_only: integer;
+	master: integer;
+	data: integer;
+	ingest: integer;
+}
+@namespace("cluster.cluster_stats")
+class ClusterOperatingSystemStats {
+	available_processors: integer;
+	allocated_processors: integer;
+	names: ClusterOperatingSystemName[];
+}
+@namespace("cluster.cluster_stats")
+class ClusterOperatingSystemName {
+	count: integer;
+	name: string;
+}
+@namespace("cluster.cluster_stats")
+class ClusterProcess {
+	cpu: ClusterProcessCpu;
+	open_file_descriptors: ClusterProcessOpenFileDescriptors;
+}
+@namespace("cluster.cluster_stats")
+class ClusterProcessCpu {
+	percent: integer;
+}
+@namespace("cluster.cluster_stats")
+class ClusterProcessOpenFileDescriptors {
+	min: long;
+	max: long;
+	avg: long;
+}
+@namespace("cluster.cluster_stats")
+class ClusterJvm {
+	max_uptime: string;
+	max_uptime_in_millis: long;
+	versions: ClusterJvmVersion[];
+	mem: ClusterJvmMemory;
+	threads: long;
+}
+@namespace("cluster.cluster_stats")
+class ClusterJvmVersion {
+	version: string;
+	vm_name: string;
+	vm_version: string;
+	vm_vendor: string;
+	count: integer;
+}
+@namespace("cluster.cluster_stats")
+class ClusterJvmMemory {
+	heap_used: string;
+	heap_used_in_bytes: long;
+	heap_max: string;
+	heap_max_in_bytes: long;
+}
+@namespace("cluster.cluster_stats")
+class ClusterFileSystem {
+	total: string;
+	total_in_bytes: long;
+	free: string;
+	free_in_bytes: long;
+	available: string;
+	available_in_bytes: long;
+}
+@namespace("common_options.stats")
+class PluginStats {
+	name: string;
+	version: string;
+	description: string;
+	classname: string;
+	jvm: boolean;
+	isolated: boolean;
+	site: boolean;
 }
 @namespace("cluster.nodes_hot_threads")
 class HotThreadInformation {
@@ -2945,252 +3363,132 @@ class HotThreadInformation {
 	threads: string[];
 	hosts: string[];
 }
-@namespace("cluster")
-class NodeStatistics {
-	total: integer;
-	successful: integer;
-	failed: integer;
-}
-@namespace("common_abstractions.response")
-class ElasticsearchVersionInfo {
-	number: string;
-	snapshot_build: boolean;
-	lucene_version: string;
-}
-@namespace("cluster.task_management.list_tasks")
-class TaskExecutingNode {
+@namespace("cluster.nodes_info")
+class NodeInfo {
 	name: string;
 	transport_address: string;
 	host: string;
 	ip: string;
-	tasks: Map<TaskId, TaskState>;
+	version: string;
+	build_hash: string;
+	roles: NodeRole[];
+	settings: string[];
+	os: NodeOperatingSystemInfo;
+	process: NodeProcessInfo;
+	jvm: NodeJvmInfo;
+	thread_pool: Dictionary<string, NodeThreadPoolInfo>[];
+	network: NodeInfoNetwork;
+	transport: NodeInfoTransport;
+	http: NodeInfoHttp;
+	plugins: PluginStats[];
 }
-@namespace("cluster.task_management.list_tasks")
-class TaskState {
-	node: string;
+@namespace("cluster.nodes_info")
+class NodeOperatingSystemInfo {
+	name: string;
+	arch: string;
+	version: string;
+	refresh_interval_in_millis: integer;
+	available_processors: integer;
+	cpu: NodeInfoOSCPU;
+	mem: NodeInfoMemory;
+	swap: NodeInfoMemory;
+}
+@namespace("cluster.nodes_info")
+class NodeInfoOSCPU {
+	vendor: string;
+	model: string;
+	mhz: integer;
+	total_cores: integer;
+	total_sockets: integer;
+	cores_per_socket: integer;
+	cache_size: string;
+	cache_size_in_bytes: integer;
+}
+@namespace("cluster.nodes_info")
+class NodeInfoMemory {
+	total: string;
+	total_in_bytes: long;
+}
+@namespace("cluster.nodes_info")
+class NodeProcessInfo {
+	refresh_interval_in_millis: long;
 	id: long;
-	type: string;
-	action: string;
-	status: TaskStatus;
-	description: string;
+	mlockall: boolean;
+}
+@namespace("cluster.nodes_info")
+class NodeJvmInfo {
+	pid: integer;
+	version: string;
+	vm_name: string;
+	vm_version: string;
+	vm_vendor: string;
+	memory_pools: string[];
+	gc_collectors: string[];
 	start_time_in_millis: long;
-	running_time_in_nanos: long;
-	parent_task_id: TaskId;
+	mem: NodeInfoJVMMemory;
 }
-@namespace("cluster.task_management.list_tasks")
-class TaskStatus {
-	total: long;
-	updated: long;
-	created: long;
-	deleted: long;
-	batches: long;
-	version_conflicts: long;
-	noops: long;
-	retries: TaskRetries;
-	throttled_millis: long;
-	requests_per_second: long;
-	throttled_until_millis: long;
+@namespace("cluster.nodes_info")
+class NodeInfoJVMMemory {
+	heap_init: string;
+	heap_init_in_bytes: long;
+	heap_max: string;
+	heap_max_in_bytes: long;
+	non_heap_init: string;
+	non_heap_init_in_bytes: long;
+	non_heap_max: string;
+	non_heap_max_in_bytes: long;
+	direct_max: string;
+	direct_max_in_bytes: long;
 }
-@namespace("cluster.task_management.list_tasks")
-class TaskRetries {
-	bulk: integer;
-	search: integer;
-}
-@namespace("cluster.task_management.get_task")
-class TaskInfo {
-	node: string;
-	id: long;
+@namespace("cluster.nodes_info")
+class NodeThreadPoolInfo {
 	type: string;
-	action: string;
-	status: TaskStatus;
-	description: string;
-	start_time_in_millis: long;
-	running_time_in_nanos: long;
-	cancellable: boolean;
+	min: integer;
+	max: integer;
+	queue_size: integer;
+	keep_alive: string;
 }
-@namespace("common_options.hit")
-class ShardStatistics {
-	total: integer;
-	successful: integer;
-	failed: integer;
-	failures: ShardFailure[];
+@namespace("cluster.nodes_info")
+class NodeInfoNetwork {
+	refresh_interval: integer;
+	primary_interface: NodeInfoNetworkInterface;
 }
-@namespace("document.multiple")
-class Retries {
-	bulk: long;
-	search: long;
+@namespace("cluster.nodes_info")
+class NodeInfoNetworkInterface {
+	address: string;
+	name: string;
+	mac_address: string;
 }
-@namespace("document.multiple")
-class BulkIndexByScrollFailure {
-	index: string;
-	type: string;
-	id: string;
-	cause: BulkIndexFailureCause;
-	status: integer;
+@namespace("cluster.nodes_info")
+class NodeInfoTransport {
+	bound_address: string[];
+	publish_address: string;
 }
-@namespace("document.single.term_vectors")
-class TermVector {
-	field_statistics: FieldStatistics;
-	terms: Map<string, TermVectorTerm>;
+@namespace("cluster.nodes_info")
+class NodeInfoHttp {
+	bound_address: string[];
+	publish_address: string;
+	max_content_length: string;
+	max_content_length_in_bytes: long;
 }
-@namespace("document.single.term_vectors")
-class FieldStatistics {
-	doc_count: integer;
-	sum_doc_freq: integer;
-	sum_ttf: integer;
-}
-@namespace("document.single.term_vectors")
-class TermVectorTerm {
-	doc_freq: integer;
-	term_freq: integer;
-	tokens: Token[];
-	ttf: integer;
-}
-@namespace("document.single.term_vectors")
-class Token {
-	end_offset: integer;
-	payload: string;
-	position: integer;
-	start_offset: integer;
-}
-@namespace("document.multiple.reindex_rethrottle")
-class ReindexNode {
+@namespace("cluster.nodes_stats")
+class NodeStats {
+	timestamp: long;
 	name: string;
 	transport_address: string;
 	host: string;
-	ip: string;
-	roles: string[];
-	attributes: Map<string, string>;
-	tasks: Map<TaskId, ReindexTask>;
-}
-@namespace("document.multiple.reindex_rethrottle")
-class ReindexTask {
-	node: string;
-	id: long;
-	type: string;
-	action: string;
-	status: ReindexStatus;
-	description: string;
-	start_time_in_millis: long;
-	running_time_in_nanos: long;
-	cancellable: boolean;
-}
-@namespace("document.multiple.reindex_rethrottle")
-class ReindexStatus {
-	total: long;
-	updated: long;
-	created: long;
-	deleted: long;
-	batches: long;
-	version_conflicts: long;
-	noops: long;
-	retries: Retries;
-	throttled_millis: long;
-	requests_per_second: float;
-	throttled_until_millis: long;
-}
-@namespace("search.explain")
-class InstantGet<TDocument> {
-	found: boolean;
-	@prop_serializer("SourceConverter")
-	_source: TDocument;
-	fields: Map<string, LazyDocument>;
-}
-@namespace("indices.analyze")
-class AnalyzeToken {
-	token: string;
-	type: string;
-	start_offset: long;
-	end_offset: long;
-	position: long;
-	position_length: long;
-}
-@namespace("indices.analyze")
-class AnalyzeDetail {
-	custom_analyzer: boolean;
-	charfilters: CharFilterDetail[];
-	tokenfilters: TokenDetail[];
-	tokenizer: TokenDetail;
-}
-@namespace("indices.analyze")
-class CharFilterDetail {
-	name: string;
-	filtered_text: string[];
-}
-@namespace("indices.analyze")
-class TokenDetail {
-	name: string;
-	tokens: ExplainAnalyzeToken[];
-}
-@namespace("indices.analyze")
-class ExplainAnalyzeToken {
-	token: string;
-	type: string;
-	start_offset: long;
-	end_offset: long;
-	position: long;
-	positionLength: long;
-	termFrequency: long;
-	keyword: boolean;
-	bytes: string;
-}
-@namespace("indices.monitoring.indices_segments")
-class IndexSegment {
-	shards: Map<string, ShardsSegment>;
-}
-@namespace("indices.monitoring.indices_segments")
-@class_serializer("Json")
-class ShardsSegment {
-	num_committed_segments: integer;
-	num_search_segments: integer;
-	routing: ShardSegmentRouting;
-	segments: Map<string, Segment>;
-}
-@namespace("indices.monitoring.indices_segments")
-class ShardSegmentRouting {
-	state: string;
-	primary: boolean;
-	node: string;
-}
-@namespace("indices.monitoring.indices_segments")
-class Segment {
-	generation: integer;
-	num_docs: long;
-	deleted_docs: long;
-	size: string;
-	size_in_bytes: double;
-	committed: boolean;
-	Search: boolean;
-}
-@namespace("indices.monitoring.indices_shard_stores")
-class IndicesShardStores {
-	shards: Map<string, ShardStoreWrapper>;
-}
-@namespace("indices.monitoring.indices_shard_stores")
-class ShardStoreWrapper {
-	stores: ShardStore[];
-}
-@namespace("indices.monitoring.indices_shard_stores")
-@class_serializer("ShardStoreJsonConverter")
-class ShardStore {
-	id: string;
-	name: string;
-	transport_address: string;
-	legacy_version: long;
-	allocation_id: string;
-	store_exception: ShardStoreException;
-	allocation: ShardStoreAllocation;
-	attributes: Map<string, any>;
-}
-@namespace("indices.monitoring.indices_shard_stores")
-class ShardStoreException {
-	type: string;
-	reason: string;
-}
-@namespace("indices.monitoring.indices_stats")
-class IndicesStats {
-	primaries: IndexStats;
-	total: IndexStats;
+	ip: string | string[];
+	roles: NodeRole[];
+	indices: IndexStats;
+	os: OperatingSystemStats;
+	process: ProcessStats;
+	script: ScriptStats;
+	jvm: NodeJvmStats;
+	thread_pool: Dictionary<string, ThreadCountStats>[];
+	breakers: Dictionary<string, BreakerStats>[];
+	fs: FileSystemStats;
+	transport: TransportStats;
+	http: HttpStats;
 }
 @namespace("indices.monitoring.indices_stats")
 class IndexStats {
@@ -3212,16 +3510,6 @@ class IndexStats {
 	recovery: RecoveryStats;
 }
 @namespace("common_options.stats")
-class DocStats {
-	count: long;
-	deleted: long;
-}
-@namespace("common_options.stats")
-class StoreStats {
-	size: string;
-	size_in_bytes: double;
-}
-@namespace("common_options.stats")
 class IndexingStats {
 	delete_current: long;
 	delete_time: string;
@@ -3235,7 +3523,7 @@ class IndexingStats {
 	noop_update_total: long;
 	throttle_time: string;
 	throttle_time_in_millis: long;
-	types: Map<string, IndexingStats>;
+	types: Dictionary<string, IndexingStats>[];
 }
 @namespace("common_options.stats")
 class GetStats {
@@ -3305,54 +3593,6 @@ class WarmerStats {
 	total_time_in_millis: long;
 }
 @namespace("common_options.stats")
-class QueryCacheStats {
-	memory_size: string;
-	memory_size_in_bytes: long;
-	total_count: long;
-	hit_count: long;
-	miss_count: long;
-	cache_size: long;
-	cache_count: long;
-	evictions: long;
-}
-@namespace("common_options.stats")
-class FielddataStats {
-	evictions: long;
-	memory_size: string;
-	memory_size_in_bytes: long;
-}
-@namespace("common_options.stats")
-class CompletionStats {
-	size: string;
-	size_in_bytes: long;
-}
-@namespace("common_options.stats")
-class SegmentsStats {
-	count: long;
-	doc_values_memory: string;
-	doc_values_memory_in_bytes: long;
-	fixed_bit_set_memory: string;
-	fixed_bit_set_memory_in_bytes: long;
-	index_writer_max_memory: string;
-	index_writer_max_memory_in_bytes: long;
-	index_writer_memory: string;
-	index_writer_memory_in_bytes: long;
-	memory: string;
-	memory_in_bytes: long;
-	norms_memory: string;
-	norms_memory_in_bytes: long;
-	points_memory: string;
-	points_memory_in_bytes: long;
-	stored_fields_memory: string;
-	stored_fields_memory_in_bytes: long;
-	term_vectors_memory: string;
-	term_vectors_memory_in_bytes: long;
-	terms_memory: string;
-	terms_memory_in_bytes: long;
-	version_map_memory: string;
-	version_map_memory_in_bytes: long;
-}
-@namespace("common_options.stats")
 class TranslogStats {
 	operations: long;
 	size: string;
@@ -3372,6 +3612,425 @@ class RecoveryStats {
 	current_as_target: long;
 	throttle_time: string;
 	throttle_time_in_millis: long;
+}
+@namespace("cluster.nodes_stats")
+class OperatingSystemStats {
+	timestamp: long;
+	mem: ExtendedMemoryStats;
+	swap: MemoryStats;
+	cpu: CPUStats;
+}
+@namespace("cluster.nodes_stats")
+class ProcessStats {
+	timestamp: long;
+	open_file_descriptors: integer;
+	cpu: CPUStats;
+	mem: MemoryStats;
+}
+@namespace("cluster.nodes_stats")
+class ScriptStats {
+	cache_evictions: long;
+	compilations: long;
+}
+@namespace("cluster.nodes_stats")
+class NodeJvmStats {
+	timestamp: long;
+	uptime: string;
+	uptime_in_millis: long;
+	mem: MemoryStats;
+	threads: ThreadStats;
+	gc: GarbageCollectionStats;
+	buffer_pools: Dictionary<string, NodeBufferPool>[];
+	classes: JvmClassesStats;
+}
+@namespace("cluster.nodes_stats")
+class ThreadCountStats {
+	threads: long;
+	queue: long;
+	active: long;
+	rejected: long;
+	largest: long;
+	completed: long;
+}
+@namespace("cluster.nodes_stats")
+class BreakerStats {
+	estimated_size: string;
+	estimated_size_in_bytes: long;
+	limit_size: string;
+	limit_size_in_bytes: long;
+	overhead: float;
+	tripped: float;
+}
+@namespace("cluster.nodes_stats")
+class FileSystemStats {
+	timestamp: long;
+	total: TotalFileSystemStats;
+	data: DataPathStats[];
+}
+@namespace("cluster.nodes_stats")
+class TransportStats {
+	server_open: integer;
+	rx_count: long;
+	rx_size: string;
+	rx_size_in_bytes: long;
+	tx_count: long;
+	tx_size: string;
+	tx_size_in_bytes: long;
+}
+@namespace("cluster.nodes_stats")
+class HttpStats {
+	current_open: integer;
+	total_opened: long;
+}
+@namespace("cluster.nodes_usage")
+class NodeUsageInformation {
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
+	timestamp: Date;
+	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
+	since: Date;
+	rest_actions: Dictionary<string, integer>[];
+}
+@namespace("cluster.remote_info")
+class RemoteInfo {
+	connected: boolean;
+	num_nodes_connected: long;
+	max_connections_per_cluster: integer;
+	initial_connect_timeout: Time;
+	seeds: string[];
+	http_addresses: string[];
+}
+@namespace("common_abstractions.response")
+class ElasticsearchVersionInfo {
+	number: string;
+	snapshot_build: boolean;
+	lucene_version: string;
+}
+@namespace("cluster.task_management.list_tasks")
+class TaskExecutingNode {
+	name: string;
+	transport_address: string;
+	host: string;
+	ip: string;
+	tasks: Dictionary<TaskId, TaskState>[];
+}
+@namespace("cluster.task_management.list_tasks")
+class TaskState {
+	node: string;
+	id: long;
+	type: string;
+	action: string;
+	status: TaskStatus;
+	description: string;
+	start_time_in_millis: long;
+	running_time_in_nanos: long;
+	parent_task_id: TaskId;
+}
+@namespace("cluster.task_management.list_tasks")
+class TaskStatus {
+	total: long;
+	updated: long;
+	created: long;
+	deleted: long;
+	batches: long;
+	version_conflicts: long;
+	noops: long;
+	retries: TaskRetries;
+	throttled_millis: long;
+	requests_per_second: long;
+	throttled_until_millis: long;
+}
+@namespace("cluster.task_management.list_tasks")
+class TaskRetries {
+	bulk: integer;
+	search: integer;
+}
+@namespace("cluster.task_management.get_task")
+class TaskInfo {
+	node: string;
+	id: long;
+	type: string;
+	action: string;
+	status: TaskStatus;
+	description: string;
+	start_time_in_millis: long;
+	running_time_in_nanos: long;
+	cancellable: boolean;
+}
+@namespace("common_options.hit")
+class ShardStatistics {
+	total: integer;
+	successful: integer;
+	failed: integer;
+	failures: ShardFailure[];
+}
+@namespace("document.multiple")
+class Retries {
+	bulk: long;
+	search: long;
+}
+@namespace("document.multiple")
+class BulkIndexByScrollFailure {
+	index: string;
+	type: string;
+	id: string;
+	cause: BulkIndexFailureCause;
+	status: integer;
+}
+@namespace("document.single.term_vectors")
+class TermVector {
+	field_statistics: FieldStatistics;
+	terms: Dictionary<string, TermVectorTerm>[];
+}
+@namespace("document.single.term_vectors")
+class FieldStatistics {
+	doc_count: integer;
+	sum_doc_freq: integer;
+	sum_ttf: integer;
+}
+@namespace("document.single.term_vectors")
+class TermVectorTerm {
+	doc_freq: integer;
+	term_freq: integer;
+	tokens: Token[];
+	ttf: integer;
+}
+@namespace("document.single.term_vectors")
+class Token {
+	end_offset: integer;
+	payload: string;
+	position: integer;
+	start_offset: integer;
+}
+@namespace("document.multiple.reindex_on_server")
+@class_serializer("ReindexRoutingJsonConverter")
+class ReindexRouting {
+}
+@namespace("document.multiple.reindex_rethrottle")
+class ReindexNode {
+	name: string;
+	transport_address: string;
+	host: string;
+	ip: string;
+	roles: string[];
+	attributes: Dictionary<string, string>[];
+	tasks: Dictionary<TaskId, ReindexTask>[];
+}
+@namespace("document.multiple.reindex_rethrottle")
+class ReindexTask {
+	node: string;
+	id: long;
+	type: string;
+	action: string;
+	status: ReindexStatus;
+	description: string;
+	start_time_in_millis: long;
+	running_time_in_nanos: long;
+	cancellable: boolean;
+}
+@namespace("document.multiple.reindex_rethrottle")
+class ReindexStatus {
+	total: long;
+	updated: long;
+	created: long;
+	deleted: long;
+	batches: long;
+	version_conflicts: long;
+	noops: long;
+	retries: Retries;
+	throttled_millis: long;
+	requests_per_second: float;
+	throttled_until_millis: long;
+}
+@namespace("search.explain")
+class InstantGet<TDocument> {
+	found: boolean;
+	@prop_serializer("SourceConverter")
+	_source: TDocument;
+	fields: Dictionary<string, LazyDocument>[];
+}
+@namespace("indices.alias_management.get_alias")
+class IndexAliases {
+	aliases: Dictionary<string, AliasDefinition>[];
+}
+@namespace("indices.alias_management")
+class AliasDefinition {
+	filter: QueryContainer;
+	routing: string;
+	index_routing: string;
+	search_routing: string;
+}
+@namespace("indices.analyze")
+class AnalyzeToken {
+	token: string;
+	type: string;
+	start_offset: long;
+	end_offset: long;
+	position: long;
+	position_length: long;
+}
+@namespace("indices.analyze")
+class AnalyzeDetail {
+	custom_analyzer: boolean;
+	charfilters: CharFilterDetail[];
+	tokenfilters: TokenDetail[];
+	tokenizer: TokenDetail;
+}
+@namespace("indices.analyze")
+class CharFilterDetail {
+	name: string;
+	filtered_text: string[];
+}
+@namespace("indices.analyze")
+class TokenDetail {
+	name: string;
+	tokens: ExplainAnalyzeToken[];
+}
+@namespace("indices.analyze")
+class ExplainAnalyzeToken {
+	token: string;
+	type: string;
+	start_offset: long;
+	end_offset: long;
+	position: long;
+	positionLength: long;
+	termFrequency: long;
+	keyword: boolean;
+	bytes: string;
+}
+@namespace("indices.mapping_management.get_field_mapping")
+class TypeFieldMappings {
+	@prop_serializer("ResolvableDictionaryJsonConverter`2")
+	mappings: Dictionary<TypeName, Dictionary<Field, FieldMapping>[]>[];
+}
+@namespace("indices.mapping_management.get_mapping")
+class IndexMappings {
+	mappings: Dictionary<TypeName, TypeMapping>[];
+	item: TypeMapping;
+}
+@namespace("indices.monitoring.indices_recovery")
+class RecoveryStatus {
+	shards: ShardRecovery[];
+}
+@namespace("indices.monitoring.indices_recovery")
+class ShardRecovery {
+	id: long;
+	type: string;
+	stage: string;
+	primary: boolean;
+	start_time: Date;
+	stop_time: Date;
+	total_time_in_millis: long;
+	source: RecoveryOrigin;
+	target: RecoveryOrigin;
+	index: RecoveryIndexStatus;
+	translog: RecoveryTranslogStatus;
+	start: RecoveryStartStatus;
+}
+@namespace("indices.monitoring.indices_recovery")
+class RecoveryOrigin {
+	id: string;
+	hostname: string;
+	ip: string;
+	name: string;
+}
+@namespace("indices.monitoring.indices_recovery")
+class RecoveryIndexStatus {
+	total_time_in_millis: long;
+	bytes: RecoveryBytes;
+	files: RecoveryFiles;
+}
+@namespace("indices.monitoring.indices_recovery")
+class RecoveryBytes {
+	total: long;
+	reused: long;
+	recovered: long;
+	percent: string;
+}
+@namespace("indices.monitoring.indices_recovery")
+class RecoveryFiles {
+	total: long;
+	reused: long;
+	recovered: long;
+	percent: string;
+	details: RecoveryFileDetails[];
+}
+@namespace("indices.monitoring.indices_recovery")
+class RecoveryFileDetails {
+	name: string;
+	length: long;
+	recovered: long;
+}
+@namespace("indices.monitoring.indices_recovery")
+class RecoveryTranslogStatus {
+	recovered: long;
+	total: long;
+	percent: string;
+	total_on_start: long;
+	total_time: string;
+	total_time_in_millis: long;
+}
+@namespace("indices.monitoring.indices_recovery")
+class RecoveryStartStatus {
+	check_index_time: long;
+	total_time_in_millis: string;
+}
+@namespace("indices.monitoring.indices_segments")
+class IndexSegment {
+	shards: Dictionary<string, ShardsSegment>[];
+}
+@namespace("indices.monitoring.indices_segments")
+@class_serializer("Json")
+class ShardsSegment {
+	num_committed_segments: integer;
+	num_search_segments: integer;
+	routing: ShardSegmentRouting;
+	segments: Dictionary<string, Segment>[];
+}
+@namespace("indices.monitoring.indices_segments")
+class ShardSegmentRouting {
+	state: string;
+	primary: boolean;
+	node: string;
+}
+@namespace("indices.monitoring.indices_segments")
+class Segment {
+	generation: integer;
+	num_docs: long;
+	deleted_docs: long;
+	size: string;
+	size_in_bytes: double;
+	committed: boolean;
+	Search: boolean;
+}
+@namespace("indices.monitoring.indices_shard_stores")
+class IndicesShardStores {
+	shards: Dictionary<string, ShardStoreWrapper>[];
+}
+@namespace("indices.monitoring.indices_shard_stores")
+class ShardStoreWrapper {
+	stores: ShardStore[];
+}
+@namespace("indices.monitoring.indices_shard_stores")
+@class_serializer("ShardStoreJsonConverter")
+class ShardStore {
+	id: string;
+	name: string;
+	transport_address: string;
+	legacy_version: long;
+	allocation_id: string;
+	store_exception: ShardStoreException;
+	allocation: ShardStoreAllocation;
+	attributes: Dictionary<string, any>[];
+}
+@namespace("indices.monitoring.indices_shard_stores")
+class ShardStoreException {
+	type: string;
+	reason: string;
+}
+@namespace("indices.monitoring.indices_stats")
+class IndicesStats {
+	primaries: IndexStats;
+	total: IndexStats;
 }
 @namespace("indices.status_management.upgrade.upgrade_status")
 class UpgradeStatus {
@@ -3400,6 +4059,11 @@ class DocumentSimulation {
 @namespace("ingest.simulate_pipeline")
 class Ingest {
 	timestamp: Date;
+}
+@namespace("modules.indices.fielddata")
+class FielddataSettings {
+	cache_size: string;
+	cache_expire: Time;
 }
 @namespace("modules.snapshot_and_restore.repositories.verify_repository")
 class CompactNodeInfo {
@@ -3439,7 +4103,7 @@ class SnapshotStatus {
 	state: string;
 	shards_stats: SnapshotShardsStats;
 	stats: SnapshotStats;
-	indices: Map<string, SnapshotIndexStats>;
+	indices: Dictionary<string, SnapshotIndexStats>[];
 }
 @namespace("modules.snapshot_and_restore.snapshot.snapshot_status")
 class SnapshotShardsStats {
@@ -3463,7 +4127,7 @@ class SnapshotStats {
 class SnapshotIndexStats {
 	shards_stats: SnapshotShardsStats;
 	stats: SnapshotStats;
-	shards: Map<string, SnapshotShardsStats>;
+	shards: Dictionary<string, SnapshotShardsStats>[];
 }
 @namespace("search.explain")
 class ExplanationDetail {
@@ -3478,6 +4142,81 @@ class FieldCapabilities {
 	indices: Indices;
 	non_searchable_indices: Indices;
 	non_aggregatable_indices: Indices;
+}
+@namespace("aggregations.bucket.histogram")
+@class_serializer("KeyValueJsonConverter`2")
+class HistogramOrder {
+	key: string;
+	order: SortOrder;
+	count_ascending: HistogramOrder;
+	count_descending: HistogramOrder;
+	key_ascending: HistogramOrder;
+	key_descending: HistogramOrder;
+}
+@namespace("aggregations.bucket.histogram")
+class ExtendedBounds<T> {
+	min: T;
+	max: T;
+}
+@namespace("aggregations.bucket.terms")
+@class_serializer("KeyValueJsonConverter`2")
+class TermsOrder {
+	key: string;
+	order: SortOrder;
+	count_ascending: TermsOrder;
+	count_descending: TermsOrder;
+	term_ascending: TermsOrder;
+	term_descending: TermsOrder;
+	key_ascending: TermsOrder;
+	key_descending: TermsOrder;
+}
+@namespace("aggregations.bucket.terms")
+@class_serializer("TermsIncludeJsonConverter")
+class TermsInclude {
+	pattern: string;
+	values: string[];
+	partition: long;
+	num_partitions: long;
+}
+@namespace("aggregations.bucket.terms")
+@class_serializer("TermsExcludeJsonConverter")
+class TermsExclude {
+	pattern: string;
+	values: string[];
+}
+@namespace("common")
+@class_serializer("SignificantTermsIncludeExcludeJsonConverter")
+class SignificantTermsIncludeExclude {
+	pattern: string;
+	values: string[];
+}
+@namespace("search.search.hits")
+class InnerHitsResult {
+	hits: InnerHitsMetadata;
+}
+@namespace("search.search.hits")
+class InnerHitsMetadata {
+	total: long;
+	max_score: double;
+	hits: Hit<LazyDocument>[];
+}
+@namespace("search.search.hits")
+class NestedIdentity {
+	field: Field;
+	offset: integer;
+	_nested: NestedIdentity;
+}
+@namespace("search.search.highlighting")
+class HighlightHit {
+	document_id: string;
+	field: string;
+	highlights: string[];
+}
+@namespace("search.explain")
+class Explanation {
+	value: float;
+	description: string;
+	details: ExplanationDetail[];
 }
 @namespace("search.search_shards")
 class SearchShard {
@@ -3568,7 +4307,7 @@ class SuggestOption<TDocument> {
 	_id: Id;
 	@prop_serializer("SourceConverter")
 	_source: TDocument;
-	contexts: Map<string, Context[]>;
+	contexts: Dictionary<string, Context[]>[];
 	highlighted: string;
 	collate_match: boolean;
 }
@@ -3577,34 +4316,6 @@ class HitsMetadata<T> {
 	total: long;
 	max_score: double;
 	//hits: Hit<T>[];
-}
-@namespace("search.search.highlighting")
-class HighlightHit {
-	document_id: string;
-	field: string;
-	highlights: string[];
-}
-@namespace("search.explain")
-class Explanation {
-	value: float;
-	description: string;
-	details: ExplanationDetail[];
-}
-@namespace("search.search.hits")
-class InnerHitsResult {
-	hits: InnerHitsMetadata;
-}
-@namespace("search.search.hits")
-class InnerHitsMetadata {
-	total: long;
-	max_score: double;
-	hits: Hit<LazyDocument>[];
-}
-@namespace("search.search.hits")
-class NestedIdentity {
-	field: Field;
-	offset: integer;
-	_nested: NestedIdentity;
 }
 @namespace("search.validate")
 class ValidationExplanation {
@@ -3619,6 +4330,16 @@ class DeprecationInfo {
 	message: string;
 	url: string;
 	details: string;
+}
+@namespace("x_pack.graph.explore.request")
+class GraphVertexInclude {
+	term: string;
+	boost: double;
+}
+@namespace("x_pack.graph.explore.request")
+class SampleDiversity {
+	field: Field;
+	max_docs_per_value: integer;
 }
 @namespace("x_pack.graph.explore.response")
 class GraphConnection {
@@ -3680,6 +4401,17 @@ class LicenseInformation {
 	issue_date: Date;
 	issue_date_in_millis: long;
 	expiry_date: Date;
+	expiry_date_in_millis: long;
+	max_nodes: long;
+	issued_to: string;
+	issuer: string;
+}
+@namespace("x_pack.license.get_license")
+class License {
+	uid: string;
+	signature: string;
+	type: LicenseType;
+	issue_date_in_millis: long;
 	expiry_date_in_millis: long;
 	max_nodes: long;
 	issued_to: string;
@@ -3797,12 +4529,12 @@ class DiscoveryNode {
 	name: string;
 	ephemeral_id: string;
 	transport_address: string;
-	attributes: Map<string, string>;
+	attributes: Dictionary<string, string>[];
 }
 @namespace("x_pack.machine_learning.datafeed")
 class DatafeedConfig {
 	datafeed_id: string;
-	aggregations: Map<string, AggregationContainer>;
+	aggregations: Dictionary<string, AggregationContainer>[];
 	chunking_config: ChunkingConfig;
 	frequency: Time;
 	@prop_serializer("IndicesJsonConverter")
@@ -3810,63 +4542,10 @@ class DatafeedConfig {
 	job_id: string;
 	query: QueryContainer;
 	query_delay: Time;
-	script_fields: Map<string, ScriptField>;
+	script_fields: Dictionary<string, ScriptField>[];
 	scroll_size: integer;
 	@prop_serializer("TypesJsonConverter")
 	types: Types;
-}
-@namespace("aggregations.bucket.histogram")
-@class_serializer("KeyValueJsonConverter`2")
-class HistogramOrder {
-	key: string;
-	order: SortOrder;
-	count_ascending: HistogramOrder;
-	count_descending: HistogramOrder;
-	key_ascending: HistogramOrder;
-	key_descending: HistogramOrder;
-}
-@namespace("aggregations.bucket.histogram")
-class ExtendedBounds<T> {
-	min: T;
-	max: T;
-}
-@namespace("common_options.geo")
-@class_serializer("DistanceJsonConverter")
-class Distance {
-	precision: double;
-	unit: DistanceUnit;
-}
-@namespace("aggregations.bucket.terms")
-@class_serializer("KeyValueJsonConverter`2")
-class TermsOrder {
-	key: string;
-	order: SortOrder;
-	count_ascending: TermsOrder;
-	count_descending: TermsOrder;
-	term_ascending: TermsOrder;
-	term_descending: TermsOrder;
-	key_ascending: TermsOrder;
-	key_descending: TermsOrder;
-}
-@namespace("aggregations.bucket.terms")
-@class_serializer("TermsIncludeJsonConverter")
-class TermsInclude {
-	pattern: string;
-	values: string[];
-	partition: long;
-	num_partitions: long;
-}
-@namespace("aggregations.bucket.terms")
-@class_serializer("TermsExcludeJsonConverter")
-class TermsExclude {
-	pattern: string;
-	values: string[];
-}
-@namespace("common")
-@class_serializer("SignificantTermsIncludeExcludeJsonConverter")
-class SignificantTermsIncludeExclude {
-	pattern: string;
-	values: string[];
 }
 @namespace("x_pack.machine_learning.job.config")
 class JobStats {
@@ -3957,13 +4636,35 @@ class ModelSnapshot {
 class SecurityNode {
 	name: string;
 }
+@namespace("x_pack.security.role_mapping.get_role_mapping")
+class XPackRoleMapping {
+	metadata: Dictionary<string, any>[];
+	enabled: boolean;
+	roles: string[];
+	rules: RoleMappingRuleBase;
+}
 @namespace("x_pack.security.role_mapping.put_role_mapping")
 class PutRoleMappingStatus {
 	created: boolean;
 }
+@namespace("x_pack.security.role.get_role")
+class XPackRole {
+	cluster: string[];
+	run_as: string[];
+	indices: IndicesPrivileges[];
+	metadata: Dictionary<string, any>[];
+}
 @namespace("x_pack.security.role.put_role")
 class PutRoleStatus {
 	created: boolean;
+}
+@namespace("x_pack.security.user.get_user")
+class XPackUser {
+	username: string;
+	roles: string[];
+	full_name: string;
+	email: string;
+	metadata: Dictionary<string, any>[];
 }
 @namespace("x_pack.security.user.put_user")
 class PutUserStatus {
@@ -3975,7 +4676,7 @@ class WatchStatus {
 	state: ActivationState;
 	last_checked: Date;
 	last_met_condition: Date;
-	actions: Map<string, ActionStatus>;
+	actions: Dictionary<string, ActionStatus>[];
 }
 @namespace("x_pack.watcher.acknowledge_watch")
 class ActivationState {
@@ -4007,7 +4708,14 @@ class ThrottleState {
 @namespace("x_pack.watcher.activate_watch")
 class ActivationStatus {
 	state: ActivationState;
-	actions: Map<string, ActionStatus>;
+	actions: Dictionary<string, ActionStatus>[];
+}
+@namespace("x_pack.watcher.execution")
+@class_serializer("SimulatedActionsConverter")
+class SimulatedActions {
+	use_all: boolean;
+	actions: string[];
+	all: SimulatedActions;
 }
 @namespace("x_pack.watcher.execute_watch")
 class WatchRecord {
@@ -4017,7 +4725,7 @@ class WatchRecord {
 	trigger_event: TriggerEventResult;
 	condition: ConditionContainer;
 	input: InputContainer;
-	metadata: Map<string, any>;
+	metadata: Dictionary<string, any>[];
 	result: ExecutionResult;
 }
 @namespace("x_pack.watcher.execute_watch")
@@ -4038,7 +4746,7 @@ class ExecutionResult {
 class ExecutionResultInput {
 	type: InputType;
 	status: Status;
-	payload: Map<string, any>;
+	payload: Dictionary<string, any>[];
 }
 @namespace("x_pack.watcher.execute_watch")
 class ExecutionResultCondition {
@@ -4101,7 +4809,7 @@ class WebhookActionResult {
 @namespace("x_pack.watcher.execution")
 class HttpInputResponseResult {
 	status: integer;
-	headers: Map<string, string[]>;
+	headers: Dictionary<string, string[]>[];
 	body: string;
 }
 @namespace("x_pack.watcher.execution.logging")
@@ -4150,13 +4858,13 @@ class SlackActionMessageResult {
 }
 @namespace("x_pack.watcher")
 class Watch {
-	metadata: Map<string, any>;
+	metadata: Dictionary<string, any>[];
 	input: InputContainer;
 	condition: ConditionContainer;
 	trigger: TriggerContainer;
 	transform: TransformContainer;
 	@prop_serializer("ActionsJsonConverter")
-	actions: Map<string, Action>;
+	actions: Dictionary<string, Action>[];
 	status: WatchStatus;
 	throttle_period: string;
 }
@@ -4180,556 +4888,436 @@ class WatchRecordQueuedStats {
 	triggered_time: Date;
 	execution_time: Date;
 }
-@namespace("document.multiple.reindex_on_server")
-@class_serializer("ReindexRoutingJsonConverter")
-class ReindexRouting {
-}
-@namespace("x_pack.license.get_license")
-class License {
-	uid: string;
-	signature: string;
-	type: LicenseType;
-	issue_date_in_millis: long;
-	expiry_date_in_millis: long;
-	max_nodes: long;
-	issued_to: string;
-	issuer: string;
-}
-@namespace("x_pack.security.role_mapping.rules.role")
-@class_serializer("RoleMappingRuleBaseJsonConverter")
-class RoleMappingRuleBase {
-}
-@namespace("x_pack.watcher.execution")
-@class_serializer("SimulatedActionsConverter")
-class SimulatedActions {
-	use_all: boolean;
-	actions: string[];
-	all: SimulatedActions;
-}
-@namespace("cluster.cluster_stats")
-class ClusterIndicesStats {
-	completion: CompletionStats;
-	count: long;
-	docs: DocStats;
-	fielddata: FielddataStats;
-	query_cache: QueryCacheStats;
-	segments: SegmentsStats;
-	shards: ClusterIndicesShardsStats;
-	store: StoreStats;
-}
-@namespace("cluster.cluster_stats")
-class ClusterIndicesShardsStats {
-	total: double;
-	primaries: double;
-	replication: double;
-	index: ClusterIndicesShardsIndexStats;
-}
-@namespace("cluster.cluster_stats")
-class ClusterIndicesShardsIndexStats {
-	shards: ClusterShardMetrics;
-	primaries: ClusterShardMetrics;
-	replication: ClusterShardMetrics;
-}
-@namespace("cluster.cluster_stats")
-class ClusterShardMetrics {
-	min: double;
-	max: double;
-	avg: double;
-}
-@namespace("cluster.cluster_stats")
-class ClusterNodesStats {
-	count: ClusterNodeCount;
-	versions: string[];
-	os: ClusterOperatingSystemStats;
-	process: ClusterProcess;
-	jvm: ClusterJvm;
-	fs: ClusterFileSystem;
-	plugins: PluginStats[];
-}
-@namespace("cluster.cluster_stats")
-class ClusterNodeCount {
-	total: integer;
-	coordinating_only: integer;
-	master: integer;
-	data: integer;
-	ingest: integer;
-}
-@namespace("cluster.cluster_stats")
-class ClusterOperatingSystemStats {
-	available_processors: integer;
-	allocated_processors: integer;
-	names: ClusterOperatingSystemName[];
-}
-@namespace("cluster.cluster_stats")
-class ClusterOperatingSystemName {
-	count: integer;
-	name: string;
-}
-@namespace("cluster.cluster_stats")
-class ClusterProcess {
-	cpu: ClusterProcessCpu;
-	open_file_descriptors: ClusterProcessOpenFileDescriptors;
-}
-@namespace("cluster.cluster_stats")
-class ClusterProcessCpu {
-	percent: integer;
-}
-@namespace("cluster.cluster_stats")
-class ClusterProcessOpenFileDescriptors {
-	min: long;
-	max: long;
-	avg: long;
-}
-@namespace("cluster.cluster_stats")
-class ClusterJvm {
-	max_uptime: string;
-	max_uptime_in_millis: long;
-	versions: ClusterJvmVersion[];
-	mem: ClusterJvmMemory;
-	threads: long;
-}
-@namespace("cluster.cluster_stats")
-class ClusterJvmVersion {
-	version: string;
-	vm_name: string;
-	vm_version: string;
-	vm_vendor: string;
-	count: integer;
-}
-@namespace("cluster.cluster_stats")
-class ClusterJvmMemory {
-	heap_used: string;
-	heap_used_in_bytes: long;
-	heap_max: string;
-	heap_max_in_bytes: long;
-}
-@namespace("cluster.cluster_stats")
-class ClusterFileSystem {
-	total: string;
-	total_in_bytes: long;
-	free: string;
-	free_in_bytes: long;
-	available: string;
-	available_in_bytes: long;
-}
-@namespace("common_options.stats")
-class PluginStats {
-	name: string;
-	version: string;
-	description: string;
-	classname: string;
-	jvm: boolean;
-	isolated: boolean;
-	site: boolean;
-}
-@namespace("cluster.nodes_info")
-class NodeInfo {
-	name: string;
-	transport_address: string;
-	host: string;
-	ip: string;
-	version: string;
-	build_hash: string;
-	roles: NodeRole[];
-	settings: string[];
-	os: NodeOperatingSystemInfo;
-	process: NodeProcessInfo;
-	jvm: NodeJvmInfo;
-	thread_pool: Map<string, NodeThreadPoolInfo>;
-	network: NodeInfoNetwork;
-	transport: NodeInfoTransport;
-	http: NodeInfoHttp;
-	plugins: PluginStats[];
-}
-@namespace("cluster.nodes_info")
-class NodeOperatingSystemInfo {
-	name: string;
-	arch: string;
-	version: string;
-	refresh_interval_in_millis: integer;
-	available_processors: integer;
-	cpu: NodeInfoOSCPU;
-	mem: NodeInfoMemory;
-	swap: NodeInfoMemory;
-}
-@namespace("cluster.nodes_info")
-class NodeInfoOSCPU {
-	vendor: string;
-	model: string;
-	mhz: integer;
-	total_cores: integer;
-	total_sockets: integer;
-	cores_per_socket: integer;
-	cache_size: string;
-	cache_size_in_bytes: integer;
-}
-@namespace("cluster.nodes_info")
-class NodeInfoMemory {
-	total: string;
-	total_in_bytes: long;
-}
-@namespace("cluster.nodes_info")
-class NodeProcessInfo {
-	refresh_interval_in_millis: long;
-	id: long;
-	mlockall: boolean;
-}
-@namespace("cluster.nodes_info")
-class NodeJvmInfo {
-	pid: integer;
-	version: string;
-	vm_name: string;
-	vm_version: string;
-	vm_vendor: string;
-	memory_pools: string[];
-	gc_collectors: string[];
-	start_time_in_millis: long;
-	mem: NodeInfoJVMMemory;
-}
-@namespace("cluster.nodes_info")
-class NodeInfoJVMMemory {
-	heap_init: string;
-	heap_init_in_bytes: long;
-	heap_max: string;
-	heap_max_in_bytes: long;
-	non_heap_init: string;
-	non_heap_init_in_bytes: long;
-	non_heap_max: string;
-	non_heap_max_in_bytes: long;
-	direct_max: string;
-	direct_max_in_bytes: long;
-}
-@namespace("cluster.nodes_info")
-class NodeThreadPoolInfo {
-	type: string;
-	min: integer;
-	max: integer;
-	queue_size: integer;
-	keep_alive: string;
-}
-@namespace("cluster.nodes_info")
-class NodeInfoNetwork {
-	refresh_interval: integer;
-	primary_interface: NodeInfoNetworkInterface;
-}
-@namespace("cluster.nodes_info")
-class NodeInfoNetworkInterface {
-	address: string;
-	name: string;
-	mac_address: string;
-}
-@namespace("cluster.nodes_info")
-class NodeInfoTransport {
-	bound_address: string[];
-	publish_address: string;
-}
-@namespace("cluster.nodes_info")
-class NodeInfoHttp {
-	bound_address: string[];
-	publish_address: string;
-	max_content_length: string;
-	max_content_length_in_bytes: long;
-}
-@namespace("cluster.nodes_stats")
-class NodeStats {
-	timestamp: long;
-	name: string;
-	transport_address: string;
-	host: string;
-	ip: string | string[];
-	roles: NodeRole[];
-	indices: IndexStats;
-	os: OperatingSystemStats;
-	process: ProcessStats;
-	script: ScriptStats;
-	jvm: NodeJvmStats;
-	thread_pool: Map<string, ThreadCountStats>;
-	breakers: Map<string, BreakerStats>;
-	fs: FileSystemStats;
-	transport: TransportStats;
-	http: HttpStats;
-}
-@namespace("cluster.nodes_stats")
-class OperatingSystemStats {
-	timestamp: long;
-	mem: ExtendedMemoryStats;
-	swap: MemoryStats;
-	cpu: CPUStats;
-}
-@namespace("cluster.nodes_stats")
-class ProcessStats {
-	timestamp: long;
-	open_file_descriptors: integer;
-	cpu: CPUStats;
-	mem: MemoryStats;
-}
-@namespace("cluster.nodes_stats")
-class ScriptStats {
-	cache_evictions: long;
-	compilations: long;
-}
-@namespace("cluster.nodes_stats")
-class NodeJvmStats {
-	timestamp: long;
-	uptime: string;
-	uptime_in_millis: long;
-	mem: MemoryStats;
-	threads: ThreadStats;
-	gc: GarbageCollectionStats;
-	buffer_pools: Map<string, NodeBufferPool>;
-	classes: JvmClassesStats;
-}
-@namespace("cluster.nodes_stats")
-class ThreadCountStats {
-	threads: long;
-	queue: long;
-	active: long;
-	rejected: long;
-	largest: long;
-	completed: long;
-}
-@namespace("cluster.nodes_stats")
-class BreakerStats {
-	estimated_size: string;
-	estimated_size_in_bytes: long;
-	limit_size: string;
-	limit_size_in_bytes: long;
-	overhead: float;
-	tripped: float;
-}
-@namespace("cluster.nodes_stats")
-class FileSystemStats {
-	timestamp: long;
-	total: TotalFileSystemStats;
-	data: DataPathStats[];
-}
-@namespace("cluster.nodes_stats")
-class TransportStats {
-	server_open: integer;
-	rx_count: long;
-	rx_size: string;
-	rx_size_in_bytes: long;
-	tx_count: long;
-	tx_size: string;
-	tx_size_in_bytes: long;
-}
-@namespace("cluster.nodes_stats")
-class HttpStats {
-	current_open: integer;
-	total_opened: long;
-}
-@namespace("cluster.nodes_usage")
-class NodeUsageInformation {
-	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
-	timestamp: Date;
-	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
-	since: Date;
-	rest_actions: Map<string, integer>;
-}
-@namespace("cluster.remote_info")
-class RemoteInfo {
-	connected: boolean;
-	num_nodes_connected: long;
-	max_connections_per_cluster: integer;
-	initial_connect_timeout: Time;
-	seeds: string[];
-	http_addresses: string[];
-}
-@namespace("indices.alias_management.get_alias")
-class IndexAliases {
-	aliases: Map<string, AliasDefinition>;
-}
-@namespace("indices.alias_management")
-class AliasDefinition {
-	filter: QueryContainer;
-	routing: string;
-	index_routing: string;
-	search_routing: string;
-}
-@namespace("indices.mapping_management.get_field_mapping")
-class TypeFieldMappings {
-	@prop_serializer("ResolvableDictionaryJsonConverter`2")
-	mappings: Map<TypeName, Map<Field, FieldMapping>>;
-}
-@namespace("indices.mapping_management.get_mapping")
-class IndexMappings {
-	mappings: Map<TypeName, TypeMapping>;
-	item: TypeMapping;
-}
-@namespace("indices.monitoring.indices_recovery")
-class RecoveryStatus {
-	shards: ShardRecovery[];
-}
-@namespace("indices.monitoring.indices_recovery")
-class ShardRecovery {
-	id: long;
-	type: string;
-	stage: string;
-	primary: boolean;
-	start_time: Date;
-	stop_time: Date;
-	total_time_in_millis: long;
-	source: RecoveryOrigin;
-	target: RecoveryOrigin;
-	index: RecoveryIndexStatus;
-	translog: RecoveryTranslogStatus;
-	start: RecoveryStartStatus;
-}
-@namespace("indices.monitoring.indices_recovery")
-class RecoveryOrigin {
-	id: string;
-	hostname: string;
-	ip: string;
-	name: string;
-}
-@namespace("indices.monitoring.indices_recovery")
-class RecoveryIndexStatus {
-	total_time_in_millis: long;
-	bytes: RecoveryBytes;
-	files: RecoveryFiles;
-}
-@namespace("indices.monitoring.indices_recovery")
-class RecoveryBytes {
-	total: long;
-	reused: long;
-	recovered: long;
-	percent: string;
-}
-@namespace("indices.monitoring.indices_recovery")
-class RecoveryFiles {
-	total: long;
-	reused: long;
-	recovered: long;
-	percent: string;
-	details: RecoveryFileDetails[];
-}
-@namespace("indices.monitoring.indices_recovery")
-class RecoveryFileDetails {
-	name: string;
-	length: long;
-	recovered: long;
-}
-@namespace("indices.monitoring.indices_recovery")
-class RecoveryTranslogStatus {
-	recovered: long;
-	total: long;
-	percent: string;
-	total_on_start: long;
-	total_time: string;
-	total_time_in_millis: long;
-}
-@namespace("indices.monitoring.indices_recovery")
-class RecoveryStartStatus {
-	check_index_time: long;
-	total_time_in_millis: string;
-}
-@namespace("x_pack.graph.explore.request")
-class GraphVertexInclude {
-	term: string;
-	boost: double;
-}
-@namespace("x_pack.graph.explore.request")
-class SampleDiversity {
-	field: Field;
-	max_docs_per_value: integer;
-}
-@namespace("x_pack.security.role_mapping.get_role_mapping")
-class XPackRoleMapping {
-	metadata: Map<string, any>;
-	enabled: boolean;
-	roles: string[];
-	rules: RoleMappingRuleBase;
-}
-@namespace("x_pack.security.role.get_role")
-class XPackRole {
-	cluster: string[];
-	run_as: string[];
-	indices: IndicesPrivileges[];
-	metadata: Map<string, any>;
-}
-@namespace("x_pack.security.user.get_user")
-class XPackUser {
-	username: string;
-	roles: string[];
-	full_name: string;
-	email: string;
-	metadata: Map<string, any>;
-}
-@namespace("analysis.analyzers")
-class AnalyzerBase {
-	version: string;
-	type: string;
-}
-@namespace("analysis.char_filters")
-class CharFilterBase {
-	version: string;
-	type: string;
-}
-@namespace("analysis.token_filters")
-class TokenFilterBase {
-	version: string;
-	type: string;
-}
-@namespace("analysis.tokenizers")
-class TokenizerBase {
-	version: string;
-	type: string;
-}
-@namespace("modules.indices")
-class IndicesModuleSettings {
-	qeueries_cache_size: string;
-	circuit_breaker_settings: CircuitBreakerSettings;
-	fielddata_settings: FielddataSettings;
-	recovery_settings: IndicesRecoverySettings;
-}
 @namespace("analysis")
 @class_serializer("UnionJsonConverter")
 class StopWords extends Union<string, string[]> {
 }
-@namespace("indices.index_settings.index_templates.get_index_template")
-class TemplateMapping {
-	index_patterns: string[];
-	order: integer;
-	settings: Map<string, any>;
-	mappings: Map<TypeName, TypeMapping>;
-	aliases: Map<IndexName, Alias>;
-	version: integer;
+@namespace("cat.cat_aliases")
+class CatAliasesRecord implements ICatRecord {
+	alias: string;
+	index: string;
+	filter: string;
+	indexRouting: string;
+	searchRouting: string;
 }
-@namespace("search.suggesters.context_suggester")
-@class_serializer("UnionJsonConverter")
-class Context extends Union<string, GeoLocation> {
-	category: string;
-	geo: GeoLocation;
+@namespace("cat.cat_aliases")
+class CatAliasesResponse extends ResponseBase {
+	records: CatAliasesRecord[];
 }
-@namespace("x_pack.info.x_pack_usage")
-class MonitoringUsage extends XPackUsage {
-	enabled_exporters: Map<string, long>;
+@namespace("common_abstractions.infer.name")
+class Names extends String {}
+@namespace("cat.cat_allocation")
+class CatAllocationRecord implements ICatRecord {
+	shards: string;
+	diskUsed: string;
+	diskAvail: string;
+	diskRatio: string;
+	ip: string;
+	node: string;
 }
-@namespace("x_pack.info.x_pack_usage")
-class MachineLearningUsage extends XPackUsage {
-	jobs: Map<string, Job>;
-	datafeeds: Map<string, DataFeed>;
+@namespace("cat.cat_allocation")
+class CatAllocationResponse extends ResponseBase {
+	records: CatAllocationRecord[];
 }
-@namespace("x_pack.info.x_pack_usage")
-class AlertingUsage extends XPackUsage {
-	execution: AlertingExecution;
-	count: AlertingCount;
+@namespace("common_abstractions.infer.node_id")
+class NodeIds extends String {}
+@namespace("cat.cat_count")
+class CatCountRecord implements ICatRecord {
+	epoch: string;
+	timestamp: string;
+	count: string;
 }
-@namespace("x_pack.info.x_pack_usage")
-class SecurityUsage extends XPackUsage {
-	system_key: SecurityFeatureToggle;
-	anonymous: SecurityFeatureToggle;
-	ssl: SslUsage;
-	ipfilter: IpFilterUsage;
-	audit: AuditUsage;
-	roles: Map<string, RoleUsage>;
-	realms: Map<string, RealmUsage>;
+@namespace("cat.cat_count")
+class CatCountResponse extends ResponseBase {
+	records: CatCountRecord[];
 }
-@namespace("common_options.date_math")
-@class_serializer("Json")
-class DateMath {
-	now: DateMathExpression;
+@namespace("cat.cat_fielddata")
+@class_serializer("CatFielddataRecordJsonConverter")
+class CatFielddataRecord implements ICatRecord {
+	id: string;
+	host: string;
+	ip: string;
+	node: string;
+	field: string;
+	size: string;
 }
+@namespace("cat.cat_fielddata")
+class CatFielddataResponse extends ResponseBase {
+	records: CatFielddataRecord[];
+}
+@namespace("cat.cat_health")
+class CatHealthRecord implements ICatRecord {
+	cluster: string;
+	epoch: string;
+	'node.data': string;
+	'node.total': string;
+	pri: string;
+	relo: string;
+	init: string;
+	shards: string;
+	status: string;
+	timestamp: string;
+	unassign: string;
+	pending_tasks: string;
+}
+@namespace("cat.cat_health")
+class CatHealthResponse extends ResponseBase {
+	records: CatHealthRecord[];
+}
+@namespace("cat.cat_help")
+class CatHelpRecord implements ICatRecord {
+	endpoint: string;
+}
+@namespace("cat.cat_help")
+class CatHelpResponse extends ResponseBase {
+	records: CatHelpRecord[];
+}
+@namespace("cat.cat_indices")
+class CatIndicesRecord implements ICatRecord {
+	'docs.count': string;
+	'docs.deleted': string;
+	health: string;
+	index: string;
+	pri: string;
+	'pri.store.size': string;
+	rep: string;
+	'store.size': string;
+	status: string;
+	tm: string;
+}
+@namespace("cat.cat_indices")
+class CatIndicesResponse extends ResponseBase {
+	records: CatIndicesRecord[];
+}
+@namespace("cat.cat_master")
+class CatMasterRecord implements ICatRecord {
+	id: string;
+	ip: string;
+	node: string;
+}
+@namespace("cat.cat_master")
+class CatMasterResponse extends ResponseBase {
+	records: CatMasterRecord[];
+}
+@namespace("cat.cat_node_attributes")
+class CatNodeAttributesRecord implements ICatRecord {
+	id: string;
+	node: string;
+	pid: long;
+	host: string;
+	ip: string;
+	port: long;
+	attr: string;
+	value: string;
+}
+@namespace("cat.cat_node_attributes")
+class CatNodeAttributesResponse extends ResponseBase {
+	records: CatNodeAttributesRecord[];
+}
+@namespace("cat.cat_nodes")
+class CatNodesRecord implements ICatRecord {
+	node_id: string;
+	pid: string;
+	ip: string;
+	port: string;
+	version: string;
+	build: string;
+	jdk: string;
+	disk_available: string;
+	heap_current: string;
+	heap_percent: string;
+	heap_max: string;
+	ram_current: string;
+	ram_percent: string;
+	ram_max: string;
+	load_1m: string;
+	load_5m: string;
+	load_15m: string;
+	cpu: string;
+	uptime: string;
+	node_role: string;
+	master: string;
+	name: string;
+	completion_size: string;
+	fielddata_memory: string;
+	fielddata_evictions: string;
+	filter_cache_memory: string;
+	filter_cache_evictions: string;
+	flush_total: string;
+	flush_total_time: string;
+	file_descriptor_current: integer;
+	file_descriptor_percent: integer;
+	file_descriptor_max: integer;
+	get_current: string;
+	get_time: string;
+	get_total: string;
+	get_exists_time: string;
+	get_exists_total: string;
+	get_missing_time: string;
+	get_missing_total: string;
+	id_cache_memory: string;
+	indexing_delete_current: string;
+	indexing_delete_time: string;
+	indexing_delete_total: string;
+	indexing_index_current: string;
+	indexing_index_time: string;
+	indexing_index_total: string;
+	merges_current: string;
+	merges_current_docs: string;
+	merges_current_size: string;
+	merges_total: string;
+	merges_total_docs: string;
+	merges_total_time: string;
+	percolate_current: string;
+	percolate_memory: string;
+	percolate_queries: string;
+	percolate_time: string;
+	percolate_total: string;
+	refresh_total: string;
+	refresh_time: string;
+	search_fetch_current: string;
+	search_fetch_time: string;
+	search_fetch_total: string;
+	search_open_contexts: string;
+	search_query_current: string;
+	search_query_time: string;
+	search_query_total: string;
+	segments_count: string;
+	segments_memory: string;
+	segments_index_writer_memory: string;
+	segments_index_writer_max_memory: string;
+	segments_version_map_memory: string;
+}
+@namespace("cat.cat_nodes")
+class CatNodesResponse extends ResponseBase {
+	records: CatNodesRecord[];
+}
+@namespace("cat.cat_pending_tasks")
+class CatPendingTasksRecord implements ICatRecord {
+	insertOrder: integer;
+	timeInQueue: string;
+	priority: string;
+	source: string;
+}
+@namespace("cat.cat_pending_tasks")
+class CatPendingTasksResponse extends ResponseBase {
+	records: CatPendingTasksRecord[];
+}
+@namespace("cat.cat_plugins")
+class CatPluginsRecord implements ICatRecord {
+	id: string;
+	name: string;
+	component: string;
+	version: string;
+	type: string;
+	isolation: string;
+	url: string;
+	description: string;
+}
+@namespace("cat.cat_plugins")
+class CatPluginsResponse extends ResponseBase {
+	records: CatPluginsRecord[];
+}
+@namespace("cat.cat_recovery")
+class CatRecoveryRecord implements ICatRecord {
+	index: string;
+	shard: string;
+	time: string;
+	type: string;
+	stage: string;
+	source_host: string;
+	source_node: string;
+	target_host: string;
+	target_node: string;
+	repository: string;
+	snapshot: string;
+	files: string;
+	files_recovered: string;
+	files_percent: string;
+	files_total: string;
+	bytes: string;
+	bytes_recovered: string;
+	bytes_percent: string;
+	bytes_total: string;
+	translog_ops: long;
+	translog_ops_percent: string;
+	translog_ops_recovered: long;
+}
+@namespace("cat.cat_recovery")
+class CatRecoveryResponse extends ResponseBase {
+	records: CatRecoveryRecord[];
+}
+@namespace("cat.cat_repositories")
+class CatRepositoriesRecord implements ICatRecord {
+	id: string;
+	type: string;
+}
+@namespace("cat.cat_repositories")
+class CatRepositoriesResponse extends ResponseBase {
+	records: CatRepositoriesRecord[];
+}
+@namespace("cat.cat_segments")
+class CatSegmentsRecord implements ICatRecord {
+	index: string;
+	shard: string;
+	prirep: string;
+	ip: string;
+	id: string;
+	segment: string;
+	generation: string;
+	'docs.count': string;
+	'docs.deleted': string;
+	size: string;
+	'size.memory': string;
+	committed: string;
+	searchable: string;
+	version: string;
+	compound: string;
+}
+@namespace("cat.cat_segments")
+class CatSegmentsResponse extends ResponseBase {
+	records: CatSegmentsRecord[];
+}
+@namespace("cat.cat_shards")
+class CatShardsRecord implements ICatRecord {
+	index: string;
+	shard: string;
+	prirep: string;
+	state: string;
+	docs: string;
+	store: string;
+	ip: string;
+	id: string;
+	node: string;
+	'completion.size': string;
+	'fielddata.memory_size': string;
+	'fielddata.evictions': string;
+	'filter_cache.memory_size': string;
+	'flush.total': string;
+	'flush.total_time': string;
+	'get.current': string;
+	'get.time': string;
+	'get.total': string;
+	'get.exists_time': string;
+	'get.exists_total': string;
+	'get.missing_time': string;
+	'get.missing_total': string;
+	'id_cache.memory_size': string;
+	'indexing.delete_current': string;
+	'indexing.delete_time': string;
+	'indexing.delete_total': string;
+	'indexing.index_current': string;
+	'indexing.index_time': string;
+	'indexing.index_total': string;
+	'merges.current': string;
+	'merges.current_docs': string;
+	'merges.current_size': string;
+	'merges.total_docs': string;
+	'merges.total_size': string;
+	'merges.total_time': string;
+	'percolate.current': string;
+	'percolate.memory_size': string;
+	'percolate.queries': string;
+	'percolate.time': string;
+	'percolate.total': string;
+	'refresh.total': string;
+	'refresh.time': string;
+	'search.fetch_current': string;
+	'search.fetch_time': string;
+	'search.fetch_total': string;
+	'search.open_contexts': string;
+	'search.query_current': string;
+	'search.query_time': string;
+	'search.query_total': string;
+	'segments.count': string;
+	'segments.memory': string;
+	'segments.index_writer_memory': string;
+	'segments.index_writer_max_memory': string;
+	'segments.version_map_memory': string;
+	'segments.fixed_bitset_memory': string;
+	'warmer.current': string;
+	'warmer.total': string;
+	'warmer.total_time': string;
+}
+@namespace("cat.cat_shards")
+class CatShardsResponse extends ResponseBase {
+	records: CatShardsRecord[];
+}
+@namespace("cat.cat_snapshots")
+class CatSnapshotsRecord implements ICatRecord {
+	id: string;
+	status: string;
+	start_epoch: long;
+	start_time: string;
+	end_epoch: long;
+	end_time: string;
+	duration: Time;
+	indices: long;
+	succesful_shards: long;
+	failed_shards: long;
+	total_shards: long;
+}
+@namespace("cat.cat_snapshots")
+class CatSnapshotsResponse extends ResponseBase {
+	records: CatSnapshotsRecord[];
+}
+@namespace("cat.cat_tasks")
+class CatTasksRecord implements ICatRecord {
+	action: string;
+	ip: string;
+	node: string;
+	parent_task_id: string;
+	running_time: string;
+	start_time: string;
+	task_id: string;
+	timestamp: string;
+	type: string;
+}
+@namespace("cat.cat_tasks")
+class CatTasksResponse extends ResponseBase {
+	records: CatTasksRecord[];
+}
+@namespace("cat.cat_templates")
+class CatTemplatesRecord implements ICatRecord {
+	name: string;
+	index_patterns: string;
+	order: long;
+	version: long;
+}
+@namespace("cat.cat_templates")
+class CatTemplatesResponse extends ResponseBase {
+	records: CatTemplatesRecord[];
+}
+@namespace("common_abstractions.infer.name")
+class Name extends String {}
+@namespace("cat.cat_thread_pool")
+class CatThreadPoolRecord implements ICatRecord {
+	node_name: string;
+	node_id: string;
+	ephemeral_node_id: string;
+	pid: integer;
+	host: string;
+	ip: string;
+	port: integer;
+	name: string;
+	type: string;
+	active: integer;
+	size: integer;
+	queue: integer;
+	queue_size: integer;
+	rejected: long;
+	largest: integer;
+	completed: long;
+	min: integer;
+	max: integer;
+	keep_alive: Time;
+}
+@namespace("cat.cat_thread_pool")
+class CatThreadPoolResponse extends ResponseBase {
+	records: CatThreadPoolRecord[];
+}
+@namespace("common_abstractions.infer.metrics")
+class Metrics extends String {}
 @namespace("common_options.minimum_should_match")
 @class_serializer("UnionJsonConverter")
 class MinimumShouldMatch extends Union<integer, string> {
@@ -4747,34 +5335,49 @@ class MultiTermQueryRewrite {
 @class_serializer("UnionJsonConverter")
 class Like extends Union<string, LikeDocument> {
 }
-@namespace("x_pack.watcher.action.email")
-class EmailBody {
-	text: string;
-	html: string;
+@namespace("common_abstractions.infer.metrics")
+class IndexMetrics extends String {}
+@namespace("search.suggesters.context_suggester")
+@class_serializer("UnionJsonConverter")
+class Context extends Union<string, GeoLocation> {
+	category: string;
+	geo: GeoLocation;
 }
-@namespace("x_pack.watcher.action.pager_duty")
-class PagerDutyEvent {
-	account: string;
-	description: string;
-	event_type: PagerDutyEventType;
-	incident_key: string;
-	client: string;
-	client_url: string;
-	attach_payload: boolean;
-	context: PagerDutyContext[];
+@namespace("x_pack.info.x_pack_usage")
+class MonitoringUsage extends XPackUsage {
+	enabled_exporters: Dictionary<string, long>[];
 }
-@namespace("x_pack.watcher.schedule")
-class ScheduleBase {
+@namespace("x_pack.info.x_pack_usage")
+class MachineLearningUsage extends XPackUsage {
+	jobs: Dictionary<string, Job>[];
+	datafeeds: Dictionary<string, DataFeed>[];
 }
+@namespace("x_pack.info.x_pack_usage")
+class AlertingUsage extends XPackUsage {
+	execution: AlertingExecution;
+	count: AlertingCount;
+}
+@namespace("x_pack.info.x_pack_usage")
+class SecurityUsage extends XPackUsage {
+	system_key: SecurityFeatureToggle;
+	anonymous: SecurityFeatureToggle;
+	ssl: SslUsage;
+	ipfilter: IpFilterUsage;
+	audit: AuditUsage;
+	roles: Dictionary<string, RoleUsage>[];
+	realms: Dictionary<string, RealmUsage>[];
+}
+@namespace("common_abstractions.infer.category_id")
+class CategoryId extends String {}
+@namespace("common_abstractions.infer.action_ids")
+class ActionIds extends String {}
 @namespace("x_pack.watcher.watcher_stats")
 class WatchRecordStats extends WatchRecordQueuedStats {
 	execution_phase: ExecutionPhase;
 }
-@namespace("index_modules.index_settings")
-class IndexState {
-	settings: Map<string, any>;
-	mappings: Map<TypeName, TypeMapping>;
-	aliases: Map<IndexName, Alias>;
+@namespace("analysis.token_filters")
+class KeepTypesTokenFilter extends TokenFilterBase implements ITokenFilter {
+	types: string[];
 }
 @namespace("common_options.time_unit")
 @class_serializer("TimeJsonConverter")
@@ -4785,43 +5388,35 @@ class Time {
 	minus_one: Time;
 	zero: Time;
 }
-@namespace("analysis.token_filters")
-class KeepTypesTokenFilter extends TokenFilterBase {
-	types: string[];
-}
-@namespace("common_abstractions.request")
-class RequestBase {
-}
-@namespace("common_abstractions.response")
-class ResponseBase {
-	server_error: ServerError;
-	is_valid: boolean;
-	debug_information: string;
-}
-@namespace("common_abstractions.infer.property_name")
-class PropertyName {
-	name: string;
-	cacheable_expression: boolean;
-}
+@namespace("common_abstractions.infer.indices")
+@class_serializer("UnionJsonConverter")
+class Indices extends String {}
 @namespace("common_abstractions.infer.index_name")
-class IndexName {
-	cluster: string;
-	name: string;
-}
+class IndexName extends String {}
+@namespace("common_abstractions.infer.field")
+class Field extends String {}
 @namespace("common_abstractions.infer.type_name")
-class TypeName {
-	name: string;
-}
+class TypeName extends String {}
+@namespace("common_abstractions.infer.property_name")
+class PropertyName extends String {}
+@namespace("common_abstractions.infer.types")
+@class_serializer("UnionJsonConverter")
+class Types extends String {}
+@namespace("common_abstractions.infer.id")
+@class_serializer("IdJsonConverter")
+class Id extends String {}
 @namespace("common_abstractions.infer.join_field_routing")
 @class_serializer("RoutingJsonConverter")
-class Routing {
+class Routing extends String {}
+@namespace("common_abstractions.infer.relation_name")
+class RelationName extends String {}
+@namespace("query_dsl.geo")
+class GeoLocation {
+	lat: double;
+	lon: double;
 }
 @namespace("common_abstractions.infer.task_id")
-class TaskId {
-	node_id: string;
-	task_number: long;
-	fully_qualified_id: string;
-}
+class TaskId extends String {}
 @namespace("common_options.failures")
 class BulkError extends Error {
 	index: string;
@@ -4833,46 +5428,16 @@ class BulkIndexFailureCause extends Error {
 	shard: integer;
 	index: string;
 }
-@namespace("common_abstractions.infer.field")
-class Field {
-	name: string;
-	boost: double;
-	cachable_expression: boolean;
-}
-@namespace("common_abstractions.infer.indices")
-@class_serializer("UnionJsonConverter")
-class Indices extends Union<AllIndicesMarker, ManyIndices> {
-	all: Indices;
-	all_indices: Indices;
-}
-@namespace("common_abstractions.infer.id")
-@class_serializer("IdJsonConverter")
-class Id {
-}
-@namespace("query_dsl.geo")
-class GeoLocation {
-	lat: double;
-	lon: double;
-}
 @namespace("common_options.date_math")
 @class_serializer("Json")
-class DateMathExpression extends DateMath {
-}
-@namespace("common_abstractions.infer.types")
-@class_serializer("UnionJsonConverter")
-class Types extends Union<AllTypesMarker, ManyTypes> {
-	all: AllTypesMarker;
-	all_types: AllTypesMarker;
-}
-@namespace("common_abstractions.infer.relation_name")
-class RelationName {
-	name: string;
+class DateMathExpression extends String {}
+@namespace("common_options.date_math")
+class DateMathTime {
+	factor: integer;
+	interval: DateMathTimeUnit;
 }
 @namespace("x_pack.watcher.execution")
 class HttpInputRequestResult extends HttpInputRequest {
-}
-@namespace("search.suggesters.phrase_suggester.smoothing_model")
-class SmoothingModelContainer {
 }
 @namespace("analysis.analyzers")
 class CustomAnalyzer extends AnalyzerBase {
@@ -5028,16 +5593,6 @@ class CommonGramsTokenFilter extends TokenFilterBase {
 	common_words_path: string;
 	ignore_case: boolean;
 	query_mode: boolean;
-}
-@namespace("analysis.token_filters.compound_word")
-class CompoundWordTokenFilterBase extends TokenFilterBase {
-	word_list: string[];
-	word_list_path: string;
-	min_word_size: integer;
-	min_subword_size: integer;
-	max_subword_size: integer;
-	only_longest_match: boolean;
-	hyphenation_patterns_path: string;
 }
 @namespace("analysis.token_filters.delimited_payload")
 class DelimitedPayloadTokenFilter extends TokenFilterBase {
@@ -5260,19 +5815,6 @@ class UaxEmailUrlTokenizer extends TokenizerBase {
 @namespace("analysis.tokenizers")
 class WhitespaceTokenizer extends TokenizerBase {
 }
-@namespace("common_abstractions.request")
-class PlainRequestBase<TParameters> extends RequestBase {
-	request_configuration: RequestConfiguration;
-	pretty: boolean;
-	human: boolean;
-	error_trace: boolean;
-	filter_path: string[];
-}
-@namespace("mapping.types")
-class PropertyBase {
-	name: PropertyName;
-	local_metadata: Map<string, any>;
-}
 @namespace("x_pack.watcher.schedule")
 @class_serializer("CronExpressionJsonConverter")
 class CronExpression extends ScheduleBase {
@@ -5321,7 +5863,7 @@ class ClusterHealthResponse extends ResponseBase {
 	unassigned_shards: integer;
 	number_of_pending_tasks: integer;
 	@prop_serializer("ResolvableDictionaryJsonConverter`2")
-	indices: Map<IndexName, IndexHealthStats>;
+	indices: Dictionary<IndexName, IndexHealthStats>[];
 }
 @namespace("cluster.cluster_pending_tasks")
 class ClusterPendingTasksResponse extends ResponseBase {
@@ -5334,14 +5876,14 @@ class ClusterRerouteResponse extends ResponseBase {
 }
 @namespace("cluster.cluster_settings.cluster_get_settings")
 class ClusterGetSettingsResponse extends ResponseBase {
-	persistent: Map<string, any>;
-	transient: Map<string, any>;
+	persistent: Dictionary<string, any>[];
+	transient: Dictionary<string, any>[];
 }
 @namespace("cluster.cluster_settings.cluster_put_settings")
 class ClusterPutSettingsResponse extends ResponseBase {
 	acknowledged: boolean;
-	persistent: Map<string, any>;
-	transient: Map<string, any>;
+	persistent: Dictionary<string, any>[];
+	transient: Dictionary<string, any>[];
 }
 @namespace("cluster.cluster_state")
 class ClusterStateResponse extends ResponseBase {
@@ -5349,7 +5891,7 @@ class ClusterStateResponse extends ResponseBase {
 	master_node: string;
 	state_uuid: string;
 	version: long;
-	nodes: Map<string, NodeState>;
+	nodes: Dictionary<string, NodeState>[];
 	metadata: MetadataState;
 	routing_table: RoutingTableState;
 	routing_nodes: RoutingNodesState;
@@ -5358,10 +5900,6 @@ class ClusterStateResponse extends ResponseBase {
 @namespace("cluster.nodes_hot_threads")
 class NodesHotThreadsResponse extends ResponseBase {
 	hot_threads: HotThreadInformation[];
-}
-@namespace("cluster")
-class NodesResponseBase extends ResponseBase {
-	node_statistics: NodeStatistics;
 }
 @namespace("cluster.ping")
 class PingResponse extends ResponseBase {
@@ -5375,7 +5913,7 @@ class RootNodeInfoResponse extends ResponseBase {
 @namespace("cluster.task_management.cancel_tasks")
 class CancelTasksResponse extends ResponseBase {
 	is_valid: boolean;
-	nodes: Map<string, TaskExecutingNode>;
+	nodes: Dictionary<string, TaskExecutingNode>[];
 	node_failures: ErrorCause[];
 }
 @namespace("cluster.task_management.get_task")
@@ -5386,24 +5924,8 @@ class GetTaskResponse extends ResponseBase {
 @namespace("cluster.task_management.list_tasks")
 class ListTasksResponse extends ResponseBase {
 	is_valid: boolean;
-	nodes: Map<string, TaskExecutingNode>;
+	nodes: Dictionary<string, TaskExecutingNode>[];
 	node_failures: ErrorCause[];
-}
-@namespace("common_abstractions.response")
-class AcknowledgedResponseBase extends ResponseBase {
-	acknowledged: boolean;
-}
-@namespace("common_abstractions.response")
-class DictionaryResponseBase<TKey, TValue> extends ResponseBase {
-}
-@namespace("common_abstractions.response")
-class IndicesResponseBase extends ResponseBase {
-	acknowledged: boolean;
-	_shards: ShardStatistics;
-}
-@namespace("common_abstractions.response")
-class ShardsOperationResponseBase extends ResponseBase {
-	_shards: ShardStatistics;
 }
 @namespace("document.multiple.bulk")
 class BulkResponse extends ResponseBase {
@@ -5458,7 +5980,7 @@ class ReindexOnServerResponse extends ResponseBase {
 }
 @namespace("document.multiple.reindex_rethrottle")
 class ReindexRethrottleResponse extends ResponseBase {
-	nodes: Map<string, ReindexNode>;
+	nodes: Dictionary<string, ReindexNode>[];
 }
 @namespace("document.multiple.update_by_query")
 class UpdateByQueryResponse extends ResponseBase {
@@ -5506,7 +6028,7 @@ class GetResponse<TDocument> extends ResponseBase {
 	found: boolean;
 	@prop_serializer("SourceConverter")
 	_source: TDocument;
-	fields: Map<string, LazyDocument>;
+	fields: Dictionary<string, LazyDocument>[];
 	_parent: string;
 	_routing: string;
 }
@@ -5553,17 +6075,17 @@ class ExistsResponse extends ResponseBase {
 @namespace("indices.monitoring.indices_segments")
 class SegmentsResponse extends ResponseBase {
 	_shards: ShardStatistics;
-	indices: Map<string, IndexSegment>;
+	indices: Dictionary<string, IndexSegment>[];
 }
 @namespace("indices.monitoring.indices_shard_stores")
 class IndicesShardStoresResponse extends ResponseBase {
-	indices: Map<string, IndicesShardStores>;
+	indices: Dictionary<string, IndicesShardStores>[];
 }
 @namespace("indices.monitoring.indices_stats")
 class IndicesStatsResponse extends ResponseBase {
 	_shards: ShardStatistics;
 	_all: IndicesStats;
-	indices: Map<string, IndicesStats>;
+	indices: Dictionary<string, IndicesStats>[];
 }
 @namespace("indices.status_management.upgrade")
 class UpgradeResponse extends ResponseBase {
@@ -5572,14 +6094,14 @@ class UpgradeResponse extends ResponseBase {
 @namespace("indices.status_management.upgrade.upgrade_status")
 @class_serializer("UpgradeStatusResponseJsonConverter")
 class UpgradeStatusResponse extends ResponseBase {
-	upgrades: Map<string, UpgradeStatus>;
+	upgrades: Dictionary<string, UpgradeStatus>[];
 	size_in_bytes: long;
 	size_to_upgrade_in_bytes: string;
 	size_to_upgrade_ancient_in_bytes: string;
 }
 @namespace("ingest.processor")
 class GrokProcessorPatternsResponse extends ResponseBase {
-	patterns: Map<string, string>;
+	patterns: Dictionary<string, string>[];
 }
 @namespace("ingest.simulate_pipeline")
 class SimulatePipelineResponse extends ResponseBase {
@@ -5592,11 +6114,11 @@ class GetScriptResponse extends ResponseBase {
 @namespace("modules.snapshot_and_restore.repositories.get_repository")
 @class_serializer("GetRepositoryResponseJsonConverter")
 class GetRepositoryResponse extends ResponseBase {
-	repositories: Map<string, SnapshotRepository>;
+	repositories: Dictionary<string, SnapshotRepository>[];
 }
 @namespace("modules.snapshot_and_restore.repositories.verify_repository")
 class VerifyRepositoryResponse extends ResponseBase {
-	nodes: Map<string, CompactNodeInfo>;
+	nodes: Dictionary<string, CompactNodeInfo>[];
 }
 @namespace("modules.snapshot_and_restore.restore")
 class RestoreResponse extends ResponseBase {
@@ -5629,13 +6151,13 @@ class ExplainResponse<TDocument> extends ResponseBase {
 @namespace("search.field_capabilities")
 class FieldCapabilitiesResponse extends ResponseBase {
 	shards: ShardStatistics;
-	fields: Map<Field, Map<string, FieldCapabilities>>;
+	fields: Dictionary<Field, Dictionary<string, FieldCapabilities>[]>[];
 }
 @namespace("search.multi_search")
 class MultiSearchResponse extends ResponseBase {
 	is_valid: boolean;
 	total_responses: integer;
-	all_responses: Response[];
+	all_responses: IResponse[];
 }
 @namespace("search.scroll.clear_scroll")
 class ClearScrollResponse extends ResponseBase {
@@ -5643,7 +6165,7 @@ class ClearScrollResponse extends ResponseBase {
 @namespace("search.search_shards")
 class SearchShardsResponse extends ResponseBase {
 	shards: SearchShard[][];
-	nodes: Map<string, SearchNode>;
+	nodes: Dictionary<string, SearchNode>[];
 }
 @namespace("search.search_template.render_search_template")
 class RenderSearchTemplateResponse extends ResponseBase {
@@ -5652,10 +6174,10 @@ class RenderSearchTemplateResponse extends ResponseBase {
 @namespace("search.search")
 class SearchResponse<T> extends ResponseBase {
 	_shards: ShardStatistics;
-	aggregations: Map<string, Aggregate>;
-	aggs: Map<string, Aggregate>;
+	aggregations: Dictionary<string, Aggregate>[];
+	aggs: Dictionary<string, Aggregate>[];
 	profile: Profile;
-	suggest: Map<string, Suggest<T>[]>;
+	suggest: Dictionary<string, Suggest<T>[]>[];
 	took: long;
 	timed_out: boolean;
 	terminated_early: boolean;
@@ -5666,7 +6188,7 @@ class SearchResponse<T> extends ResponseBase {
 	max_score: double;
 	documents: T[];
 	//hits: Hit<T>[];
-	fields: Map<string, LazyDocument>;
+	fields: Dictionary<string, LazyDocument>[][];
 }
 @namespace("search.validate")
 class ValidateQueryResponse extends ResponseBase {
@@ -5678,7 +6200,7 @@ class ValidateQueryResponse extends ResponseBase {
 class DeprecationInfoResponse extends ResponseBase {
 	cluster_settings: DeprecationInfo[];
 	node_settings: DeprecationInfo[];
-	index_settings: Map<string, DeprecationInfo[]>;
+	index_settings: Dictionary<string, DeprecationInfo[]>[];
 }
 @namespace("x_pack.graph.explore")
 class GraphExploreResponse extends ResponseBase {
@@ -5802,7 +6324,7 @@ class PreviewDatafeedResponse<T> extends ResponseBase {
 @namespace("x_pack.machine_learning.put_datafeed")
 class PutDatafeedResponse extends ResponseBase {
 	datafeed_id: string;
-	aggregations: Map<string, AggregationContainer>;
+	aggregations: Dictionary<string, AggregationContainer>[];
 	chunking_config: ChunkingConfig;
 	frequency: Time;
 	@prop_serializer("IndicesJsonConverter")
@@ -5810,7 +6332,7 @@ class PutDatafeedResponse extends ResponseBase {
 	job_id: string;
 	query: QueryContainer;
 	query_delay: Time;
-	script_fields: Map<string, ScriptField>;
+	script_fields: Dictionary<string, ScriptField>[];
 	scroll_size: integer;
 	@prop_serializer("TypesJsonConverter")
 	types: Types;
@@ -5844,7 +6366,7 @@ class StopDatafeedResponse extends ResponseBase {
 @namespace("x_pack.machine_learning.update_data_feed")
 class UpdateDatafeedResponse extends ResponseBase {
 	datafeed_id: string;
-	aggregations: Map<string, AggregationContainer>;
+	aggregations: Dictionary<string, AggregationContainer>[];
 	chunking_config: ChunkingConfig;
 	frequency: Time;
 	@prop_serializer("IndicesJsonConverter")
@@ -5852,7 +6374,7 @@ class UpdateDatafeedResponse extends ResponseBase {
 	job_id: string;
 	query: QueryContainer;
 	query_delay: Time;
-	script_fields: Map<string, ScriptField>;
+	script_fields: Dictionary<string, ScriptField>[];
 	scroll_size: integer;
 	@prop_serializer("TypesJsonConverter")
 	types: Types;
@@ -5866,12 +6388,12 @@ class AuthenticateResponse extends ResponseBase {
 	roles: string[];
 	full_name: string;
 	email: string;
-	metadata: Map<string, any>;
+	metadata: Dictionary<string, any>[];
 }
 @namespace("x_pack.security.clear_cached_realms")
 class ClearCachedRealmsResponse extends ResponseBase {
 	cluster_name: string;
-	nodes: Map<string, SecurityNode>;
+	nodes: Dictionary<string, SecurityNode>[];
 }
 @namespace("x_pack.security.role_mapping.delete_role_mapping")
 class DeleteRoleMappingResponse extends ResponseBase {
@@ -5885,7 +6407,7 @@ class PutRoleMappingResponse extends ResponseBase {
 @namespace("x_pack.security.role.clear_cached_roles")
 class ClearCachedRolesResponse extends ResponseBase {
 	cluster_name: string;
-	nodes: Map<string, SecurityNode>;
+	nodes: Dictionary<string, SecurityNode>[];
 }
 @namespace("x_pack.security.role.delete_role")
 class DeleteRoleResponse extends ResponseBase {
@@ -5941,6 +6463,12 @@ class DeleteWatchResponse extends ResponseBase {
 	_version: integer;
 	found: boolean;
 }
+@namespace("x_pack.watcher.schedule")
+@class_serializer("IntervalJsonConverter")
+class Interval extends ScheduleBase {
+	factor: long;
+	unit: IntervalUnit;
+}
 @namespace("x_pack.watcher.execute_watch")
 class ExecuteWatchResponse extends ResponseBase {
 	_id: string;
@@ -5952,12 +6480,6 @@ class GetWatchResponse extends ResponseBase {
 	_id: string;
 	status: WatchStatus;
 	watch: Watch;
-}
-@namespace("x_pack.watcher.schedule")
-@class_serializer("IntervalJsonConverter")
-class Interval extends ScheduleBase {
-	factor: long;
-	unit: IntervalUnit;
 }
 @namespace("x_pack.watcher.put_watch")
 class PutWatchResponse extends ResponseBase {
@@ -6422,8 +6944,8 @@ class ClusterGetSettingsRequest extends RequestBase {
 @namespace("cluster.cluster_settings.cluster_put_settings")
 @rest_spec_name("cluster.put_settings")
 class ClusterPutSettingsRequest extends RequestBase {
-	persistent: Map<string, any>;
-	transient: Map<string, any>;
+	persistent: Dictionary<string, any>[];
+	transient: Dictionary<string, any>[];
 	@request_parameter()
 	flat_settings: boolean;
 	@request_parameter()
@@ -6922,7 +7444,7 @@ class SourceRequest extends RequestBase {
 class TermVectorsRequest<TDocument> extends RequestBase {
 	@prop_serializer("SourceConverter")
 	doc: TDocument;
-	per_field_analyzer: Map<Field, string>;
+	per_field_analyzer: Dictionary<Field, string>[];
 	filter: TermVectorFilter;
 	@request_parameter()
 	term_statistics: boolean;
@@ -6958,7 +7480,7 @@ class TermVectorsResponse extends ResponseBase {
 	found: boolean;
 	took: long;
 	@prop_serializer("ResolvableDictionaryJsonConverter`2")
-	term_vectors: Map<Field, TermVector>;
+	term_vectors: Dictionary<Field, TermVector>[];
 }
 @namespace("document.single.update")
 @rest_spec_name("update")
@@ -7048,12 +7570,12 @@ class PutAliasRequest extends RequestBase {
 @namespace("indices.analyze")
 @rest_spec_name("indices.analyze")
 class AnalyzeRequest extends RequestBase {
-	tokenizer: Union<string, Tokenizer>;
+	tokenizer: Union<string, ITokenizer>;
 	analyzer: string;
 	explain: boolean;
 	attributes: string[];
-	char_filter: Union<string, CharFilter>[];
-	filter: Union<string, TokenFilter>[];
+	char_filter: Union<string, ICharFilter>[];
+	filter: Union<string, ITokenFilter>[];
 	normalizer: string;
 	field: Field;
 	text: string[];
@@ -7139,8 +7661,8 @@ class OpenIndexRequest extends RequestBase {
 @namespace("indices.index_management.shrink_index")
 @rest_spec_name("indices.shrink")
 class ShrinkIndexRequest extends RequestBase {
-	settings: Map<string, any>;
-	aliases: Map<IndexName, Alias>;
+	settings: Dictionary<string, any>[];
+	aliases: Dictionary<IndexName, Alias>[];
 	@request_parameter()
 	timeout: Time;
 	@request_parameter()
@@ -7203,6 +7725,24 @@ class IndexTemplateExistsRequest extends RequestBase {
 	master_timeout: Time;
 	@request_parameter()
 	local: boolean;
+}
+@namespace("indices.index_settings.update_index_settings")
+@rest_spec_name("indices.put_settings")
+@class_serializer("IndexSettingsConverter")
+class UpdateIndexSettingsRequest extends RequestBase {
+	index_settings: Dictionary<string, any>[];
+	@request_parameter()
+	master_timeout: Time;
+	@request_parameter()
+	preserve_existing: boolean;
+	@request_parameter()
+	ignore_unavailable: boolean;
+	@request_parameter()
+	allow_no_indices: boolean;
+	@request_parameter()
+	expand_wildcards: ExpandWildcards;
+	@request_parameter()
+	flat_settings: boolean;
 }
 @namespace("indices.mapping_management.get_field_mapping")
 @rest_spec_name("indices.get_field_mapping")
@@ -7410,16 +7950,9 @@ class SimulatePipelineRequest extends RequestBase {
 	@request_parameter()
 	verbose: boolean;
 }
-@namespace("mapping.types")
-class CorePropertyBase extends PropertyBase {
-	copy_to: Field[];
-	fields: Map<PropertyName, Property>;
-	similarity: Union<SimilarityOption, string>;
-	store: boolean;
-}
 @namespace("mapping.types.core.join")
 class JoinProperty extends PropertyBase {
-	relations: Map<RelationName, RelationName[]>;
+	relations: Dictionary<RelationName, RelationName[]>[];
 }
 @namespace("mapping.types.core.percolator")
 class PercolatorProperty extends PropertyBase {
@@ -7611,7 +8144,7 @@ class FieldCapabilitiesRequest extends RequestBase {
 @rest_spec_name("msearch_template")
 @class_serializer("MultiSearchTemplateJsonConverter")
 class MultiSearchTemplateRequest extends RequestBase {
-	operations: Map<string, SearchTemplateRequest>;
+	operations: Dictionary<string, SearchTemplateRequest>[];
 	@request_parameter()
 	search_type: SearchType;
 	@request_parameter()
@@ -7623,7 +8156,7 @@ class MultiSearchTemplateRequest extends RequestBase {
 @rest_spec_name("msearch")
 @class_serializer("MultiSearchJsonConverter")
 class MultiSearchRequest extends RequestBase {
-	operations: Map<string, SearchRequest>;
+	operations: Dictionary<string, SearchRequest>[];
 	@request_parameter()
 	search_type: SearchType;
 	@request_parameter()
@@ -7660,7 +8193,7 @@ class RenderSearchTemplateRequest extends RequestBase {
 	source: string;
 	inline: string;
 	file: string;
-	params: Map<string, any>;
+	params: Dictionary<string, any>[];
 }
 @namespace("search.validate")
 @rest_spec_name("indices.validate_query")
@@ -7863,7 +8396,7 @@ class PreviewDatafeedRequest extends RequestBase {
 @namespace("x_pack.machine_learning.put_datafeed")
 @rest_spec_name("xpack.ml.put_datafeed")
 class PutDatafeedRequest extends RequestBase {
-	aggregations: Map<string, AggregationContainer>;
+	aggregations: Dictionary<string, AggregationContainer>[];
 	chunking_config: ChunkingConfig;
 	frequency: Time;
 	@prop_serializer("IndicesJsonConverter")
@@ -7871,7 +8404,7 @@ class PutDatafeedRequest extends RequestBase {
 	job_id: Id;
 	query: QueryContainer;
 	query_delay: Time;
-	script_fields: Map<string, ScriptField>;
+	script_fields: Dictionary<string, ScriptField>[];
 	scroll_size: integer;
 	@prop_serializer("TypesJsonConverter")
 	types: Types;
@@ -7910,7 +8443,7 @@ class StopDatafeedRequest extends RequestBase {
 @namespace("x_pack.machine_learning.update_data_feed")
 @rest_spec_name("xpack.ml.update_datafeed")
 class UpdateDatafeedRequest extends RequestBase {
-	aggregations: Map<string, AggregationContainer>;
+	aggregations: Dictionary<string, AggregationContainer>[];
 	chunking_config: ChunkingConfig;
 	frequency: Time;
 	@prop_serializer("IndicesJsonConverter")
@@ -7918,7 +8451,7 @@ class UpdateDatafeedRequest extends RequestBase {
 	job_id: Id;
 	query: QueryContainer;
 	query_delay: Time;
-	script_fields: Map<string, ScriptField>;
+	script_fields: Dictionary<string, ScriptField>[];
 	scroll_size: integer;
 	@prop_serializer("TypesJsonConverter")
 	types: Types;
@@ -7928,7 +8461,7 @@ class UpdateDatafeedRequest extends RequestBase {
 class UpdateJobRequest extends RequestBase {
 	analysis_limits: AnalysisMemoryLimit;
 	background_persist_interval: Time;
-	custom_settings: Map<string, any>;
+	custom_settings: Dictionary<string, any>[];
 	description: string;
 	model_plot_config: ModelPlotConfigEnabled;
 	model_snapshot_retention_days: long;
@@ -7982,7 +8515,7 @@ class GetRoleMappingRequest extends RequestBase {
 @rest_spec_name("xpack.security.put_role_mapping")
 class PutRoleMappingRequest extends RequestBase {
 	run_as: string[];
-	metadata: Map<string, any>;
+	metadata: Dictionary<string, any>[];
 	enabled: boolean;
 	roles: string[];
 	rules: RoleMappingRuleBase;
@@ -8009,7 +8542,7 @@ class PutRoleRequest extends RequestBase {
 	cluster: string[];
 	run_as: string[];
 	indices: IndicesPrivileges[];
-	metadata: Map<string, any>;
+	metadata: Dictionary<string, any>[];
 	@request_parameter()
 	refresh: Refresh;
 }
@@ -8059,7 +8592,7 @@ class PutUserRequest extends RequestBase {
 	roles: string[];
 	full_name: string;
 	email: string;
-	metadata: Map<string, any>;
+	metadata: Dictionary<string, any>[];
 	@request_parameter()
 	refresh: Refresh;
 }
@@ -8093,8 +8626,8 @@ class ExecuteWatchRequest extends RequestBase {
 	trigger_data: ScheduleTriggerEvent;
 	ignore_condition: boolean;
 	record_execution: boolean;
-	alternative_input: Map<string, any>;
-	action_modes: Map<string, ActionExecutionMode>;
+	alternative_input: Dictionary<string, any>[];
+	action_modes: Dictionary<string, ActionExecutionMode>[];
 	simulated_actions: SimulatedActions;
 	watch: PutWatchRequest;
 	@request_parameter()
@@ -8103,6 +8636,21 @@ class ExecuteWatchRequest extends RequestBase {
 @namespace("x_pack.watcher.get_watch")
 @rest_spec_name("xpack.watcher.get_watch")
 class GetWatchRequest extends RequestBase {
+}
+@namespace("x_pack.watcher.put_watch")
+@rest_spec_name("xpack.watcher.put_watch")
+class PutWatchRequest extends RequestBase {
+	metadata: Dictionary<string, any>[];
+	trigger: TriggerContainer;
+	input: InputContainer;
+	throttle_period: string;
+	condition: ConditionContainer;
+	transform: TransformContainer;
+	actions: Dictionary<string, Action>[];
+	@request_parameter()
+	master_timeout: Time;
+	@request_parameter()
+	active: boolean;
 }
 @namespace("x_pack.watcher.restart_watcher")
 @rest_spec_name("xpack.watcher.restart")
@@ -8123,7 +8671,7 @@ class WatcherStatsRequest extends RequestBase {
 	emit_stacktraces: boolean;
 }
 @namespace("cluster.cluster_stats")
-class ClusterStatsResponse extends ResponseBase {
+class ClusterStatsResponse extends NodesResponseBase {
 	cluster_name: string;
 	timestamp: long;
 	status: ClusterStatus;
@@ -8131,23 +8679,23 @@ class ClusterStatsResponse extends ResponseBase {
 	nodes: ClusterNodesStats;
 }
 @namespace("cluster.nodes_info")
-class NodesInfoResponse extends ResponseBase {
+class NodesInfoResponse extends NodesResponseBase {
 	cluster_name: string;
-	nodes: Map<string, NodeInfo>;
+	nodes: Dictionary<string, NodeInfo>[];
 }
 @namespace("cluster.nodes_stats")
-class NodesStatsResponse extends ResponseBase {
+class NodesStatsResponse extends NodesResponseBase {
 	cluster_name: string;
-	nodes: Map<string, NodeStats>;
+	nodes: Dictionary<string, NodeStats>[];
 }
 @namespace("cluster.nodes_usage")
-class NodesUsageResponse extends ResponseBase {
+class NodesUsageResponse extends NodesResponseBase {
 	cluster_name: string;
-	nodes: Map<string, NodeUsageInformation>;
+	nodes: Dictionary<string, NodeUsageInformation>[];
 }
 @namespace("cluster.remote_info")
 class RemoteInfoResponse extends DictionaryResponseBase<string, RemoteInfo> {
-	remotes: Map<string, RemoteInfo>;
+	remotes: Dictionary<string, RemoteInfo>[];
 }
 @namespace("document.single.create")
 @rest_spec_name("create")
@@ -8198,15 +8746,15 @@ class BulkAliasResponse extends AcknowledgedResponseBase {
 }
 @namespace("indices.alias_management.get_alias")
 class GetAliasResponse extends DictionaryResponseBase<IndexName, IndexAliases> {
-	indices: Map<IndexName, IndexAliases>;
+	indices: Dictionary<IndexName, IndexAliases>[];
 	is_valid: boolean;
 }
 @namespace("indices.index_management.create_index")
 @rest_spec_name("indices.create")
 class CreateIndexRequest extends RequestBase {
-	settings: Map<string, any>;
-	mappings: Map<TypeName, TypeMapping>;
-	aliases: Map<IndexName, Alias>;
+	settings: Dictionary<string, any>[];
+	mappings: Dictionary<TypeName, TypeMapping>[];
+	aliases: Dictionary<IndexName, Alias>[];
 	@request_parameter()
 	wait_for_active_shards: string;
 	@request_parameter()
@@ -8225,7 +8773,7 @@ class DeleteIndexResponse extends IndicesResponseBase {
 }
 @namespace("indices.index_management.get_index")
 class GetIndexResponse extends DictionaryResponseBase<IndexName, IndexState> {
-	indices: Map<IndexName, IndexState>;
+	indices: Dictionary<IndexName, IndexState>[];
 }
 @namespace("indices.index_management.open_close_index.close_index")
 class CloseIndexResponse extends AcknowledgedResponseBase {
@@ -8237,9 +8785,9 @@ class OpenIndexResponse extends AcknowledgedResponseBase {
 @rest_spec_name("indices.rollover")
 class RolloverIndexRequest extends RequestBase {
 	conditions: RolloverConditions;
-	settings: Map<string, any>;
-	aliases: Map<IndexName, Alias>;
-	mappings: Map<TypeName, TypeMapping>;
+	settings: Dictionary<string, any>[];
+	aliases: Dictionary<IndexName, Alias>[];
+	mappings: Dictionary<TypeName, TypeMapping>[];
 	@request_parameter()
 	timeout: Time;
 	@request_parameter()
@@ -8255,7 +8803,7 @@ class RolloverIndexResponse extends AcknowledgedResponseBase {
 	new_index: string;
 	old_index: string;
 	rolled_over: boolean;
-	conditions: Map<string, boolean>;
+	conditions: Dictionary<string, boolean>[];
 	shards_acknowledged: boolean;
 }
 @namespace("indices.index_management.shrink_index")
@@ -8264,14 +8812,14 @@ class ShrinkIndexResponse extends AcknowledgedResponseBase {
 }
 @namespace("indices.index_settings.get_index_settings")
 class GetIndexSettingsResponse extends DictionaryResponseBase<IndexName, IndexState> {
-	indices: Map<IndexName, IndexState>;
+	indices: Dictionary<IndexName, IndexState>[];
 }
 @namespace("indices.index_settings.index_templates.delete_index_template")
 class DeleteIndexTemplateResponse extends AcknowledgedResponseBase {
 }
 @namespace("indices.index_settings.index_templates.get_index_template")
 class GetIndexTemplateResponse extends DictionaryResponseBase<string, TemplateMapping> {
-	template_mappings: Map<string, TemplateMapping>;
+	template_mappings: Dictionary<string, TemplateMapping>[];
 }
 @namespace("indices.index_settings.index_templates.put_index_template")
 @rest_spec_name("indices.put_template")
@@ -8279,9 +8827,9 @@ class PutIndexTemplateRequest extends RequestBase {
 	index_patterns: string[];
 	order: integer;
 	version: integer;
-	settings: Map<string, any>;
-	mappings: Map<TypeName, TypeMapping>;
-	aliases: Map<IndexName, Alias>;
+	settings: Dictionary<string, any>[];
+	mappings: Dictionary<TypeName, TypeMapping>[];
+	aliases: Dictionary<IndexName, Alias>[];
 	@request_parameter()
 	create: boolean;
 	@request_parameter()
@@ -8299,13 +8847,13 @@ class UpdateIndexSettingsResponse extends AcknowledgedResponseBase {
 }
 @namespace("indices.mapping_management.get_field_mapping")
 class GetFieldMappingResponse extends DictionaryResponseBase<IndexName, TypeFieldMappings> {
-	indices: Map<IndexName, TypeFieldMappings>;
+	indices: Dictionary<IndexName, TypeFieldMappings>[];
 	is_valid: boolean;
 }
 @namespace("indices.mapping_management.get_mapping")
 class GetMappingResponse extends DictionaryResponseBase<IndexName, IndexMappings> {
-	indices: Map<IndexName, IndexMappings>;
-	mappings: Map<IndexName, IndexMappings>;
+	indices: Dictionary<IndexName, IndexMappings>[];
+	mappings: Dictionary<IndexName, IndexMappings>[];
 	mapping: TypeMapping;
 }
 @namespace("indices.mapping_management.put_mapping")
@@ -8314,13 +8862,13 @@ class PutMappingRequest extends RequestBase {
 	all_field: AllField;
 	date_detection: boolean;
 	dynamic_date_formats: string[];
-	dynamic_templates: Map<string, DynamicTemplate>;
+	dynamic_templates: Dictionary<string, DynamicTemplate>[];
 	dynamic: Union<boolean, DynamicMapping>;
 	field_names_field: FieldNamesField;
 	index_field: IndexField;
-	meta: Map<string, any>;
+	meta: Dictionary<string, any>[];
 	numeric_detection: boolean;
-	properties: Map<PropertyName, Property>;
+	properties: Dictionary<PropertyName, IProperty>[];
 	routing_field: RoutingField;
 	size_field: SizeField;
 	source_field: SourceField;
@@ -8342,7 +8890,7 @@ class PutMappingResponse extends IndicesResponseBase {
 }
 @namespace("indices.monitoring.indices_recovery")
 class RecoveryStatusResponse extends DictionaryResponseBase<IndexName, RecoveryStatus> {
-	indices: Map<IndexName, RecoveryStatus>;
+	indices: Dictionary<IndexName, RecoveryStatus>[];
 }
 @namespace("indices.status_management.clear_cache")
 class ClearCacheResponse extends ShardsOperationResponseBase {
@@ -8364,7 +8912,7 @@ class DeletePipelineResponse extends AcknowledgedResponseBase {
 }
 @namespace("ingest.get_pipeline")
 class GetPipelineResponse extends DictionaryResponseBase<string, Pipeline> {
-	pipelines: Map<string, Pipeline>;
+	pipelines: Dictionary<string, Pipeline>[];
 }
 @namespace("ingest.put_pipeline")
 @rest_spec_name("ingest.put_pipeline")
@@ -8400,6 +8948,110 @@ class DeleteSnapshotResponse extends AcknowledgedResponseBase {
 class ScrollRequest extends RequestBase {
 	scroll: Time;
 	scroll_id: string;
+}
+@namespace("search.search_template")
+@rest_spec_name("search_template")
+class SearchTemplateRequest extends RequestBase {
+	source: string;
+	inline: string;
+	id: string;
+	params: Dictionary<string, any>[];
+	@request_parameter()
+	ignore_unavailable: boolean;
+	@request_parameter()
+	allow_no_indices: boolean;
+	@request_parameter()
+	expand_wildcards: ExpandWildcards;
+	@request_parameter()
+	preference: string;
+	@request_parameter()
+	routing: Routing;
+	@request_parameter()
+	scroll: Time;
+	@request_parameter()
+	search_type: SearchType;
+	@request_parameter()
+	explain: boolean;
+	@request_parameter()
+	profile: boolean;
+	@request_parameter()
+	typed_keys: boolean;
+}
+@namespace("search.search")
+@rest_spec_name("search")
+class SearchRequest extends RequestBase {
+	timeout: string;
+	from: integer;
+	size: integer;
+	explain: boolean;
+	version: boolean;
+	track_scores: boolean;
+	profile: boolean;
+	min_score: double;
+	terminate_after: long;
+	@request_parameter()
+	docvalue_fields: Field[];
+	@request_parameter()
+	stored_fields: Field[];
+	script_fields: Dictionary<string, ScriptField>[];
+	_source: Union<boolean, SourceFilter>;
+	sort: Sort[];
+	search_after: any[];
+	indices_boost: Dictionary<IndexName, double>[];
+	post_filter: QueryContainer;
+	slice: SlicedScroll;
+	query: QueryContainer;
+	rescore: Rescore[];
+	suggest: Dictionary<string, SuggestBucket>[];
+	highlight: Highlight;
+	collapse: FieldCollapse;
+	aggs: Dictionary<string, AggregationContainer>[];
+	@request_parameter()
+	analyzer: string;
+	@request_parameter()
+	analyze_wildcard: boolean;
+	@request_parameter()
+	default_operator: DefaultOperator;
+	@request_parameter()
+	df: string;
+	@request_parameter()
+	ignore_unavailable: boolean;
+	@request_parameter()
+	allow_no_indices: boolean;
+	@request_parameter()
+	expand_wildcards: ExpandWildcards;
+	@request_parameter()
+	lenient: boolean;
+	@request_parameter()
+	preference: string;
+	@request_parameter()
+	routing: Routing;
+	@request_parameter()
+	scroll: Time;
+	@request_parameter()
+	search_type: SearchType;
+	@request_parameter()
+	stats: string[];
+	@request_parameter()
+	suggest_field: Field;
+	@request_parameter()
+	suggest_mode: SuggestMode;
+	@request_parameter()
+	suggest_size: long;
+	@request_parameter()
+	suggest_text: string;
+	@request_parameter()
+	track_total_hits: boolean;
+	@request_parameter()
+	typed_keys: boolean;
+	@request_parameter()
+	request_cache: boolean;
+	@request_parameter()
+	batched_reduce_size: long;
+	@request_parameter()
+	max_concurrent_shard_requests: long;
+	@request_parameter()
+	pre_filter_shard_size: long;
 }
 @namespace("x_pack.graph.explore")
 @rest_spec_name("xpack.graph.explore")
@@ -8438,15 +9090,15 @@ class ValidateJobResponse extends AcknowledgedResponseBase {
 }
 @namespace("x_pack.security.role_mapping.get_role_mapping")
 class GetRoleMappingResponse extends DictionaryResponseBase<string, XPackRoleMapping> {
-	role_mappings: Map<string, XPackRoleMapping>;
+	role_mappings: Dictionary<string, XPackRoleMapping>[];
 }
 @namespace("x_pack.security.role.get_role")
 class GetRoleResponse extends DictionaryResponseBase<string, XPackRole> {
-	roles: Map<string, XPackRole>;
+	roles: Dictionary<string, XPackRole>[];
 }
 @namespace("x_pack.security.user.get_user")
 class GetUserResponse extends DictionaryResponseBase<string, XPackUser> {
-	users: Map<string, XPackUser>;
+	users: Dictionary<string, XPackUser>[];
 }
 @namespace("x_pack.watcher.restart_watcher")
 class RestartWatcherResponse extends AcknowledgedResponseBase {
@@ -8461,7 +9113,7 @@ class StopWatcherResponse extends AcknowledgedResponseBase {
 class ObjectProperty extends CorePropertyBase {
 	dynamic: Union<boolean, DynamicMapping>;
 	enabled: boolean;
-	properties: Map<PropertyName, Property>;
+	properties: Dictionary<PropertyName, IProperty>[];
 }
 @namespace("mapping.types.core.text")
 class TextProperty extends CorePropertyBase {
@@ -8478,9 +9130,10 @@ class TextProperty extends CorePropertyBase {
 	search_quote_analyzer: string;
 	term_vector: TermVectorOption;
 }
-@namespace("mapping.types")
-class DocValuesPropertyBase extends CorePropertyBase {
-	doc_values: boolean;
+@namespace("mapping.types.complex.nested")
+class NestedProperty extends ObjectProperty {
+	include_in_parent: boolean;
+	include_in_root: boolean;
 }
 @namespace("mapping.types.core.binary")
 class BinaryProperty extends DocValuesPropertyBase {
@@ -8522,12 +9175,6 @@ class NumberProperty extends DocValuesPropertyBase {
 	coerce: boolean;
 	fielddata: NumericFielddata;
 	scaling_factor: double;
-}
-@namespace("mapping.types.core.range")
-class RangePropertyBase extends DocValuesPropertyBase {
-	coerce: boolean;
-	boost: double;
-	index: boolean;
 }
 @namespace("mapping.types.geo.geo_point")
 class GeoPointProperty extends DocValuesPropertyBase {
@@ -8583,11 +9230,6 @@ class TokenCountProperty extends DocValuesPropertyBase {
 	boost: double;
 	null_value: double;
 }
-@namespace("mapping.types.complex.nested")
-class NestedProperty extends ObjectProperty {
-	include_in_parent: boolean;
-	include_in_root: boolean;
-}
 @namespace("mapping.types.core.range.date_range")
 class DateRangeProperty extends RangePropertyBase {
 	format: string;
@@ -8614,35 +9256,10 @@ enum HttpMethod {
 	HEAD = 4
 }
 /** namespace:common **/
-enum Health {
-	green = 0,
-	yellow = 1,
-	red = 2
-}
-/** namespace:common **/
-enum VersionType {
-	internal = 0,
-	external = 1,
-	external_gte = 2,
-	force = 3
-}
-/** namespace:common **/
-enum ExpandWildcards {
-	open = 0,
-	closed = 1,
-	none = 2,
-	all = 3
-}
-/** namespace:common **/
-enum SuggestMode {
-	missing = 0,
-	popular = 1,
-	always = 2
-}
-/** namespace:common **/
-enum SearchType {
-	query_then_fetch = 0,
-	dfs_query_then_fetch = 1
+enum WatcherStatsMetric {
+	queued_watches = 1,
+	pending_watches = 2,
+	_all = 4
 }
 /** namespace:common **/
 enum Bytes {
@@ -8657,6 +9274,12 @@ enum Bytes {
 	tb = 8,
 	p = 9,
 	pb = 10
+}
+/** namespace:common **/
+enum Health {
+	green = 0,
+	yellow = 1,
+	red = 2
 }
 /** namespace:common **/
 enum Size {
@@ -8689,6 +9312,20 @@ enum WaitForStatus {
 	red = 2
 }
 /** namespace:common **/
+enum ExpandWildcards {
+	open = 0,
+	closed = 1,
+	none = 2,
+	all = 3
+}
+/** namespace:common **/
+enum VersionType {
+	internal = 0,
+	external = 1,
+	external_gte = 2,
+	force = 3
+}
+/** namespace:common **/
 enum ThreadType {
 	cpu = 0,
 	wait = 1,
@@ -8716,6 +9353,11 @@ enum Conflicts {
 	proceed = 1
 }
 /** namespace:common **/
+enum SearchType {
+	query_then_fetch = 0,
+	dfs_query_then_fetch = 1
+}
+/** namespace:common **/
 enum OpType {
 	index = 0,
 	create = 1
@@ -8724,6 +9366,12 @@ enum OpType {
 enum Format {
 	detailed = 0,
 	text = 1
+}
+/** namespace:common **/
+enum SuggestMode {
+	missing = 0,
+	popular = 1,
+	always = 2
 }
 @namespace("common")
 class RequestConfiguration {
@@ -8744,6 +9392,17 @@ class RequestConfiguration {
 	throw_exceptions: boolean;
 }
 @namespace("common")
+class UrlParameter {
+}
+@namespace("common")
+class ElasticsearchResponse {
+}
+@namespace("common")
+class BasicAuthenticationCredentials {
+	username: string;
+	password: string;
+}
+@namespace("common")
 class ServerError {
 	error: MainError;
 	status: integer;
@@ -8757,9 +9416,9 @@ class ShardFailure {
 	status: string;
 }
 @namespace("common")
-class BasicAuthenticationCredentials {
-	username: string;
-	password: string;
+class Dictionary<TKey, TValue> {
+	key: TKey;
+	value: TValue;
 }
 @namespace("common")
 class ErrorCauseMetadata {
@@ -8779,80 +9438,6 @@ class ErrorCauseMetadata {
 	script_stack: string[];
 	script: string;
 	language: string;
-}
-@namespace("common")
-class Map<TKey, TValue> {
-	key: TKey;
-	value: TValue;
-}
-@namespace("common_abstractions.infer.indices")
-class AllIndicesMarker {
-}
-@namespace("common_abstractions.infer.indices")
-class ManyIndices {
-	indices: IndexName[];
-}
-@namespace("x_pack.info.x_pack_usage")
-class JobStatistics {
-	total: double;
-	min: double;
-	max: double;
-	avg: double;
-}
-@namespace("x_pack.info.x_pack_usage")
-class DataFeed {
-	count: long;
-}
-@namespace("x_pack.info.x_pack_usage")
-class AlertingExecution {
-	actions: Map<string, ExecutionAction>;
-}
-@namespace("x_pack.info.x_pack_usage")
-class ExecutionAction {
-	total: long;
-	total_in_ms: long;
-}
-@namespace("x_pack.info.x_pack_usage")
-class AlertingCount {
-	total: long;
-	active: long;
-}
-@namespace("x_pack.info.x_pack_usage")
-class SecurityFeatureToggle {
-	enabled: boolean;
-}
-@namespace("x_pack.info.x_pack_usage")
-class SslUsage {
-	http: SecurityFeatureToggle;
-	transport: SecurityFeatureToggle;
-}
-@namespace("x_pack.info.x_pack_usage")
-class IpFilterUsage {
-	http: boolean;
-	transport: boolean;
-}
-@namespace("x_pack.info.x_pack_usage")
-class RoleUsage {
-	dls: boolean;
-	fls: boolean;
-	size: long;
-}
-@namespace("x_pack.info.x_pack_usage")
-class AuditUsage extends SecurityFeatureToggle {
-	outputs: string[];
-}
-@namespace("x_pack.info.x_pack_usage")
-class RealmUsage extends XPackUsage {
-	name: string[];
-	size: long[];
-	order: long[];
-}
-@namespace("common_abstractions.infer.types")
-class AllTypesMarker {
-}
-@namespace("common_abstractions.infer.types")
-class ManyTypes {
-	types: TypeName[];
 }
 @namespace("cluster.nodes_stats")
 class MemoryStats {
@@ -8886,7 +9471,7 @@ class ThreadStats {
 }
 @namespace("cluster.nodes_stats")
 class GarbageCollectionStats {
-	collectors: Map<string, GarbageCollectionGenerationStats>;
+	collectors: Dictionary<string, GarbageCollectionGenerationStats>[];
 }
 @namespace("cluster.nodes_stats")
 class GarbageCollectionGenerationStats {
@@ -8946,4 +9531,59 @@ class DataPathStats {
 	disk_write_size: string;
 	disk_write_size_in_bytes: long;
 	disk_queue: string;
+}
+@namespace("x_pack.info.x_pack_usage")
+class JobStatistics {
+	total: double;
+	min: double;
+	max: double;
+	avg: double;
+}
+@namespace("x_pack.info.x_pack_usage")
+class DataFeed {
+	count: long;
+}
+@namespace("x_pack.info.x_pack_usage")
+class AlertingExecution {
+	actions: Dictionary<string, ExecutionAction>[];
+}
+@namespace("x_pack.info.x_pack_usage")
+class ExecutionAction {
+	total: long;
+	total_in_ms: long;
+}
+@namespace("x_pack.info.x_pack_usage")
+class AlertingCount {
+	total: long;
+	active: long;
+}
+@namespace("x_pack.info.x_pack_usage")
+class SecurityFeatureToggle {
+	enabled: boolean;
+}
+@namespace("x_pack.info.x_pack_usage")
+class SslUsage {
+	http: SecurityFeatureToggle;
+	transport: SecurityFeatureToggle;
+}
+@namespace("x_pack.info.x_pack_usage")
+class IpFilterUsage {
+	http: boolean;
+	transport: boolean;
+}
+@namespace("x_pack.info.x_pack_usage")
+class RoleUsage {
+	dls: boolean;
+	fls: boolean;
+	size: long;
+}
+@namespace("x_pack.info.x_pack_usage")
+class AuditUsage extends SecurityFeatureToggle {
+	outputs: string[];
+}
+@namespace("x_pack.info.x_pack_usage")
+class RealmUsage extends XPackUsage {
+	name: string[];
+	size: long[];
+	order: long[];
 }

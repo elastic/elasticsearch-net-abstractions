@@ -10,6 +10,7 @@ namespace Nest.TypescriptGenerator
 		/// <summary>
 		/// generate [definitionfile] [nest_source_folder]
 		/// split [definitionfile] [nest_source_folder] [out_folder]
+		/// both [definitionfile] [nest_source_folder] [out_folder]
 		/// </summary>
 		public static int Main(string[] args)
 		{

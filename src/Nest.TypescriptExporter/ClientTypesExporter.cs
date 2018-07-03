@@ -26,6 +26,7 @@ namespace Nest.TypescriptGenerator
 				.WithVisibility((@class, name) => false)
 				.AsConstEnums(false)
 				.For<DateInterval>()
+				.For<AnalyzerBase>()
 				.WithModuleNameFormatter(module => string.Empty);
 
 			this._definitions = typeInfoProvider.ExposedTypes.Aggregate(d, (def, t) => def.For(t));
@@ -79,7 +80,7 @@ namespace Nest.TypescriptGenerator
 				? ClientTypescriptGenerator.TypeRenames[tsClass.Name]
 				: tsClass.Name;
 
-			if (InterfaceRegex.IsMatch(name)) name = name.Substring(1);
+			if (InterfaceRegex.IsMatch(name) && !CsharpTypeInfoProvider.ExposedInterfaces.Contains(type.Type)) name = name.Substring(1);
 
 			if (!tsClass.GenericArguments.Any()) return name;
 

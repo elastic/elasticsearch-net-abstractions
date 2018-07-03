@@ -79,7 +79,7 @@ namespace Nest.TypescriptGenerator
 		private RestSpecMapping CreateMapping(FileInfo file)
 		{
 			var typeName = Path.GetFileNameWithoutExtension(file.Name);
-			if (SkipRequest(typeName)) return null;
+			if (SkipRequestImplementation(typeName)) return null;
 
 			var specFileName = typeName.Replace("Request", "");
 			if (!_badDescriptorFors.Contains(typeName))
@@ -96,8 +96,10 @@ namespace Nest.TypescriptGenerator
 			throw new Exception($"{typeName} is not a known request in {this.RestSpecificationFolder}");
 		}
 
-		public bool SkipRequest(string typeName)
+		public bool SkipRequestImplementation(string typeName)
 		{
+			if (typeName == "IRequest") return true;
+			if (typeName == "ICovariantSearchRequest") return true;
 			if (ClientTypesExporter.InterfaceRegex.IsMatch(typeName)) typeName = typeName.Substring(1);
 			return !typeName.EndsWith("Request")
 			       || _helperRequests.Contains(typeName)
