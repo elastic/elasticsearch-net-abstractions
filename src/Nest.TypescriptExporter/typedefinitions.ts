@@ -20,7 +20,7 @@ class ErrorCause {
 @namespace("common")
 class MainError extends ErrorCause {
 	root_cause: ErrorCause[];
-	headers: Dictionary<string, string>[];
+	headers: Dictionary<string, string>;
 }
 interface short {}
 interface byte {}
@@ -1159,7 +1159,7 @@ class PlainRequestBase<TParameters> extends RequestBase {
 @namespace("mapping.types")
 class PropertyBase implements IProperty {
 	name: PropertyName;
-	local_metadata: Dictionary<string, any>[];
+	local_metadata: Dictionary<string, any>;
 	type: string;
 }
 @namespace("cluster")
@@ -1185,7 +1185,7 @@ class ShardsOperationResponseBase extends ResponseBase {
 @namespace("mapping.types")
 class CorePropertyBase extends PropertyBase {
 	copy_to: Field[];
-	fields: Dictionary<PropertyName, IProperty>[];
+	fields: Dictionary<PropertyName, IProperty>;
 	similarity: Union<SimilarityOption, string>;
 	store: boolean;
 }
@@ -1232,10 +1232,10 @@ class TypeMapping {
 	_index: IndexField;
 	_size: SizeField;
 	_field_names: FieldNamesField;
-	_meta: Dictionary<string, any>[];
-	dynamic_templates: Dictionary<string, DynamicTemplate>[];
+	_meta: Dictionary<string, any>;
+	dynamic_templates: Dictionary<string, DynamicTemplate>;
 	dynamic: Union<boolean, DynamicMapping>;
-	properties: Dictionary<PropertyName, IProperty>[];
+	properties: Dictionary<PropertyName, IProperty>;
 }
 @namespace("mapping.meta_fields")
 class FieldMapping {
@@ -1342,7 +1342,7 @@ class InnerHits {
 	explain: boolean;
 	_source: Union<boolean, SourceFilter>;
 	version: boolean;
-	script_fields: Dictionary<string, ScriptField>[];
+	script_fields: Dictionary<string, ScriptField>;
 	docvalue_fields: Field[];
 }
 @namespace("search.search.sort")
@@ -1366,7 +1366,7 @@ class Highlight {
 	encoder: HighlighterEncoder;
 	order: HighlighterOrder;
 	tags_schema: HighlighterTagsSchema;
-	fields: Dictionary<Field, HighlightField>[];
+	fields: Dictionary<Field, HighlightField>;
 	require_field_match: boolean;
 	boundary_chars: string;
 	max_fragment_length: integer;
@@ -1411,7 +1411,7 @@ class ScriptField {
 @namespace("common_options.scripting")
 @class_serializer("ScriptJsonConverter")
 class Script {
-	params: Dictionary<string, any>[];
+	params: Dictionary<string, any>;
 	lang: string;
 }
 @namespace("query_dsl.specialized.more_like_this.like")
@@ -1423,7 +1423,7 @@ class LikeDocument {
 	_routing: Routing;
 	@prop_serializer("SourceConverter")
 	doc: any;
-	per_field_analyzer: Dictionary<Field, string>[];
+	per_field_analyzer: Dictionary<Field, string>;
 }
 @namespace("query_dsl.compound.function_score.functions")
 class ScoreFunction {
@@ -1442,9 +1442,9 @@ class Descriptor {
 class TemplateMapping {
 	index_patterns: string[];
 	order: integer;
-	settings: Dictionary<string, any>[];
-	mappings: Dictionary<TypeName, TypeMapping>[];
-	aliases: Dictionary<IndexName, Alias>[];
+	settings: Dictionary<string, any>;
+	mappings: Dictionary<TypeName, TypeMapping>;
+	aliases: Dictionary<IndexName, Alias>;
 	version: integer;
 }
 @namespace("document.multiple.bulk.bulk_operation")
@@ -1540,7 +1540,7 @@ class TermVectors {
 	version: long;
 	found: boolean;
 	took: long;
-	term_vectors: Dictionary<Field, TermVector>[];
+	term_vectors: Dictionary<Field, TermVector>;
 }
 @namespace("document.multiple.reindex_on_server")
 class ReindexSource {
@@ -1573,9 +1573,9 @@ class AliasAction {
 }
 @namespace("index_modules.index_settings")
 class IndexState {
-	settings: Dictionary<string, any>[];
-	aliases: Dictionary<IndexName, Alias>[];
-	mappings: Dictionary<TypeName, TypeMapping>[];
+	settings: Dictionary<string, any>;
+	aliases: Dictionary<IndexName, Alias>;
+	mappings: Dictionary<TypeName, TypeMapping>;
 }
 @namespace("indices.index_management.rollover_index")
 class RolloverConditions {
@@ -1707,7 +1707,7 @@ class PhraseSuggestHighlight {
 class PhraseSuggestCollate {
 	query: PhraseSuggestCollateQuery;
 	prune: boolean;
-	params: Dictionary<string, any>[];
+	params: Dictionary<string, any>;
 }
 @namespace("search.suggesters.phrase_suggester")
 class PhraseSuggestCollateQuery {
@@ -1759,7 +1759,7 @@ class RescoreQuery {
 }
 @namespace("aggregations")
 class AggregationContainer {
-	meta: Dictionary<string, any>[];
+	meta: Dictionary<string, any>;
 	avg: AverageAggregation;
 	date_histogram: DateHistogramAggregation;
 	percentiles: PercentilesAggregation;
@@ -1806,12 +1806,12 @@ class AggregationContainer {
 	geo_centroid: GeoCentroidAggregation;
 	matrix_stats: MatrixStatsAggregation;
 	adjacency_matrix: AdjacencyMatrixAggregation;
-	aggs: Dictionary<string, AggregationContainer>[];
+	aggs: Dictionary<string, AggregationContainer>;
 }
 @namespace("aggregations")
 class Aggregation {
 	name: string;
-	meta: Dictionary<string, any>[];
+	meta: Dictionary<string, any>;
 }
 @namespace("common_options.date_math")
 class DateMath extends String {}
@@ -1878,7 +1878,7 @@ class HitMetadata<TDocument> {
 }
 @namespace("aggregations")
 class Aggregate {
-	meta: Dictionary<string, any>[];
+	meta: Dictionary<string, any>;
 }
 @namespace("x_pack.graph.explore.request")
 class GraphVertexDefinition {
@@ -2018,8 +2018,8 @@ class HttpInputRequest {
 	host: string;
 	path: string;
 	method: HttpInputMethod;
-	headers: Dictionary<string, string>[];
-	params: Dictionary<string, string>[];
+	headers: Dictionary<string, string>;
+	params: Dictionary<string, string>;
 	url: string;
 	auth: HttpInputAuthentication;
 	proxy: HttpInputProxy;
@@ -2355,7 +2355,7 @@ class MoreLikeThisQuery {
 	minimum_should_match: MinimumShouldMatch;
 	boost_terms: double;
 	include: boolean;
-	per_field_analyzer: Dictionary<Field, string>[];
+	per_field_analyzer: Dictionary<Field, string>;
 	version: long;
 	version_type: VersionType;
 	routing: Routing;
@@ -2395,7 +2395,7 @@ class ScriptQuery {
 	source: string;
 	inline: string;
 	id: Id;
-	params: Dictionary<string, any>[];
+	params: Dictionary<string, any>;
 	lang: string;
 }
 @namespace("query_dsl.term_level.exists")
@@ -2475,7 +2475,7 @@ class CompletionSuggester {
 	prefix: string;
 	regex: string;
 	fuzzy: FuzzySuggester;
-	contexts: Dictionary<string, SuggestContextQuery[]>[];
+	contexts: Dictionary<string, SuggestContextQuery[]>;
 }
 @namespace("aggregations.metric")
 class MetricAggregation {
@@ -2485,7 +2485,7 @@ class MetricAggregation {
 }
 @namespace("aggregations.bucket")
 class BucketAggregation {
-	aggregations: Dictionary<string, AggregationContainer>[];
+	aggregations: Dictionary<string, AggregationContainer>;
 }
 @namespace("aggregations.pipeline")
 class PipelineAggregation {
@@ -2496,17 +2496,17 @@ class PipelineAggregation {
 @namespace("aggregations.matrix")
 class MatrixAggregation {
 	fields: Field[];
-	missing: Dictionary<Field, double>[];
+	missing: Dictionary<Field, double>;
 }
 @namespace("search.search.hits")
 class Hit<TDocument> {
 	score: double;
-	fields: Dictionary<string, LazyDocument>[];
+	fields: Dictionary<string, LazyDocument>;
 	sorts: any[];
-	highlights: Dictionary<string, HighlightHit>[];
+	highlights: Dictionary<string, HighlightHit>;
 	explanation: Explanation;
 	matched_queries: string[];
-	inner_hits: Dictionary<string, InnerHitsResult>[];
+	inner_hits: Dictionary<string, InnerHitsResult>;
 }
 @namespace("x_pack.machine_learning.job.config")
 class ModelPlotConfig {
@@ -2540,12 +2540,12 @@ class SearchInput {
 @namespace("x_pack.watcher.input")
 @class_serializer("SimpleInputJsonConverter")
 class SimpleInput {
-	payload: Dictionary<string, any>[];
+	payload: Dictionary<string, any>;
 }
 @namespace("x_pack.watcher.input")
 @class_serializer("ChainInputJsonConverter")
 class ChainInput {
-	inputs: Dictionary<string, InputContainer>[];
+	inputs: Dictionary<string, InputContainer>;
 }
 @namespace("x_pack.watcher.condition")
 class AlwaysCondition {
@@ -2564,7 +2564,7 @@ class CompareCondition {
 @class_serializer("ScriptConditionJsonConverter")
 class ScriptCondition {
 	lang: string;
-	params: Dictionary<string, any>[];
+	params: Dictionary<string, any>;
 }
 @namespace("x_pack.watcher.transform")
 class SearchTransform {
@@ -2574,7 +2574,7 @@ class SearchTransform {
 @namespace("x_pack.watcher.transform")
 @class_serializer("ScriptTransformJsonConverter")
 class ScriptTransform {
-	params: Dictionary<string, any>[];
+	params: Dictionary<string, any>;
 	lang: string;
 }
 @namespace("x_pack.watcher.transform")
@@ -2729,7 +2729,7 @@ class AverageAggregation {
 class DateHistogramAggregation {
 	field: Field;
 	script: Script;
-	params: Dictionary<string, any>[];
+	params: Dictionary<string, any>;
 	interval: Union<DateInterval, Time>;
 	format: string;
 	min_doc_count: integer;
@@ -2761,7 +2761,7 @@ class FilterAggregation {
 }
 @namespace("aggregations.bucket.filters")
 class FiltersAggregation {
-	filters: Union<Dictionary<string, QueryContainer>[], QueryContainer[]>;
+	filters: Union<Dictionary<string, QueryContainer>, QueryContainer[]>;
 	other_bucket: boolean;
 	other_bucket_key: string;
 }
@@ -2886,7 +2886,7 @@ class TopHitsAggregation {
 	_source: Union<boolean, SourceFilter>;
 	highlight: Highlight;
 	explain: boolean;
-	script_fields: Dictionary<string, ScriptField>[];
+	script_fields: Dictionary<string, ScriptField>;
 	stored_fields: Field[];
 	version: boolean;
 	track_scores: boolean;
@@ -2901,7 +2901,7 @@ class ScriptedMetricAggregation {
 	map_script: Script;
 	combine_script: Script;
 	reduce_script: Script;
-	params: Dictionary<string, any>[];
+	params: Dictionary<string, any>;
 }
 @namespace("aggregations.pipeline.average_bucket")
 class AverageBucketAggregation {
@@ -2967,7 +2967,7 @@ class MatrixStatsAggregation {
 }
 @namespace("aggregations.bucket.adjacency_matrix")
 class AdjacencyMatrixAggregation {
-	filters: Dictionary<string, QueryContainer>[];
+	filters: Dictionary<string, QueryContainer>;
 }
 @namespace("query_dsl.term_level.wildcard")
 @class_serializer("FieldNameQueryJsonConverter`1")
@@ -3033,7 +3033,7 @@ class CurrentNode {
 	name: string;
 	transport_address: string;
 	weight_ranking: string;
-	attributes: Dictionary<string, string>[];
+	attributes: Dictionary<string, string>;
 }
 @namespace("cluster.cluster_allocation_explain")
 class AllocationDecision {
@@ -3047,7 +3047,7 @@ class NodeAllocationExplanation {
 	node_name: string;
 	transport_address: string;
 	node_decision: Decision;
-	node_attributes: Dictionary<string, string>[];
+	node_attributes: Dictionary<string, string>;
 	store: AllocationStore;
 	weight_ranking: integer;
 	deciders: AllocationDecision[];
@@ -3071,7 +3071,7 @@ class IndexHealthStats {
 	relocating_shards: integer;
 	initializing_shards: integer;
 	unassigned_shards: integer;
-	shards: Dictionary<string, ShardHealthStats>[];
+	shards: Dictionary<string, ShardHealthStats>;
 }
 @namespace("cluster.cluster_health")
 class ShardHealthStats {
@@ -3095,7 +3095,7 @@ class ClusterRerouteState {
 	version: integer;
 	master_node: string;
 	blocks: BlockState;
-	nodes: Dictionary<string, NodeState>[];
+	nodes: Dictionary<string, NodeState>;
 	routing_table: RoutingTableState;
 	routing_nodes: RoutingNodesState;
 }
@@ -3107,15 +3107,15 @@ class BlockState {
 class NodeState {
 	name: string;
 	transport_address: string;
-	attributes: Dictionary<string, string>[];
+	attributes: Dictionary<string, string>;
 }
 @namespace("cluster.cluster_state")
 class RoutingTableState {
-	indices: Dictionary<string, IndexRoutingTable>[];
+	indices: Dictionary<string, IndexRoutingTable>;
 }
 @namespace("cluster.cluster_state")
 class IndexRoutingTable {
-	shards: Dictionary<string, RoutingShard[]>[];
+	shards: Dictionary<string, RoutingShard[]>;
 }
 @namespace("cluster.cluster_state")
 class RoutingShard {
@@ -3134,7 +3134,7 @@ class AllocationId {
 @namespace("cluster.cluster_state")
 class RoutingNodesState {
 	unassigned: RoutingShard[];
-	nodes: Dictionary<string, RoutingShard[]>[];
+	nodes: Dictionary<string, RoutingShard[]>;
 }
 @namespace("cluster.cluster_reroute")
 class ClusterRerouteExplanation {
@@ -3159,9 +3159,9 @@ class ClusterRerouteDecision {
 }
 @namespace("cluster.cluster_state")
 class MetadataState {
-	templates: Dictionary<string, TemplateMapping>[];
+	templates: Dictionary<string, TemplateMapping>;
 	cluster_uuid: string;
-	indices: Dictionary<string, MetadataIndexState>[];
+	indices: Dictionary<string, MetadataIndexState>;
 }
 @namespace("common_options.geo")
 @class_serializer("DistanceJsonConverter")
@@ -3173,7 +3173,7 @@ class Distance {
 class MetadataIndexState {
 	state: string;
 	settings: string[];
-	mappings: Dictionary<TypeName, TypeMapping>[];
+	mappings: Dictionary<TypeName, TypeMapping>;
 	aliases: string[];
 }
 @namespace("cluster")
@@ -3376,7 +3376,7 @@ class NodeInfo {
 	os: NodeOperatingSystemInfo;
 	process: NodeProcessInfo;
 	jvm: NodeJvmInfo;
-	thread_pool: Dictionary<string, NodeThreadPoolInfo>[];
+	thread_pool: Dictionary<string, NodeThreadPoolInfo>;
 	network: NodeInfoNetwork;
 	transport: NodeInfoTransport;
 	http: NodeInfoHttp;
@@ -3484,8 +3484,8 @@ class NodeStats {
 	process: ProcessStats;
 	script: ScriptStats;
 	jvm: NodeJvmStats;
-	thread_pool: Dictionary<string, ThreadCountStats>[];
-	breakers: Dictionary<string, BreakerStats>[];
+	thread_pool: Dictionary<string, ThreadCountStats>;
+	breakers: Dictionary<string, BreakerStats>;
 	fs: FileSystemStats;
 	transport: TransportStats;
 	http: HttpStats;
@@ -3523,7 +3523,7 @@ class IndexingStats {
 	noop_update_total: long;
 	throttle_time: string;
 	throttle_time_in_millis: long;
-	types: Dictionary<string, IndexingStats>[];
+	types: Dictionary<string, IndexingStats>;
 }
 @namespace("common_options.stats")
 class GetStats {
@@ -3640,7 +3640,7 @@ class NodeJvmStats {
 	mem: MemoryStats;
 	threads: ThreadStats;
 	gc: GarbageCollectionStats;
-	buffer_pools: Dictionary<string, NodeBufferPool>[];
+	buffer_pools: Dictionary<string, NodeBufferPool>;
 	classes: JvmClassesStats;
 }
 @namespace("cluster.nodes_stats")
@@ -3688,7 +3688,7 @@ class NodeUsageInformation {
 	timestamp: Date;
 	@prop_serializer("EpochMillisecondsDateTimeJsonConverter")
 	since: Date;
-	rest_actions: Dictionary<string, integer>[];
+	rest_actions: Dictionary<string, integer>;
 }
 @namespace("cluster.remote_info")
 class RemoteInfo {
@@ -3711,7 +3711,7 @@ class TaskExecutingNode {
 	transport_address: string;
 	host: string;
 	ip: string;
-	tasks: Dictionary<TaskId, TaskState>[];
+	tasks: Dictionary<TaskId, TaskState>;
 }
 @namespace("cluster.task_management.list_tasks")
 class TaskState {
@@ -3779,7 +3779,7 @@ class BulkIndexByScrollFailure {
 @namespace("document.single.term_vectors")
 class TermVector {
 	field_statistics: FieldStatistics;
-	terms: Dictionary<string, TermVectorTerm>[];
+	terms: Dictionary<string, TermVectorTerm>;
 }
 @namespace("document.single.term_vectors")
 class FieldStatistics {
@@ -3812,8 +3812,8 @@ class ReindexNode {
 	host: string;
 	ip: string;
 	roles: string[];
-	attributes: Dictionary<string, string>[];
-	tasks: Dictionary<TaskId, ReindexTask>[];
+	attributes: Dictionary<string, string>;
+	tasks: Dictionary<TaskId, ReindexTask>;
 }
 @namespace("document.multiple.reindex_rethrottle")
 class ReindexTask {
@@ -3846,11 +3846,11 @@ class InstantGet<TDocument> {
 	found: boolean;
 	@prop_serializer("SourceConverter")
 	_source: TDocument;
-	fields: Dictionary<string, LazyDocument>[];
+	fields: Dictionary<string, LazyDocument>;
 }
 @namespace("indices.alias_management.get_alias")
 class IndexAliases {
-	aliases: Dictionary<string, AliasDefinition>[];
+	aliases: Dictionary<string, AliasDefinition>;
 }
 @namespace("indices.alias_management")
 class AliasDefinition {
@@ -3900,11 +3900,11 @@ class ExplainAnalyzeToken {
 @namespace("indices.mapping_management.get_field_mapping")
 class TypeFieldMappings {
 	@prop_serializer("ResolvableDictionaryJsonConverter`2")
-	mappings: Dictionary<TypeName, Dictionary<Field, FieldMapping>[]>[];
+	mappings: Dictionary<TypeName, Dictionary<Field, FieldMapping>>;
 }
 @namespace("indices.mapping_management.get_mapping")
 class IndexMappings {
-	mappings: Dictionary<TypeName, TypeMapping>[];
+	mappings: Dictionary<TypeName, TypeMapping>;
 	item: TypeMapping;
 }
 @namespace("indices.monitoring.indices_recovery")
@@ -3976,7 +3976,7 @@ class RecoveryStartStatus {
 }
 @namespace("indices.monitoring.indices_segments")
 class IndexSegment {
-	shards: Dictionary<string, ShardsSegment>[];
+	shards: Dictionary<string, ShardsSegment>;
 }
 @namespace("indices.monitoring.indices_segments")
 @class_serializer("Json")
@@ -3984,7 +3984,7 @@ class ShardsSegment {
 	num_committed_segments: integer;
 	num_search_segments: integer;
 	routing: ShardSegmentRouting;
-	segments: Dictionary<string, Segment>[];
+	segments: Dictionary<string, Segment>;
 }
 @namespace("indices.monitoring.indices_segments")
 class ShardSegmentRouting {
@@ -4004,7 +4004,7 @@ class Segment {
 }
 @namespace("indices.monitoring.indices_shard_stores")
 class IndicesShardStores {
-	shards: Dictionary<string, ShardStoreWrapper>[];
+	shards: Dictionary<string, ShardStoreWrapper>;
 }
 @namespace("indices.monitoring.indices_shard_stores")
 class ShardStoreWrapper {
@@ -4020,7 +4020,7 @@ class ShardStore {
 	allocation_id: string;
 	store_exception: ShardStoreException;
 	allocation: ShardStoreAllocation;
-	attributes: Dictionary<string, any>[];
+	attributes: Dictionary<string, any>;
 }
 @namespace("indices.monitoring.indices_shard_stores")
 class ShardStoreException {
@@ -4103,7 +4103,7 @@ class SnapshotStatus {
 	state: string;
 	shards_stats: SnapshotShardsStats;
 	stats: SnapshotStats;
-	indices: Dictionary<string, SnapshotIndexStats>[];
+	indices: Dictionary<string, SnapshotIndexStats>;
 }
 @namespace("modules.snapshot_and_restore.snapshot.snapshot_status")
 class SnapshotShardsStats {
@@ -4127,7 +4127,7 @@ class SnapshotStats {
 class SnapshotIndexStats {
 	shards_stats: SnapshotShardsStats;
 	stats: SnapshotStats;
-	shards: Dictionary<string, SnapshotShardsStats>[];
+	shards: Dictionary<string, SnapshotShardsStats>;
 }
 @namespace("search.explain")
 class ExplanationDetail {
@@ -4307,7 +4307,7 @@ class SuggestOption<TDocument> {
 	_id: Id;
 	@prop_serializer("SourceConverter")
 	_source: TDocument;
-	contexts: Dictionary<string, Context[]>[];
+	contexts: Dictionary<string, Context[]>;
 	highlighted: string;
 	collate_match: boolean;
 }
@@ -4529,12 +4529,12 @@ class DiscoveryNode {
 	name: string;
 	ephemeral_id: string;
 	transport_address: string;
-	attributes: Dictionary<string, string>[];
+	attributes: Dictionary<string, string>;
 }
 @namespace("x_pack.machine_learning.datafeed")
 class DatafeedConfig {
 	datafeed_id: string;
-	aggregations: Dictionary<string, AggregationContainer>[];
+	aggregations: Dictionary<string, AggregationContainer>;
 	chunking_config: ChunkingConfig;
 	frequency: Time;
 	@prop_serializer("IndicesJsonConverter")
@@ -4542,7 +4542,7 @@ class DatafeedConfig {
 	job_id: string;
 	query: QueryContainer;
 	query_delay: Time;
-	script_fields: Dictionary<string, ScriptField>[];
+	script_fields: Dictionary<string, ScriptField>;
 	scroll_size: integer;
 	@prop_serializer("TypesJsonConverter")
 	types: Types;
@@ -4638,7 +4638,7 @@ class SecurityNode {
 }
 @namespace("x_pack.security.role_mapping.get_role_mapping")
 class XPackRoleMapping {
-	metadata: Dictionary<string, any>[];
+	metadata: Dictionary<string, any>;
 	enabled: boolean;
 	roles: string[];
 	rules: RoleMappingRuleBase;
@@ -4652,7 +4652,7 @@ class XPackRole {
 	cluster: string[];
 	run_as: string[];
 	indices: IndicesPrivileges[];
-	metadata: Dictionary<string, any>[];
+	metadata: Dictionary<string, any>;
 }
 @namespace("x_pack.security.role.put_role")
 class PutRoleStatus {
@@ -4664,7 +4664,7 @@ class XPackUser {
 	roles: string[];
 	full_name: string;
 	email: string;
-	metadata: Dictionary<string, any>[];
+	metadata: Dictionary<string, any>;
 }
 @namespace("x_pack.security.user.put_user")
 class PutUserStatus {
@@ -4676,7 +4676,7 @@ class WatchStatus {
 	state: ActivationState;
 	last_checked: Date;
 	last_met_condition: Date;
-	actions: Dictionary<string, ActionStatus>[];
+	actions: Dictionary<string, ActionStatus>;
 }
 @namespace("x_pack.watcher.acknowledge_watch")
 class ActivationState {
@@ -4708,7 +4708,7 @@ class ThrottleState {
 @namespace("x_pack.watcher.activate_watch")
 class ActivationStatus {
 	state: ActivationState;
-	actions: Dictionary<string, ActionStatus>[];
+	actions: Dictionary<string, ActionStatus>;
 }
 @namespace("x_pack.watcher.execution")
 @class_serializer("SimulatedActionsConverter")
@@ -4725,7 +4725,7 @@ class WatchRecord {
 	trigger_event: TriggerEventResult;
 	condition: ConditionContainer;
 	input: InputContainer;
-	metadata: Dictionary<string, any>[];
+	metadata: Dictionary<string, any>;
 	result: ExecutionResult;
 }
 @namespace("x_pack.watcher.execute_watch")
@@ -4746,7 +4746,7 @@ class ExecutionResult {
 class ExecutionResultInput {
 	type: InputType;
 	status: Status;
-	payload: Dictionary<string, any>[];
+	payload: Dictionary<string, any>;
 }
 @namespace("x_pack.watcher.execute_watch")
 class ExecutionResultCondition {
@@ -4809,7 +4809,7 @@ class WebhookActionResult {
 @namespace("x_pack.watcher.execution")
 class HttpInputResponseResult {
 	status: integer;
-	headers: Dictionary<string, string[]>[];
+	headers: Dictionary<string, string[]>;
 	body: string;
 }
 @namespace("x_pack.watcher.execution.logging")
@@ -4858,13 +4858,13 @@ class SlackActionMessageResult {
 }
 @namespace("x_pack.watcher")
 class Watch {
-	metadata: Dictionary<string, any>[];
+	metadata: Dictionary<string, any>;
 	input: InputContainer;
 	condition: ConditionContainer;
 	trigger: TriggerContainer;
 	transform: TransformContainer;
 	@prop_serializer("ActionsJsonConverter")
-	actions: Dictionary<string, Action>[];
+	actions: Dictionary<string, Action>;
 	status: WatchStatus;
 	throttle_period: string;
 }
@@ -5345,12 +5345,12 @@ class Context extends Union<string, GeoLocation> {
 }
 @namespace("x_pack.info.x_pack_usage")
 class MonitoringUsage extends XPackUsage {
-	enabled_exporters: Dictionary<string, long>[];
+	enabled_exporters: Dictionary<string, long>;
 }
 @namespace("x_pack.info.x_pack_usage")
 class MachineLearningUsage extends XPackUsage {
-	jobs: Dictionary<string, Job>[];
-	datafeeds: Dictionary<string, DataFeed>[];
+	jobs: Dictionary<string, Job>;
+	datafeeds: Dictionary<string, DataFeed>;
 }
 @namespace("x_pack.info.x_pack_usage")
 class AlertingUsage extends XPackUsage {
@@ -5364,8 +5364,8 @@ class SecurityUsage extends XPackUsage {
 	ssl: SslUsage;
 	ipfilter: IpFilterUsage;
 	audit: AuditUsage;
-	roles: Dictionary<string, RoleUsage>[];
-	realms: Dictionary<string, RealmUsage>[];
+	roles: Dictionary<string, RoleUsage>;
+	realms: Dictionary<string, RealmUsage>;
 }
 @namespace("common_abstractions.infer.category_id")
 class CategoryId extends String {}
@@ -5863,7 +5863,7 @@ class ClusterHealthResponse extends ResponseBase {
 	unassigned_shards: integer;
 	number_of_pending_tasks: integer;
 	@prop_serializer("ResolvableDictionaryJsonConverter`2")
-	indices: Dictionary<IndexName, IndexHealthStats>[];
+	indices: Dictionary<IndexName, IndexHealthStats>;
 }
 @namespace("cluster.cluster_pending_tasks")
 class ClusterPendingTasksResponse extends ResponseBase {
@@ -5876,14 +5876,14 @@ class ClusterRerouteResponse extends ResponseBase {
 }
 @namespace("cluster.cluster_settings.cluster_get_settings")
 class ClusterGetSettingsResponse extends ResponseBase {
-	persistent: Dictionary<string, any>[];
-	transient: Dictionary<string, any>[];
+	persistent: Dictionary<string, any>;
+	transient: Dictionary<string, any>;
 }
 @namespace("cluster.cluster_settings.cluster_put_settings")
 class ClusterPutSettingsResponse extends ResponseBase {
 	acknowledged: boolean;
-	persistent: Dictionary<string, any>[];
-	transient: Dictionary<string, any>[];
+	persistent: Dictionary<string, any>;
+	transient: Dictionary<string, any>;
 }
 @namespace("cluster.cluster_state")
 class ClusterStateResponse extends ResponseBase {
@@ -5891,7 +5891,7 @@ class ClusterStateResponse extends ResponseBase {
 	master_node: string;
 	state_uuid: string;
 	version: long;
-	nodes: Dictionary<string, NodeState>[];
+	nodes: Dictionary<string, NodeState>;
 	metadata: MetadataState;
 	routing_table: RoutingTableState;
 	routing_nodes: RoutingNodesState;
@@ -5913,7 +5913,7 @@ class RootNodeInfoResponse extends ResponseBase {
 @namespace("cluster.task_management.cancel_tasks")
 class CancelTasksResponse extends ResponseBase {
 	is_valid: boolean;
-	nodes: Dictionary<string, TaskExecutingNode>[];
+	nodes: Dictionary<string, TaskExecutingNode>;
 	node_failures: ErrorCause[];
 }
 @namespace("cluster.task_management.get_task")
@@ -5924,7 +5924,7 @@ class GetTaskResponse extends ResponseBase {
 @namespace("cluster.task_management.list_tasks")
 class ListTasksResponse extends ResponseBase {
 	is_valid: boolean;
-	nodes: Dictionary<string, TaskExecutingNode>[];
+	nodes: Dictionary<string, TaskExecutingNode>;
 	node_failures: ErrorCause[];
 }
 @namespace("document.multiple.bulk")
@@ -5980,7 +5980,7 @@ class ReindexOnServerResponse extends ResponseBase {
 }
 @namespace("document.multiple.reindex_rethrottle")
 class ReindexRethrottleResponse extends ResponseBase {
-	nodes: Dictionary<string, ReindexNode>[];
+	nodes: Dictionary<string, ReindexNode>;
 }
 @namespace("document.multiple.update_by_query")
 class UpdateByQueryResponse extends ResponseBase {
@@ -6028,7 +6028,7 @@ class GetResponse<TDocument> extends ResponseBase {
 	found: boolean;
 	@prop_serializer("SourceConverter")
 	_source: TDocument;
-	fields: Dictionary<string, LazyDocument>[];
+	fields: Dictionary<string, LazyDocument>;
 	_parent: string;
 	_routing: string;
 }
@@ -6075,17 +6075,17 @@ class ExistsResponse extends ResponseBase {
 @namespace("indices.monitoring.indices_segments")
 class SegmentsResponse extends ResponseBase {
 	_shards: ShardStatistics;
-	indices: Dictionary<string, IndexSegment>[];
+	indices: Dictionary<string, IndexSegment>;
 }
 @namespace("indices.monitoring.indices_shard_stores")
 class IndicesShardStoresResponse extends ResponseBase {
-	indices: Dictionary<string, IndicesShardStores>[];
+	indices: Dictionary<string, IndicesShardStores>;
 }
 @namespace("indices.monitoring.indices_stats")
 class IndicesStatsResponse extends ResponseBase {
 	_shards: ShardStatistics;
 	_all: IndicesStats;
-	indices: Dictionary<string, IndicesStats>[];
+	indices: Dictionary<string, IndicesStats>;
 }
 @namespace("indices.status_management.upgrade")
 class UpgradeResponse extends ResponseBase {
@@ -6094,14 +6094,14 @@ class UpgradeResponse extends ResponseBase {
 @namespace("indices.status_management.upgrade.upgrade_status")
 @class_serializer("UpgradeStatusResponseJsonConverter")
 class UpgradeStatusResponse extends ResponseBase {
-	upgrades: Dictionary<string, UpgradeStatus>[];
+	upgrades: Dictionary<string, UpgradeStatus>;
 	size_in_bytes: long;
 	size_to_upgrade_in_bytes: string;
 	size_to_upgrade_ancient_in_bytes: string;
 }
 @namespace("ingest.processor")
 class GrokProcessorPatternsResponse extends ResponseBase {
-	patterns: Dictionary<string, string>[];
+	patterns: Dictionary<string, string>;
 }
 @namespace("ingest.simulate_pipeline")
 class SimulatePipelineResponse extends ResponseBase {
@@ -6114,11 +6114,11 @@ class GetScriptResponse extends ResponseBase {
 @namespace("modules.snapshot_and_restore.repositories.get_repository")
 @class_serializer("GetRepositoryResponseJsonConverter")
 class GetRepositoryResponse extends ResponseBase {
-	repositories: Dictionary<string, SnapshotRepository>[];
+	repositories: Dictionary<string, SnapshotRepository>;
 }
 @namespace("modules.snapshot_and_restore.repositories.verify_repository")
 class VerifyRepositoryResponse extends ResponseBase {
-	nodes: Dictionary<string, CompactNodeInfo>[];
+	nodes: Dictionary<string, CompactNodeInfo>;
 }
 @namespace("modules.snapshot_and_restore.restore")
 class RestoreResponse extends ResponseBase {
@@ -6151,7 +6151,7 @@ class ExplainResponse<TDocument> extends ResponseBase {
 @namespace("search.field_capabilities")
 class FieldCapabilitiesResponse extends ResponseBase {
 	shards: ShardStatistics;
-	fields: Dictionary<Field, Dictionary<string, FieldCapabilities>[]>[];
+	fields: Dictionary<Field, Dictionary<string, FieldCapabilities>>;
 }
 @namespace("search.multi_search")
 class MultiSearchResponse extends ResponseBase {
@@ -6165,7 +6165,7 @@ class ClearScrollResponse extends ResponseBase {
 @namespace("search.search_shards")
 class SearchShardsResponse extends ResponseBase {
 	shards: SearchShard[][];
-	nodes: Dictionary<string, SearchNode>[];
+	nodes: Dictionary<string, SearchNode>;
 }
 @namespace("search.search_template.render_search_template")
 class RenderSearchTemplateResponse extends ResponseBase {
@@ -6174,10 +6174,10 @@ class RenderSearchTemplateResponse extends ResponseBase {
 @namespace("search.search")
 class SearchResponse<T> extends ResponseBase {
 	_shards: ShardStatistics;
-	aggregations: Dictionary<string, Aggregate>[];
-	aggs: Dictionary<string, Aggregate>[];
+	aggregations: Dictionary<string, Aggregate>;
+	aggs: Dictionary<string, Aggregate>;
 	profile: Profile;
-	suggest: Dictionary<string, Suggest<T>[]>[];
+	suggest: Dictionary<string, Suggest<T>[]>;
 	took: long;
 	timed_out: boolean;
 	terminated_early: boolean;
@@ -6188,7 +6188,7 @@ class SearchResponse<T> extends ResponseBase {
 	max_score: double;
 	documents: T[];
 	//hits: Hit<T>[];
-	fields: Dictionary<string, LazyDocument>[][];
+	fields: Dictionary<string, LazyDocument>;
 }
 @namespace("search.validate")
 class ValidateQueryResponse extends ResponseBase {
@@ -6200,7 +6200,7 @@ class ValidateQueryResponse extends ResponseBase {
 class DeprecationInfoResponse extends ResponseBase {
 	cluster_settings: DeprecationInfo[];
 	node_settings: DeprecationInfo[];
-	index_settings: Dictionary<string, DeprecationInfo[]>[];
+	index_settings: Dictionary<string, DeprecationInfo[]>;
 }
 @namespace("x_pack.graph.explore")
 class GraphExploreResponse extends ResponseBase {
@@ -6324,7 +6324,7 @@ class PreviewDatafeedResponse<T> extends ResponseBase {
 @namespace("x_pack.machine_learning.put_datafeed")
 class PutDatafeedResponse extends ResponseBase {
 	datafeed_id: string;
-	aggregations: Dictionary<string, AggregationContainer>[];
+	aggregations: Dictionary<string, AggregationContainer>;
 	chunking_config: ChunkingConfig;
 	frequency: Time;
 	@prop_serializer("IndicesJsonConverter")
@@ -6332,7 +6332,7 @@ class PutDatafeedResponse extends ResponseBase {
 	job_id: string;
 	query: QueryContainer;
 	query_delay: Time;
-	script_fields: Dictionary<string, ScriptField>[];
+	script_fields: Dictionary<string, ScriptField>;
 	scroll_size: integer;
 	@prop_serializer("TypesJsonConverter")
 	types: Types;
@@ -6366,7 +6366,7 @@ class StopDatafeedResponse extends ResponseBase {
 @namespace("x_pack.machine_learning.update_data_feed")
 class UpdateDatafeedResponse extends ResponseBase {
 	datafeed_id: string;
-	aggregations: Dictionary<string, AggregationContainer>[];
+	aggregations: Dictionary<string, AggregationContainer>;
 	chunking_config: ChunkingConfig;
 	frequency: Time;
 	@prop_serializer("IndicesJsonConverter")
@@ -6374,7 +6374,7 @@ class UpdateDatafeedResponse extends ResponseBase {
 	job_id: string;
 	query: QueryContainer;
 	query_delay: Time;
-	script_fields: Dictionary<string, ScriptField>[];
+	script_fields: Dictionary<string, ScriptField>;
 	scroll_size: integer;
 	@prop_serializer("TypesJsonConverter")
 	types: Types;
@@ -6388,12 +6388,12 @@ class AuthenticateResponse extends ResponseBase {
 	roles: string[];
 	full_name: string;
 	email: string;
-	metadata: Dictionary<string, any>[];
+	metadata: Dictionary<string, any>;
 }
 @namespace("x_pack.security.clear_cached_realms")
 class ClearCachedRealmsResponse extends ResponseBase {
 	cluster_name: string;
-	nodes: Dictionary<string, SecurityNode>[];
+	nodes: Dictionary<string, SecurityNode>;
 }
 @namespace("x_pack.security.role_mapping.delete_role_mapping")
 class DeleteRoleMappingResponse extends ResponseBase {
@@ -6407,7 +6407,7 @@ class PutRoleMappingResponse extends ResponseBase {
 @namespace("x_pack.security.role.clear_cached_roles")
 class ClearCachedRolesResponse extends ResponseBase {
 	cluster_name: string;
-	nodes: Dictionary<string, SecurityNode>[];
+	nodes: Dictionary<string, SecurityNode>;
 }
 @namespace("x_pack.security.role.delete_role")
 class DeleteRoleResponse extends ResponseBase {
@@ -6944,8 +6944,8 @@ class ClusterGetSettingsRequest extends RequestBase {
 @namespace("cluster.cluster_settings.cluster_put_settings")
 @rest_spec_name("cluster.put_settings")
 class ClusterPutSettingsRequest extends RequestBase {
-	persistent: Dictionary<string, any>[];
-	transient: Dictionary<string, any>[];
+	persistent: Dictionary<string, any>;
+	transient: Dictionary<string, any>;
 	@request_parameter()
 	flat_settings: boolean;
 	@request_parameter()
@@ -7444,7 +7444,7 @@ class SourceRequest extends RequestBase {
 class TermVectorsRequest<TDocument> extends RequestBase {
 	@prop_serializer("SourceConverter")
 	doc: TDocument;
-	per_field_analyzer: Dictionary<Field, string>[];
+	per_field_analyzer: Dictionary<Field, string>;
 	filter: TermVectorFilter;
 	@request_parameter()
 	term_statistics: boolean;
@@ -7480,7 +7480,7 @@ class TermVectorsResponse extends ResponseBase {
 	found: boolean;
 	took: long;
 	@prop_serializer("ResolvableDictionaryJsonConverter`2")
-	term_vectors: Dictionary<Field, TermVector>[];
+	term_vectors: Dictionary<Field, TermVector>;
 }
 @namespace("document.single.update")
 @rest_spec_name("update")
@@ -7661,8 +7661,8 @@ class OpenIndexRequest extends RequestBase {
 @namespace("indices.index_management.shrink_index")
 @rest_spec_name("indices.shrink")
 class ShrinkIndexRequest extends RequestBase {
-	settings: Dictionary<string, any>[];
-	aliases: Dictionary<IndexName, Alias>[];
+	settings: Dictionary<string, any>;
+	aliases: Dictionary<IndexName, Alias>;
 	@request_parameter()
 	timeout: Time;
 	@request_parameter()
@@ -7730,7 +7730,7 @@ class IndexTemplateExistsRequest extends RequestBase {
 @rest_spec_name("indices.put_settings")
 @class_serializer("IndexSettingsConverter")
 class UpdateIndexSettingsRequest extends RequestBase {
-	index_settings: Dictionary<string, any>[];
+	index_settings: Dictionary<string, any>;
 	@request_parameter()
 	master_timeout: Time;
 	@request_parameter()
@@ -7952,7 +7952,7 @@ class SimulatePipelineRequest extends RequestBase {
 }
 @namespace("mapping.types.core.join")
 class JoinProperty extends PropertyBase {
-	relations: Dictionary<RelationName, RelationName[]>[];
+	relations: Dictionary<RelationName, RelationName[]>;
 }
 @namespace("mapping.types.core.percolator")
 class PercolatorProperty extends PropertyBase {
@@ -8144,7 +8144,7 @@ class FieldCapabilitiesRequest extends RequestBase {
 @rest_spec_name("msearch_template")
 @class_serializer("MultiSearchTemplateJsonConverter")
 class MultiSearchTemplateRequest extends RequestBase {
-	operations: Dictionary<string, SearchTemplateRequest>[];
+	operations: Dictionary<string, SearchTemplateRequest>;
 	@request_parameter()
 	search_type: SearchType;
 	@request_parameter()
@@ -8156,7 +8156,7 @@ class MultiSearchTemplateRequest extends RequestBase {
 @rest_spec_name("msearch")
 @class_serializer("MultiSearchJsonConverter")
 class MultiSearchRequest extends RequestBase {
-	operations: Dictionary<string, SearchRequest>[];
+	operations: Dictionary<string, SearchRequest>;
 	@request_parameter()
 	search_type: SearchType;
 	@request_parameter()
@@ -8193,7 +8193,7 @@ class RenderSearchTemplateRequest extends RequestBase {
 	source: string;
 	inline: string;
 	file: string;
-	params: Dictionary<string, any>[];
+	params: Dictionary<string, any>;
 }
 @namespace("search.validate")
 @rest_spec_name("indices.validate_query")
@@ -8396,7 +8396,7 @@ class PreviewDatafeedRequest extends RequestBase {
 @namespace("x_pack.machine_learning.put_datafeed")
 @rest_spec_name("xpack.ml.put_datafeed")
 class PutDatafeedRequest extends RequestBase {
-	aggregations: Dictionary<string, AggregationContainer>[];
+	aggregations: Dictionary<string, AggregationContainer>;
 	chunking_config: ChunkingConfig;
 	frequency: Time;
 	@prop_serializer("IndicesJsonConverter")
@@ -8404,7 +8404,7 @@ class PutDatafeedRequest extends RequestBase {
 	job_id: Id;
 	query: QueryContainer;
 	query_delay: Time;
-	script_fields: Dictionary<string, ScriptField>[];
+	script_fields: Dictionary<string, ScriptField>;
 	scroll_size: integer;
 	@prop_serializer("TypesJsonConverter")
 	types: Types;
@@ -8443,7 +8443,7 @@ class StopDatafeedRequest extends RequestBase {
 @namespace("x_pack.machine_learning.update_data_feed")
 @rest_spec_name("xpack.ml.update_datafeed")
 class UpdateDatafeedRequest extends RequestBase {
-	aggregations: Dictionary<string, AggregationContainer>[];
+	aggregations: Dictionary<string, AggregationContainer>;
 	chunking_config: ChunkingConfig;
 	frequency: Time;
 	@prop_serializer("IndicesJsonConverter")
@@ -8451,7 +8451,7 @@ class UpdateDatafeedRequest extends RequestBase {
 	job_id: Id;
 	query: QueryContainer;
 	query_delay: Time;
-	script_fields: Dictionary<string, ScriptField>[];
+	script_fields: Dictionary<string, ScriptField>;
 	scroll_size: integer;
 	@prop_serializer("TypesJsonConverter")
 	types: Types;
@@ -8461,7 +8461,7 @@ class UpdateDatafeedRequest extends RequestBase {
 class UpdateJobRequest extends RequestBase {
 	analysis_limits: AnalysisMemoryLimit;
 	background_persist_interval: Time;
-	custom_settings: Dictionary<string, any>[];
+	custom_settings: Dictionary<string, any>;
 	description: string;
 	model_plot_config: ModelPlotConfigEnabled;
 	model_snapshot_retention_days: long;
@@ -8515,7 +8515,7 @@ class GetRoleMappingRequest extends RequestBase {
 @rest_spec_name("xpack.security.put_role_mapping")
 class PutRoleMappingRequest extends RequestBase {
 	run_as: string[];
-	metadata: Dictionary<string, any>[];
+	metadata: Dictionary<string, any>;
 	enabled: boolean;
 	roles: string[];
 	rules: RoleMappingRuleBase;
@@ -8542,7 +8542,7 @@ class PutRoleRequest extends RequestBase {
 	cluster: string[];
 	run_as: string[];
 	indices: IndicesPrivileges[];
-	metadata: Dictionary<string, any>[];
+	metadata: Dictionary<string, any>;
 	@request_parameter()
 	refresh: Refresh;
 }
@@ -8592,7 +8592,7 @@ class PutUserRequest extends RequestBase {
 	roles: string[];
 	full_name: string;
 	email: string;
-	metadata: Dictionary<string, any>[];
+	metadata: Dictionary<string, any>;
 	@request_parameter()
 	refresh: Refresh;
 }
@@ -8626,8 +8626,8 @@ class ExecuteWatchRequest extends RequestBase {
 	trigger_data: ScheduleTriggerEvent;
 	ignore_condition: boolean;
 	record_execution: boolean;
-	alternative_input: Dictionary<string, any>[];
-	action_modes: Dictionary<string, ActionExecutionMode>[];
+	alternative_input: Dictionary<string, any>;
+	action_modes: Dictionary<string, ActionExecutionMode>;
 	simulated_actions: SimulatedActions;
 	watch: PutWatchRequest;
 	@request_parameter()
@@ -8640,13 +8640,13 @@ class GetWatchRequest extends RequestBase {
 @namespace("x_pack.watcher.put_watch")
 @rest_spec_name("xpack.watcher.put_watch")
 class PutWatchRequest extends RequestBase {
-	metadata: Dictionary<string, any>[];
+	metadata: Dictionary<string, any>;
 	trigger: TriggerContainer;
 	input: InputContainer;
 	throttle_period: string;
 	condition: ConditionContainer;
 	transform: TransformContainer;
-	actions: Dictionary<string, Action>[];
+	actions: Dictionary<string, Action>;
 	@request_parameter()
 	master_timeout: Time;
 	@request_parameter()
@@ -8681,21 +8681,21 @@ class ClusterStatsResponse extends NodesResponseBase {
 @namespace("cluster.nodes_info")
 class NodesInfoResponse extends NodesResponseBase {
 	cluster_name: string;
-	nodes: Dictionary<string, NodeInfo>[];
+	nodes: Dictionary<string, NodeInfo>;
 }
 @namespace("cluster.nodes_stats")
 class NodesStatsResponse extends NodesResponseBase {
 	cluster_name: string;
-	nodes: Dictionary<string, NodeStats>[];
+	nodes: Dictionary<string, NodeStats>;
 }
 @namespace("cluster.nodes_usage")
 class NodesUsageResponse extends NodesResponseBase {
 	cluster_name: string;
-	nodes: Dictionary<string, NodeUsageInformation>[];
+	nodes: Dictionary<string, NodeUsageInformation>;
 }
 @namespace("cluster.remote_info")
 class RemoteInfoResponse extends DictionaryResponseBase<string, RemoteInfo> {
-	remotes: Dictionary<string, RemoteInfo>[];
+	remotes: Dictionary<string, RemoteInfo>;
 }
 @namespace("document.single.create")
 @rest_spec_name("create")
@@ -8746,15 +8746,15 @@ class BulkAliasResponse extends AcknowledgedResponseBase {
 }
 @namespace("indices.alias_management.get_alias")
 class GetAliasResponse extends DictionaryResponseBase<IndexName, IndexAliases> {
-	indices: Dictionary<IndexName, IndexAliases>[];
+	indices: Dictionary<IndexName, IndexAliases>;
 	is_valid: boolean;
 }
 @namespace("indices.index_management.create_index")
 @rest_spec_name("indices.create")
 class CreateIndexRequest extends RequestBase {
-	settings: Dictionary<string, any>[];
-	mappings: Dictionary<TypeName, TypeMapping>[];
-	aliases: Dictionary<IndexName, Alias>[];
+	settings: Dictionary<string, any>;
+	mappings: Dictionary<TypeName, TypeMapping>;
+	aliases: Dictionary<IndexName, Alias>;
 	@request_parameter()
 	wait_for_active_shards: string;
 	@request_parameter()
@@ -8773,7 +8773,7 @@ class DeleteIndexResponse extends IndicesResponseBase {
 }
 @namespace("indices.index_management.get_index")
 class GetIndexResponse extends DictionaryResponseBase<IndexName, IndexState> {
-	indices: Dictionary<IndexName, IndexState>[];
+	indices: Dictionary<IndexName, IndexState>;
 }
 @namespace("indices.index_management.open_close_index.close_index")
 class CloseIndexResponse extends AcknowledgedResponseBase {
@@ -8785,9 +8785,9 @@ class OpenIndexResponse extends AcknowledgedResponseBase {
 @rest_spec_name("indices.rollover")
 class RolloverIndexRequest extends RequestBase {
 	conditions: RolloverConditions;
-	settings: Dictionary<string, any>[];
-	aliases: Dictionary<IndexName, Alias>[];
-	mappings: Dictionary<TypeName, TypeMapping>[];
+	settings: Dictionary<string, any>;
+	aliases: Dictionary<IndexName, Alias>;
+	mappings: Dictionary<TypeName, TypeMapping>;
 	@request_parameter()
 	timeout: Time;
 	@request_parameter()
@@ -8803,7 +8803,7 @@ class RolloverIndexResponse extends AcknowledgedResponseBase {
 	new_index: string;
 	old_index: string;
 	rolled_over: boolean;
-	conditions: Dictionary<string, boolean>[];
+	conditions: Dictionary<string, boolean>;
 	shards_acknowledged: boolean;
 }
 @namespace("indices.index_management.shrink_index")
@@ -8812,14 +8812,14 @@ class ShrinkIndexResponse extends AcknowledgedResponseBase {
 }
 @namespace("indices.index_settings.get_index_settings")
 class GetIndexSettingsResponse extends DictionaryResponseBase<IndexName, IndexState> {
-	indices: Dictionary<IndexName, IndexState>[];
+	indices: Dictionary<IndexName, IndexState>;
 }
 @namespace("indices.index_settings.index_templates.delete_index_template")
 class DeleteIndexTemplateResponse extends AcknowledgedResponseBase {
 }
 @namespace("indices.index_settings.index_templates.get_index_template")
 class GetIndexTemplateResponse extends DictionaryResponseBase<string, TemplateMapping> {
-	template_mappings: Dictionary<string, TemplateMapping>[];
+	template_mappings: Dictionary<string, TemplateMapping>;
 }
 @namespace("indices.index_settings.index_templates.put_index_template")
 @rest_spec_name("indices.put_template")
@@ -8827,9 +8827,9 @@ class PutIndexTemplateRequest extends RequestBase {
 	index_patterns: string[];
 	order: integer;
 	version: integer;
-	settings: Dictionary<string, any>[];
-	mappings: Dictionary<TypeName, TypeMapping>[];
-	aliases: Dictionary<IndexName, Alias>[];
+	settings: Dictionary<string, any>;
+	mappings: Dictionary<TypeName, TypeMapping>;
+	aliases: Dictionary<IndexName, Alias>;
 	@request_parameter()
 	create: boolean;
 	@request_parameter()
@@ -8847,13 +8847,13 @@ class UpdateIndexSettingsResponse extends AcknowledgedResponseBase {
 }
 @namespace("indices.mapping_management.get_field_mapping")
 class GetFieldMappingResponse extends DictionaryResponseBase<IndexName, TypeFieldMappings> {
-	indices: Dictionary<IndexName, TypeFieldMappings>[];
+	indices: Dictionary<IndexName, TypeFieldMappings>;
 	is_valid: boolean;
 }
 @namespace("indices.mapping_management.get_mapping")
 class GetMappingResponse extends DictionaryResponseBase<IndexName, IndexMappings> {
-	indices: Dictionary<IndexName, IndexMappings>[];
-	mappings: Dictionary<IndexName, IndexMappings>[];
+	indices: Dictionary<IndexName, IndexMappings>;
+	mappings: Dictionary<IndexName, IndexMappings>;
 	mapping: TypeMapping;
 }
 @namespace("indices.mapping_management.put_mapping")
@@ -8862,13 +8862,13 @@ class PutMappingRequest extends RequestBase {
 	all_field: AllField;
 	date_detection: boolean;
 	dynamic_date_formats: string[];
-	dynamic_templates: Dictionary<string, DynamicTemplate>[];
+	dynamic_templates: Dictionary<string, DynamicTemplate>;
 	dynamic: Union<boolean, DynamicMapping>;
 	field_names_field: FieldNamesField;
 	index_field: IndexField;
-	meta: Dictionary<string, any>[];
+	meta: Dictionary<string, any>;
 	numeric_detection: boolean;
-	properties: Dictionary<PropertyName, IProperty>[];
+	properties: Dictionary<PropertyName, IProperty>;
 	routing_field: RoutingField;
 	size_field: SizeField;
 	source_field: SourceField;
@@ -8890,7 +8890,7 @@ class PutMappingResponse extends IndicesResponseBase {
 }
 @namespace("indices.monitoring.indices_recovery")
 class RecoveryStatusResponse extends DictionaryResponseBase<IndexName, RecoveryStatus> {
-	indices: Dictionary<IndexName, RecoveryStatus>[];
+	indices: Dictionary<IndexName, RecoveryStatus>;
 }
 @namespace("indices.status_management.clear_cache")
 class ClearCacheResponse extends ShardsOperationResponseBase {
@@ -8912,7 +8912,7 @@ class DeletePipelineResponse extends AcknowledgedResponseBase {
 }
 @namespace("ingest.get_pipeline")
 class GetPipelineResponse extends DictionaryResponseBase<string, Pipeline> {
-	pipelines: Dictionary<string, Pipeline>[];
+	pipelines: Dictionary<string, Pipeline>;
 }
 @namespace("ingest.put_pipeline")
 @rest_spec_name("ingest.put_pipeline")
@@ -8955,7 +8955,7 @@ class SearchTemplateRequest extends RequestBase {
 	source: string;
 	inline: string;
 	id: string;
-	params: Dictionary<string, any>[];
+	params: Dictionary<string, any>;
 	@request_parameter()
 	ignore_unavailable: boolean;
 	@request_parameter()
@@ -8993,19 +8993,19 @@ class SearchRequest extends RequestBase {
 	docvalue_fields: Field[];
 	@request_parameter()
 	stored_fields: Field[];
-	script_fields: Dictionary<string, ScriptField>[];
+	script_fields: Dictionary<string, ScriptField>;
 	_source: Union<boolean, SourceFilter>;
 	sort: Sort[];
 	search_after: any[];
-	indices_boost: Dictionary<IndexName, double>[];
+	indices_boost: Dictionary<IndexName, double>;
 	post_filter: QueryContainer;
 	slice: SlicedScroll;
 	query: QueryContainer;
 	rescore: Rescore[];
-	suggest: Dictionary<string, SuggestBucket>[];
+	suggest: Dictionary<string, SuggestBucket>;
 	highlight: Highlight;
 	collapse: FieldCollapse;
-	aggs: Dictionary<string, AggregationContainer>[];
+	aggs: Dictionary<string, AggregationContainer>;
 	@request_parameter()
 	analyzer: string;
 	@request_parameter()
@@ -9090,15 +9090,15 @@ class ValidateJobResponse extends AcknowledgedResponseBase {
 }
 @namespace("x_pack.security.role_mapping.get_role_mapping")
 class GetRoleMappingResponse extends DictionaryResponseBase<string, XPackRoleMapping> {
-	role_mappings: Dictionary<string, XPackRoleMapping>[];
+	role_mappings: Dictionary<string, XPackRoleMapping>;
 }
 @namespace("x_pack.security.role.get_role")
 class GetRoleResponse extends DictionaryResponseBase<string, XPackRole> {
-	roles: Dictionary<string, XPackRole>[];
+	roles: Dictionary<string, XPackRole>;
 }
 @namespace("x_pack.security.user.get_user")
 class GetUserResponse extends DictionaryResponseBase<string, XPackUser> {
-	users: Dictionary<string, XPackUser>[];
+	users: Dictionary<string, XPackUser>;
 }
 @namespace("x_pack.watcher.restart_watcher")
 class RestartWatcherResponse extends AcknowledgedResponseBase {
@@ -9113,7 +9113,7 @@ class StopWatcherResponse extends AcknowledgedResponseBase {
 class ObjectProperty extends CorePropertyBase {
 	dynamic: Union<boolean, DynamicMapping>;
 	enabled: boolean;
-	properties: Dictionary<PropertyName, IProperty>[];
+	properties: Dictionary<PropertyName, IProperty>;
 }
 @namespace("mapping.types.core.text")
 class TextProperty extends CorePropertyBase {
@@ -9471,7 +9471,7 @@ class ThreadStats {
 }
 @namespace("cluster.nodes_stats")
 class GarbageCollectionStats {
-	collectors: Dictionary<string, GarbageCollectionGenerationStats>[];
+	collectors: Dictionary<string, GarbageCollectionGenerationStats>;
 }
 @namespace("cluster.nodes_stats")
 class GarbageCollectionGenerationStats {
@@ -9545,7 +9545,7 @@ class DataFeed {
 }
 @namespace("x_pack.info.x_pack_usage")
 class AlertingExecution {
-	actions: Dictionary<string, ExecutionAction>[];
+	actions: Dictionary<string, ExecutionAction>;
 }
 @namespace("x_pack.info.x_pack_usage")
 class ExecutionAction {

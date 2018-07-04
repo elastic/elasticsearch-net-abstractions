@@ -40,8 +40,9 @@ namespace Nest.TypescriptGenerator
 
 			var asCollection = tsProperty.PropertyType as TsCollection;
 			var isCollection = asCollection != null;
+			if (typeof(IIsADictionary).IsAssignableFrom(tsProperty.PropertyType.Type)) return memberTypeName;
 
-			return memberTypeName.StartsWith("Map<")
+			return memberTypeName.StartsWith("Dictionary<")
 				? memberTypeName
 				: memberTypeName + (isCollection ? string.Concat(Enumerable.Repeat("[]", asCollection.Dimension)) : "");
 		}
@@ -90,8 +91,13 @@ namespace Nest.TypescriptGenerator
 		private string WriteArrayIfCollection(TsType a)
 		{
 			var fullyQualifiedTypeName = _scriptGenerator.GetFullyQualifiedTypeName(a);
+			if (typeof(IIsADictionary).IsAssignableFrom(a.Type)) return fullyQualifiedTypeName;
+			if (a is TsCollection)
+			{
 
-			return a is TsCollection && !fullyQualifiedTypeName.StartsWith("Map<")
+			}
+
+			return a is TsCollection && !fullyQualifiedTypeName.StartsWith("Dictionary<")
 				? fullyQualifiedTypeName + "[]"
 				: fullyQualifiedTypeName;
 		}

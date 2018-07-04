@@ -72,7 +72,7 @@ namespace Nest.TypescriptGenerator
 				if (readingType) symbolContents.Enqueue(l);
 				else additionalLines.Add(l);
 
-				if (l == "}" && readingType)
+				if ((l == "}" || l.EndsWith("extends String {}")) && readingType)
 				{
 					readingType = false;
 					DumpFile(currentNamespace, currentSymbol, symbolContents, currentSpecName);
