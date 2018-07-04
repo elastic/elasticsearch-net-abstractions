@@ -136,7 +136,7 @@ namespace Nest.TypescriptGenerator
 			return true;
 		}
 
-		private static readonly Regex SymbolRe = new Regex(@"^(?:class|enum|interface) (?<symbol>.+?)(?: extends.+$| \{.*?$|$)");
+		private static readonly Regex SymbolRe = new Regex(@"^(?:class|enum|interface) (?<symbol>.+?)(?: (extends|implements).+$| \{.*?$|$)");
 		private static bool TryGetSymbol(string l, out string symbol)
 		{
 			symbol = null;
