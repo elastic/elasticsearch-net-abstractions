@@ -86,7 +86,6 @@ namespace Elastic.Managed.Ephemeral
 			NodeStarted = true;
 		}
 
-
 		public void OnAfterStart()
 		{
 			if (this.Cluster.ClusterConfiguration.SkipBuiltInAfterStartTasks) return;

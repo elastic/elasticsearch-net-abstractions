@@ -39,9 +39,10 @@ namespace Elastic.Managed
 		protected ClusterBase(TConfiguration clusterConfiguration)
 		{
 			this.ClusterConfiguration = clusterConfiguration;
+			this.ClusterMoniker = this.GetType().Name.Replace("Cluster", "");
 
 			var nodes = Enumerable.Range(this.ClusterConfiguration.StartingPortNumber, this.ClusterConfiguration.NumberOfNodes)
-				.Select(p => new NodeConfiguration(clusterConfiguration, p)
+				.Select(p => new NodeConfiguration(clusterConfiguration, p, this.ClusterMoniker)
 				{
 					ShowElasticsearchOutputAfterStarted =  clusterConfiguration.ShowElasticsearchOutputAfterStarted
 				})
@@ -51,7 +52,6 @@ namespace Elastic.Managed
 				})
 				.ToList();
 			this.Nodes = new ReadOnlyCollection<ElasticsearchNode>(nodes);
-			this.ClusterMoniker = this.GetType().Name.Replace("Cluster", "");
 		}
 
 		/// <summary> A short name to identify the cluster defaults to the <see cref="ClusterBase"/> subclass name with Cluster removed </summary>

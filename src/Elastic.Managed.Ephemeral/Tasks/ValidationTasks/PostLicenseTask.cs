@@ -8,7 +8,11 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 		public override void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster)
 		{
 			if (!cluster.ClusterConfiguration.XPackInstalled) return;
-			if (string.IsNullOrWhiteSpace(cluster.ClusterConfiguration.XPackLicenseJson)) return;
+			if (string.IsNullOrWhiteSpace(cluster.ClusterConfiguration.XPackLicenseJson))
+			{
+				cluster.Writer.WriteDiagnostic($"{{{nameof(PostLicenseTask)}}} no license file available to post");
+				return;
+			}
 
 			cluster.Writer.WriteDiagnostic($"{{{nameof(PostLicenseTask)}}} attempting to post license json");
 

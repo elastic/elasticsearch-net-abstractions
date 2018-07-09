@@ -59,7 +59,6 @@ namespace Elastic.Managed.Ephemeral
 			return $"{this.NodePrefix}-node-{suffix}{node}";
 		}
 
-
 		protected virtual string NodePrefix => "ephemeral";
 
 		private static readonly ElasticsearchVersion LastVersionThatAcceptedShieldSettings = "5.0.0-alpha1";

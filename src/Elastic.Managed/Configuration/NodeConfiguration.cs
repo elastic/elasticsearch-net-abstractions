@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using Elastic.Managed.FileSystem;
 
@@ -7,11 +8,11 @@ namespace Elastic.Managed.Configuration
 	{
 		public NodeConfiguration(ElasticsearchVersion version, int? port = null) : this(new ClusterConfiguration(version), port) { }
 
-		public NodeConfiguration(IClusterConfiguration<NodeFileSystem> clusterConfiguration, int? port = null)
+		public NodeConfiguration(IClusterConfiguration<NodeFileSystem> clusterConfiguration, int? port = null, string nodePrefix = null)
 		{
 			this.ClusterConfiguration = clusterConfiguration;
 			this.DesiredPort = port;
-			this.DesiredNodeName = clusterConfiguration.CreateNodeName(port);
+			this.DesiredNodeName = this.CreateNodeName(port, nodePrefix) ?? clusterConfiguration.CreateNodeName(port);
 			this.Settings = new NodeSettings(clusterConfiguration.DefaultNodeSettings);
 
 			if (!string.IsNullOrWhiteSpace(this.DesiredNodeName)) this.Settings.Add("node.name", this.DesiredNodeName);
@@ -45,5 +46,12 @@ namespace Elastic.Managed.Configuration
 		}
 
 		public void Add(string key, string value) => this.Settings.Add(key,value);
+
+		private string CreateNodeName(int? node, string prefix = null)
+		{
+			if (prefix == null) return null;
+			var suffix = Guid.NewGuid().ToString("N").Substring(0, 6);
+			return $"{prefix.Replace("Cluster", "").ToLowerInvariant()}-node-{suffix}{node}";
+		}
 	}
 }
