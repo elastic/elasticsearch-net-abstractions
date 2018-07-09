@@ -99,33 +99,7 @@ namespace Nest.TypescriptGenerator
 
 			sb.AppendLine(" {");
 
-			var members = new List<TsProperty>();
-			if ((generatorOutput & TsGeneratorOutput.Properties) == TsGeneratorOutput.Properties)
-			{
-				members.AddRange(classModel.Properties);
-			}
-
-			if ((generatorOutput & TsGeneratorOutput.Fields) == TsGeneratorOutput.Fields)
-			{
-				members.AddRange(classModel.Fields);
-			}
-
-			if (classModel.Type == typeof(PropertyBase))
-
-			using (sb.IncreaseIndentation())
-			{
-				foreach (var property in members)
-				{
-					if (property.IsIgnored ||
-					    PropertyTypesToIgnore(property.PropertyType.Type) ||
-					    (_typesPropertiesToIgnore.ContainsKey(classModel.Type) && _typesPropertiesToIgnore[classModel.Type].Contains(property.Name)))
-						continue;
-
-					AddDocCommentForCustomJsonConverter(sb, property);
-					_docAppender.AppendPropertyDoc(sb, property, this.GetPropertyName(property), this.GetPropertyType(property));
-					sb.AppendLineIndented($"{this.GetPropertyName(property)}: {this.GetPropertyType(property)};");
-				}
-			}
+			GenerateProperties(classModel, sb, generatorOutput);
 
 			sb.AppendLineIndented("}");
 			_generatedClasses.Add(classModel);
@@ -179,16 +153,28 @@ namespace Nest.TypescriptGenerator
 
 			sb.AppendLine(" {");
 
-			var members = new List<TsProperty>();
-			if ((generatorOutput & TsGeneratorOutput.Properties) == TsGeneratorOutput.Properties)
-			{
-				members.AddRange(classModel.Properties);
-			}
+			GenerateProperties(classModel, sb, generatorOutput);
 
-			if ((generatorOutput & TsGeneratorOutput.Fields) == TsGeneratorOutput.Fields)
+			sb.AppendLineIndented("}");
+			_generatedClasses.Add(classModel);
+
+			//generate a closed cat response type (NEST uses catresponse<TRecord> for all)
+			if (typeof(ICatRecord).IsAssignableFrom(classModel.Type))
 			{
-				members.AddRange(classModel.Fields);
+				var catResponseName = classModel.Type.Name.Replace("Record", "Response");
+				AddNamespaceHeader(classModel.Name, sb);
+				sb.AppendLineIndented($"class {catResponseName} extends ResponseBase {{");
+				using (sb.IncreaseIndentation())
+					sb.AppendLineIndented($"records: {typeName}[];");
+				sb.AppendLineIndented("}");
 			}
+		}
+
+		private void GenerateProperties(TsClass classModel, ScriptBuilder sb, TsGeneratorOutput generatorOutput)
+		{
+			var members = new List<TsProperty>();
+			if ((generatorOutput & TsGeneratorOutput.Properties) == TsGeneratorOutput.Properties) members.AddRange(classModel.Properties);
+			if ((generatorOutput & TsGeneratorOutput.Fields) == TsGeneratorOutput.Fields) members.AddRange(classModel.Fields);
 
 			using (sb.IncreaseIndentation())
 			{
@@ -203,26 +189,9 @@ namespace Nest.TypescriptGenerator
 					_docAppender.AppendPropertyDoc(sb, property, this.GetPropertyName(property), this.GetPropertyType(property));
 					sb.AppendLineIndented($"{this.GetPropertyName(property)}: {this.GetPropertyType(property)};");
 				}
+
 				if (classModel.Type == typeof(PropertyBase)) sb.AppendLineIndented($"type: string;");
 			}
-
-			sb.AppendLineIndented("}");
-			_generatedClasses.Add(classModel);
-
-			//generate a closed cat response type (NEST uses catresponse<TRecord> for all)
-			if (typeof(ICatRecord).IsAssignableFrom(classModel.Type))
-			{
-				var catResponseName = classModel.Type.Name.Replace("Record", "Response");
-				AddNamespaceHeader(classModel.Name, sb);
-				sb.AppendLineIndented($"class {catResponseName} extends ResponseBase {{");
-				using (sb.IncreaseIndentation())
-					sb.AppendLineIndented($"records: {typeName}[];");
-				sb.AppendLineIndented("}");
-
-
-			}
-
-
 		}
 
 		private bool AddNamespaceHeaderEnum(string name, string ns, ScriptBuilder sb)
