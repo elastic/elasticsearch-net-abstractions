@@ -60,7 +60,8 @@ namespace Elastic.Managed.Ephemeral.Tasks
 			string query,
 			Func<HttpClient, Uri, CancellationToken, Task<HttpResponseMessage>> verb)
 		{
-			var statusUrl = new UriBuilder(cluster.NodesUris().First()) { Path = path, Query = query }.Uri;
+			var q = string.IsNullOrEmpty(query) ? "pretty=true" : (query + "&pretty=true");
+			var statusUrl = new UriBuilder(cluster.NodesUris().First()) { Path = path, Query = q }.Uri;
 
 			var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(20));
 			var handler = new HttpClientHandler
@@ -83,6 +84,10 @@ namespace Elastic.Managed.Ephemeral.Tasks
 				{
 					var response = verb(client, statusUrl, tokenSource.Token).ConfigureAwait(false).GetAwaiter().GetResult();
 					if (response.StatusCode == HttpStatusCode.OK) return response;
+					cluster.Writer.WriteDiagnostic($"{{{nameof(Call)}}} [{statusUrl.PathAndQuery}] Bad status code: [{(int)response.StatusCode}]");
+					var body = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+					foreach(var l in (body ?? string.Empty).Split('\n','\r'))
+						cluster.Writer.WriteDiagnostic($"{{{nameof(Call)}}} [{statusUrl.PathAndQuery}] returned [{l}]");
 				}
 				catch
 				{

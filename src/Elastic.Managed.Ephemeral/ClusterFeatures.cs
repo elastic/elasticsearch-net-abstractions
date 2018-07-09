@@ -26,4 +26,14 @@ namespace Elastic.Managed.Ephemeral
 		/// </summary>
 		SSL = 1 << 3,
 	}
+
+	/// <summary>
+	/// As of 6.3.0 x-pack is included by default, this enum allows you to optionally make ephemeral cluster accept the basic license or start a trial
+	/// </summary>
+	public enum XPackTrialMode
+	{
+		None,
+		Basic,
+		Trial
+	}
 }

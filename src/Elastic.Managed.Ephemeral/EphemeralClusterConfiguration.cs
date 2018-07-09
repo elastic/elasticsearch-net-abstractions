@@ -20,7 +20,9 @@ namespace Elastic.Managed.Ephemeral
 		public EphemeralClusterConfiguration(ElasticsearchVersion version, ClusterFeatures features = ClusterFeatures.None, ElasticsearchPlugins plugins = null, int numberOfNodes = 1)
 			: base(version, (v, s) => new EphemeralFileSystem(v, s), numberOfNodes, EphemeralClusterName)
 		{
+			this.TrialMode = XPackTrialMode.None;
 			this.Features = features;
+
 
 			var pluginsList = plugins?.ToList() ?? new List<ElasticsearchPlugin>();
 			if (this.Features.HasFlag(ClusterFeatures.XPack) && !pluginsList.Any(p=>p.Moniker == "x-pack"))
@@ -52,6 +54,7 @@ namespace Elastic.Managed.Ephemeral
 		public bool SkipBuiltInAfterStartTasks { get; set; }
 		/// <summary> If not null or empty will be posted as the x-pack license to use. </summary>
 		public string XPackLicenseJson { get; set; }
+		public XPackTrialMode TrialMode { get; set; }
 
 		public override string CreateNodeName(int? node)
 		{
