@@ -92,7 +92,7 @@ namespace Elastic.Managed.Ephemeral
 			var tasks = new List<IClusterComposeTask>(AfterStartedTasks);
 			if (this.Cluster.ClusterConfiguration.AdditionalAfterStartedTasks != null)
 				tasks.AddRange(this.Cluster.ClusterConfiguration.AdditionalAfterStartedTasks);
-			Itterate(tasks, (t, c, fs) => t.Run(c));
+			Itterate(tasks, (t, c, fs) => t.Run(c), false);
 		}
 
 		private readonly object _lock = new object();
@@ -109,7 +109,6 @@ namespace Elastic.Managed.Ephemeral
 					}
 					catch (Exception e)
 					{
-						Console.WriteLine(e);
 						if (callOnStop) this.OnStop();
 						throw;
 					}

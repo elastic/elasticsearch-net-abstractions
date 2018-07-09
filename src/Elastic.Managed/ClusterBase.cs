@@ -105,7 +105,7 @@ namespace Elastic.Managed
 			}
 			catch (Exception e)
 			{
-				writer?.WriteError(e.Message);
+				writer?.WriteError(e.ToString());
 				throw;
 			}
 

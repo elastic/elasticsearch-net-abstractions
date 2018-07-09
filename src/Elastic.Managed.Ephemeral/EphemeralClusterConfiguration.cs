@@ -54,6 +54,10 @@ namespace Elastic.Managed.Ephemeral
 		public bool SkipBuiltInAfterStartTasks { get; set; }
 		/// <summary> If not null or empty will be posted as the x-pack license to use. </summary>
 		public string XPackLicenseJson { get; set; }
+		/// <summary>
+		/// From 6.3.0 and up this property allows you to control what type of license is applied (trial/basic) in the absense of
+		/// <see cref="XPackLicenseJson"/>
+		/// </summary>
 		public XPackTrialMode TrialMode { get; set; }
 
 		public override string CreateNodeName(int? node)

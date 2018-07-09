@@ -46,6 +46,7 @@ namespace ScratchPad
 				ShowElasticsearchOutputAfterStarted = true,
 				PrintYamlFilesInConfigFolder = false,
 				CacheEsHomeInstallation = true,
+				TrialMode = XPackTrialMode.Trial
 			};
 
 			using (var cluster = new EphemeralCluster(config))
