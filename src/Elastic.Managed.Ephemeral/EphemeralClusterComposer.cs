@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http.Headers;
+using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.Ephemeral.Tasks;
 using Elastic.Managed.Ephemeral.Tasks.AfterNodeStoppedTasks;
 using Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks;

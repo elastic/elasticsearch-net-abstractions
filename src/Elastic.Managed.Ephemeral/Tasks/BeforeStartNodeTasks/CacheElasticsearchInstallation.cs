@@ -9,7 +9,6 @@ namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks
 		{
 			if (!cluster.ClusterConfiguration.CacheEsHomeInstallation) return;
 
-
 			var fs = cluster.FileSystem;
 			var cachedEsHomeFolder = Path.Combine(fs.LocalFolder, cluster.GetCacheFolderName());
 			var cachedelasticsearchYaml = Path.Combine(cachedEsHomeFolder, "config", "elasticsearch.yml");
@@ -18,7 +17,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks
 			var source = fs.ElasticsearchHome;
 			var target = cachedEsHomeFolder;
 			cluster.Writer?.WriteDiagnostic($"{{{nameof(CacheElasticsearchInstallation)}}} caching {{{source}}} to [{target}]");
-			CopyFolder(source, target);
+			CopyFolder(source, target, false);
 		}
 
 	}
