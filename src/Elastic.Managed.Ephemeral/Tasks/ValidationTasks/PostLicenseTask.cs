@@ -30,7 +30,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 			var c = cluster.ClusterConfiguration;
 			if (c.Version < "6.3.0" || c.TrialMode == XPackTrialMode.None)
 			{
-				cluster.Writer.WriteDiagnostic($"{{{nameof(PostLicenseTask)}}} < 6.3.0 or opting out of explicit basic/trial license");
+				cluster.Writer.WriteDiagnostic($"{{{nameof(PostLicenseTask)}}} {c.Version} < 6.3.0 or opting out of explicit basic/trial license");
 				return;
 			}
 
