@@ -51,10 +51,10 @@ namespace Elastic.Managed.Ephemeral
 		protected static IEnumerable<IClusterComposeTask> AfterStartedTasks  { get; } = new List<IClusterComposeTask>
 		{
 			new ValidateRunningVersion(),
+			new ValidateClusterStateTask(),
 			new PostLicenseTask(),
 			new ValidateLicenseTask(),
 			new ValidatePluginsTask(),
-			new ValidateClusterStateTask()
 		};
 	}
 
