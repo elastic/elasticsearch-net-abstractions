@@ -21,10 +21,14 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 		private string GetLicenseStatus(IEphemeralCluster<EphemeralClusterConfiguration> cluster) => LicenseInfo(cluster, "license.status");
 		private string GetLicenseType(IEphemeralCluster<EphemeralClusterConfiguration> cluster) => LicenseInfo(cluster, "license.type");
 
-		private string LicenseInfo(IEphemeralCluster<EphemeralClusterConfiguration> cluster, string filter)
+		private string LicenseInfo(IEphemeralCluster<EphemeralClusterConfiguration> cluster, string filter, int retries = 0)
 		{
 			var getLicense = this.Get(cluster, "_xpack/license", "filter_path=" + filter);
-			if (getLicense == null || !getLicense.IsSuccessStatusCode) throw new Exception($"Calling GET _xpack/license did not result in an OK response");
+			if ((getLicense == null || !getLicense.IsSuccessStatusCode) && retries >= 5)
+				throw new Exception($"Calling GET _xpack/license did not result in an OK response after trying {retries}");
+
+			if (getLicense == null || !getLicense.IsSuccessStatusCode) return LicenseInfo(cluster, filter, ++retries);
+
 			var licenseStatusString = this.GetResponseString(getLicense)
 				.Where(c => !new[] {' ', '\n', '{', '"', '}'}.Contains(c))
 				.ToArray();
