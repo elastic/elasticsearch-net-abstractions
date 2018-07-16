@@ -23,6 +23,7 @@ namespace Elastic.Xunit.Sdk
 		{
 			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.Version), this.Options.Version);
 			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), this.Options.RunIntegrationTests);
+			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.IntegrationTestsMayUseAlreadyRunningNode), this.Options.IntegrationTestsMayUseAlreadyRunningNode);
 			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), this.Options.RunUnitTests);
 			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.TestFilter), this.Options.TestFilter);
 			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.ClusterFilter), this.Options.ClusterFilter);

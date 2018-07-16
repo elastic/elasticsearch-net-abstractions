@@ -62,7 +62,7 @@ namespace Elastic.Managed
 
 		public ReadOnlyCollection<ElasticsearchNode> Nodes { get; }
 		public bool Started { get; private set; }
-		public IConsoleLineWriter Writer { get; private set; }
+		public IConsoleLineWriter Writer { get; private set; } = NoopConsoleLineWriter.Instance;
 
 		protected virtual void SeedCluster() { }
 
@@ -73,7 +73,7 @@ namespace Elastic.Managed
 
 		public IDisposable Start(IConsoleLineWriter writer, TimeSpan waitForStarted)
 		{
-			this.Writer = writer;
+			this.Writer = writer ?? NoopConsoleLineWriter.Instance;
 
 			this.OnBeforeStart();
 

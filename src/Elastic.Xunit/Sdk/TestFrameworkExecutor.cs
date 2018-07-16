@@ -19,12 +19,14 @@ namespace Elastic.Xunit.Sdk
 		{
 			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.Version), this.Options.Version);
 			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), this.Options.RunIntegrationTests);
+			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.IntegrationTestsMayUseAlreadyRunningNode), this.Options.IntegrationTestsMayUseAlreadyRunningNode);
 			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), this.Options.RunUnitTests);
 			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.TestFilter), this.Options.TestFilter);
 			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.ClusterFilter), this.Options.ClusterFilter);
 
 			executionOptions.SetValue(nameof(ElasticXunitRunOptions.Version), this.Options.Version);
 			executionOptions.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), this.Options.RunIntegrationTests);
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.IntegrationTestsMayUseAlreadyRunningNode), this.Options.IntegrationTestsMayUseAlreadyRunningNode);
 			executionOptions.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), this.Options.RunUnitTests);
 			executionOptions.SetValue(nameof(ElasticXunitRunOptions.TestFilter), this.Options.TestFilter);
 			executionOptions.SetValue(nameof(ElasticXunitRunOptions.ClusterFilter), this.Options.ClusterFilter);
@@ -37,6 +39,7 @@ namespace Elastic.Xunit.Sdk
 		{
 			executionOptions.SetValue(nameof(ElasticXunitRunOptions.Version), this.Options.Version);
 			executionOptions.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), this.Options.RunIntegrationTests);
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.IntegrationTestsMayUseAlreadyRunningNode), this.Options.IntegrationTestsMayUseAlreadyRunningNode);
 			executionOptions.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), this.Options.RunUnitTests);
 			executionOptions.SetValue(nameof(ElasticXunitRunOptions.TestFilter), this.Options.TestFilter);
 			executionOptions.SetValue(nameof(ElasticXunitRunOptions.ClusterFilter), this.Options.ClusterFilter);
@@ -47,6 +50,7 @@ namespace Elastic.Xunit.Sdk
 		{
 			options.SetValue(nameof(ElasticXunitRunOptions.Version), this.Options.Version);
 			options.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), this.Options.RunIntegrationTests);
+			options.SetValue(nameof(ElasticXunitRunOptions.IntegrationTestsMayUseAlreadyRunningNode), this.Options.IntegrationTestsMayUseAlreadyRunningNode);
 			options.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), this.Options.RunUnitTests);
 			options.SetValue(nameof(ElasticXunitRunOptions.TestFilter), this.Options.TestFilter);
 			options.SetValue(nameof(ElasticXunitRunOptions.ClusterFilter), this.Options.ClusterFilter);

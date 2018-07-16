@@ -11,12 +11,13 @@ namespace Elastic.Xunit.ExampleComplex
 	/// </summary>
 	public class MyRunOptions : ElasticXunitRunOptions
 	{
-		public static ElasticsearchVersion TestVersion { get; } = "6.2.3";
+		public static ElasticsearchVersion TestVersion { get; } = "6.3.0";
 		public MyRunOptions()
 		{
 			this.ClusterFilter = "test";
 			this.RunUnitTests = false;
 			this.RunIntegrationTests = true;
+			this.IntegrationTestsMayUseAlreadyRunningNode = true;
 			this.Version = TestVersion;
 		}
 	}

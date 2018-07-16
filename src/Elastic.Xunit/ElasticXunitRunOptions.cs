@@ -18,6 +18,12 @@ namespace Elastic.Xunit
 		public bool RunIntegrationTests { get; set; } = true;
 
 		/// <summary>
+		/// Setting this to true will assume the cluster that is currently running was started for the purpose of these tests
+		/// Defaults to <c>false</c>
+		/// </summary>
+		public bool IntegrationTestsMayUseAlreadyRunningNode { get; set; } = false;
+
+		/// <summary>
 		/// Informs the runner whether unit tests will be run. Defaults to <c>false</c>.
 		/// If set to <c>true</c> and <see cref="RunIntegrationTests"/> is <c>false</c>, the runner will run all the
 		/// tests in parallel with the maximum degree of parallelism

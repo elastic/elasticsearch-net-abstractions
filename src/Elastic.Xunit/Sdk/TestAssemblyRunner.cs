@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Elastic.Managed.Ephemeral;
+using Elastic.Managed.Ephemeral.Tasks.ValidationTasks;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
@@ -39,6 +40,7 @@ namespace Elastic.Xunit.Sdk
 		{
 			var tests = OrderTestCollections();
 			this.RunIntegrationTests = executionOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.RunIntegrationTests));
+			this.IntegrationTestsMayUseAlreadyRunningNode = executionOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.IntegrationTestsMayUseAlreadyRunningNode));
 			this.RunUnitTests = executionOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.RunUnitTests));
 			this.TestFilter = executionOptions.GetValue<string>(nameof(ElasticXunitRunOptions.TestFilter));
 			this.ClusterFilter = executionOptions.GetValue<string>(nameof(ElasticXunitRunOptions.ClusterFilter));
@@ -54,6 +56,7 @@ namespace Elastic.Xunit.Sdk
 		}
 
 		private bool RunIntegrationTests { get; }
+		private bool IntegrationTestsMayUseAlreadyRunningNode { get; }
 		private bool RunUnitTests { get; }
 		private string TestFilter { get; }
 		private string ClusterFilter { get; }
@@ -128,9 +131,25 @@ namespace Elastic.Xunit.Sdk
 				}
 				else
 				{
+					bool ValidateRunningVersion()
+					{
+						try
+						{
+							var t = new ValidateRunningVersion();
+							t.Run(@group.Key);
+							return true;
+						}
+						catch (Exception e)
+						{
+							return false;
+						}
+
+					}
 					using (@group.Key)
 					{
-						@group.Key?.Start(timeout);
+						if (!this.IntegrationTestsMayUseAlreadyRunningNode || !ValidateRunningVersion())
+							@group.Key?.Start(timeout);
+
 						await @group.ForEachAsync(dop, async g => { await RunTestCollections(messageBus, ctx, g, testFilters); });
 					}
 				}
