@@ -22,7 +22,7 @@ namespace Nest.TypescriptGenerator
 
 		public int Split()
 		{
-			using (var pbar = new ProgressBar(5, "splitting local typedefinitions.ts to elastic-client-generator", new ProgressBarOptions {ForegroundColor = ConsoleColor.Blue}))
+			using (var pbar = new ProgressBar(6, "splitting local typedefinitions.ts to elastic-client-generator", new ProgressBarOptions {ForegroundColor = ConsoleColor.Blue}))
 			{
 				if (Directory.Exists(this._outFolder))
 				{
@@ -39,6 +39,8 @@ namespace Nest.TypescriptGenerator
 				pbar.Tick($"written common.ts");
 				CopyTsConfig();
 				pbar.Tick($"copied tsconfig.json");
+				WriteTsLintFile();
+				pbar.Tick($"wrote empty tslint.json");
 				return 0;
 			}
 		}
@@ -84,6 +86,11 @@ namespace Nest.TypescriptGenerator
 			return additionalLines;
 		}
 
+		private void WriteTsLintFile()
+		{
+			var target = Path.Combine(this._outFolder, "tslint.json");
+			File.WriteAllText(target, "{}");
+		}
 		private void CopyTsConfig()
 		{
 			var tsconfigJson = "tsconfig.json";

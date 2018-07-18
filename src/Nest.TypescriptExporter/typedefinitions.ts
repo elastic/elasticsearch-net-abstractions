@@ -1201,21 +1201,31 @@ class RangePropertyBase extends DocValuesPropertyBase {
 }
 /** namespace:analysis.analyzers **/
 interface IAnalyzer {
+	version: string;
+	type: string;
 }
 /** namespace:analysis.char_filters **/
 interface ICharFilter {
+	version: string;
+	type: string;
 }
 /** namespace:analysis.token_filters **/
 interface ITokenFilter {
+	version: string;
+	type: string;
 }
 /** namespace:analysis.tokenizers **/
 interface ITokenizer {
+	version: string;
+	type: string;
 }
 /** namespace:cat **/
 interface ICatRecord {
 }
 /** namespace:common_abstractions.request **/
 interface IRequest {
+	http_method: HttpMethod;
+	route_values: RouteValues;
 }
 @namespace("cluster.cluster_reroute.commands")
 class ClusterRerouteCommand {
@@ -2172,6 +2182,7 @@ class SlackDynamicAttachment {
 }
 /** namespace:common_abstractions.response **/
 interface IResponse {
+	server_error: ServerError;
 }
 @namespace("mapping.meta_fields.source")
 class SourceField {
@@ -2212,6 +2223,9 @@ class FieldNamesField {
 }
 /** namespace:mapping.types **/
 interface IProperty {
+	name: PropertyName;
+	type: string;
+	local_metadata: Dictionary<string, any>;
 }
 @namespace("query_dsl.nest_specific")
 class RawQuery {
