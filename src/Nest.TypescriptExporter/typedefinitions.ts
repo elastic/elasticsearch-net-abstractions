@@ -4329,7 +4329,7 @@ class SuggestOption<TDocument> {
 class HitsMetadata<T> {
 	total: long;
 	max_score: double;
-	//hits: Hit<T>[];
+	hits: Hit<T>[];
 }
 @namespace("search.validate")
 class ValidationExplanation {
@@ -6201,7 +6201,7 @@ class SearchResponse<T> extends ResponseBase {
 	total: long;
 	max_score: double;
 	documents: T[];
-	//hits: Hit<T>[];
+	hits: Hit<T>[];
 	fields: Dictionary<string, LazyDocument>;
 }
 @namespace("search.validate")

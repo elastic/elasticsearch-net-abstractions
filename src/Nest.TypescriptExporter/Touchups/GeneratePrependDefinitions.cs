@@ -20,7 +20,6 @@ interface SourceDocument {}
 ";
 			var contents = File.ReadAllText(file);
 			contents = contents
-				.Replace("\thits: Hit<T>[];", "\t//hits: Hit<T>[];")
 				.Replace("class Error extends ErrorCause", $"class {nameof(MainError)} extends ErrorCause");
 
 			File.WriteAllText(file, hack);

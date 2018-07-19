@@ -71,7 +71,14 @@ namespace Nest.TypescriptGenerator
 				if (TryGetSymbol(l, out var s))
 					currentSymbol = s;
 
-				if (readingType) symbolContents.Enqueue(l);
+				if (readingType && !string.IsNullOrEmpty(currentSymbol))
+				{
+					if (currentSymbol.StartsWith("SearchResponse"))
+					{
+						if (l.StartsWith("\thits: Hit<")) continue;
+					}
+					symbolContents.Enqueue(l);
+				}
 				else additionalLines.Add(l);
 
 				if ((l == "}" || l.EndsWith("extends String {}")) && readingType)
