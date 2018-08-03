@@ -8,8 +8,8 @@ namespace Elastic.Xunit.XunitPlumbing
 	public class SkippingTestCase : TestMethodTestCase, IXunitTestCase
 	{
 		/// <summary>Used for de-serialization.</summary>
-		protected SkippingTestCase() { }
-		
+		public SkippingTestCase() { }
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SkippingTestCase"/> class.
 		/// </summary>
