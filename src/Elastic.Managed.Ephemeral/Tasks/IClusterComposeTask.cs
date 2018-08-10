@@ -125,6 +125,7 @@ namespace Elastic.Managed.Ephemeral.Tasks
 				throw new Exception($"Expected exit code 0 but recieved ({result.ExitCode}) while executing {description}: {command}");
 
 			var errorOut = result.ConsoleOut.Where(c => c.Error).ToList();
+			// this manifasted when calling certgen on versions smaller then 5.2.0
 			if (errorOut.Any() && config.Version < "5.2.0")
 				errorOut = errorOut.Where(e => !e.Line.Contains("No log4j2 configuration file found")).ToList();
 			if (errorOut.Any(e=>!string.IsNullOrWhiteSpace(e.Line)))
