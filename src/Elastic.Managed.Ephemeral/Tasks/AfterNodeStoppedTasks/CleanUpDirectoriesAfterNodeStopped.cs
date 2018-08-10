@@ -10,6 +10,13 @@ namespace Elastic.Managed.Ephemeral.Tasks.AfterNodeStoppedTasks
 			var fs = cluster.FileSystem;
 			var w = cluster.Writer;
 			var v = cluster.ClusterConfiguration.Version;
+			if (cluster.ClusterConfiguration.NoCleanupAfterNodeStopped)
+			{
+				w.WriteDiagnostic($"{{{nameof(CleanUpDirectoriesAfterNodeStopped)}}} skipping cleanup as requested on cluster configuration");
+				return;
+			}
+
+
 			DeleteDirectory(w, "cluster data", fs.DataPath);
 			DeleteDirectory(w, "cluster config", fs.ConfigPath);
 			DeleteDirectory(w, "cluster logs", fs.LogsPath);

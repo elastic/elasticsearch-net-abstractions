@@ -125,7 +125,9 @@ namespace Elastic.Managed.Ephemeral.Tasks
 				throw new Exception($"Expected exit code 0 but recieved ({result.ExitCode}) while executing {description}: {command}");
 
 			var errorOut = result.ConsoleOut.Where(c => c.Error).ToList();
-			if (errorOut.Any())
+			if (errorOut.Any() && config.Version < "5.2.0")
+				errorOut = errorOut.Where(e => !e.Line.Contains("No log4j2 configuration file found")).ToList();
+			if (errorOut.Any(e=>!string.IsNullOrWhiteSpace(e.Line)))
 				throw new Exception($"Recieved error out with exitCode ({result.ExitCode}) while executing {description}: {command}");
 
 			writer?.WriteDiagnostic($"{{{nameof(ExecuteBinary)}}} finished process [{description}] {{{result.ExitCode}}}");

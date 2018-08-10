@@ -14,6 +14,7 @@ namespace Elastic.Managed.Configuration
 		ElasticsearchVersion Version { get; }
 		int NumberOfNodes { get; }
 		int StartingPortNumber { get; set; }
+		bool NoCleanupAfterNodeStopped { get; set; }
 
 		bool ShowElasticsearchOutputAfterStarted { get; set; }
 		bool CacheEsHomeInstallation { get; set; }
@@ -69,6 +70,8 @@ namespace Elastic.Managed.Configuration
 		public TFileSystem FileSystem { get; }
 		public int NumberOfNodes { get; }
 		public int StartingPortNumber { get; set; } = 9200;
+		public bool NoCleanupAfterNodeStopped { get; set; }
+
 
 		/// <summary> Will print the contents of all the yaml files when starting the cluster up, great for debugging purposes</summary>
 		public bool PrintYamlFilesInConfigFolder { get; set; }

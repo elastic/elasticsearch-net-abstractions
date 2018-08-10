@@ -12,7 +12,11 @@ namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks
 			var fs = cluster.FileSystem;
 			var cachedEsHomeFolder = Path.Combine(fs.LocalFolder, cluster.GetCacheFolderName());
 			var cachedelasticsearchYaml = Path.Combine(cachedEsHomeFolder, "config", "elasticsearch.yml");
-			if (File.Exists(cachedelasticsearchYaml)) return;
+			if (File.Exists(cachedelasticsearchYaml))
+			{
+				cluster.Writer?.WriteDiagnostic($"{{{nameof(CacheElasticsearchInstallation)}}} cached home already exists [{cachedEsHomeFolder}]");
+				return;
+			}
 
 			var source = fs.ElasticsearchHome;
 			var target = cachedEsHomeFolder;

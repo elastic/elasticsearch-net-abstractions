@@ -13,7 +13,7 @@ namespace ScratchPad
 	{
 		public static int Main()
 		{
-			ElasticsearchVersion version = "6.3.0";
+			ElasticsearchVersion version = "5.0.2";
 
 
 //			var clusterConfiguration = new EphemeralClusterConfiguration("6.0.0", numberOfNodes: 2);
@@ -46,7 +46,8 @@ namespace ScratchPad
 				ShowElasticsearchOutputAfterStarted = true,
 				PrintYamlFilesInConfigFolder = false,
 				CacheEsHomeInstallation = true,
-				TrialMode = XPackTrialMode.Trial
+				TrialMode = XPackTrialMode.Trial,
+				NoCleanupAfterNodeStopped = false
 			};
 
 			using (var cluster = new EphemeralCluster(config))
