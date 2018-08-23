@@ -44,7 +44,8 @@ namespace Elastic.Managed
 			var nodes = Enumerable.Range(this.ClusterConfiguration.StartingPortNumber, this.ClusterConfiguration.NumberOfNodes)
 				.Select(p => new NodeConfiguration(clusterConfiguration, p, this.ClusterMoniker)
 				{
-					ShowElasticsearchOutputAfterStarted =  clusterConfiguration.ShowElasticsearchOutputAfterStarted
+					ShowElasticsearchOutputAfterStarted = clusterConfiguration.ShowElasticsearchOutputAfterStarted,
+					ShowElasticsearchOutputAfterDispose = clusterConfiguration.ShowElasticsearchOutputAfterDispose
 				})
 				.Select(n => new ElasticsearchNode(n)
 				{
@@ -146,7 +147,13 @@ namespace Elastic.Managed
 		public void Dispose()
 		{
 			this.Started = false;
-			foreach (var node in this.Nodes) node?.Dispose();
+			foreach (var node in this.Nodes)
+			{
+				if (!node.NodeConfiguration.ShowElasticsearchOutputAfterStarted && node.NodeConfiguration.ShowElasticsearchOutputAfterDispose)
+					node.StartAsyncReads();
+				node?.Dispose();
+			}
+
 			this.OnDispose();
 		}
 	}

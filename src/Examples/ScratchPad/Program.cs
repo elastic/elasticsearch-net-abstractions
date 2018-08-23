@@ -13,41 +13,17 @@ namespace ScratchPad
 	{
 		public static int Main()
 		{
-			ElasticsearchVersion version = "5.0.2";
-
-
-//			var clusterConfiguration = new EphemeralClusterConfiguration("6.0.0", numberOfNodes: 2);
-//			var ephemeralCluster = new EphemeralCluster(clusterConfiguration);
-//			var nodeConfiguration = new NodeConfiguration(clusterConfiguration, 9200);
-//			var elasticsearchNode = new ElasticsearchNode(nodeConfiguration);
-////
-
-//			using (var node = new ElasticsearchNode("5.5.1"))
-//			{
-//				node.Subscribe(new ConsoleOutColorWriter());
-//				node.WaitForStarted(TimeSpan.FromMinutes(2));
-//			}
-//
-//			using (var node = new ElasticsearchNode("6.0.0-beta2", @"c:\Data\elasticsearch-6.0.0-beta2"))
-//			{
-//				node.Subscribe();
-//				node.WaitForStarted(TimeSpan.FromMinutes(2));
-//				Console.ReadKey();
-//			}
-
-//			using (var cluster = new EphemeralCluster("6.0.0"))
-//			{
-//				cluster.Start();
-//			}
+			ElasticsearchVersion version = "6.3.0";
 
 			var plugins = new ElasticsearchPlugins(ElasticsearchPlugin.IngestGeoIp);
-			var config = new EphemeralClusterConfiguration(version, XPack | Security | SSL, plugins, 1)
+			var config = new EphemeralClusterConfiguration(version, plugins, 1)
 			{
-				ShowElasticsearchOutputAfterStarted = true,
+				ShowElasticsearchOutputAfterStarted = false,
+				ShowElasticsearchOutputAfterDispose = true,
 				PrintYamlFilesInConfigFolder = false,
 				CacheEsHomeInstallation = true,
 				TrialMode = XPackTrialMode.Trial,
-				NoCleanupAfterNodeStopped = false
+				NoCleanupAfterNodeStopped = false,
 			};
 
 			using (var cluster = new EphemeralCluster(config))
@@ -65,9 +41,11 @@ namespace ScratchPad
 				var client = new ElasticClient(settings);
 
 				Console.Write(client.XPackInfo().DebugInformation);
+				Console.WriteLine("Press any key to exit");
+				Console.ReadKey();
+				Console.WriteLine("Exitting..");
 			}
-//
-//			Console.WriteLine($".. DONE ...");
+			Console.WriteLine("Done!");
 			return 0;
 		}
 	}

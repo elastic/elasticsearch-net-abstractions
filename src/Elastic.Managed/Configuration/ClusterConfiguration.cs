@@ -17,6 +17,7 @@ namespace Elastic.Managed.Configuration
 		bool NoCleanupAfterNodeStopped { get; set; }
 
 		bool ShowElasticsearchOutputAfterStarted { get; set; }
+		bool ShowElasticsearchOutputAfterDispose { get; set; }
 		bool CacheEsHomeInstallation { get; set; }
 
 		string CreateNodeName(int? node);
@@ -81,6 +82,12 @@ namespace Elastic.Managed.Configuration
 		/// <para>Defaults to <c>true</c></para>
 		/// </summary>
 		public bool ShowElasticsearchOutputAfterStarted { get; set; } = true;
+
+		/// <summary>
+		/// Whether <see cref="ElasticsearchNode" /> should write output again before stopping the node when <see cref="ShowElasticsearchOutputAfterStarted"/> is false.
+		/// <para>Defaults to <c>true</c></para>
+		/// </summary>
+		public bool ShowElasticsearchOutputAfterDispose { get; set; } = true;
 
 		public bool CacheEsHomeInstallation { get; set; }
 

@@ -134,7 +134,15 @@ namespace Elastic.Managed
 		protected override bool KeepBufferingLines(LineOut c)
 		{
 			//if the node is already started only keep buffering lines while we have a writer and the nodeconfiguration wants output after started
-			if (this.NodeStarted) return this.Writer != null && this.NodeConfiguration.ShowElasticsearchOutputAfterStarted;
+			if (this.NodeStarted)
+			{
+				var keepBuffering = this.Writer != null && this.NodeConfiguration.ShowElasticsearchOutputAfterStarted;
+				if (!keepBuffering) this.CancelAsyncReads();
+				// if we want to StartAsyncReadsLater we need to keep this subscription alive otherwise we can bail out early
+				if (this.NodeConfiguration.ShowElasticsearchOutputAfterDispose) return true;
+				// bail out early
+				return keepBuffering;
+			}
 
 			var parsed = LineOutParser.TryParse(c?.Line, out _, out _, out var section, out _, out var message, out var started);
 

@@ -29,6 +29,10 @@ namespace Elastic.Managed.Configuration
 		/// <para>Defaults to true but useful to turn of if it proofs to be too noisy </para>
 		/// </summary>
 		public bool ShowElasticsearchOutputAfterStarted { get; set; } = true;
+		/// <summary>
+		/// Wheter to resubscribe just before disposing and stopping the wrapped elasticsearch process
+		/// </summary>
+		public bool ShowElasticsearchOutputAfterDispose { get; set; } = true;
 
 		/// <summary>
 		/// Copy of <see cref="IClusterConfiguration{TFileSystem}.DefaultNodeSettings" />. Add individual node settings here.
