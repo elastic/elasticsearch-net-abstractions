@@ -31,6 +31,8 @@ namespace Elastic.Managed
 			{
 				SendControlCFirst = true,
 				Environment = EnvVars(config),
+				WaitForExit = config.WaitForShutdown,
+				WaitForStreamReadersTimeout = config.WaitForShutdown
 			};
 			config.ModifyStartArguments(startArguments);
 			return startArguments;
@@ -60,7 +62,6 @@ namespace Elastic.Managed
 				return true;
 			return false;
 		}
-
 
 		public IDisposable Start() => this.Start(TimeSpan.FromMinutes(2));
 

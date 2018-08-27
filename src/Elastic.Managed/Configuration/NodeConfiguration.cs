@@ -7,7 +7,9 @@ namespace Elastic.Managed.Configuration
 {
 	public class NodeConfiguration
 	{
-		public NodeConfiguration(ElasticsearchVersion version, int? port = null) : this(new ClusterConfiguration(version), port) { }
+		public NodeConfiguration(ElasticsearchVersion version, int? port = null) : this(new ClusterConfiguration(version), port)
+		{
+		}
 
 		public NodeConfiguration(IClusterConfiguration<NodeFileSystem> clusterConfiguration, int? port = null, string nodePrefix = null)
 		{
@@ -25,6 +27,7 @@ namespace Elastic.Managed.Configuration
 		public int? DesiredPort { get; }
 		public string DesiredNodeName { get; }
 		private Action<StartArguments> _defaultStartArgs = s => { };
+
 		public Action<StartArguments> ModifyStartArguments
 		{
 			get => _defaultStartArgs;
@@ -36,10 +39,16 @@ namespace Elastic.Managed.Configuration
 		/// <para>Defaults to true but useful to turn of if it proofs to be too noisy </para>
 		/// </summary>
 		public bool ShowElasticsearchOutputAfterStarted { get; set; } = true;
+
 		/// <summary>
 		/// Wheter to resubscribe just before disposing and stopping the wrapped elasticsearch process
 		/// </summary>
 		public bool ShowElasticsearchOutputAfterDispose { get; set; } = true;
+
+		/// <summary>
+		/// The expected duration of the shut down sequence for Elasticsearch. After this wait duration a hard kill will occur.
+		/// </summary>
+		public TimeSpan WaitForShutdown { get; set; } = TimeSpan.FromSeconds(10);
 
 		/// <summary>
 		/// Copy of <see cref="IClusterConfiguration{TFileSystem}.DefaultNodeSettings" />. Add individual node settings here.

@@ -63,7 +63,6 @@ namespace Elastic.Managed
 		/// <summary> A short name to identify the cluster defaults to the <see cref="ClusterBase"/> subclass name with Cluster removed </summary>
 		public virtual string ClusterMoniker { get; }
 
-
 		public TConfiguration ClusterConfiguration { get; }
 		public INodeFileSystem FileSystem => this.ClusterConfiguration.FileSystem;
 
@@ -72,9 +71,7 @@ namespace Elastic.Managed
 		public IConsoleLineWriter Writer { get; private set; } = NoopConsoleLineWriter.Instance;
 
 		private Action<NodeConfiguration, int> _defaultConfigSelector = (n, i) => { };
-		protected virtual void ModifyNodeConfiguration(NodeConfiguration nodeConfiguration, int port)
-		{
-		}
+		protected virtual void ModifyNodeConfiguration(NodeConfiguration nodeConfiguration, int port) { }
 
 		protected virtual void SeedCluster() { }
 
