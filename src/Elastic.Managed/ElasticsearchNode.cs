@@ -125,14 +125,15 @@ namespace Elastic.Managed
 			base.OnBeforeSetCompletedHandle();
 		}
 
-		protected override void OnError(IObserver<CharactersOut> observer, Exception e)
+		protected override void OnBeforeWaitForEndOfStreamsError(TimeSpan waited)
 		{
-			if (e is ObservableProcessException oe && e.Message.StartsWith("Waited"))
-			{
-				HardKill(this.HostProcessId);
-				HardKill(this.JavaProcessId);
-			}
-			base.OnError(observer, e);
+			// The wait for streams finished before streams were fully read.
+			// this usually indicates the process is still running.
+			// Proc will successfully kill the host but will leave the JavaProcess the bat file starts running
+			// The elasticsearch jar is closing down so won't leak but might prevent EphemeralClusterComposer to do its clean up.
+			// We do a hard kill on both here to make sure both processes are gone.
+			HardKill(this.HostProcessId);
+			HardKill(this.JavaProcessId);
 		}
 
 		private static void HardKill(int? processId)
