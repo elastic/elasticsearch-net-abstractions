@@ -49,7 +49,7 @@ namespace Elastic.Managed
 						ShowElasticsearchOutputAfterStarted = clusterConfiguration.ShowElasticsearchOutputAfterStarted,
 						ShowElasticsearchOutputAfterDispose = clusterConfiguration.ShowElasticsearchOutputAfterDispose
 					};
-					this.ModifyNodeConfiguration.Invoke(config, p);
+					this.ModifyNodeConfiguration(config, p);
 					return config;
 				})
 				.Select(n => new ElasticsearchNode(n)
@@ -72,10 +72,8 @@ namespace Elastic.Managed
 		public IConsoleLineWriter Writer { get; private set; } = NoopConsoleLineWriter.Instance;
 
 		private Action<NodeConfiguration, int> _defaultConfigSelector = (n, i) => { };
-		public Action<NodeConfiguration, int> ModifyNodeConfiguration
+		protected virtual void ModifyNodeConfiguration(NodeConfiguration nodeConfiguration, int port)
 		{
-			get => _defaultConfigSelector;
-			set => _defaultConfigSelector = value ?? ((n, i) => { });
 		}
 
 		protected virtual void SeedCluster() { }
