@@ -19,7 +19,7 @@
     <PackageTags>elastic,elasticsearch,cluster,observable,rx</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Proc" Version="0.3.3" />
+    <PackageReference Include="Proc" Version="0.3.4" />
     <!--<ProjectReference Include="..\..\..\..\proc\src\Proc\Proc.csproj" />-->
     <PackageReference Include="SemanticVersioning" Version="0.8.0" />
   </ItemGroup>

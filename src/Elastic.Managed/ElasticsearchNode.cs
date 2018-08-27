@@ -25,12 +25,16 @@ namespace Elastic.Managed
 
 		public ElasticsearchNode(NodeConfiguration config) : base(StartArgs(config)) => this.NodeConfiguration = config;
 
-		private static StartArguments StartArgs(NodeConfiguration config) =>
-			new StartArguments(config.FileSystem.Binary, config.CommandLineArguments)
+		private static StartArguments StartArgs(NodeConfiguration config)
+		{
+			var startArguments = new StartArguments(config.FileSystem.Binary, config.CommandLineArguments)
 			{
 				SendControlCFirst = true,
-				Environment = EnvVars(config)
+				Environment = EnvVars(config),
 			};
+			config.ModifyStartArguments(startArguments);
+			return startArguments;
+		}
 
 		private static Dictionary<string, string> EnvVars(NodeConfiguration config)
 		{

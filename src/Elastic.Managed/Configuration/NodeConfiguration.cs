@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using Elastic.Managed.FileSystem;
+using ProcNet;
 
 namespace Elastic.Managed.Configuration
 {
@@ -23,6 +24,12 @@ namespace Elastic.Managed.Configuration
 
 		public int? DesiredPort { get; }
 		public string DesiredNodeName { get; }
+		private Action<StartArguments> _defaultStartArgs = s => { };
+		public Action<StartArguments> ModifyStartArguments
+		{
+			get => _defaultStartArgs;
+			set => _defaultStartArgs = value ?? (s => { });
+		}
 
 		/// <summary>
 		/// Wheter <see cref="ElasticsearchNode" /> should continue to write output to console after it has started.

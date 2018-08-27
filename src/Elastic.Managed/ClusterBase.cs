@@ -42,10 +42,15 @@ namespace Elastic.Managed
 			this.ClusterMoniker = this.GetType().Name.Replace("Cluster", "");
 
 			var nodes = Enumerable.Range(this.ClusterConfiguration.StartingPortNumber, this.ClusterConfiguration.NumberOfNodes)
-				.Select(p => new NodeConfiguration(clusterConfiguration, p, this.ClusterMoniker)
+				.Select(p =>
 				{
-					ShowElasticsearchOutputAfterStarted = clusterConfiguration.ShowElasticsearchOutputAfterStarted,
-					ShowElasticsearchOutputAfterDispose = clusterConfiguration.ShowElasticsearchOutputAfterDispose
+					var config = new NodeConfiguration(clusterConfiguration, p, this.ClusterMoniker)
+					{
+						ShowElasticsearchOutputAfterStarted = clusterConfiguration.ShowElasticsearchOutputAfterStarted,
+						ShowElasticsearchOutputAfterDispose = clusterConfiguration.ShowElasticsearchOutputAfterDispose
+					};
+					this.ModifyNodeConfiguration.Invoke(config, p);
+					return config;
 				})
 				.Select(n => new ElasticsearchNode(n)
 				{
@@ -58,12 +63,20 @@ namespace Elastic.Managed
 		/// <summary> A short name to identify the cluster defaults to the <see cref="ClusterBase"/> subclass name with Cluster removed </summary>
 		public virtual string ClusterMoniker { get; }
 
+
 		public TConfiguration ClusterConfiguration { get; }
 		public INodeFileSystem FileSystem => this.ClusterConfiguration.FileSystem;
 
 		public ReadOnlyCollection<ElasticsearchNode> Nodes { get; }
 		public bool Started { get; private set; }
 		public IConsoleLineWriter Writer { get; private set; } = NoopConsoleLineWriter.Instance;
+
+		private Action<NodeConfiguration, int> _defaultConfigSelector = (n, i) => { };
+		public Action<NodeConfiguration, int> ModifyNodeConfiguration
+		{
+			get => _defaultConfigSelector;
+			set => _defaultConfigSelector = value ?? ((n, i) => { });
+		}
 
 		protected virtual void SeedCluster() { }
 
