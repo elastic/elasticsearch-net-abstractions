@@ -124,6 +124,27 @@ namespace Elastic.Managed
 			base.OnBeforeSetCompletedHandle();
 		}
 
+		protected override void OnError(IObserver<CharactersOut> observer, Exception e)
+		{
+			if (e is ObservableProcessException oe && e.Message.StartsWith("Waited"))
+			{
+				HardKill(this.HostProcessId);
+				HardKill(this.JavaProcessId);
+			}
+			base.OnError(observer, e);
+		}
+
+		private static void HardKill(int? processId)
+		{
+			if (!processId.HasValue) return;
+			try
+			{
+				var p = System.Diagnostics.Process.GetProcessById(processId.Value);
+				p.Kill();
+			}
+			catch (Exception) { }
+		}
+
 		protected override bool ContinueReadingFromProcessReaders()
 		{
 			if (!this.NodeStarted) return true;
