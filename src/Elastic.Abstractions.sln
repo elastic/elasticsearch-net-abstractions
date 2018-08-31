@@ -14,7 +14,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{73A4EA23
 		..\build.bat = ..\build.bat
 		..\build.sh = ..\build.sh
 		..\global.json = ..\global.json
-		..\build\outputpath.props = ..\build\outputpath.props
 		..\paket.dependencies = ..\paket.dependencies
 		..\build\Versioning.targets = ..\build\Common.targets
 		..\appveyor.yml = ..\appveyor.yml
