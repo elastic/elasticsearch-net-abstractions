@@ -40,7 +40,7 @@ Target "FullBuild"  <| fun _ ->
 Target "Version" <| fun _ -> 
     let changedResults = 
         Commandline.projects
-        |> List.map (fun p -> Versioning.writeVersionIntoGlobalJson (p.Project.project) (p.Informational.ToString()))
+        |> List.map (fun p -> Versioning.writeVersionIntoVersionsJson (p.Project.project) (p.Informational.ToString()))
         |> List.contains true
 
     setBuildParam "versionchanged" (if changedResults then "1" else "0")

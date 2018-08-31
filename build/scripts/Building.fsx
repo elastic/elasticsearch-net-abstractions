@@ -16,13 +16,12 @@ open Versioning
 
 module Build =
 
-    type private GlobalJson = JsonProvider<"../../global.json">
+    type private GlobalJson = JsonProvider<"../../global.json", InferTypesFromValues = false>
     let private pinnedSdkVersion = GlobalJson.GetSample().Sdk.Version
 
     let msBuildProperties (projects: Versioning.AssemblyVersionInfo list) = 
         let props = (projects |> List.collect Versioning.MsBuildArgs)
-        let globalJson = GlobalJson.Load("../../global.json");
-        let v = globalJson.Versions.Repos.Remove(0, 1)
+        let v = Versioning.reposVersion()
         [(sprintf "/p:ReposVersion=v%s" v)] |> List.append props
 
     let Compile (projects: Versioning.AssemblyVersionInfo list) = 
