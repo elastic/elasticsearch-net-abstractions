@@ -41,11 +41,6 @@ namespace Elastic.Managed.Configuration
 		public bool ShowElasticsearchOutputAfterStarted { get; set; } = true;
 
 		/// <summary>
-		/// Wheter to resubscribe just before disposing and stopping the wrapped elasticsearch process
-		/// </summary>
-		public bool ShowElasticsearchOutputAfterDispose { get; set; } = true;
-
-		/// <summary>
 		/// The expected duration of the shut down sequence for Elasticsearch. After this wait duration a hard kill will occur.
 		/// </summary>
 		public TimeSpan WaitForShutdown { get; set; } = TimeSpan.FromSeconds(10);

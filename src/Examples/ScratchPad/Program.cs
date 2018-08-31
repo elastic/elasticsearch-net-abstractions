@@ -19,7 +19,6 @@ namespace ScratchPad
 			var config = new EphemeralClusterConfiguration(version, plugins, 1)
 			{
 				ShowElasticsearchOutputAfterStarted = false,
-				ShowElasticsearchOutputAfterDispose = true,
 				PrintYamlFilesInConfigFolder = false,
 				CacheEsHomeInstallation = true,
 				TrialMode = XPackTrialMode.Trial,

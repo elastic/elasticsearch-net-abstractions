@@ -1,4 +1,5 @@
-﻿using Elastic.Managed.Configuration;
+﻿using System;
+using Elastic.Managed.Configuration;
 using Elastic.Xunit.ExampleComplex;
 
 [assembly: Xunit.TestFrameworkAttribute("Elastic.Xunit.Sdk.ElasticTestFramework", "Elastic.Xunit")]

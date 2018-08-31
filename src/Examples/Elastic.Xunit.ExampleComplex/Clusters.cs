@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using Elastic.Managed.Ephemeral;
 using Elasticsearch.Net;
 using Nest;
@@ -28,7 +29,13 @@ namespace Elastic.Xunit.ExampleComplex
 
 	public abstract class MyClusterBase : XunitClusterBase, IMyCluster
 	{
-		protected MyClusterBase() : base(new XunitClusterConfiguration(MyRunOptions.TestVersion)) { }
+		protected MyClusterBase() : base(new XunitClusterConfiguration(MyRunOptions.TestVersion)
+		{
+			ShowElasticsearchOutputAfterStarted = false,
+		})
+		{
+
+		}
 
 		public IElasticClient Client => this.GetOrAddClient();
 	}

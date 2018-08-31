@@ -47,7 +47,6 @@ namespace Elastic.Managed
 					var config = new NodeConfiguration(clusterConfiguration, p, this.ClusterMoniker)
 					{
 						ShowElasticsearchOutputAfterStarted = clusterConfiguration.ShowElasticsearchOutputAfterStarted,
-						ShowElasticsearchOutputAfterDispose = clusterConfiguration.ShowElasticsearchOutputAfterDispose
 					};
 					this.ModifyNodeConfiguration(config, p);
 					return config;
@@ -156,13 +155,7 @@ namespace Elastic.Managed
 		{
 			this.Started = false;
 			foreach (var node in this.Nodes)
-			{
-				if (!node.NodeConfiguration.ShowElasticsearchOutputAfterStarted
-				    && node.NodeConfiguration.ShowElasticsearchOutputAfterDispose
-				    && node.NodeStarted)
-					node.StartAsyncReads();
 				node?.Dispose();
-			}
 
 			this.OnDispose();
 		}

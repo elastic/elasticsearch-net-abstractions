@@ -150,12 +150,7 @@ namespace Elastic.Managed
 		protected override bool ContinueReadingFromProcessReaders()
 		{
 			if (!this.NodeStarted) return true;
-			return true;
-
-			// some how if we return false here it leads to Task starvation in Proc and tests in e.g will Elastic.Xunit will start
-			// to timeout. This makes little sense to me now, so leaving this performance optimization out for now. Hopefully another fresh look will yield
-			// to (not so) obvious.
-			//return this.NodeConfiguration.ShowElasticsearchOutputAfterStarted;
+			return this.NodeConfiguration.ShowElasticsearchOutputAfterStarted;
 		}
 
 		protected override bool KeepBufferingLines(LineOut c)
@@ -165,9 +160,6 @@ namespace Elastic.Managed
 			{
 				var keepBuffering = this.Writer != null && this.NodeConfiguration.ShowElasticsearchOutputAfterStarted;
 				if (!keepBuffering) this.CancelAsyncReads();
-				// if we want to StartAsyncReadsLater we need to keep this subscription alive otherwise we can bail out early
-				if (this.NodeConfiguration.ShowElasticsearchOutputAfterDispose) return true;
-				// bail out early
 				return keepBuffering;
 			}
 

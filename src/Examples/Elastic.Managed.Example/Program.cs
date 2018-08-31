@@ -10,7 +10,7 @@ namespace Elastic.Managed.Example
 	{
 		static void Main(string[] args)
 		{
-			var version = "6.2.0";
+			var version = "6.3.0";
 			var esHome = Environment.ExpandEnvironmentVariables($@"%LOCALAPPDATA%\ElasticManaged\{version}\elasticsearch-{version}");
 
 //			var clusterConfiguration = new ClusterConfiguration(version, esHome);
