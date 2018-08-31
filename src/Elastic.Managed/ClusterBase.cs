@@ -157,7 +157,9 @@ namespace Elastic.Managed
 			this.Started = false;
 			foreach (var node in this.Nodes)
 			{
-				if (!node.NodeConfiguration.ShowElasticsearchOutputAfterStarted && node.NodeConfiguration.ShowElasticsearchOutputAfterDispose)
+				if (!node.NodeConfiguration.ShowElasticsearchOutputAfterStarted
+				    && node.NodeConfiguration.ShowElasticsearchOutputAfterDispose
+				    && node.NodeStarted)
 					node.StartAsyncReads();
 				node?.Dispose();
 			}
