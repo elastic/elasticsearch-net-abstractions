@@ -22,5 +22,12 @@ Works with `.NET Core` and `.NET 4.6` and up.
 
 Supports `dotnet xunit`, `dotnet test`, `xunit.console.runner` and tests will be runnable in your IDE through VSTest and jetBrains Rider.
 
+### [Differ](src/Differ/README.md)
+
+Compare and Diff assemblies from different sources e.g. assemblies, directories, GitHub commit, NuGet packages.
+Useful for determining what changes are introduced across versions, and if any are _breaking_.
+
+Outputs differences in XML, Markdown or AsciiDoc. 
+
 
 
