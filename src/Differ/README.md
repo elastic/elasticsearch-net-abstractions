@@ -11,7 +11,28 @@ Run
 dotnet run -- --help
 ```
 
-to see the support Assembly Providers and outputs
+to see the supported Assembly Providers and outputs:
+
+```bat
+Differ.exe <Old Assembly Provider> <New Assembly Provider> [Options]
+
+Supported Assembly Providers:
+
+  assembly|<assembly path>
+  directory|<directory path>
+  nuget|<package id>|<version>|[framework version]
+  github|<owner>/<repo>|<commit>|<build command>|<relative output path>
+
+Options:
+  -t, --target=VALUE         the assembly targets. Defaults to *all* assemblies
+                               located by the provider
+  -f, --format=VALUE         the format of the diff output. Supported formats
+                               are xml, markdown, asciidoc. Defaults to xml
+  -o, --output=VALUE         the output directory. Defaults to current directory
+  -h, -?, --help             show this message and exit
+```
+
+Differ uses [JustAssembly, licensed under Apache 2.0](https://github.com/telerik/JustAssembly)
 
 #### Examples:
 
