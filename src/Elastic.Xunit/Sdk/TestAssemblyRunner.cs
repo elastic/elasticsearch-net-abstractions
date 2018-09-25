@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Elastic.Managed.Ephemeral;
 using Elastic.Managed.Ephemeral.Tasks.ValidationTasks;
+using Elastic.Xunit.XunitPlumbing;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
@@ -105,14 +106,23 @@ namespace Elastic.Xunit.Sdk
 			var testFilters = CreateTestFilters(TestFilter);
 			foreach (var group in this._grouped)
 			{
-				var type = @group.Key?.GetType();
-				var clusterName = type?.Name.Replace("Cluster", string.Empty) ?? "UNKNOWN";
+				ElasticXunitRunner.CurrentCluster = @group.Key;
+				if (@group.Key == null)
+				{
+					var testCount = @group.SelectMany(q => q.TestCases).Count();
+					Console.WriteLine($" -> Several tests skipped because they have no cluster associated");
+					this.Summaries.Add(new RunSummary { Total = testCount, Skipped = testCount});
+					continue;
+				}
+
+				var type = @group.Key.GetType();
+				var clusterName = type.Name.Replace("Cluster", string.Empty) ?? "UNKNOWN";
 				if (!this.MatchesClusterFilter(clusterName)) continue;
 
-				var dop= @group.Key?.ClusterConfiguration?.MaxConcurrency ?? defaultMaxConcurrency;
+				var dop= @group.Key.ClusterConfiguration?.MaxConcurrency ?? defaultMaxConcurrency;
 				dop = dop <= 0 ? defaultMaxConcurrency : dop;
 
-				var timeout = @group.Key?.ClusterConfiguration?.Timeout ?? TimeSpan.FromMinutes(2);
+				var timeout = @group.Key.ClusterConfiguration?.Timeout ?? TimeSpan.FromMinutes(2);
 
 				var skipReasons = @group.SelectMany(g => g.TestCases.Select(t => t.SkipReason)).ToList();
 				var allSkipped = skipReasons.All(r=>!string.IsNullOrWhiteSpace(r));
@@ -124,34 +134,26 @@ namespace Elastic.Xunit.Sdk
 				}
 
 				this.ClusterTotals.Add(clusterName, Stopwatch.StartNew());
-				//We group over each cluster group and execute test classes pertaining to that cluster in parallel
-				if (@group.Key == null)
+				bool ValidateRunningVersion()
 				{
-					await @group.ForEachAsync(dop, async g => { await RunTestCollections(messageBus, ctx, g, testFilters); });
+					try
+					{
+						var t = new ValidateRunningVersion();
+						t.Run(@group.Key);
+						return true;
+					}
+					catch (Exception e)
+					{
+						return false;
+					}
 				}
-				else
+
+				using (@group.Key)
 				{
-					bool ValidateRunningVersion()
-					{
-						try
-						{
-							var t = new ValidateRunningVersion();
-							t.Run(@group.Key);
-							return true;
-						}
-						catch (Exception e)
-						{
-							return false;
-						}
+					if (!this.IntegrationTestsMayUseAlreadyRunningNode || !ValidateRunningVersion())
+						@group.Key?.Start(timeout);
 
-					}
-					using (@group.Key)
-					{
-						if (!this.IntegrationTestsMayUseAlreadyRunningNode || !ValidateRunningVersion())
-							@group.Key?.Start(timeout);
-
-						await @group.ForEachAsync(dop, async g => { await RunTestCollections(messageBus, ctx, g, testFilters); });
-					}
+					await @group.ForEachAsync(dop, async g => { await RunTestCollections(messageBus, ctx, g, testFilters); });
 				}
 				this.ClusterTotals[clusterName].Stop();
 			}
@@ -203,12 +205,11 @@ namespace Elastic.Xunit.Sdk
 				.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
 				.Select(c => c.Trim())
 				.Any(c => cluster.IndexOf(c, StringComparison.OrdinalIgnoreCase) >= 0);
-
 		}
 
 		private IEphemeralCluster<XunitClusterConfiguration> ClusterFixture(ITestClass testMethodTestClass)
 		{
-			var clusterType = GetClusterForCollection(testMethodTestClass.Class);
+			var clusterType = GetClusterForClass(testMethodTestClass.Class);
 			if (clusterType == null) return null;
 
 			if (_assemblyFixtureMappings.TryGetValue(clusterType, out var cluster)) return cluster;
@@ -221,13 +222,23 @@ namespace Elastic.Xunit.Sdk
 			return cluster;
 		}
 
-		private static Type GetClusterForCollection(ITypeInfo testClass) => (
+		public static bool IsAnIntegrationTestClusterType(Type type) =>
+			typeof(XunitClusterBase).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo())
+			|| IsSubclassOfRawGeneric(typeof(XunitClusterBase<>), type);
+
+		public static Type GetClusterForClass(ITypeInfo testClass) =>
+			GetClusterFromClassClusterFixture(testClass) ?? GetClusterFromIntegrationAttribute(testClass);
+
+		private static Type GetClusterFromClassClusterFixture(ITypeInfo testClass) => (
 			from i in testClass.Interfaces
 			where i.IsGenericType
 			from a in i.GetGenericArguments()
 			select a.ToRuntimeType()
-		).FirstOrDefault(type => typeof(XunitClusterBase).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo())
-		                         || IsSubclassOfRawGeneric(typeof(XunitClusterBase<>), type));
+		).FirstOrDefault(IsAnIntegrationTestClusterType);
+
+		private static Type GetClusterFromIntegrationAttribute(ITypeInfo testClass) =>
+			testClass.GetCustomAttributes(typeof(IntegrationTestClusterAttribute))
+				.FirstOrDefault()?.GetNamedArgument<Type>(nameof(IntegrationTestClusterAttribute.ClusterType));
 
 		private static bool IsSubclassOfRawGeneric(Type generic, Type toCheck)
 		{

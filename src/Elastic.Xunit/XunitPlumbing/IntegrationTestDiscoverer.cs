@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Elastic.Managed.Configuration;
+using Elastic.Managed.Ephemeral;
 using Elastic.Xunit.Sdk;
 using SemVer;
 using Xunit;
@@ -47,13 +48,20 @@ namespace Elastic.Xunit.XunitPlumbing
 			var runIntegrationTests = discoveryOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.RunIntegrationTests));
 			if (!runIntegrationTests) return true;
 
+			var cluster = TestAssemblyRunner.GetClusterForClass(testMethod.TestClass.Class);
+			if (cluster == null)
+			{
+				skipReason += $"{testMethod.TestClass.Class.Name} does not define a cluster through IClusterFixture or {nameof(IntegrationTestClusterAttribute)}";
+				return true;
+			}
+
 			var elasticsearchVersion = discoveryOptions.GetValue<ElasticsearchVersion>(nameof(ElasticXunitRunOptions.Version));
 
 			// Skip if the version we are testing against is attributed to be skipped do not run the test nameof(SkipVersionAttribute.Ranges)
 			var skipVersionAttribute = GetAttributes<SkipVersionAttribute>(testMethod).FirstOrDefault();
 			if (skipVersionAttribute != null)
 			{
-				var skipVersionRanges = skipVersionAttribute.GetNamedArgument<IList<Range>>(nameof(SkipVersionAttribute.Reason)) ?? new List<Range>();
+				var skipVersionRanges = skipVersionAttribute.GetNamedArgument<IList<Range>>(nameof(SkipVersionAttribute.Ranges)) ?? new List<Range>();
 				if (elasticsearchVersion == null && skipVersionRanges.Count > 0)
                 {
                     skipReason = $"{nameof(SkipVersionAttribute)} has ranges defined for this test but " +

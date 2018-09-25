@@ -58,5 +58,4 @@ namespace Elastic.Xunit.ExampleComplex
 			(1 + 1).Should().Be(2);
 		}
 	}
-
 }

@@ -15,7 +15,7 @@ namespace Elastic.Xunit.ExampleComplex
 		public static ElasticsearchVersion TestVersion { get; } = "6.3.0";
 		public MyRunOptions()
 		{
-			this.ClusterFilter = "test";
+			this.ClusterFilter = "";
 			this.RunUnitTests = false;
 			this.RunIntegrationTests = true;
 			this.IntegrationTestsMayUseAlreadyRunningNode = true;
