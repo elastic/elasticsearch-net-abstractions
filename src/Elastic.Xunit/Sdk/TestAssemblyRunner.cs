@@ -142,7 +142,7 @@ namespace Elastic.Xunit.Sdk
 						t.Run(@group.Key);
 						return true;
 					}
-					catch (Exception e)
+					catch (Exception)
 					{
 						return false;
 					}

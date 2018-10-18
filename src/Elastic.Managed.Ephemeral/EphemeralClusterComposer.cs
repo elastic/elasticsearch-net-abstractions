@@ -107,7 +107,7 @@ namespace Elastic.Managed.Ephemeral
 					{
 						act(task, cluster, cluster.FileSystem);
 					}
-					catch (Exception e)
+					catch (Exception)
 					{
 						if (callOnStop) this.OnStop();
 						throw;

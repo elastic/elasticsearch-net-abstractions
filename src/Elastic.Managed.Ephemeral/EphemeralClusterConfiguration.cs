@@ -23,9 +23,8 @@ namespace Elastic.Managed.Ephemeral
 			this.TrialMode = XPackTrialMode.None;
 			this.Features = features;
 
-
 			var pluginsList = plugins?.ToList() ?? new List<ElasticsearchPlugin>();
-			if (this.Features.HasFlag(ClusterFeatures.XPack) && !pluginsList.Any(p=>p.Moniker == "x-pack"))
+			if (this.Features.HasFlag(ClusterFeatures.XPack) && pluginsList.All(p => p.Moniker != "x-pack"))
 				pluginsList.Add(ElasticsearchPlugin.XPack);
 
 			this.Plugins = new ElasticsearchPlugins(pluginsList);
@@ -33,8 +32,22 @@ namespace Elastic.Managed.Ephemeral
 			AddDefaultXPackSettings();
 		}
 
+		/// <summary>
+		/// The features supported by the cluster
+		/// </summary>
 		public ClusterFeatures Features { get; }
+
+		/// <summary>
+		/// The collection of plugins to install
+		/// </summary>
 		public ElasticsearchPlugins Plugins { get; }
+
+		/// <summary>
+		/// Validates that the plugins to install can be installed on the target Elasticsearch version.
+		/// This can be useful to fail early when subsequent operations are relying on installation
+		/// succeeding.
+		/// </summary>
+		public bool ValidatePluginsToInstall { get; } = true;
 
 		public bool XPackInstalled => this.Features.HasFlag(ClusterFeatures.XPack)
 		                              || this.Version >= "6.3.0"
@@ -48,12 +61,15 @@ namespace Elastic.Managed.Ephemeral
 		public IList<IClusterComposeTask> AdditionalBeforeNodeStartedTasks { get; } = new List<IClusterComposeTask>();
 
 		public IList<IClusterComposeTask> AdditionalAfterStartedTasks { get; } = new List<IClusterComposeTask>();
+
 		/// <summary>
-		/// Expert level setting, skips all builtin validation tasks for cases where you need to guarantee your call is the first call into the cluster
+		/// Expert level setting, skips all built-in validation tasks for cases where you need to guarantee your call is the first call into the cluster
 		/// </summary>
 		public bool SkipBuiltInAfterStartTasks { get; set; }
+
 		/// <summary> If not null or empty will be posted as the x-pack license to use. </summary>
 		public string XPackLicenseJson { get; set; }
+
 		/// <summary>
 		/// From 6.3.0 and up this property allows you to control what type of license is applied (trial/basic) in the absense of
 		/// <see cref="XPackLicenseJson"/>
@@ -103,7 +119,5 @@ namespace Elastic.Managed.Ephemeral
                 this.Add("xpack.ssl.certificate_authorities", this.FileSystem.CaCertificate);
 			}
 		}
-
-
 	}
 }
