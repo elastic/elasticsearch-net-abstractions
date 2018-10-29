@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nest.TypescriptExporter", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Differ", "Differ\Differ.csproj", "{346B9887-CBF1-458F-99F4-D67F13C19623}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elastic.BenchmarkDotNetExporter", "Elastic.BenchmarkDotNetExporter\Elastic.BenchmarkDotNetExporter.csproj", "{3C312633-7F3E-43EB-A1FE-73B4BC16907F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,5 +99,9 @@ Global
 		{346B9887-CBF1-458F-99F4-D67F13C19623}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{346B9887-CBF1-458F-99F4-D67F13C19623}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{346B9887-CBF1-458F-99F4-D67F13C19623}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C312633-7F3E-43EB-A1FE-73B4BC16907F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C312633-7F3E-43EB-A1FE-73B4BC16907F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C312633-7F3E-43EB-A1FE-73B4BC16907F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C312633-7F3E-43EB-A1FE-73B4BC16907F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
