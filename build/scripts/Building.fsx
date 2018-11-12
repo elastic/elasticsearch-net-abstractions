@@ -13,6 +13,7 @@ open FSharp.Data
 
 open Paths
 open Versioning
+open Tooling
 
 module Build =
 
@@ -39,6 +40,24 @@ module Build =
                     AdditionalArgs = props
                 }
             ) |> ignore
+            
+    let RewriteBenchmarkDotNetExporter () = 
+        let assemblyRewriter = Paths.PaketDotNetGlobalTool "assembly-rewriter" @"tools\netcoreapp2.1\any\assembly-rewriter.dll"
+        let bdOutput = sprintf @"%s\%s" (Paths.Source @"Elastic.BenchmarkDotNetExporter") @"bin\Release\netstandard2.0"
+        let outDllName s = match s with | "Elastic.BenchmarkDotNetExporter" -> s | _ -> sprintf "Elastic.Internal.%s" s
+        let dllName s = sprintf @"%s\%s.dll" bdOutput s
+        let names = [@"Elastic.BenchmarkDotNetExporter"; "Elasticsearch.Net"; "Nest"] 
+        let dlls = 
+            names
+            |> Seq.map (fun s -> sprintf @"-i ""%s"" -o ""%s"" " (dllName s) (dllName <| outDllName s))
+            |> Seq.fold (+) " "
+        let mergeCommand = sprintf @"%s %s" assemblyRewriter dlls
+        DotNetCli.RunCommand (fun p -> { p with TimeOut = TimeSpan.FromMinutes(3.) }) mergeCommand |> ignore
+        
+        let keyFile = Paths.Keys "keypair.snk"
+        let ilMergeArgs = ["/internalize"; (sprintf "/keyfile:%s" keyFile); (sprintf "/out:%s" (dllName (names |> Seq.head)))]
+        let mergeDlls = names |> Seq.map (fun s -> dllName <| outDllName s)
+        Tooling.ILRepack.Exec (ilMergeArgs |> Seq.append mergeDlls) |> ignore
 
     let Restore () =
         DotNetCli.Restore
@@ -56,7 +75,7 @@ module Build =
 
     let CreateNugetPackage (projects: Versioning.AssemblyVersionInfo list) = 
 
-        let props = projects |> msBuildProperties
+        let props = projects |> msBuildProperties |> List.append ["--no-build"]
         DotNetCli.Pack(fun p -> 
         {
             p with 
@@ -65,4 +84,5 @@ module Build =
                 TimeOut = TimeSpan.FromMinutes(3.)
                 Project = Paths.SolutionFile
                 AdditionalArgs = props
+                
         })

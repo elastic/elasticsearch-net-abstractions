@@ -37,6 +37,8 @@ module Versioning =
         | Managed -> canaryVersionOrCurrent <| globalJson.Versions.Managed.Remove(0, 1)
         | Ephemeral -> canaryVersionOrCurrent <| globalJson.Versions.Ephemeral.Remove(0, 1)
         | Xunit -> canaryVersionOrCurrent <| globalJson.Versions.Xunit.Remove(0, 1)
+        | Differ -> canaryVersionOrCurrent <| globalJson.Versions.Differ.Remove(0, 1)
+        | BenchmarkDotNetExporter -> canaryVersionOrCurrent <| globalJson.Versions.Bdnetexporter.Remove(0, 1)
         
     let reposVersion () =
         let globalJson = VersionsJson.Load("../../versions.json");
@@ -47,9 +49,9 @@ module Versioning =
     let private assemblyFileVersionOf v = sprintf "%i.%i.%i.0" v.Major v.Minor v.Patch |> parse
 
     //write it with a leading v in the json, needed for the json type provider to keep things strings
-    let writeVersionsJson reposVersion managedVersion ephemeralVersion xunitVersion =
+    let writeVersionsJson reposVersion managedVersion ephemeralVersion xunitVersion differVersion bdVersion =
         let globalJson = VersionsJson.Load("../../versions.json");
-        let versionsNode = VersionsJson.Versions(reposVersion, managedVersion, ephemeralVersion, xunitVersion)
+        let versionsNode = VersionsJson.Versions(reposVersion, managedVersion, ephemeralVersion, xunitVersion, differVersion, bdVersion)
 
         let newVersionsJson = VersionsJson.Root (versionsNode)
         use tw = new StreamWriter("versions.json")
@@ -62,7 +64,10 @@ module Versioning =
         let managedVersion = match project with | Managed -> pre version | _ -> pre <| globalJson.Versions.Managed
         let ephemeralVersion = match project with | Ephemeral -> pre version | _ -> pre <| globalJson.Versions.Ephemeral
         let xunitVersion = match project with | Xunit -> pre version | _ -> pre <| globalJson.Versions.Xunit
-        writeVersionsJson reposVersion managedVersion ephemeralVersion xunitVersion
+        let bdVersion = match project with | BenchmarkDotNetExporter -> pre version | _ -> pre <| globalJson.Versions.Bdnetexporter
+        let differVersion = match project with | Differ -> pre version | _ -> pre <| globalJson.Versions.Differ
+        
+        writeVersionsJson reposVersion managedVersion ephemeralVersion xunitVersion differVersion bdVersion
         traceImportant <| sprintf "%s bumped version to (%O) in global.json " (nameOf project) version
 
     let writeVersionIntoVersionsJson project version =
@@ -73,6 +78,8 @@ module Versioning =
             | Managed -> pv <> (pre <| globalJson.Versions.Managed)
             | Ephemeral -> pv <> (pre <| globalJson.Versions.Ephemeral)
             | Xunit -> pv <> (pre <| globalJson.Versions.Xunit)
+            | Differ -> pv <> (pre <| globalJson.Versions.Differ)
+            | BenchmarkDotNetExporter -> pv <> (pre <| globalJson.Versions.Bdnetexporter)
 
         match changed with 
         | true -> bumpVersion project version 
@@ -89,7 +96,9 @@ module Versioning =
         let managedVersion = pre <| globalJson.Versions.Managed
         let ephemeralVersion = pre <| globalJson.Versions.Ephemeral
         let xunitVersion = pre <| globalJson.Versions.Xunit
-        writeVersionsJson bumpedVersion managedVersion ephemeralVersion xunitVersion
+        let differVersion = pre <| globalJson.Versions.Differ
+        let bdVersion = pre <| globalJson.Versions.Bdnetexporter
+        writeVersionsJson bumpedVersion managedVersion ephemeralVersion xunitVersion differVersion bdVersion
         traceImportant <| sprintf "bumped repos version to (%s) in global.json"  bumpedVersion
 
         let header p = sprintf "%s %O" p.Project.name p.Informational
@@ -136,7 +145,11 @@ module Versioning =
             if not <| assemblyName.FullName.Contains("PublicKeyToken=96c599bbe3e70f5d") then
                 failwith <| sprintf "%s should have PublicKeyToken=96c599bbe3e70f5d" assemblyName.FullName
         )
-        DeleteDir tmpFolder
 
-    let ValidateArtifacts (projects: AssemblyVersionInfo list) = for info in projects do validateNugetPackage info
+    let ValidateArtifacts (projects: AssemblyVersionInfo list) = 
+        for info in projects do validateNugetPackage info
+        for info in projects do 
+            let fileName = sprintf "%s.%O" info.Project.name info.Informational
+            let tmpFolder = sprintf "%s/tmp-%s" Paths.NugetOutput fileName
+            DeleteDir tmpFolder
     

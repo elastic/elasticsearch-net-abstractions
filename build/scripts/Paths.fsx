@@ -27,6 +27,7 @@ module Paths =
     let SourceFolder = "src"
     
     let CheckedInTool(tool) = sprintf "%s/%s" CheckedInToolsFolder tool
+    let PaketDotNetGlobalTool tool subPath = sprintf "%s/%s" (Tool tool) subPath
     let Keys(keyFile) = sprintf "%s/%s" KeysFolder keyFile
     let Output(folder) = sprintf "%s/%s" BuildOutput folder
     let Source(folder) = sprintf "%s/%s" SourceFolder folder
@@ -37,5 +38,5 @@ module Paths =
         sprintf "%s/%s/bin/Release" SourceFolder f
 
     let SolutionFile = sprintf "%s/Elastic.Abstractions.sln" SourceFolder
-
+    
     let PackageOutFolder = Output("_packages")
