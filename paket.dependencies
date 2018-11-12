@@ -4,3 +4,8 @@ group build
     source https://api.nuget.org/v3/index.json
     nuget FAKE
     nuget FSharp.Data
+    
+    nuget ILRepack 2.0.16
+    
+    source https://www.myget.org/F/assembly-rewriter-temp/api/v3/index.json 
+    clitool assembly-rewriter

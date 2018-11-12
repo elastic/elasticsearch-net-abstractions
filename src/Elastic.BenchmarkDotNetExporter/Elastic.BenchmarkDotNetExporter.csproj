@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\Common.targets" />
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    
+    <LangVersion>latest</LangVersion>
+    <Version>$(BDNetExporterVersion)</Version>
+    <InformationalVersion>$(BDNetExporterVersion)</InformationalVersion>
+    <AssemblyVersion>$(BDNetExporterAssemblyVersion)</AssemblyVersion>
+    <FileVersion>$(BDNetExporterAssemblyFileVersion)</FileVersion>
+    
+    <PackageId>Elastic.BenchmarkDotNetExporter</PackageId>
+    <Authors>Elastic and contributors</Authors>
+    <Description>Provides an exporter for BenchmarkDotNet results directly into Elasticsearch</Description>
+    <PackageTags>elastic,elasticsearch,cluster,ephemeral</PackageTags>
+    <RestoreSources>https://www.myget.org/F/assembly-rewriter-temp/api/v3/index.json;$(RestoreSources);</RestoreSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="[0.*,1.0.0)" />
+    <PackageReference Include="NEST" Version="6.4.0" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

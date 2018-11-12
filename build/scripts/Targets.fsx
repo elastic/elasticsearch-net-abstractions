@@ -34,6 +34,8 @@ Target "Clean" Build.Clean
 
 Target "Restore" Build.Restore
 
+Target "RewriteBenchmarkDotNetExporter" Build.RewriteBenchmarkDotNetExporter
+
 Target "FullBuild"  <| fun _ -> 
     Build.Compile Commandline.projects
 
@@ -63,6 +65,7 @@ Target "Release" <| fun _ -> traceHeader "Running Release"
     ==> "Build"
 
 "Build"
+  ==> "RewriteBenchmarkDotNetExporter"
   ==> "Pack"
 
 "Pack"
