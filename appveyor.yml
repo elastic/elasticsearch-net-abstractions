@@ -17,11 +17,6 @@ environment:
 artifacts:  
 - path: .\build\output\_packages\*.nupkg
   name: NuGet
-deploy:  
-- provider: NuGet
-  server: https://www.myget.org/F/elasticsearch-net-abstractions-temp/api/v2/package
-  api_key:
-    secure: HBy2VHve+/49OtJlgU1JBDLTkzEnBE0nzeq/F/4crZGY1SAZN6g9r1ofXEduhOS/
-  skip_symbols: true
-  on:
-    branch: master
+nuget:
+  account_feed: true
+  project_feed: true
