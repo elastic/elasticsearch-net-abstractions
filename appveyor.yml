@@ -6,8 +6,6 @@ pull_requests:
 branches:  
   only:
   - master
-nuget:  
-  disable_publish_on_pr: true
 build_script: 
   - cmd: build.bat canary
 test: off
@@ -18,5 +16,6 @@ artifacts:
 - path: .\build\output\_packages\*.nupkg
   name: NuGet
 nuget:
+  disable_publish_on_pr: true
   account_feed: true
   project_feed: true
