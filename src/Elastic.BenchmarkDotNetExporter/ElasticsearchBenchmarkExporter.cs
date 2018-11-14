@@ -60,7 +60,7 @@ namespace Elastic.BenchmarkDotNetExporter
 
 		public override void ExportToLog(Summary summary, ILogger logger)
 		{
-			if (TryPutIndexTemplate(logger)) return;
+			if (!TryPutIndexTemplate(logger)) return;
 			if (!TryPutPipeline(logger)) return;
 
 			var environmentInfo = CreateHostEnvironmentInformation(summary);

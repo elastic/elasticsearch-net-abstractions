@@ -14,7 +14,6 @@
     <Authors>Elastic and contributors</Authors>
     <Description>Provides an exporter for BenchmarkDotNet results directly into Elasticsearch</Description>
     <PackageTags>elastic,elasticsearch,cluster,ephemeral</PackageTags>
-    <RestoreSources>https://www.myget.org/F/assembly-rewriter-temp/api/v3/index.json;$(RestoreSources);</RestoreSources>
   </PropertyGroup>
 
   <ItemGroup>
