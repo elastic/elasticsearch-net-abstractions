@@ -12,6 +12,7 @@ using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using Elasticsearch.Net;
 using Nest;
+using static Elastic.BenchmarkDotNetExporter.ElasticsearchBenchmarkExporterOptions.TimeSeriesStrategy;
 
 namespace Elastic.BenchmarkDotNetExporter
 {
@@ -88,13 +89,15 @@ namespace Elastic.BenchmarkDotNetExporter
 			var getPipelineResponse = Client.GetPipeline(p => p.Id(Options.PipelineName));
 			if (getPipelineResponse.IsValid) return true;
 
+			var rounding = GetIndexRounding();
+
 			var putPipeline = Client.PutPipeline(Options.PipelineName, r => r
 				.Description("Enriches the benchmark exports from BenchmarkDotNet")
 				.Processors(procs => procs
 					.DateIndexName<BenchmarkDocument>(din => din
 						.Field(p => p.Timestamp)
 						.IndexNamePrefix($"{Options.IndexName}-")
-						.DateRounding(DateRounding.Month)
+						.DateRounding(rounding)
 						.DateFormats("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSZ")
 					)
 				)
@@ -104,6 +107,18 @@ namespace Elastic.BenchmarkDotNetExporter
 			logger.WriteLine(putPipeline.DebugInformation);
 			return false;
 
+		}
+
+		private DateRounding GetIndexRounding()
+		{
+			switch (Options.IndexStrategy)
+			{
+				case Yearly: return DateRounding.Year;
+				case Hourly: return DateRounding.Hour;
+				case Dayly: return DateRounding.Day;
+				case Weekly: return DateRounding.Week;
+				default: return DateRounding.Month;
+			}
 		}
 
 		private List<BenchmarkDocument> CreateBenchmarkDocuments(Summary summary)
