@@ -162,7 +162,7 @@ namespace Elastic.BenchmarkDotNetExporter
 					Launch = r.BenchmarkCase.Job.Run,
 					RunTime = r.BenchmarkCase.Job.Environment.Runtime.Name,
 					Jit = Enum.GetName(typeof(Jit),r.BenchmarkCase.Job.Environment.Jit),
-					Gc = Enum.GetName(typeof(GcMode),r.BenchmarkCase.Job.Environment.Gc),
+					Gc = r.BenchmarkCase.Job.Environment.Gc,
 					Id = r.BenchmarkCase.Job.Environment.Id,
 
 				};
@@ -229,7 +229,7 @@ namespace Elastic.BenchmarkDotNetExporter
 			[Keyword]public string Platform { get; set; }
 			[Keyword]public string RunTime { get; set; }
 			[Keyword]public string Jit { get; set; }
-			[Keyword]public string Gc { get; set; }
+			[Keyword]public GcMode Gc { get; set; }
 			[Keyword]public string Id { get; set; }
 			public RunMode Launch { get; set; }
 		}
