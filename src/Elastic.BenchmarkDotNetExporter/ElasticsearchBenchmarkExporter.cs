@@ -22,7 +22,16 @@ namespace Elastic.BenchmarkDotNetExporter
 		public ElasticsearchBenchmarkExporter(ElasticsearchBenchmarkExporterOptions options)
 		{
 			Options = options;
-			Client = new ElasticClient(Options.CreateConnectionSettings());
+			Client = new ElasticClient(Options.CreateConnectionSettings()
+				.DefaultMappingFor<BenchmarkDocument>(m=>m
+					.TypeName("_doc")
+				)
+				.DefaultFieldNameInferrer(p=>ToUnderscoreCase(p))
+			);
+		}
+
+		private static string ToUnderscoreCase(string str) {
+			return string.Concat(str.Select((x, i) => i > 0 && char.IsUpper(x) ? "_" + x.ToString() : x.ToString())).ToLower();
 		}
 
 
@@ -32,7 +41,6 @@ namespace Elastic.BenchmarkDotNetExporter
 		//we only log when we can not write to Elasticsearch
 		protected override string FileExtension => "log";
 		protected override string FileNameSuffix => "-elasticsearch-error";
-
 
 		public override void ExportToLog(Summary summary, ILogger logger)
 		{
@@ -190,19 +198,14 @@ namespace Elastic.BenchmarkDotNetExporter
 		{
 			switch (Environment.OSVersion.Platform)
 			{
-				case PlatformID.MacOSX:
-					return "Max OS X";
-				case PlatformID.Unix:
-					return "Linux";
+				case PlatformID.MacOSX: return "Max OS X";
+				case PlatformID.Unix: return "Linux";
 				case PlatformID.Win32NT:
 				case PlatformID.Win32S:
 				case PlatformID.Win32Windows:
-				case PlatformID.WinCE:
-					return "Windows";
-				case PlatformID.Xbox:
-					return "XBox";
-				default:
-					return "Unknown";
+				case PlatformID.WinCE: return "Windows";
+				case PlatformID.Xbox: return "XBox";
+				default: return "Unknown";
 			}
 		}
 
@@ -210,19 +213,14 @@ namespace Elastic.BenchmarkDotNetExporter
 		{
 			switch (Environment.OSVersion.Platform)
 			{
-				case PlatformID.MacOSX:
-					return "darwin";
-				case PlatformID.Unix:
-					return "unix";
+				case PlatformID.MacOSX: return "darwin";
+				case PlatformID.Unix: return "unix";
 				case PlatformID.Win32NT:
 				case PlatformID.Win32S:
 				case PlatformID.Win32Windows:
-				case PlatformID.WinCE:
-					return "windows";
-				case PlatformID.Xbox:
-					return "xbox";
-				default:
-					return "unknown";
+				case PlatformID.WinCE: return "windows";
+				case PlatformID.Xbox: return "xbox";
+				default: return "unknown";
 			}
 		}
 
@@ -244,8 +242,8 @@ namespace Elastic.BenchmarkDotNetExporter
 
 		internal class BenchmarkMeasurementStage
 		{
-			public string IterationMode { get; set; }
-			public string IterationStage { get; set; }
+			[Keyword]public string IterationMode { get; set; }
+			[Keyword]public string IterationStage { get; set; }
 			public long Operations { get; set; }
 		}
 
@@ -261,8 +259,6 @@ namespace Elastic.BenchmarkDotNetExporter
 			[Date(Name = "@timestamp")]
 			public DateTime Timestamp { get; set; }
 
-			[Text] public string Description { get; set; }
-
 			public BenchmarkAgent Agent { get; set; }
 
 			public BenchmarkHost Host { get; set; }
@@ -272,15 +268,15 @@ namespace Elastic.BenchmarkDotNetExporter
 
 		internal class BenchmarkEvent
 		{
-			public string Category { get; set; }
+			[Keyword]public string Category { get; set; }
 
-			public string Original { get; set; }
-			public string Module { get; set; }
-			public string Type { get; set; }
-			public string Action { get; set; }
-			public string Description { get; set; }
-			public string Parameters { get; set; }
-			public string Method { get; set; }
+			[Text]public string Original { get; set; }
+			[Keyword]public string Module { get; set; }
+			[Keyword]public string Type { get; set; }
+			[Keyword]public string Action { get; set; }
+			[Text]public string Description { get; set; }
+			[Text]public string Parameters { get; set; }
+			[Keyword]public string Method { get; set; }
 			public IEnumerable<BenchmarkMeasurementStage> MeasurementStages { get; set; }
 			public TimeSpan Duration { get; set; }
 			public BenchmarkSimplifiedWorkloadCounts Repetitions { get; set; }
@@ -340,9 +336,9 @@ namespace Elastic.BenchmarkDotNetExporter
 		internal class BenchmarkAgent
 		{
 			private static readonly Version Reference = typeof(BenchmarkAgent).Assembly.GetName().Version;
-			public string Version => Reference.ToString();
-			public string Name { get; set; }
-			public string Type => "benchmark-dotnet-exporter";
+			[Keyword]public string Version => Reference.ToString();
+			[Keyword]public string Name { get; set; }
+			[Keyword]public string Type => "benchmark-dotnet-exporter";
 			public BenchmarkGit Git { get; set; }
 			public BenchmarkLanguage Language { get; set; }
 			[Object(Name="os")]
@@ -351,32 +347,32 @@ namespace Elastic.BenchmarkDotNetExporter
 
 		internal class BenchmarkOperatingSystem
 		{
-			public string Version { get; set; }
-			public string Platform { get; set; }
-			public string Name { get; set; }
-			public string Family { get; set; }
-			public string Kernel { get; set; }
+			[Keyword]public string Version { get; set; }
+			[Keyword]public string Platform { get; set; }
+			[Keyword]public string Name { get; set; }
+			[Keyword]public string Family { get; set; }
+			[Keyword]public string Kernel { get; set; }
 		}
 
 		internal class BenchmarkLanguage
 		{
 			[Keyword] public string Version { get; set; }
-			public string DotNetSdkVersion { get; set; }
+			[Keyword]public string DotNetSdkVersion { get; set; }
 			public bool HasRyuJit { get; set; }
-			public string JitModules { get; set; }
-			public string BuildConfiguration { get; set; }
+			[Text]public string JitModules { get; set; }
+			[Keyword]public string BuildConfiguration { get; set; }
 			public bool HasDebuggerAttached { get; set; }
-			public string BenchmarkDotNetVersion { get; set; }
-			public string BenchmarkDotNetCaption { get; set; }
+			[Keyword]public string BenchmarkDotNetVersion { get; set; }
+			[Keyword]public string BenchmarkDotNetCaption { get; set; }
 		}
 
 		internal class BenchmarkHost
 		{
-			public string ProcessorName { get; set; }
+			[Keyword]public string ProcessorName { get; set; }
 			public int? PhysicalProcessorCount { get; set; }
 			public int? PhysicalCoreCount { get; set; }
 			public int? LogicalCoreCount { get; set; }
-			public string Architecture { get; set; }
+			[Keyword]public string Architecture { get; set; }
 			public bool HasAttachedDebugger { get; set; }
 			public string HardwareTimerKind { get; set; }
 			public double ChronometerFrequencyHerz { get; set; }
@@ -388,7 +384,7 @@ namespace Elastic.BenchmarkDotNetExporter
 			[Keyword(Name="branch")] public string BranchName { get; set; }
 			[Keyword(Name="sha")] public string Sha { get; set; }
 			[Text(Name="commit_message")] public string CommitMessage { get; set; }
-			[Text(Name="repos")] public string Repository { get; set; }
+			[Keyword(Name="repos")] public string Repository { get; set; }
 		}
 
 
