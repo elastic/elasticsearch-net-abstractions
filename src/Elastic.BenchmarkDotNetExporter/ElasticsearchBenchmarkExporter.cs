@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
@@ -121,6 +122,7 @@ namespace Elastic.BenchmarkDotNetExporter
 				DotNetSdkVersion = summary.HostEnvironmentInfo.DotNetSdkVersion.Value,
 				HasRyuJit = summary.HostEnvironmentInfo.HasRyuJit,
 				JitModules = summary.HostEnvironmentInfo.JitModules,
+				JitInfo = summary.HostEnvironmentInfo.JitInfo,
 				BuildConfiguration = summary.HostEnvironmentInfo.Configuration,
 				BenchmarkDotNetCaption = HostEnvironmentInfo.BenchmarkDotNetCaption,
 				BenchmarkDotNetVersion = summary.HostEnvironmentInfo.BenchmarkDotNetVersion,
@@ -139,6 +141,17 @@ namespace Elastic.BenchmarkDotNetExporter
 			};
 			var benchmarks = summary.Reports.Select(r =>
 			{
+				var jobConfig = new BenchmarkJobConfig
+				{
+					Platform = Enum.GetName(typeof(Platform),r.BenchmarkCase.Job.Environment.Platform),
+					Launch = r.BenchmarkCase.Job.Run,
+					RunTime = r.BenchmarkCase.Job.Environment.Runtime.Name,
+					Jit = Enum.GetName(typeof(Jit),r.BenchmarkCase.Job.Environment.Jit),
+					Gc = Enum.GetName(typeof(GcMode),r.BenchmarkCase.Job.Environment.Gc),
+					Id = r.BenchmarkCase.Job.Environment.Id,
+
+				};
+
 				var @event = new BenchmarkEvent
 				{
 					Description = r.BenchmarkCase.Descriptor.WorkloadMethodDisplayInfo,
@@ -149,6 +162,8 @@ namespace Elastic.BenchmarkDotNetExporter
 					Type = FullNameProvider.GetTypeName(r.BenchmarkCase.Descriptor.Type),
 					Duration = summary.TotalTime,
 					Original = r.BenchmarkCase.DisplayInfo,
+
+					JobConfig = jobConfig,
 
 					Method = FullNameProvider.GetBenchmarkName(r.BenchmarkCase),
 					Parameters = r.BenchmarkCase.Parameters.PrintInfo,
@@ -194,6 +209,16 @@ namespace Elastic.BenchmarkDotNetExporter
 			return benchmarks;
 		}
 
+		internal class BenchmarkJobConfig
+		{
+			[Keyword]public string Platform { get; set; }
+			[Keyword]public string RunTime { get; set; }
+			[Keyword]public string Jit { get; set; }
+			[Keyword]public string Gc { get; set; }
+			[Keyword]public string Id { get; set; }
+			public RunMode Launch { get; set; }
+		}
+
 		private string OsName()
 		{
 			switch (Environment.OSVersion.Platform)
@@ -233,6 +258,8 @@ namespace Elastic.BenchmarkDotNetExporter
 				PhysicalCoreCount = summary.HostEnvironmentInfo.CpuInfo.Value?.PhysicalCoreCount,
 				LogicalCoreCount = summary.HostEnvironmentInfo.CpuInfo.Value?.LogicalCoreCount,
 				Architecture = summary.HostEnvironmentInfo.Architecture,
+				VirtualMachineHypervisor = summary.HostEnvironmentInfo.VirtualMachineHypervisor.Value?.Name,
+				InDocker = summary.HostEnvironmentInfo.InDocker,
 				HasAttachedDebugger = summary.HostEnvironmentInfo.HasAttachedDebugger,
 				ChronometerFrequencyHerz = summary.HostEnvironmentInfo.ChronometerFrequency.Hertz,
 				HardwareTimerKind = summary.HostEnvironmentInfo.HardwareTimerKind.ToString()
@@ -280,6 +307,7 @@ namespace Elastic.BenchmarkDotNetExporter
 			public IEnumerable<BenchmarkMeasurementStage> MeasurementStages { get; set; }
 			public TimeSpan Duration { get; set; }
 			public BenchmarkSimplifiedWorkloadCounts Repetitions { get; set; }
+			public BenchmarkJobConfig JobConfig { get; set; }
 		}
 
 
@@ -368,9 +396,9 @@ namespace Elastic.BenchmarkDotNetExporter
 			public bool HasRyuJit { get; set; }
 			[Text]public string JitModules { get; set; }
 			[Keyword]public string BuildConfiguration { get; set; }
-			public bool HasDebuggerAttached { get; set; }
 			[Keyword]public string BenchmarkDotNetVersion { get; set; }
 			[Keyword]public string BenchmarkDotNetCaption { get; set; }
+			[Keyword]public string JitInfo { get; set; }
 		}
 
 		internal class BenchmarkHost
@@ -381,9 +409,10 @@ namespace Elastic.BenchmarkDotNetExporter
 			public int? LogicalCoreCount { get; set; }
 			[Keyword]public string Architecture { get; set; }
 			public bool HasAttachedDebugger { get; set; }
-			public string HardwareTimerKind { get; set; }
+			[Keyword]public string HardwareTimerKind { get; set; }
 			public double ChronometerFrequencyHerz { get; set; }
-
+			[Keyword]public string VirtualMachineHypervisor { get; set; }
+			public bool InDocker { get; set; }
 		}
 
 		internal class BenchmarkGit

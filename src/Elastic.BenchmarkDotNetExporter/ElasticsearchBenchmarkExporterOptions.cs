@@ -74,6 +74,7 @@ namespace Elastic.BenchmarkDotNetExporter
 			if (uris.Count == 0) throw new ArgumentException($"'{urls}' can not be parsed to a list of Uri", nameof(urls));
 			return uris.ToArray();
 		}
+
 		internal IConnectionPool CreateConnectionPool()
 		{
 			var uris = this.Nodes;
@@ -85,7 +86,6 @@ namespace Elastic.BenchmarkDotNetExporter
 			return this.UseSniffingConnectionPool
 				? new SniffingConnectionPool(uris)
 				: new StaticConnectionPool(uris);
-
 		}
 
 		internal ConnectionSettings CreateConnectionSettings()
