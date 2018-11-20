@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
@@ -12,69 +14,42 @@ using Nest;
 
 namespace Elastic.BenchmarkDotNetExporter
 {
-
 	public class ElasticsearchBenchmarkExporter : BenchmarkDotNet.Exporters.ExporterBase
 	{
-		public ElasticsearchBenchmarkExporter(
-			string urls,
-			string username,
-			string password,
-			string commitSha = "unknown",
-			string currentBranch = "unknown",
-			string indexName = "benchmarks-dotnet",
-			string templateName = "benchmarks-dotnet",
-			string pipelineName = "benchmarks-dotnet"
-		)
+		public ElasticsearchBenchmarkExporter(string commaSeparatedListOfUrls)
+			: this(new ElasticsearchBenchmarkExporterOptions(commaSeparatedListOfUrls)) {}
+
+		public ElasticsearchBenchmarkExporter(ElasticsearchBenchmarkExporterOptions options)
 		{
-			if (string.IsNullOrWhiteSpace(urls)) throw new ArgumentException("no urls provided, empty string or null", nameof(urls));
-			var uris = urls.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
-				.Select(u => u.Trim())
-				.Select(u => Uri.TryCreate(u, UriKind.Absolute, out var url) ? url : null)
-				.Where(u => u != null)
-				.ToList();
-			if (uris.Count == 0) throw new ArgumentException($"'{urls}' can not be parsed to a list of Uri", nameof(urls));
-
-			var cp = uris.Count == 1 ? new SingleNodeConnectionPool(uris[0]) : (IConnectionPool)new SniffingConnectionPool(uris);
-			var settings = new ConnectionSettings(cp);
-			if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password))
-				settings = settings.BasicAuthentication(username, password);
-
-			this.Client = new ElasticClient(settings);
-			this.CommitSha = commitSha;
-			this.CurrentBranchName = currentBranch;
-			this.IndexName = indexName;
-			this.PipelineName = pipelineName;
-			this.TemplateName = templateName;
+			Options = options;
+			Client = new ElasticClient(Options.CreateConnectionSettings());
 		}
 
-		private ElasticClient Client { get; }
-		private string CommitSha { get; }
-		private string CurrentBranchName { get; }
-		private string IndexName { get; }
-		private string PipelineName { get; }
-		private string TemplateName { get; }
+
+		private ElasticsearchBenchmarkExporterOptions Options { get; }
+		private IElasticClient Client { get; set; }
 
 		//we only log when we can not write to Elasticsearch
 		protected override string FileExtension => "log";
 		protected override string FileNameSuffix => "-elasticsearch-error";
+
 
 		public override void ExportToLog(Summary summary, ILogger logger)
 		{
 			if (!TryPutIndexTemplate(logger)) return;
 			if (!TryPutPipeline(logger)) return;
 
-			var environmentInfo = CreateHostEnvironmentInformation(summary);
-			var benchmarks = CreateBenchmarkDocuments(summary, environmentInfo);
+			var benchmarks = CreateBenchmarkDocuments(summary);
 
 			IndexBenchmarksIntoElasticsearch(logger, benchmarks);
 		}
 
 		private void IndexBenchmarksIntoElasticsearch(ILogger logger, List<BenchmarkDocument> benchmarks)
 		{
-			var bulk = this.Client.Bulk(b => b
-				.Index(this.IndexName)
+			var bulk = Client.Bulk(b => b
+				.Index(Options.IndexName)
 				.Type("_doc")
-				.Pipeline(this.PipelineName)
+				.Pipeline(Options.PipelineName)
 				.IndexMany(benchmarks)
 			);
 			if (!bulk.IsValid) logger.WriteLine(bulk.DebugInformation);
@@ -82,13 +57,13 @@ namespace Elastic.BenchmarkDotNetExporter
 
 		private bool TryPutIndexTemplate(ILogger logger)
 		{
-			var indexTemplateExists = this.Client.IndexTemplateExists(this.TemplateName).Exists;
+			var indexTemplateExists = Client.IndexTemplateExists(Options.TemplateName).Exists;
 			if (indexTemplateExists) return true;
 
-			var putIndexTemplate = this.Client.PutIndexTemplate(this.TemplateName, r => r
+			var putIndexTemplate = Client.PutIndexTemplate(Options.TemplateName, r => r
 				.Settings(s => s.NumberOfShards(1))
 				.Mappings(m => m.Map<BenchmarkDocument>(mm => mm.AutoMap()))
-				.IndexPatterns(this.IndexName, $"{this.IndexName}-*")
+				.IndexPatterns(Options.IndexName, $"{Options.IndexName}-*")
 			);
 			if (putIndexTemplate.IsValid) return true;
 
@@ -99,17 +74,17 @@ namespace Elastic.BenchmarkDotNetExporter
 
 		private bool TryPutPipeline(ILogger logger)
 		{
-			if (string.IsNullOrWhiteSpace(this.PipelineName)) return true;
+			if (string.IsNullOrWhiteSpace(Options.PipelineName)) return true;
 
-			var getPipelineResponse = this.Client.GetPipeline(p => p.Id(this.PipelineName));
+			var getPipelineResponse = Client.GetPipeline(p => p.Id(Options.PipelineName));
 			if (getPipelineResponse.IsValid) return true;
 
-			var putPipeline = this.Client.PutPipeline(this.PipelineName, r => r
+			var putPipeline = Client.PutPipeline(Options.PipelineName, r => r
 				.Description("Enriches the benchmark exports from BenchmarkDotNet")
 				.Processors(procs => procs
 					.DateIndexName<BenchmarkDocument>(din => din
-						.Field(p => p.Date)
-						.IndexNamePrefix($"{this.IndexName}-")
+						.Field(p => p.Timestamp)
+						.IndexNamePrefix($"{Options.IndexName}-")
 						.DateRounding(DateRounding.Month)
 						.DateFormats("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSZ")
 					)
@@ -122,35 +97,72 @@ namespace Elastic.BenchmarkDotNetExporter
 
 		}
 
-		private List<BenchmarkDocument> CreateBenchmarkDocuments(Summary summary, HostEnv environmentInfo)
+		private List<BenchmarkDocument> CreateBenchmarkDocuments(Summary summary)
 		{
+			var host = CreateHostEnvironmentInformation(summary);
+			var git = new BenchmarkGit
+			{
+				Sha = Options.GitCommitSha,
+				BranchName = Options.GitBranch,
+				CommitMessage = Options.GitCommitMessage,
+				Repository = Options.GitRepositoryIdentifier
+			};
+			var runtimeVersion = new BenchmarkLanguage
+			{
+				Version = summary.HostEnvironmentInfo.RuntimeVersion,
+				DotNetSdkVersion = summary.HostEnvironmentInfo.DotNetSdkVersion.Value,
+				HasRyuJit = summary.HostEnvironmentInfo.HasRyuJit,
+				JitModules = summary.HostEnvironmentInfo.JitModules,
+				BuildConfiguration = summary.HostEnvironmentInfo.Configuration,
+				BenchmarkDotNetCaption = HostEnvironmentInfo.BenchmarkDotNetCaption,
+				BenchmarkDotNetVersion = summary.HostEnvironmentInfo.BenchmarkDotNetVersion,
+			};
+			var os = new BenchmarkOperatingSystem
+			{
+				Version = summary.HostEnvironmentInfo.OsVersion.Value,
+				Name = OsName(),
+				Platform = OsPlatform()
+			};
+			var agent = new BenchmarkAgent
+			{
+				OperatingSystem = os,
+				Git = git,
+				Language = runtimeVersion,
+			};
 			var benchmarks = summary.Reports.Select(r =>
 			{
-				var data = new BenchmarkDocument
+				var @event = new BenchmarkEvent
 				{
-					Date = DateTime.UtcNow,
-					Commit = this.CommitSha,
-					BranchName = this.CurrentBranchName,
-					Title = summary.Title,
-					TotalBenchmarkRunTime = summary.TotalTime,
-					HostEnvironmentInfo = environmentInfo,
+					Description = r.BenchmarkCase.Descriptor.WorkloadMethodDisplayInfo,
 
-					DisplayInfo = r.BenchmarkCase.DisplayInfo,
-					Namespace = r.BenchmarkCase.Descriptor.Type.Namespace,
+					Action = r.BenchmarkCase.Descriptor.WorkloadMethod.Name,
+					Module = r.BenchmarkCase.Descriptor.Type.Namespace,
+					Category = summary.Title,
 					Type = FullNameProvider.GetTypeName(r.BenchmarkCase.Descriptor.Type),
-					Method = r.BenchmarkCase.Descriptor.WorkloadMethod.Name,
-					MethodTitle = r.BenchmarkCase.Descriptor.WorkloadMethodDisplayInfo,
+					Duration = summary.TotalTime,
+					Original = r.BenchmarkCase.DisplayInfo,
+
+					Method = FullNameProvider.GetBenchmarkName(r.BenchmarkCase),
 					Parameters = r.BenchmarkCase.Parameters.PrintInfo,
-					// do NOT remove this property, it is used for xunit-performance migration
-					FullName = FullNameProvider.GetBenchmarkName(r.BenchmarkCase),
-					Statistics = r.ResultStatistics
 				};
 
-				if (summary.Config.HasMemoryDiagnoser()) data.Memory = r.GcStats;
+				var data = new BenchmarkDocument
+				{
+					Timestamp = DateTime.UtcNow,
+					Host = host,
+					Agent = agent,
+					Event = @event,
+					Benchmark = new BenchmarkData(r.ResultStatistics),
+				};
 
-				data.MeasurementStages = r.AllMeasurements
+				if (summary.Config.HasMemoryDiagnoser()) data.Benchmark.Memory = r.GcStats;
+
+				var grouped = r.AllMeasurements
 					.GroupBy(m => $"{m.IterationStage.ToString()}-{m.IterationMode.ToString()}")
 					.Where(g => g.Any())
+					.ToList();
+
+				@event.MeasurementStages = grouped
 					.Select(g => new BenchmarkMeasurementStage
 					{
 						IterationMode = g.First().IterationMode.ToString(),
@@ -158,30 +170,73 @@ namespace Elastic.BenchmarkDotNetExporter
 						Operations = g.First().Operations,
 					});
 
+				var warmupCount = grouped.Select(g=>g.First())
+					.FirstOrDefault(s => s.IterationStage == IterationStage.Warmup && s.IterationMode == IterationMode.Workload)
+					.Operations;
+				var measuredCount = grouped.Select(g=>g.First())
+					.FirstOrDefault(s => s.IterationStage == IterationStage.Result && s.IterationMode == IterationMode.Workload)
+					.Operations;
+				@event.Repetitions = new BenchmarkSimplifiedWorkloadCounts
+				{
+					Warmup = warmupCount,
+					Measured = measuredCount
+				};
 				return data;
 			}).ToList();
 			return benchmarks;
 		}
 
-		private static HostEnv CreateHostEnvironmentInformation(Summary summary)
+		private string OsName()
 		{
-			var environmentInfo = new HostEnv
+			switch (Environment.OSVersion.Platform)
 			{
-				BenchmarkDotNetCaption = HostEnvironmentInfo.BenchmarkDotNetCaption,
-				BenchmarkDotNetVersion = summary.HostEnvironmentInfo.BenchmarkDotNetVersion,
-				OsVersion = summary.HostEnvironmentInfo.OsVersion.Value,
+				case PlatformID.MacOSX:
+					return "Max OS X";
+				case PlatformID.Unix:
+					return "Linux";
+				case PlatformID.Win32NT:
+				case PlatformID.Win32S:
+				case PlatformID.Win32Windows:
+				case PlatformID.WinCE:
+					return "Windows";
+				case PlatformID.Xbox:
+					return "XBox";
+				default:
+					return "Unknown";
+			}
+		}
+
+		private string OsPlatform()
+		{
+			switch (Environment.OSVersion.Platform)
+			{
+				case PlatformID.MacOSX:
+					return "darwin";
+				case PlatformID.Unix:
+					return "unix";
+				case PlatformID.Win32NT:
+				case PlatformID.Win32S:
+				case PlatformID.Win32Windows:
+				case PlatformID.WinCE:
+					return "windows";
+				case PlatformID.Xbox:
+					return "xbox";
+				default:
+					return "unknown";
+			}
+		}
+
+		private static BenchmarkHost CreateHostEnvironmentInformation(Summary summary)
+		{
+			var environmentInfo = new BenchmarkHost
+			{
 				ProcessorName = summary.HostEnvironmentInfo.CpuInfo.Value.ProcessorName,
 				PhysicalProcessorCount = summary.HostEnvironmentInfo.CpuInfo.Value?.PhysicalProcessorCount,
 				PhysicalCoreCount = summary.HostEnvironmentInfo.CpuInfo.Value?.PhysicalCoreCount,
 				LogicalCoreCount = summary.HostEnvironmentInfo.CpuInfo.Value?.LogicalCoreCount,
-				RuntimeVersion = summary.HostEnvironmentInfo.RuntimeVersion,
 				Architecture = summary.HostEnvironmentInfo.Architecture,
 				HasAttachedDebugger = summary.HostEnvironmentInfo.HasAttachedDebugger,
-				HasRyuJit = summary.HostEnvironmentInfo.HasRyuJit,
-				Configuration = summary.HostEnvironmentInfo.Configuration,
-				JitModules = summary.HostEnvironmentInfo.JitModules,
-				DotNetSdkVersion = summary.HostEnvironmentInfo.DotNetSdkVersion.Value,
-				ChronometerFrequency = new ChronometerFrequency {Hertz = summary.HostEnvironmentInfo.ChronometerFrequency.Hertz},
+				ChronometerFrequencyHerz = summary.HostEnvironmentInfo.ChronometerFrequency.Hertz,
 				HardwareTimerKind = summary.HostEnvironmentInfo.HardwareTimerKind.ToString()
 			};
 			return environmentInfo;
@@ -194,57 +249,149 @@ namespace Elastic.BenchmarkDotNetExporter
 			public long Operations { get; set; }
 		}
 
-		internal class BenchmarkData
+		internal class BenchmarkSimplifiedWorkloadCounts
 		{
-			public string DisplayInfo { get; set; }
-			public string Namespace { get; set; }
-			public string Type { get; set; }
-			public string Method { get; set; }
-			public string MethodTitle { get; set; }
-			public string Parameters { get; set; }
-			public string FullName { get; set; }
-			public Statistics Statistics { get; set; }
-			public GcStats Memory { get; set; }
-			public IEnumerable<BenchmarkMeasurementStage> MeasurementStages { get; set; }
+			public long Warmup { get; set; }
+			public long Measured { get; set; }
 		}
 
 		/// <summary> Represents a benchmark case with information of the overall benchmark run as well. </summary>
-		internal class BenchmarkDocument : BenchmarkData
+		internal class BenchmarkDocument
 		{
-			public string Title { get; set; }
-			public string BranchName { get; set; }
-			public string Commit { get; set; }
-			public DateTime Date { get; set; }
-			public TimeSpan TotalBenchmarkRunTime { get; set; }
-			public HostEnv HostEnvironmentInfo { get; set; }
+			[Date(Name = "@timestamp")]
+			public DateTime Timestamp { get; set; }
+
+			[Text] public string Description { get; set; }
+
+			public BenchmarkAgent Agent { get; set; }
+
+			public BenchmarkHost Host { get; set; }
 			public BenchmarkData Benchmark { get; set; }
+			public BenchmarkEvent Event { get; set; }
 		}
 
-		internal class HostEnv
+		internal class BenchmarkEvent
 		{
-			public string BenchmarkDotNetCaption { get; set; }
+			public string Category { get; set; }
+
+			public string Original { get; set; }
+			public string Module { get; set; }
+			public string Type { get; set; }
+			public string Action { get; set; }
+			public string Description { get; set; }
+			public string Parameters { get; set; }
+			public string Method { get; set; }
+			public IEnumerable<BenchmarkMeasurementStage> MeasurementStages { get; set; }
+			public TimeSpan Duration { get; set; }
+			public BenchmarkSimplifiedWorkloadCounts Repetitions { get; set; }
+		}
+
+
+		internal class BenchmarkData
+		{
+			public GcStats Memory { get; set; }
+			public int N { get; }
+			public double Min { get; }
+			public double LowerFence { get; }
+			public double Q1 { get; }
+			public double Median { get; }
+			public double Mean { get; }
+			public double Q3 { get; }
+			public double UpperFence { get; }
+			public double Max { get; }
+			public double InterquartileRange { get; }
+			public double[] LowerOutliers { get; }
+			public double[] UpperOutliers { get; }
+			public double[] AllOutliers { get; }
+			public double StandardError { get; }
+			public double Variance { get; }
+			public double StandardDeviation { get; }
+			public double Skewness { get; }
+			public double Kurtosis { get; }
+			public ConfidenceInterval ConfidenceInterval { get; }
+			public PercentileValues Percentiles { get; }
+
+			public BenchmarkData(Statistics statistics)
+			{
+				this.N = statistics.N;
+				this.Min = statistics.Min;
+				this.LowerFence = statistics.LowerFence;
+				this.Q1 = statistics.Q1;
+				this.Median = statistics.Median;
+				this.Mean = statistics.Mean;
+				this.Q3 = statistics.Q3;
+				this.UpperFence = statistics.UpperFence;
+				this.Max = statistics.Max;
+				this.InterquartileRange = statistics.InterquartileRange;
+				this.LowerOutliers = statistics.LowerOutliers;
+				this.UpperOutliers = statistics.UpperOutliers;
+				this.AllOutliers = statistics.AllOutliers;
+				this.StandardError = statistics.StandardError;
+				this.Variance = statistics.Variance;
+				this.StandardDeviation = statistics.StandardDeviation;
+				this.Skewness = statistics.Skewness;
+				this.Kurtosis = statistics.Kurtosis;
+				this.ConfidenceInterval = statistics.ConfidenceInterval;
+				this.Percentiles = statistics.Percentiles;
+
+			}
+		}
+
+		internal class BenchmarkAgent
+		{
+			private static readonly Version Reference = typeof(BenchmarkAgent).Assembly.GetName().Version;
+			public string Version => Reference.ToString();
+			public string Name { get; set; }
+			public string Type => "benchmark-dotnet-exporter";
+			public BenchmarkGit Git { get; set; }
+			public BenchmarkLanguage Language { get; set; }
+			[Object(Name="os")]
+			public BenchmarkOperatingSystem OperatingSystem { get; set; }
+		}
+
+		internal class BenchmarkOperatingSystem
+		{
+			public string Version { get; set; }
+			public string Platform { get; set; }
+			public string Name { get; set; }
+			public string Family { get; set; }
+			public string Kernel { get; set; }
+		}
+
+		internal class BenchmarkLanguage
+		{
+			[Keyword] public string Version { get; set; }
+			public string DotNetSdkVersion { get; set; }
+			public bool HasRyuJit { get; set; }
+			public string JitModules { get; set; }
+			public string BuildConfiguration { get; set; }
+			public bool HasDebuggerAttached { get; set; }
 			public string BenchmarkDotNetVersion { get; set; }
-			public string OsVersion { get; set; }
+			public string BenchmarkDotNetCaption { get; set; }
+		}
+
+		internal class BenchmarkHost
+		{
 			public string ProcessorName { get; set; }
 			public int? PhysicalProcessorCount { get; set; }
 			public int? PhysicalCoreCount { get; set; }
 			public int? LogicalCoreCount { get; set; }
-			public string RuntimeVersion { get; set; }
 			public string Architecture { get; set; }
 			public bool HasAttachedDebugger { get; set; }
-			public bool HasRyuJit { get; set; }
-			public string Configuration { get; set; }
-			public string JitModules { get; set; }
-			public string DotNetSdkVersion { get; set; }
-			public ChronometerFrequency ChronometerFrequency { get; set; }
 			public string HardwareTimerKind { get; set; }
+			public double ChronometerFrequencyHerz { get; set; }
+
 		}
 
-		internal class ChronometerFrequency { public double Hertz { get; set; } }
+		internal class BenchmarkGit
+		{
+			[Keyword(Name="branch")] public string BranchName { get; set; }
+			[Keyword(Name="sha")] public string Sha { get; set; }
+			[Text(Name="commit_message")] public string CommitMessage { get; set; }
+			[Text(Name="repos")] public string Repository { get; set; }
+		}
+
 
 	}
 
-
-	// copy pasta from https://raw.githubusercontent.com/dotnet/BenchmarkDotNet/04a71586206a822bca56f0abdacefdc2e5fc1b01/src/BenchmarkDotNet/Exporters/FullNameProvider.cs
-	// needs a PR to open this up to the outside
 }

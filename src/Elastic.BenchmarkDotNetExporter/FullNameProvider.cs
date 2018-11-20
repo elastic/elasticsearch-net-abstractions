@@ -10,6 +10,8 @@ using BenchmarkDotNet.Running;
 
 namespace Elastic.BenchmarkDotNetExporter
 {
+	// copy pasta from https://raw.githubusercontent.com/dotnet/BenchmarkDotNet/04a71586206a822bca56f0abdacefdc2e5fc1b01/src/BenchmarkDotNet/Exporters/FullNameProvider.cs
+	// needs a PR to open this up to the outside
 	internal static class FullNameProvider
 	{
 		private static readonly IReadOnlyDictionary<Type, string> Aliases = new Dictionary<Type, string>
