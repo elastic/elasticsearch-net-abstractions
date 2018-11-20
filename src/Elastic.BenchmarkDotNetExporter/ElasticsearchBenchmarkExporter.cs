@@ -121,7 +121,21 @@ namespace Elastic.BenchmarkDotNetExporter
 			}
 		}
 
+		internal class BenchmarchGcInfo
+		{
+			public bool Force { get; set; }
+			public bool Server { get; set; }
+			public bool Concurrent { get; set; }
+			public bool RetainVm { get; set; }
+			public bool CpuGroups { get; set; }
+			public int HeapCount { get; set; }
+			public bool NoAffinitize { get; set; }
+			public int HeapAffinitizeMask { get; set; }
+			public bool AllowVeryLargeObjects { get; set; }
+		}
+
 		private List<BenchmarkDocument> CreateBenchmarkDocuments(Summary summary)
+
 		{
 			var host = CreateHostEnvironmentInformation(summary);
 			var git = new BenchmarkGit
@@ -156,13 +170,25 @@ namespace Elastic.BenchmarkDotNetExporter
 			};
 			var benchmarks = summary.Reports.Select(r =>
 			{
+				var gc = r.BenchmarkCase.Job.Environment.Gc;
 				var jobConfig = new BenchmarkJobConfig
 				{
 					Platform = Enum.GetName(typeof(Platform),r.BenchmarkCase.Job.Environment.Platform),
 					Launch = r.BenchmarkCase.Job.Run,
 					RunTime = r.BenchmarkCase.Job.Environment.Runtime.Name,
 					Jit = Enum.GetName(typeof(Jit),r.BenchmarkCase.Job.Environment.Jit),
-					Gc = r.BenchmarkCase.Job.Environment.Gc,
+					Gc = new BenchmarchGcInfo
+					{
+						Force = gc.Force,
+						Server = gc.Server,
+						Concurrent = gc.Concurrent,
+						RetainVm = gc.RetainVm,
+						CpuGroups = gc.CpuGroups,
+						HeapCount = gc.HeapCount,
+						NoAffinitize = gc.NoAffinitize,
+						HeapAffinitizeMask = gc.HeapAffinitizeMask,
+						AllowVeryLargeObjects = gc.AllowVeryLargeObjects,
+					},
 					Id = r.BenchmarkCase.Job.Environment.Id,
 
 				};
@@ -229,7 +255,7 @@ namespace Elastic.BenchmarkDotNetExporter
 			[Keyword]public string Platform { get; set; }
 			[Keyword]public string RunTime { get; set; }
 			[Keyword]public string Jit { get; set; }
-			[Keyword]public GcMode Gc { get; set; }
+			[Keyword]public BenchmarchGcInfo Gc { get; set; }
 			[Keyword]public string Id { get; set; }
 			public RunMode Launch { get; set; }
 		}
