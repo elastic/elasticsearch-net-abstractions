@@ -335,10 +335,17 @@ namespace Elastic.BenchmarkDotNetExporter
 
 		internal class BenchmarkAgent
 		{
-			private static readonly Version Reference = typeof(BenchmarkAgent).Assembly.GetName().Version;
-			[Keyword]public string Version => Reference.ToString();
+			private static readonly AssemblyName Reference = typeof(BenchmarkAgent).Assembly.GetName();
+			private static readonly AssemblyInformationalVersionAttribute Attribute =
+				typeof(BenchmarkAgent)
+					.Assembly
+					.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false)
+					.FirstOrDefault() as AssemblyInformationalVersionAttribute;
+
+			[Keyword]public string Type => Reference.Name;
+			[Keyword]public string Version => Attribute?.InformationalVersion ?? Reference.Version.ToString();
 			[Keyword]public string Name { get; set; }
-			[Keyword]public string Type => "benchmark-dotnet-exporter";
+
 			public BenchmarkGit Git { get; set; }
 			public BenchmarkLanguage Language { get; set; }
 			[Object(Name="os")]
