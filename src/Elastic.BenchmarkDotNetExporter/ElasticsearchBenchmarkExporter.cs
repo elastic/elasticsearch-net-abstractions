@@ -134,6 +134,22 @@ namespace Elastic.BenchmarkDotNetExporter
 			public bool AllowVeryLargeObjects { get; set; }
 		}
 
+		internal class BenchmarkLaunchInformation
+		{
+			public string RunStrategy { get; set; }
+			public int LaunchCount { get; set; }
+			public int WarmCount { get; set; }
+			public int UnrollFactor { get; set; }
+			public int IterationCount { get; set; }
+			public int InvocationCount { get; set; }
+			public int MaxIterationCount { get; set; }
+			public int MinIterationCount { get; set; }
+			public int MaxWarmupIterationCount { get; set; }
+			public int MinWarmupIterationCount { get; set; }
+			public double IterationTimeInMilliseconds { get; set; }
+		}
+
+
 		private List<BenchmarkDocument> CreateBenchmarkDocuments(Summary summary)
 
 		{
@@ -171,10 +187,25 @@ namespace Elastic.BenchmarkDotNetExporter
 			var benchmarks = summary.Reports.Select(r =>
 			{
 				var gc = r.BenchmarkCase.Job.Environment.Gc;
+				var run = r.BenchmarkCase.Job.Run;
 				var jobConfig = new BenchmarkJobConfig
 				{
 					Platform = Enum.GetName(typeof(Platform),r.BenchmarkCase.Job.Environment.Platform),
-					Launch = r.BenchmarkCase.Job.Run,
+					Launch = new BenchmarkLaunchInformation
+					{
+						RunStrategy = Enum.GetName(typeof(RunStrategy), run.RunStrategy),
+						LaunchCount = run.LaunchCount,
+						WarmCount = run.WarmupCount,
+						UnrollFactor = run.UnrollFactor,
+						IterationCount = run.IterationCount,
+						InvocationCount = run.InvocationCount,
+						MaxIterationCount = run.MaxIterationCount,
+						MinIterationCount = run.MinIterationCount,
+						MaxWarmupIterationCount = run.MaxWarmupIterationCount,
+						MinWarmupIterationCount = run.MinWarmupIterationCount,
+						IterationTimeInMilliseconds = run.IterationTime.ToMilliseconds(),
+					},
+
 					RunTime = r.BenchmarkCase.Job.Environment.Runtime.Name,
 					Jit = Enum.GetName(typeof(Jit),r.BenchmarkCase.Job.Environment.Jit),
 					Gc = new BenchmarchGcInfo
@@ -257,7 +288,7 @@ namespace Elastic.BenchmarkDotNetExporter
 			[Keyword]public string Jit { get; set; }
 			[Keyword]public BenchmarchGcInfo Gc { get; set; }
 			[Keyword]public string Id { get; set; }
-			public RunMode Launch { get; set; }
+			public BenchmarkLaunchInformation Launch { get; set; }
 		}
 
 		private string OsName()
@@ -463,7 +494,6 @@ namespace Elastic.BenchmarkDotNetExporter
 			[Text(Name="commit_message")] public string CommitMessage { get; set; }
 			[Keyword(Name="repos")] public string Repository { get; set; }
 		}
-
 
 	}
 
