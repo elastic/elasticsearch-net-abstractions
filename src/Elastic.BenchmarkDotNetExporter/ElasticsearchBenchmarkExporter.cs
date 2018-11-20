@@ -286,7 +286,7 @@ namespace Elastic.BenchmarkDotNetExporter
 			[Keyword]public string Platform { get; set; }
 			[Keyword]public string RunTime { get; set; }
 			[Keyword]public string Jit { get; set; }
-			[Keyword]public BenchmarchGcInfo Gc { get; set; }
+			public BenchmarchGcInfo Gc { get; set; }
 			[Keyword]public string Id { get; set; }
 			public BenchmarkLaunchInformation Launch { get; set; }
 		}
