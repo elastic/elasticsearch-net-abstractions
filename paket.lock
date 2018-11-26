@@ -2,8 +2,8 @@
 
 GROUP build
 NUGET
-  remote: https://www.myget.org/F/assembly-rewriter-temp/api/v3/index.json
-    assembly-rewriter (1.0.0-alpha20181112T111634) - clitool: true
+  remote: https://ci.appveyor.com/nuget/assemblyrewriter
+    assembly-rewriter (1.0.0-alpha20181126T140416) - clitool: true
   remote: https://api.nuget.org/v3/index.json
     FAKE (4.64.4)
     FSharp.Core (4.3.3) - restriction: && (< net40) (< portable-net45+win8+wp8+wpa81)
