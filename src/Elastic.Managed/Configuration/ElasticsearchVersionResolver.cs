@@ -17,6 +17,8 @@ namespace Elastic.Managed.Configuration
 		private static readonly object Lock = new { };
 		private static readonly ConcurrentDictionary<string, string> SnapshotVersions = new ConcurrentDictionary<string, string>();
 
+		public static readonly string WindowsSuffix = "windows-x86_64";
+
 		/// <summary>
 		/// Resolves an elasticsearch version using either (version | version-snapshot | 'latest')
 		/// </summary>
@@ -24,6 +26,7 @@ namespace Elastic.Managed.Configuration
 		{
 			if (string.IsNullOrWhiteSpace(managedVersionString)) return null;
 			var version = managedVersionString;
+
 			var zip = $"elasticsearch-{version}.zip";
 			ReleaseState state;
 			var localFolder = version;
@@ -31,9 +34,10 @@ namespace Elastic.Managed.Configuration
 			switch (version)
 			{
 				case "latest":
-					state = ReleaseState.Released;
 					version = LatestVersion.Value;
+					state = version.Contains("SNAPSHOT") ? ReleaseState.Snapshot : ReleaseState.Released;
 					zip = LatestSnapshot.Value;
+					localFolder = zip?.Replace(".zip", "").Replace("elasticsearch-", "");
 					break;
 				case string _ when version.EndsWith("-snapshot", StringComparison.OrdinalIgnoreCase):
 					state = ReleaseState.Snapshot;

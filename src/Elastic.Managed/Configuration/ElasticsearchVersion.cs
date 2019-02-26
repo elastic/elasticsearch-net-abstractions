@@ -32,6 +32,9 @@ namespace Elastic.Managed.Configuration
 			this.ReleaseState = state;
 			this.Zip = zip;
 			this.ExtractFolderName = localFolder;
+			//after 7 OS suffix is added e.g: elasticsearch-7.0.0-beta1-windows-x86_64.zip
+			if (this.Major >= 7)
+				this.Zip = this.Zip.Replace(".zip", $"-{ElasticsearchVersionResolver.WindowsSuffix}.zip");
 			this.DownloadLocations = new  ElasticsearchDownloadLocations(this);
 		}
 

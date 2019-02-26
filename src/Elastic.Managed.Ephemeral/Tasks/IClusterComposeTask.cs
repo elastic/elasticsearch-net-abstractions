@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -61,7 +62,10 @@ namespace Elastic.Managed.Ephemeral.Tasks
 			Func<HttpClient, Uri, CancellationToken, Task<HttpResponseMessage>> verb)
 		{
 			var q = string.IsNullOrEmpty(query) ? "pretty=true" : (query + "&pretty=true");
-			var statusUrl = new UriBuilder(cluster.NodesUris().First()) { Path = path, Query = q }.Uri;
+			var host = cluster.ClusterConfiguration.HttpFiddlerAware && Process.GetProcessesByName("fiddler").Any()
+				? "ipv4.fiddler"
+				: "localhost";
+			var statusUrl = new UriBuilder(cluster.NodesUris(host).First()) { Path = path, Query = q }.Uri;
 
 			var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(20));
 			var handler = new HttpClientHandler

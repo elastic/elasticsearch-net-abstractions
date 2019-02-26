@@ -17,7 +17,7 @@ namespace Elastic.Managed.Ephemeral
 		public EphemeralClusterConfiguration(ElasticsearchVersion version, ElasticsearchPlugins plugins = null, int numberOfNodes = 1)
 			: this(version, ClusterFeatures.None, plugins, numberOfNodes) { }
 
-		public EphemeralClusterConfiguration(ElasticsearchVersion version, ClusterFeatures features = ClusterFeatures.None, ElasticsearchPlugins plugins = null, int numberOfNodes = 1)
+		public EphemeralClusterConfiguration(ElasticsearchVersion version, ClusterFeatures features, ElasticsearchPlugins plugins = null, int numberOfNodes = 1)
 			: base(version, (v, s) => new EphemeralFileSystem(v, s), numberOfNodes, EphemeralClusterName)
 		{
 			this.TrialMode = XPackTrialMode.None;
@@ -75,6 +75,9 @@ namespace Elastic.Managed.Ephemeral
 		/// <see cref="XPackLicenseJson"/>
 		/// </summary>
 		public XPackTrialMode TrialMode { get; set; }
+
+		/// <summary> Bootstrapping HTTP calls should attempt to auto route traffic through fiddler if its running </summary>
+		public bool HttpFiddlerAware { get; set; }
 
 		public override string CreateNodeName(int? node)
 		{

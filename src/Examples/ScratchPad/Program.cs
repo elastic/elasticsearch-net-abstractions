@@ -13,11 +13,31 @@ namespace ScratchPad
 	{
 		public static int Main()
 		{
-			ElasticsearchVersion version = "6.3.0";
+			var versions = new[] {"7.0.0-beta1", "6.6.1", "7.0.0-alpha1-SNAPSHOT", "latest", "7.0.0-beta1"};
+			foreach (var v in versions)
+			{
+				var r = ElasticsearchVersion.From(v);
+				Console.ForegroundColor = ConsoleColor.Green;
+				Console.WriteLine(v);
+				Console.ForegroundColor = ConsoleColor.Blue;
+				Console.WriteLine($"\t{r}");
+				Console.WriteLine($"\t{r.Zip}");
+				Console.WriteLine($"\t{r.ReleaseState}");
+				Console.WriteLine($"\t{r.FolderInZip}");
+				Console.WriteLine($"\tfolder: {r.ExtractFolderName}");
+				Console.WriteLine($"\t{r.FullyQualifiedVersion}");
+				Console.WriteLine($"\t{r.DownloadLocations.ElasticsearchDownloadUrl}");
+				Console.WriteLine($"\t{r.DownloadLocations.PluginDownloadUrl("analysis-icu")}");
+			}
+
+
+
+			ElasticsearchVersion version = "7.0.0-beta1";
 
 			var plugins = new ElasticsearchPlugins(ElasticsearchPlugin.IngestGeoIp);
-			var config = new EphemeralClusterConfiguration(version, plugins, 1)
+			var config = new EphemeralClusterConfiguration(version)
 			{
+				HttpFiddlerAware = true,
 				ShowElasticsearchOutputAfterStarted = false,
 				PrintYamlFilesInConfigFolder = false,
 				CacheEsHomeInstallation = true,
@@ -29,7 +49,7 @@ namespace ScratchPad
 			{
 				cluster.Start();
 
-				var nodes = cluster.NodesUris();
+				var nodes = cluster.NodesUris("ipv4.fiddler");
 				var connectionPool = new StaticConnectionPool(nodes);
 				var settings = new ConnectionSettings(connectionPool).EnableDebugMode();
 				if (config.EnableSecurity)

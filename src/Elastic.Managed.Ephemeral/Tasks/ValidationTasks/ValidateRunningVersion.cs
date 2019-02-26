@@ -15,10 +15,21 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 			var catNodes = this.Get(cluster, "_cat/nodes", "h=version");
 			if (catNodes == null || !catNodes.IsSuccessStatusCode) throw new Exception($"Calling _cat/nodes for version checking did not result in an OK response");
 
-			var requestedVersionNoSnapShot = cluster.ClusterConfiguration.Version.ToString().Replace("-SNAPSHOT", "");
 			var nodeVersions = GetResponseString(catNodes).Split(new [] {'\n'}, StringSplitOptions.RemoveEmptyEntries).ToList();
+			var allOnRequestedVersion = false;
 
-			var allOnRequestedVersion = nodeVersions.All(v => v == requestedVersion || v == requestedVersionNoSnapShot);
+			// fully qualified name not returned anymore, so beta1 rc1 etcetera is no longer returned in the version number
+			if (requestedVersion.Major >= 7)
+			{
+				var anchorVersion = $"{requestedVersion.Major}.{requestedVersion.Minor}.{requestedVersion.Patch}";
+				allOnRequestedVersion = nodeVersions.All(v => v == anchorVersion);
+			}
+			else
+			{
+				var requestedVersionNoSnapShot = cluster.ClusterConfiguration.Version.ToString().Replace("-SNAPSHOT", "");
+				allOnRequestedVersion = nodeVersions.All(v => v == requestedVersion || v == requestedVersionNoSnapShot);
+			}
+
 			if (!allOnRequestedVersion)
 				throw new Exception($"Not all the running nodes in the cluster are on requested version: {requestedVersion}");
 		}
