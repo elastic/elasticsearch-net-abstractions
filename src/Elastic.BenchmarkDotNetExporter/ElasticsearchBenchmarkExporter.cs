@@ -250,7 +250,7 @@ namespace Elastic.BenchmarkDotNetExporter
 					Benchmark = new BenchmarkData(r.ResultStatistics),
 				};
 
-				if (summary.Config.HasMemoryDiagnoser()) data.Benchmark.Memory = r.GcStats;
+				if (summary.BenchmarksCases.Any(c=>c.Config.HasMemoryDiagnoser())) data.Benchmark.Memory = r.GcStats;
 
 				var grouped = r.AllMeasurements
 					.GroupBy(m => $"{m.IterationStage.ToString()}-{m.IterationMode.ToString()}")
