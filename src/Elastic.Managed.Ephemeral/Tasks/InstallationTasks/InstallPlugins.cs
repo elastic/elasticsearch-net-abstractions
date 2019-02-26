@@ -35,7 +35,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 					.Where(p => p.Moniker != "x-pack") //x-pack is already installed OOTB since 6.3.0 NOT an error condition though to specify the plugin
 					.Select(p => p.Moniker).ToList();
 				if (invalidPlugins.Any())
-					throw new CleanExitException(
+					throw new ObservableProcessException(
 						$"Can not install the following plugins for version {v}: {string.Join(", ", invalidPlugins)} ");
 			}
 

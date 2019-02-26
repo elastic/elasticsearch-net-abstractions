@@ -65,10 +65,10 @@ namespace Elastic.Xunit.Sdk
 			}
 			catch (Exception e)
 			{
-				if (e is CleanExitException || e is AggregateException ae && ae.Flatten().InnerException is CleanExitException)
+				if (e is CleanExitExceptionBase || e is AggregateException ae && ae.Flatten().InnerException is CleanExitExceptionBase)
 				{
 					sink.OnMessage(new TestAssemblyCleanupFailure(Enumerable.Empty<ITestCase>(), this.TestAssembly,
-						new CleanExitException("Node failed to start", e)));
+						new ObservableProcessException("Node failed to start", e.Message, e)));
 				}
 				else
 					sink.OnMessage(new TestAssemblyCleanupFailure(Enumerable.Empty<ITestCase>(), this.TestAssembly, e));
