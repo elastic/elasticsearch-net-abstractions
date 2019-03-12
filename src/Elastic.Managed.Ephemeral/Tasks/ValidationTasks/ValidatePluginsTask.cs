@@ -15,7 +15,11 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 				return;
 			}
 
-			var requestPlugins = cluster.ClusterConfiguration.Plugins.Where(p=>p.IsValid(v)).Select(p => p.ListedPluginName(v)).ToList();
+			var requestPlugins = cluster.ClusterConfiguration.Plugins
+				.Where(p => p.IsValid(v))
+				.Where(p => !p.IsIncludedOutOfTheBox(v))
+				.Select(p => p.ListedPluginName(v))
+				.ToList();
 			if (!requestPlugins.Any()) return;
 
 			cluster.Writer.WriteDiagnostic($"{{{nameof(ValidatePluginsTask)}}} validating the cluster is running the requested plugins");

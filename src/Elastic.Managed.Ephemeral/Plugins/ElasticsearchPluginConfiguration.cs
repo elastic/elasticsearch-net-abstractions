@@ -23,7 +23,10 @@ namespace Elastic.Managed.Ephemeral.Plugins
 		public static ElasticsearchPlugin DiscoveryGCE { get; } = new ElasticsearchPlugin("discovery-gce");
 
 		public static ElasticsearchPlugin IngestAttachment { get; } = new ElasticsearchPlugin("ingest-attachment", version => version >= "5.0.0-alpha3");
-		public static ElasticsearchPlugin IngestGeoIp { get; } = new ElasticsearchPlugin("ingest-geoip", version => version >= "5.0.0-alpha3");
+		public static ElasticsearchPlugin IngestGeoIp { get; } = new ElasticsearchPlugin("ingest-geoip", version => version >= "5.0.0-alpha3")
+		{
+			ShippedByDefaultAsOf = "7.0.0-beta1"
+		};
 		public static ElasticsearchPlugin IngestUserAgent { get; } = new ElasticsearchPlugin("ingest-geoip", version => version >= "5.0.0-alpha3");
 
 		public static ElasticsearchPlugin MapperAttachment { get; } = new ElasticsearchPlugin("mapper-attachments");
@@ -39,7 +42,10 @@ namespace Elastic.Managed.Ephemeral.Plugins
 
 		public static ElasticsearchPlugin DeleteByQuery { get; } = new ElasticsearchPlugin("delete-by-query", version => version < "5.0.0-alpha3");
 		public static ElasticsearchPlugin XPack { get; } =
-			new ElasticsearchPlugin("x-pack", listName: v => v >= "6.2.0" && v < "6.3.0" ? "x-pack-core" : "x-pack", isValid: v => v < "6.3.0");
+			new ElasticsearchPlugin("x-pack", listName: v => v >= "6.2.0" && v < "6.3.0" ? "x-pack-core" : "x-pack", isValid: v => v < "6.3.0")
+			{
+				ShippedByDefaultAsOf = "6.3.0"
+			};
 
 		// ReSharper enable InconsistentNaming
 
@@ -51,6 +57,7 @@ namespace Elastic.Managed.Ephemeral.Plugins
 			_getListedPluginName = listName ?? (v => moniker);
 		}
 
+		internal ElasticsearchVersion ShippedByDefaultAsOf { get; set; }
 		private readonly Func<ElasticsearchVersion, bool> _isValid;
 		private readonly Func<ElasticsearchVersion, string> _getListedPluginName;
 
@@ -63,7 +70,9 @@ namespace Elastic.Managed.Ephemeral.Plugins
 		/// <summary> The folder name under /plugins, defaults to the value of <see cref="Moniker"/></summary>
 		public virtual string FolderName { get; }
 
-		public bool IsValid(ElasticsearchVersion version) => _isValid(version);
+		public bool IsIncludedOutOfTheBox(ElasticsearchVersion version) => ShippedByDefaultAsOf != null && version >= ShippedByDefaultAsOf;
+
+		public bool IsValid(ElasticsearchVersion version) => IsIncludedOutOfTheBox(version) || _isValid(version);
 
 		public virtual string DownloadUrl(ElasticsearchVersion version)  => version.DownloadLocations.PluginDownloadUrl(this.Moniker);
 	}

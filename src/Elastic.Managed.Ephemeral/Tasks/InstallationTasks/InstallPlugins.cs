@@ -32,7 +32,6 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 			{
 				var invalidPlugins = requiredPlugins
 					.Where(p => !p.IsValid(v))
-					.Where(p => p.Moniker != "x-pack") //x-pack is already installed OOTB since 6.3.0 NOT an error condition though to specify the plugin
 					.Select(p => p.Moniker).ToList();
 				if (invalidPlugins.Any())
 					throw new CleanExitException(
@@ -41,9 +40,10 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 
 			var plugins =
 				from plugin in requiredPlugins
+				let includedByDefault = plugin.IsIncludedOutOfTheBox(v)
 				let validForCurrentVersion = plugin.IsValid(v)
-				let alreadyInstalled = AlreadyInstalled(fs, plugin.FolderName)
-				where !alreadyInstalled && validForCurrentVersion
+				let alreadyInstalled = includedByDefault || AlreadyInstalled(fs, plugin.FolderName)
+				where !includedByDefault || (!alreadyInstalled && validForCurrentVersion)
 				select plugin;
 
 			foreach (var plugin in plugins)

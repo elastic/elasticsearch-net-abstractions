@@ -13,29 +13,12 @@ namespace ScratchPad
 	{
 		public static int Main()
 		{
-			var versions = new[] {"7.0.0-beta1", "6.6.1", "7.0.0-alpha1-SNAPSHOT", "latest", "7.0.0-beta1"};
-			foreach (var v in versions)
-			{
-				var r = ElasticsearchVersion.From(v);
-				Console.ForegroundColor = ConsoleColor.Green;
-				Console.WriteLine(v);
-				Console.ForegroundColor = ConsoleColor.Blue;
-				Console.WriteLine($"\t{r}");
-				Console.WriteLine($"\t{r.Zip}");
-				Console.WriteLine($"\t{r.ReleaseState}");
-				Console.WriteLine($"\t{r.FolderInZip}");
-				Console.WriteLine($"\tfolder: {r.ExtractFolderName}");
-				Console.WriteLine($"\t{r.FullyQualifiedVersion}");
-				Console.WriteLine($"\t{r.DownloadLocations.ElasticsearchDownloadUrl}");
-				Console.WriteLine($"\t{r.DownloadLocations.PluginDownloadUrl("analysis-icu")}");
-			}
+			//ResolveVersions();
 
+			ElasticsearchVersion version = "6.6.1";
 
-
-			ElasticsearchVersion version = "7.0.0-beta1";
-
-			var plugins = new ElasticsearchPlugins(ElasticsearchPlugin.IngestGeoIp);
-			var config = new EphemeralClusterConfiguration(version)
+			var plugins = new ElasticsearchPlugins(ElasticsearchPlugin.IngestGeoIp, ElasticsearchPlugin.AnalysisKuromoji);
+			var config = new EphemeralClusterConfiguration(version, plugins)
 			{
 				HttpFiddlerAware = true,
 				ShowElasticsearchOutputAfterStarted = false,
@@ -66,6 +49,26 @@ namespace ScratchPad
 			}
 			Console.WriteLine("Done!");
 			return 0;
+		}
+
+		private static void ResolveVersions()
+		{
+			var versions = new[] {"7.0.0-beta1", "6.6.1", "7.0.0-alpha1-SNAPSHOT", "latest", "7.0.0-beta1"};
+			foreach (var v in versions)
+			{
+				var r = ElasticsearchVersion.From(v);
+				Console.ForegroundColor = ConsoleColor.Green;
+				Console.WriteLine(v);
+				Console.ForegroundColor = ConsoleColor.Blue;
+				Console.WriteLine($"\t{r}");
+				Console.WriteLine($"\t{r.Zip}");
+				Console.WriteLine($"\t{r.ReleaseState}");
+				Console.WriteLine($"\t{r.FolderInZip}");
+				Console.WriteLine($"\tfolder: {r.ExtractFolderName}");
+				Console.WriteLine($"\t{r.FullyQualifiedVersion}");
+				Console.WriteLine($"\t{r.DownloadLocations.ElasticsearchDownloadUrl}");
+				Console.WriteLine($"\t{r.DownloadLocations.PluginDownloadUrl("analysis-icu")}");
+			}
 		}
 	}
 }
