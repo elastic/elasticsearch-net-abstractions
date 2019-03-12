@@ -15,10 +15,10 @@ namespace ScratchPad
 		{
 			//ResolveVersions();
 
-			ElasticsearchVersion version = "6.6.1";
+			ElasticsearchVersion version = "7.0.0-beta1";
 
 			var plugins = new ElasticsearchPlugins(ElasticsearchPlugin.IngestGeoIp, ElasticsearchPlugin.AnalysisKuromoji);
-			var config = new EphemeralClusterConfiguration(version, plugins)
+			var config = new EphemeralClusterConfiguration(version, plugins, numberOfNodes: 1)
 			{
 				HttpFiddlerAware = true,
 				ShowElasticsearchOutputAfterStarted = false,

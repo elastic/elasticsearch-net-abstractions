@@ -41,21 +41,28 @@ namespace Elastic.Managed
 			this.ClusterConfiguration = clusterConfiguration;
 			this.ClusterMoniker = this.GetType().Name.Replace("Cluster", "");
 
-			var nodes = Enumerable.Range(this.ClusterConfiguration.StartingPortNumber, this.ClusterConfiguration.NumberOfNodes)
-				.Select(p =>
+			NodeConfiguration Modify(NodeConfiguration n, int p)
+			{
+				this.ModifyNodeConfiguration(n, p);
+				return n;
+			}
+
+			var nodes =
+				(from port in Enumerable.Range(this.ClusterConfiguration.StartingPortNumber, this.ClusterConfiguration.NumberOfNodes)
+				let config = new NodeConfiguration(clusterConfiguration, port, this.ClusterMoniker)
 				{
-					var config = new NodeConfiguration(clusterConfiguration, p, this.ClusterMoniker)
-					{
-						ShowElasticsearchOutputAfterStarted = clusterConfiguration.ShowElasticsearchOutputAfterStarted,
-					};
-					this.ModifyNodeConfiguration(config, p);
-					return config;
-				})
-				.Select(n => new ElasticsearchNode(n)
+					ShowElasticsearchOutputAfterStarted = clusterConfiguration.ShowElasticsearchOutputAfterStarted,
+				}
+				let node = new ElasticsearchNode(Modify(config, port))
 				{
 					AssumeStartedOnNotEnoughMasterPing = this.ClusterConfiguration.NumberOfNodes > 1,
-				})
-				.ToList();
+				}
+				select node).ToList();
+
+			var initialMasterNodes = string.Join(",", nodes.Select(n=>n.NodeConfiguration.DesiredNodeName));
+			foreach (var node in nodes)
+				node.NodeConfiguration.InitialMasterNodes(initialMasterNodes);
+
 			this.Nodes = new ReadOnlyCollection<ElasticsearchNode>(nodes);
 		}
 

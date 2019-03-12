@@ -54,6 +54,8 @@ namespace Elastic.Managed.Configuration
 		public ElasticsearchVersion Version => this.ClusterConfiguration.Version;
 		public string[] CommandLineArguments => this.Settings.ToCommandLineArguments(this.Version);
 
+		public void InitialMasterNodes(string initialMasterNodes) => Settings.Add("cluster.initial_master_nodes", initialMasterNodes, ">=7.0.0.beta1");
+
 		public string AttributeKey(string attribute)
 		{
 			var attr = this.Version.Major >= 5 ? "attr." : "";

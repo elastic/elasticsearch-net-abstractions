@@ -198,5 +198,6 @@ namespace Elastic.Managed
 			//otherwise only keep buffering if we are not started
 			return !started;
 		}
+
 	}
 }

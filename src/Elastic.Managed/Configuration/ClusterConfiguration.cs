@@ -53,7 +53,9 @@ namespace Elastic.Managed.Configuration
 
 			var fs = this.FileSystem;
 			this.Add("node.max_local_storage_nodes", numberOfNodes.ToString(CultureInfo.InvariantCulture));
-			this.Add("discovery.zen.minimum_master_nodes", Quorum(numberOfNodes).ToString(CultureInfo.InvariantCulture));
+
+			if (version < "7.0.0-beta1")
+				this.Add("discovery.zen.minimum_master_nodes", Quorum(numberOfNodes).ToString(CultureInfo.InvariantCulture));
 
 			this.Add("cluster.name", clusterName);
 			this.Add("path.repo", fs.RepositoryPath);
