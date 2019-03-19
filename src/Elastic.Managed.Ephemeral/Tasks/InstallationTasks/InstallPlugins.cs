@@ -48,6 +48,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 
 			foreach (var plugin in plugins)
 			{
+				cluster.Writer?.WriteDiagnostic($"{{{nameof(Run)}}} attempting install [{plugin.Moniker}] as it's not OOTB: {{{plugin.ShippedByDefaultAsOf}}} and valid for {v}: {{{plugin.IsValid(v)}}}");
 				//var installParameter = v.ReleaseState == ReleaseState.Released ? plugin.Moniker : UseHttpPluginLocation(cluster.Writer, fs, plugin, v);
 				var installParameter = UseHttpPluginLocation(cluster.Writer, fs, plugin, v);
 				ExecuteBinary(cluster.ClusterConfiguration, cluster.Writer, "cmd", $"install elasticsearch plugin: {plugin.Moniker}", $"/c CALL {fs.PluginBinary} install --batch", installParameter);
