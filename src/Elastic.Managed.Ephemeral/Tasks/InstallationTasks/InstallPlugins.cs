@@ -38,22 +38,35 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 						$"Can not install the following plugins for version {v}: {string.Join(", ", invalidPlugins)} ");
 			}
 
-			var plugins =
-				from plugin in requiredPlugins
-				let includedByDefault = plugin.IsIncludedOutOfTheBox(v)
-				let validForCurrentVersion = plugin.IsValid(v)
-				let alreadyInstalled = includedByDefault || AlreadyInstalled(fs, plugin.FolderName)
-				where !includedByDefault || (!alreadyInstalled && validForCurrentVersion)
-				select plugin;
-
-			foreach (var plugin in plugins)
+			foreach (var plugin in requiredPlugins)
 			{
+				var includedByDefault = plugin.IsIncludedOutOfTheBox(v);
+				if (includedByDefault)
+				{
+					cluster.Writer?.WriteDiagnostic($"{{{nameof(Run)}}} SKIP plugin [{plugin.Moniker}] shipped OOTB as of: {{{plugin.ShippedByDefaultAsOf}}}");
+					continue;
+				}
+				var validForCurrentVersion = plugin.IsValid(v);
+				if (!validForCurrentVersion)
+				{
+					cluster.Writer?.WriteDiagnostic($"{{{nameof(Run)}}} SKIP plugin [{plugin.Moniker}] not valid for version: {{{v}}}");
+					continue;
+				}
+				var alreadyInstalled = AlreadyInstalled(fs, plugin.FolderName);
+				if (alreadyInstalled)
+				{
+					cluster.Writer?.WriteDiagnostic($"{{{nameof(Run)}}} SKIP plugin [{plugin.Moniker}] already installed");
+					continue;
+				}
+
 				cluster.Writer?.WriteDiagnostic($"{{{nameof(Run)}}} attempting install [{plugin.Moniker}] as it's not OOTB: {{{plugin.ShippedByDefaultAsOf}}} and valid for {v}: {{{plugin.IsValid(v)}}}");
 				//var installParameter = v.ReleaseState == ReleaseState.Released ? plugin.Moniker : UseHttpPluginLocation(cluster.Writer, fs, plugin, v);
 				var installParameter = UseHttpPluginLocation(cluster.Writer, fs, plugin, v);
 				ExecuteBinary(cluster.ClusterConfiguration, cluster.Writer, "cmd", $"install elasticsearch plugin: {plugin.Moniker}", $"/c CALL {fs.PluginBinary} install --batch", installParameter);
 				CopyConfigDirectoryToHomeCacheConfigDirectory(cluster, plugin);
 			}
+
+
 		}
 
 		private static void CopyConfigDirectoryToHomeCacheConfigDirectory(IEphemeralCluster<EphemeralClusterConfiguration> cluster, ElasticsearchPlugin plugin)
