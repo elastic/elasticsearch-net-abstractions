@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading;
 using Elastic.Managed.ConsoleWriters;
 
 namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
@@ -27,7 +28,11 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 			if ((getLicense == null || !getLicense.IsSuccessStatusCode) && retries >= 5)
 				throw new Exception($"Calling GET _xpack/license did not result in an OK response after trying {retries} {GetResponseException(getLicense)}");
 
-			if (getLicense == null || !getLicense.IsSuccessStatusCode) return LicenseInfo(cluster, filter, ++retries);
+			if (getLicense == null || !getLicense.IsSuccessStatusCode)
+			{
+				Thread.Sleep(TimeSpan.FromSeconds(10));
+				return LicenseInfo(cluster, filter, ++retries);
+			}
 
 			var licenseStatusString = this.GetResponseString(getLicense)
 				.Where(c => !new[] {' ', '\n', '{', '"', '}'}.Contains(c))
