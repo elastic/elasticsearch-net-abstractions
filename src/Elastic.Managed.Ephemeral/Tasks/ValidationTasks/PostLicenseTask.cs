@@ -20,7 +20,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 			var postResponse = this.Post(cluster, "_xpack/license", "", cluster.ClusterConfiguration.XPackLicenseJson);
 			if (postResponse != null && postResponse.IsSuccessStatusCode) return;
 
-			var details = postResponse != null ? this.GetResponseString(postResponse) : "";
+			var details = postResponse != null ? this.GetResponseException(postResponse) : "";
 			throw new Exception($"The license that was posted was not accepted: {details}");
 		}
 

@@ -7,7 +7,7 @@ namespace Elastic.Managed.Ephemeral
 {
 	public interface IEphemeralCluster
 	{
-		ICollection<Uri> NodesUris(string hostName = "localhost");
+		ICollection<Uri> NodesUris(string hostName = null);
 		string GetCacheFolderName();
 		bool CachingAndCachedHomeExists();
 	}

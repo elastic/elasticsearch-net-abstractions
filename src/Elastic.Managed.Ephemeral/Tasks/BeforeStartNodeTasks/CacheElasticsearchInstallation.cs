@@ -1,5 +1,7 @@
+using System;
 using System.IO;
 using Elastic.Managed.ConsoleWriters;
+using static Elastic.Managed.Ephemeral.ClusterFeatures;
 
 namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks
 {

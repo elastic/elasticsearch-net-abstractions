@@ -5,6 +5,7 @@ using Elastic.Managed.Ephemeral;
 using Elastic.Managed.Ephemeral.Plugins;
 using Elasticsearch.Net;
 using Nest;
+using ScratchPad;
 using static Elastic.Managed.Ephemeral.ClusterFeatures;
 
 namespace ScratchPad
@@ -14,11 +15,18 @@ namespace ScratchPad
 		public static int Main()
 		{
 			//ResolveVersions();
+			//ManualConfigRun();
+			ValidateCombinations.Run();
+			return 0;
+		}
 
+		private static void ManualConfigRun()
+		{
 			ElasticsearchVersion version = "7.0.0-beta1";
 
-			var plugins = new ElasticsearchPlugins(ElasticsearchPlugin.IngestGeoIp, ElasticsearchPlugin.AnalysisKuromoji);
-			var config = new EphemeralClusterConfiguration(version, XPack | SSL | Security, plugins, numberOfNodes: 1)
+			var plugins =
+				new ElasticsearchPlugins(ElasticsearchPlugin.IngestGeoIp, ElasticsearchPlugin.AnalysisKuromoji);
+			var config = new EphemeralClusterConfiguration(version, XPack | Security, plugins, numberOfNodes: 1)
 			{
 				HttpFiddlerAware = true,
 				ShowElasticsearchOutputAfterStarted = false,
@@ -32,7 +40,7 @@ namespace ScratchPad
 			{
 				cluster.Start();
 
-				var nodes = cluster.NodesUris("ipv4.fiddler");
+				var nodes = cluster.NodesUris();
 				var connectionPool = new StaticConnectionPool(nodes);
 				var settings = new ConnectionSettings(connectionPool).EnableDebugMode();
 				if (config.EnableSecurity)
@@ -47,8 +55,8 @@ namespace ScratchPad
 				Console.ReadKey();
 				Console.WriteLine("Exitting..");
 			}
+
 			Console.WriteLine("Done!");
-			return 0;
 		}
 
 		private static void ResolveVersions()

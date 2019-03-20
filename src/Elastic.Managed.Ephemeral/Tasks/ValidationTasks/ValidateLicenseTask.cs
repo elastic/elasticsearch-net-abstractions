@@ -25,7 +25,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 		{
 			var getLicense = this.Get(cluster, "_xpack/license", "filter_path=" + filter);
 			if ((getLicense == null || !getLicense.IsSuccessStatusCode) && retries >= 5)
-				throw new Exception($"Calling GET _xpack/license did not result in an OK response after trying {retries}");
+				throw new Exception($"Calling GET _xpack/license did not result in an OK response after trying {retries} {GetResponseException(getLicense)}");
 
 			if (getLicense == null || !getLicense.IsSuccessStatusCode) return LicenseInfo(cluster, filter, ++retries);
 

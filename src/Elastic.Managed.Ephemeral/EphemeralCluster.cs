@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -36,8 +37,11 @@ namespace Elastic.Managed.Ephemeral
 
 		protected override void OnAfterStarted() => this.Composer.OnAfterStart();
 
-		public virtual ICollection<Uri> NodesUris(string hostName = "localhost")
+		public virtual ICollection<Uri> NodesUris(string hostName = null)
 		{
+			hostName = hostName ?? (this.ClusterConfiguration.HttpFiddlerAware && Process.GetProcessesByName("fiddler").Any()
+				? "ipv4.fiddler"
+				: "localhost");
 			var ssl = this.ClusterConfiguration.EnableSsl ? "s" : "";
 			return this.Nodes
 				.Select(n=>$"http{ssl}://{hostName}:{n.Port ?? 9200}")

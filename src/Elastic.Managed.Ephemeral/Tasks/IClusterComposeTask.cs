@@ -47,7 +47,12 @@ namespace Elastic.Managed.Ephemeral.Tasks
 				fileStream.Flush();
 			}
 		}
-		protected string GetResponseString(HttpResponseMessage m) => m.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+
+
+		protected string GetResponseException(HttpResponseMessage m) => $"Code: {m?.StatusCode} Reason: {m?.ReasonPhrase} Content: {GetResponseString(m)}";
+
+		protected string GetResponseString(HttpResponseMessage m) =>
+			m?.Content?.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult() ?? string.Empty;
 
 		protected HttpResponseMessage Get(IEphemeralCluster<EphemeralClusterConfiguration> cluster, string path, string query) =>
 			Call(cluster, path, query, (c, u, t) => c.GetAsync(u, t));
@@ -62,10 +67,7 @@ namespace Elastic.Managed.Ephemeral.Tasks
 			Func<HttpClient, Uri, CancellationToken, Task<HttpResponseMessage>> verb)
 		{
 			var q = string.IsNullOrEmpty(query) ? "pretty=true" : (query + "&pretty=true");
-			var host = cluster.ClusterConfiguration.HttpFiddlerAware && Process.GetProcessesByName("fiddler").Any()
-				? "ipv4.fiddler"
-				: "localhost";
-			var statusUrl = new UriBuilder(cluster.NodesUris(host).First()) { Path = path, Query = q }.Uri;
+			var statusUrl = new UriBuilder(cluster.NodesUris().First()) { Path = path, Query = q }.Uri;
 
 			var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(20));
 			var handler = new HttpClientHandler

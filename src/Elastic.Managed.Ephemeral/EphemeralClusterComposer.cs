@@ -19,6 +19,7 @@ namespace Elastic.Managed.Ephemeral
 
 		internal static IEnumerable<IClusterComposeTask> InstallationTasks { get; } = new List<IClusterComposeTask>
 		{
+			new PrintConfiguration(),
 			new CreateLocalApplicationDirectory(),
 			new CopyCachedEsInstallation(),
 			new EnsureJavaHomeEnvironmentVariableIsSet(),

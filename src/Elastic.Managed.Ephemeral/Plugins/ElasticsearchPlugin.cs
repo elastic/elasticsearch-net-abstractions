@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Elastic.Managed.Ephemeral.Plugins
 {
@@ -43,5 +44,6 @@ namespace Elastic.Managed.Ephemeral.Plugins
 				ElasticsearchPlugin.XPack,
 			});
 
+		public override string ToString() => string.Join(", ", this.Items.Select(s => s.Moniker));
 	}
 }
