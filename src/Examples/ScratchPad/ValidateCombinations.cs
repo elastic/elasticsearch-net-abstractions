@@ -50,7 +50,8 @@ namespace ScratchPad
 
                               var client = new ElasticClient(settings);
                               Console.WriteLine(client.RootNodeInfo().Version.Number);
-
+                              cluster.Dispose();
+                              cluster.WaitForExit(TimeSpan.FromMinutes(1));
 						}
 						catch (Exception e)
 						{
@@ -64,10 +65,9 @@ namespace ScratchPad
 							throw;
 						}
 					}
-
-					Console.WriteLine("Done!");
 				}
 			}
+			Console.WriteLine("Done!");
 		}
 	}
 }
