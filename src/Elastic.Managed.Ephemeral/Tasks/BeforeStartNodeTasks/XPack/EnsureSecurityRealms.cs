@@ -16,10 +16,42 @@ namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 			var lines = File.ReadAllLines(configFile).ToList();
 			var saveFile = false;
 
-			saveFile = cluster.ClusterConfiguration.Version.Major >= 6 ? Write6XAndUpRealms(lines) : Write5XAndUpRealms(lines);
+			var major = cluster.ClusterConfiguration.Version.Major;
+			saveFile =  major >= 6
+				? (major >= 7 ? Write7XAndUpRealms(lines, cluster.ClusterConfiguration.EnableSsl) : Write6XAndUpRealms(lines))
+				: Write5XAndUpRealms(lines);
 
 			if (saveFile) File.WriteAllLines(configFile, lines);
 			cluster.Writer.WriteDiagnostic($"{{{nameof(EnsureSecurityRealms)}}} {(saveFile ? "saved" : "skipped saving")} xpack realms to [{configFile}]");
+		}
+
+		private static bool Write7XAndUpRealms(List<string> lines, bool sslEnabled)
+		{
+			if (lines.Any(line => line.Contains("file1"))) return false;
+			lines.AddRange(new[]
+			{
+				string.Empty,
+				"xpack:",
+				"  security:",
+				"    authc:",
+				"      realms:",
+				"        file:",
+				$"         {SecurityRealms.FileRealm}:",
+				"            order: 0",
+				string.Empty
+			});
+			if (sslEnabled)
+			{
+				lines.AddRange(new[]
+				{
+
+					"        pki:",
+					$"         {SecurityRealms.PkiRealm}:",
+					"            order: 1",
+					string.Empty
+				});
+			}
+			return true;
 		}
 
 		private static bool Write6XAndUpRealms(List<string> lines)

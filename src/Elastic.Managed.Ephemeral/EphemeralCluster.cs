@@ -49,7 +49,8 @@ namespace Elastic.Managed.Ephemeral
 		protected override string SeeLogsMessage(string message)
 		{
 			var log = Path.Combine(this.FileSystem.LogsPath, $"{this.ClusterConfiguration.ClusterName}.log");
-			if (!File.Exists(log)) return message;
+			if (!File.Exists(log) || this.ClusterConfiguration.ShowElasticsearchOutputAfterStarted) return message;
+			if (!this.Started) return message;
 			using (var fileStream = new FileStream(log, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 			using (var textReader = new StreamReader(fileStream))
 			{

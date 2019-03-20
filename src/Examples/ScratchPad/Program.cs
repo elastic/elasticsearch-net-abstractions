@@ -18,11 +18,11 @@ namespace ScratchPad
 			ElasticsearchVersion version = "7.0.0-beta1";
 
 			var plugins = new ElasticsearchPlugins(ElasticsearchPlugin.IngestGeoIp, ElasticsearchPlugin.AnalysisKuromoji);
-			var config = new EphemeralClusterConfiguration(version, plugins, numberOfNodes: 1)
+			var config = new EphemeralClusterConfiguration(version, XPack | SSL | Security, plugins, numberOfNodes: 1)
 			{
 				HttpFiddlerAware = true,
 				ShowElasticsearchOutputAfterStarted = false,
-				PrintYamlFilesInConfigFolder = false,
+				PrintYamlFilesInConfigFolder = true,
 				CacheEsHomeInstallation = false,
 				TrialMode = XPackTrialMode.Trial,
 				NoCleanupAfterNodeStopped = false,

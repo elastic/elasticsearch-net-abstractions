@@ -109,17 +109,34 @@ namespace Elastic.Managed.Ephemeral
 
             this.AddSecuritySetting("http.ssl.enabled", sslEnabled);
             this.AddSecuritySetting("transport.ssl.enabled", sslEnabled);
-            this.AddSecuritySetting("authc.token.enabled", "true", ">=5.5.0");
-			if (this.EnableSecurity)
+			if (this.EnableSecurity && this.EnableSsl)
 			{
-	           	this.AddSecuritySetting("authc.realms.pki1.enabled", sslEnabled);
+	           	this.AddSecuritySetting("authc.realms.pki1.enabled", sslEnabled, "<7.0.0-beta1");
+	           	this.AddSecuritySetting("authc.realms.pki.pki1.enabled", sslEnabled, ">=7.0.0-beta1");
 			}
 
 			if (this.EnableSsl)
 			{
-                this.Add("xpack.ssl.key", this.FileSystem.NodePrivateKey);
-                this.Add("xpack.ssl.certificate", this.FileSystem.NodeCertificate);
-                this.Add("xpack.ssl.certificate_authorities", this.FileSystem.CaCertificate);
+				this.AddSecuritySetting("authc.token.enabled", "true", ">=5.5.0");
+				if (this.Version < "7.0.0-beta1")
+				{
+					this.Add("xpack.ssl.key", this.FileSystem.NodePrivateKey);
+					this.Add("xpack.ssl.certificate", this.FileSystem.NodeCertificate);
+					this.Add("xpack.ssl.certificate_authorities", this.FileSystem.CaCertificate);
+
+				}
+				else
+				{
+					this.Add("xpack.security.transport.ssl.key", this.FileSystem.NodePrivateKey);
+					this.Add("xpack.security.transport.ssl.certificate", this.FileSystem.NodeCertificate);
+					this.Add("xpack.security.transport.ssl.certificate_authorities", this.FileSystem.CaCertificate);
+
+					this.Add("xpack.security.http.ssl.key", this.FileSystem.NodePrivateKey);
+					this.Add("xpack.security.http.ssl.certificate", this.FileSystem.NodeCertificate);
+					this.Add("xpack.security.http.ssl.certificate_authorities", this.FileSystem.CaCertificate);
+
+				}
+
 			}
 		}
 	}
