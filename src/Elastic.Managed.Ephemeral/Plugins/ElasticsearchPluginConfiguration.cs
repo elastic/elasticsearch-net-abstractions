@@ -8,7 +8,6 @@ namespace Elastic.Managed.Ephemeral.Plugins
 	/// </summary>
 	public class ElasticsearchPlugin
 	{
-
 		// ReSharper disable InconsistentNaming
 		public static ElasticsearchPlugin AnalysisIcu { get; } = new ElasticsearchPlugin("analysis-icu");
 		public static ElasticsearchPlugin AnalysisKuromoji { get; } = new ElasticsearchPlugin("analysis-kuromoji");
@@ -25,9 +24,12 @@ namespace Elastic.Managed.Ephemeral.Plugins
 		public static ElasticsearchPlugin IngestAttachment { get; } = new ElasticsearchPlugin("ingest-attachment", version => version >= "5.0.0-alpha3");
 		public static ElasticsearchPlugin IngestGeoIp { get; } = new ElasticsearchPlugin("ingest-geoip", version => version >= "5.0.0-alpha3")
 		{
-			ShippedByDefaultAsOf = "7.0.0-beta1"
+			ShippedByDefaultAsOf = "6.7.0"
 		};
-		public static ElasticsearchPlugin IngestUserAgent { get; } = new ElasticsearchPlugin("ingest-geoip", version => version >= "5.0.0-alpha3");
+		public static ElasticsearchPlugin IngestUserAgent { get; } = new ElasticsearchPlugin("ingest-user-agent", version => version >= "5.0.0-alpha3")
+		{
+			ShippedByDefaultAsOf = "6.7.0"
+		};
 
 		public static ElasticsearchPlugin MapperAttachment { get; } = new ElasticsearchPlugin("mapper-attachments");
 		public static ElasticsearchPlugin MapperMurmur3 { get; } = new ElasticsearchPlugin("mapper-murmur3");
@@ -70,10 +72,12 @@ namespace Elastic.Managed.Ephemeral.Plugins
 		/// <summary> The folder name under /plugins, defaults to the value of <see cref="Moniker"/></summary>
 		public virtual string FolderName { get; }
 
+		/// <summary>Whether the plugin is included in the distribution out of the box for the given version</summary>
 		public bool IsIncludedOutOfTheBox(ElasticsearchVersion version) => ShippedByDefaultAsOf != null && version >= ShippedByDefaultAsOf;
 
+		/// <summary>Whether the plugin is valid for the given version</summary>
 		public bool IsValid(ElasticsearchVersion version) => IsIncludedOutOfTheBox(version) || _isValid(version);
 
-		public virtual string DownloadUrl(ElasticsearchVersion version)  => version.DownloadLocations.PluginDownloadUrl(this.Moniker);
+		public virtual string DownloadUrl(ElasticsearchVersion version) => version.DownloadLocations.PluginDownloadUrl(this.Moniker);
 	}
 }
