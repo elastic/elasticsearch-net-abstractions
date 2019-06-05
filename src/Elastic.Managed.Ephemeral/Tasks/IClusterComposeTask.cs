@@ -81,6 +81,7 @@ namespace Elastic.Managed.Ephemeral.Tasks
 				AutomaticDecompression =
 					DecompressionMethods.Deflate | DecompressionMethods.GZip | DecompressionMethods.None,
 			};
+			cluster.Writer.WriteDiagnostic($"{{{nameof(Call)}}} [{statusUrl}] Security: {cluster.ClusterConfiguration.EnableSsl} Security: {cluster.ClusterConfiguration.EnableSecurity}");
 			if (cluster.ClusterConfiguration.EnableSsl)
 			{
 				handler.ServerCertificateCustomValidationCallback += (m, c, cn, p) => true;
@@ -108,8 +109,9 @@ namespace Elastic.Managed.Ephemeral.Tasks
 					foreach (var l in (body ?? string.Empty).Split('\n', '\r'))
 						cluster.Writer.WriteDiagnostic($"{{{nameof(Call)}}} [{statusUrl}] returned [{l}]");
 				}
-				catch
+				catch (Exception e)
 				{
+					cluster.Writer.WriteError($"{{{nameof(Call)}}} [{statusUrl}] exception: {e}");
 					// ignored
 				}
 			}
