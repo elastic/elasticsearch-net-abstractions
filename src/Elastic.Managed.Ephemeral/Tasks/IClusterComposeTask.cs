@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -11,6 +10,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Elastic.Managed.ConsoleWriters;
+using ICSharpCode.SharpZipLib.GZip;
+using ICSharpCode.SharpZipLib.Tar;
 using ProcNet;
 using ProcNet.Std;
 
@@ -183,5 +184,31 @@ namespace Elastic.Managed.Ephemeral.Tasks
 				File.Copy(sourcePath, targetPath, overwrite);
 			}
 		}
+
+		protected static void Extract(string file, string toFolder)
+		{
+			if (file.EndsWith(".zip")) ExtractZip(file, toFolder);
+			else if (file.EndsWith(".tar.gz")) ExtractTarGz(file, toFolder);
+			else if (file.EndsWith(".tar")) ExtractTar(file, toFolder);
+			else throw new Exception("Can not extract:" + file);
+		}
+
+		private static void ExtractTar(string file, string toFolder)
+		{
+			using(var inStream = File.OpenRead(file))
+			using (var tarArchive = TarArchive.CreateInputTarArchive(inStream))
+				tarArchive.ExtractContents(toFolder);
+		}
+
+		private static void ExtractTarGz(string file, string toFolder)
+		{
+			using(var inStream = File.OpenRead(file))
+			using(var gzipStream = new GZipInputStream(inStream))
+			using(var tarArchive = TarArchive.CreateInputTarArchive(gzipStream))
+				tarArchive.ExtractContents(toFolder);
+		}
+
+		private static void ExtractZip(string file, string toFolder) =>
+			System.IO.Compression.ZipFile.ExtractToDirectory(file, toFolder);
 	}
 }

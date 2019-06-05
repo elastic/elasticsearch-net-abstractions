@@ -15,18 +15,18 @@ namespace ScratchPad
 		public static int Main()
 		{
 			//ResolveVersions();
-			//ManualConfigRun();
-			ValidateCombinations.Run();
+			ManualConfigRun();
+			//ValidateCombinations.Run();
 			return 0;
 		}
 
 		private static void ManualConfigRun()
 		{
-			ElasticsearchVersion version = "7.0.0-beta1";
+			ElasticsearchVersion version = "7.0.0";
 
 			var plugins =
 				new ElasticsearchPlugins(ElasticsearchPlugin.IngestGeoIp, ElasticsearchPlugin.AnalysisKuromoji);
-			var config = new EphemeralClusterConfiguration(version, XPack | Security, plugins, numberOfNodes: 1)
+			var config = new EphemeralClusterConfiguration(version, None, plugins, numberOfNodes: 1)
 			{
 				HttpFiddlerAware = true,
 				ShowElasticsearchOutputAfterStarted = false,

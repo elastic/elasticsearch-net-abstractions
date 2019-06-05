@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Elastic.Managed.Configuration;
 using Elastic.Managed.ConsoleWriters;
@@ -27,6 +28,8 @@ namespace Elastic.Managed
 
 		private static StartArguments StartArgs(NodeConfiguration config)
 		{
+			//var args = new[] {config.FileSystem.Binary}.Concat(config.CommandLineArguments);
+			
 			var startArguments = new StartArguments(config.FileSystem.Binary, config.CommandLineArguments)
 			{
 				SendControlCFirst = true,

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Runtime.InteropServices;
 using Version = SemVer.Version;
 
 namespace Elastic.Managed.Configuration
@@ -34,9 +36,31 @@ namespace Elastic.Managed.Configuration
 			this.ExtractFolderName = localFolder;
 			//after 7 OS suffix is added e.g: elasticsearch-7.0.0-beta1-windows-x86_64.zip
 			if (this.Major >= 7)
-				this.Zip = this.Zip.Replace(".zip", $"-{ElasticsearchVersionResolver.WindowsSuffix}.zip");
+			{
+				this.Zip = this.Zip.Replace(".zip", $"-{OsSuffix()}.{OsFileType()}");
+				
+			}
 			this.DownloadLocations = new  ElasticsearchDownloadLocations(this);
 		}
+		
+		private static string OsFileType()
+		{
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return "zip";
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return "tar.gz";
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) return "tar.gz";
+			
+			throw new Exception($"{RuntimeInformation.OSDescription} is currently not supported please open an issue @elastic/elasticsearch-net-abstractions");
+		}
+		
+		private static string OsSuffix()
+		{
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return ElasticsearchVersionResolver.WindowsSuffix;
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return ElasticsearchVersionResolver.OsxSuffix;
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) return ElasticsearchVersionResolver.LinuxSuffix;
+			
+			throw new Exception($"{RuntimeInformation.OSDescription} is currently not supported please open an issue @elastic/elasticsearch-net-abstractions");
+		}
+
 
 		public ElasticsearchDownloadLocations DownloadLocations { get; }
 
@@ -58,7 +82,10 @@ namespace Elastic.Managed.Configuration
 		/// <summary>
 		/// Returns the version in elasticsearch-{version} format, for SNAPSHOTS this includes a /// datetime suffix
 		/// </summary>
-		public string FullyQualifiedVersion => this.Zip?.Replace(".zip", "").Replace("elasticsearch-", "");
+		public string FullyQualifiedVersion => this.Zip
+			?.Replace(".zip", "")
+			?.Replace(".tar.gz", "")
+			.Replace("elasticsearch-", "");
 
 		/// <summary>
 		/// The folder name to expect inside the zip distribution

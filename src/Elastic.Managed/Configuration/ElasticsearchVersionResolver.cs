@@ -18,6 +18,8 @@ namespace Elastic.Managed.Configuration
 		private static readonly ConcurrentDictionary<string, string> SnapshotVersions = new ConcurrentDictionary<string, string>();
 
 		public static readonly string WindowsSuffix = "windows-x86_64";
+		public static readonly string LinuxSuffix = "linux-x86_64";
+		public static readonly string OsxSuffix = "darwin-x86_64";
 
 		/// <summary>
 		/// Resolves an elasticsearch version using either (version | version-snapshot | 'latest')

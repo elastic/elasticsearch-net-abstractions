@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Elastic.Managed.Configuration;
 using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.Ephemeral.Plugins;
@@ -62,7 +63,14 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 				cluster.Writer?.WriteDiagnostic($"{{{nameof(Run)}}} attempting install [{plugin.Moniker}] as it's not OOTB: {{{plugin.ShippedByDefaultAsOf}}} and valid for {v}: {{{plugin.IsValid(v)}}}");
 				//var installParameter = v.ReleaseState == ReleaseState.Released ? plugin.Moniker : UseHttpPluginLocation(cluster.Writer, fs, plugin, v);
 				var installParameter = UseHttpPluginLocation(cluster.Writer, fs, plugin, v);
-				ExecuteBinary(cluster.ClusterConfiguration, cluster.Writer, "cmd", $"install elasticsearch plugin: {plugin.Moniker}", $"/c CALL {fs.PluginBinary} install --batch", installParameter);
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+					ExecuteBinary(cluster.ClusterConfiguration, cluster.Writer, "cmd", $"install elasticsearch plugin: {plugin.Moniker}", $"/c CALL {fs.PluginBinary} install --batch", installParameter);
+				else
+				{
+					if (!Directory.Exists(fs.ConfigPath)) Directory.CreateDirectory(fs.ConfigPath);
+					ExecuteBinary(cluster.ClusterConfiguration, cluster.Writer, fs.PluginBinary, $"install elasticsearch plugin: {plugin.Moniker}", "install --batch", installParameter);
+				}
+				
 				CopyConfigDirectoryToHomeCacheConfigDirectory(cluster, plugin);
 			}
 
@@ -96,7 +104,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 			var downloadLocation = Path.Combine(fileSystem.LocalFolder, $"{plugin.FolderName}-{v}.zip");
 			DownloadPluginSnapshot(writer, downloadLocation, plugin, v);
 			//transform downloadLocation to file uri and use that to install from
-			return new Uri(downloadLocation).AbsoluteUri;
+			return new Uri(new Uri("file://"), downloadLocation).AbsoluteUri;
 		}
 
 		private static void DownloadPluginSnapshot(IConsoleLineWriter writer, string downloadLocation, ElasticsearchPlugin plugin, ElasticsearchVersion v)

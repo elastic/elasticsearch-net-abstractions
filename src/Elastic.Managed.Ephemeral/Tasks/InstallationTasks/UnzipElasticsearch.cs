@@ -25,7 +25,8 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 			if (!Directory.Exists(extractedFolder))
 			{
                 cluster.Writer?.WriteDiagnostic($"{{{nameof(UnzipElasticsearch)}}} unzipping version [{v}] {{{from}}}");
-                ZipFile.ExtractToDirectory(from, fs.LocalFolder);
+                Extract(from, fs.LocalFolder);
+                
                 cluster.Writer?.WriteDiagnostic($"{{{nameof(UnzipElasticsearch)}}} extracted version [{v}] to {{{fs.LocalFolder}}}");
 			}
 
