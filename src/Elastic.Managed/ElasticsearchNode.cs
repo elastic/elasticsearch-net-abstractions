@@ -76,7 +76,7 @@ namespace Elastic.Managed
 			var subscription = this.SubscribeLines(writer);
 			if (this.WaitForStarted(waitForStarted)) return subscription;
 			subscription.Dispose();
-			throw new CleanExitException($"Failed to start node: {node} before the configured timeout of: {waitForStarted}");
+			throw new ElasticsearchCleanExitException($"Failed to start node: {node} before the configured timeout of: {waitForStarted}");
 		}
 
 		internal IConsoleLineWriter Writer { get; private set; }
@@ -185,13 +185,13 @@ namespace Elastic.Managed
 				this.Port = port;
 				var dp = this.NodeConfiguration.DesiredPort;
 				if (dp.HasValue && this.Port != dp.Value)
-					throw new CleanExitException($"Node started on port {port} but {dp.Value} was requested");
+					throw new ElasticsearchCleanExitException($"Node started on port {port} but {dp.Value} was requested");
 			}
 
 			if (!started) started = AssumedStartedStateChecker(section, message);
 			if (started)
 			{
-				if (!this.Port.HasValue) throw new CleanExitException($"Node started but ElasticsearchNode did not grab its port number");
+				if (!this.Port.HasValue) throw new ElasticsearchCleanExitException($"Node started but ElasticsearchNode did not grab its port number");
 				this.NodeStarted = true;
 				this._startedHandle.Set();
 			}

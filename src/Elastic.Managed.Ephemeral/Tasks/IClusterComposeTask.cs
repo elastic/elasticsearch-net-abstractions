@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.ExceptionServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -204,10 +205,18 @@ namespace Elastic.Managed.Ephemeral.Tasks
 
 		private static void ExtractTarGz(string file, string toFolder)
 		{
-			using(var inStream = File.OpenRead(file))
-			using(var gzipStream = new GZipInputStream(inStream))
-			using(var tarArchive = TarArchive.CreateInputTarArchive(gzipStream))
-				tarArchive.ExtractContents(toFolder);
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				using (var inStream = File.OpenRead(file))
+				using (var gzipStream = new GZipInputStream(inStream))
+				using (var tarArchive = TarArchive.CreateInputTarArchive(gzipStream))
+					tarArchive.ExtractContents(toFolder);
+			}
+			else
+			{
+				//SharpZipLib loses permissions when untarring
+				Proc.Exec("tar", "-xvf", file, "-C", toFolder);
+			}
 		}
 
 		private static void ExtractZip(string file, string toFolder) =>

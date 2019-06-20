@@ -55,6 +55,8 @@ namespace Elastic.Managed.FileSystem
 		protected static string GetEsHomeVariable() => Environment.GetEnvironmentVariable("ES_HOME");
 
 		protected static string GetApplicationDataDirectory() =>
-			RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? Environment.GetEnvironmentVariable("LocalAppData") : "/tmp";
+			RuntimeInformation.IsOSPlatform(OSPlatform.Windows) 
+				? Environment.GetEnvironmentVariable("LocalAppData") 
+				: Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create);
 	}
 }

@@ -35,7 +35,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 					.Where(p => !p.IsValid(v))
 					.Select(p => p.Moniker).ToList();
 				if (invalidPlugins.Any())
-					throw new CleanExitException(
+					throw new ElasticsearchCleanExitException(
 						$"Can not install the following plugins for version {v}: {string.Join(", ", invalidPlugins)} ");
 			}
 
