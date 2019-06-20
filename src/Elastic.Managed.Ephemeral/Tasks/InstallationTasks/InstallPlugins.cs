@@ -8,6 +8,7 @@ using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.Ephemeral.Plugins;
 using Elastic.Managed.FileSystem;
 using ProcNet;
+using ProcNet.Std;
 
 namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 {
@@ -99,7 +100,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 			return Directory.Exists(pluginFolder);
 		}
 
-		private static string UseHttpPluginLocation(IConsoleLineWriter writer, INodeFileSystem fileSystem, ElasticsearchPlugin plugin, ElasticsearchVersion v)
+		private static string UseHttpPluginLocation(IConsoleLineHandler writer, INodeFileSystem fileSystem, ElasticsearchPlugin plugin, ElasticsearchVersion v)
 		{
 			var downloadLocation = Path.Combine(fileSystem.LocalFolder, $"{plugin.FolderName}-{v}.zip");
 			DownloadPluginSnapshot(writer, downloadLocation, plugin, v);
@@ -107,7 +108,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 			return new Uri(new Uri("file://"), downloadLocation).AbsoluteUri;
 		}
 
-		private static void DownloadPluginSnapshot(IConsoleLineWriter writer, string downloadLocation, ElasticsearchPlugin plugin, ElasticsearchVersion v)
+		private static void DownloadPluginSnapshot(IConsoleLineHandler writer, string downloadLocation, ElasticsearchPlugin plugin, ElasticsearchVersion v)
 		{
 			if (File.Exists(downloadLocation)) return;
 			var downloadUrl = plugin.DownloadUrl(v);

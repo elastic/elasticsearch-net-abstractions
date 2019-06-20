@@ -125,15 +125,15 @@ namespace Elastic.Managed.Ephemeral.Tasks
 			if (!File.Exists(fileLocation)) File.WriteAllText(fileLocation, contents);
 		}
 
-		protected static void ExecuteBinary(EphemeralClusterConfiguration config, IConsoleLineWriter writer,
+		protected static void ExecuteBinary(EphemeralClusterConfiguration config, IConsoleLineHandler writer,
 			string binary, string description, params string[] arguments) =>
 			ExecuteBinaryInternal(config, writer, binary, description, null, arguments);
 
-		protected static void ExecuteBinary(EphemeralClusterConfiguration config, IConsoleLineWriter writer,
+		protected static void ExecuteBinary(EphemeralClusterConfiguration config, IConsoleLineHandler writer,
 			string binary, string description, StartedHandler startedHandler, params string[] arguments) =>
 			ExecuteBinaryInternal(config, writer, binary, description, startedHandler, arguments);
 
-		private static void ExecuteBinaryInternal(EphemeralClusterConfiguration config, IConsoleLineWriter writer,
+		private static void ExecuteBinaryInternal(EphemeralClusterConfiguration config, IConsoleLineHandler writer,
 			string binary, string description, StartedHandler startedHandler, params string[] arguments)
 		{
 			var command = $"{{{binary}}} {{{string.Join(" ", arguments)}}}";

@@ -7,6 +7,7 @@ using System.Threading;
 using Elastic.Managed.Configuration;
 using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.FileSystem;
+using ProcNet.Std;
 
 namespace Elastic.Managed
 {
@@ -18,13 +19,13 @@ namespace Elastic.Managed
 		INodeFileSystem FileSystem { get; }
 		bool Started { get; }
 		ReadOnlyCollection<ElasticsearchNode> Nodes { get; }
-		IConsoleLineWriter Writer { get; }
+		IConsoleLineHandler Writer { get; }
 
 		IDisposable Start();
 
 		IDisposable Start(TimeSpan waitForStarted);
 
-		IDisposable Start(IConsoleLineWriter writer, TimeSpan waitForStarted);
+		IDisposable Start(IConsoleLineHandler writer, TimeSpan waitForStarted);
 	}
 
 
@@ -74,7 +75,7 @@ namespace Elastic.Managed
 
 		public ReadOnlyCollection<ElasticsearchNode> Nodes { get; }
 		public bool Started { get; private set; }
-		public IConsoleLineWriter Writer { get; private set; } = NoopConsoleLineWriter.Instance;
+		public IConsoleLineHandler Writer { get; private set; } = NoopConsoleLineWriter.Instance;
 
 		private Action<NodeConfiguration, int> _defaultConfigSelector = (n, i) => { };
 		protected virtual void ModifyNodeConfiguration(NodeConfiguration nodeConfiguration, int port) { }
@@ -86,7 +87,7 @@ namespace Elastic.Managed
 		public IDisposable Start(TimeSpan waitForStarted) =>
 			this.Start(new LineHighlightWriter(this.Nodes.Select(n => n.NodeConfiguration.DesiredNodeName).ToArray()), waitForStarted);
 
-		public IDisposable Start(IConsoleLineWriter writer, TimeSpan waitForStarted)
+		public IDisposable Start(IConsoleLineHandler writer, TimeSpan waitForStarted)
 		{
 			this.Writer = writer ?? NoopConsoleLineWriter.Instance;
 

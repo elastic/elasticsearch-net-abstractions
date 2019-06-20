@@ -70,7 +70,7 @@ namespace Elastic.Managed
 
 		public IDisposable Start(TimeSpan waitForStarted) => this.Start(new LineHighlightWriter(), waitForStarted);
 
-		public IDisposable Start(IConsoleLineWriter writer, TimeSpan waitForStarted)
+		public IDisposable Start(IConsoleLineHandler writer, TimeSpan waitForStarted)
 		{
 			var node = this.NodeConfiguration.DesiredNodeName;
 			var subscription = this.SubscribeLines(writer);
@@ -79,19 +79,19 @@ namespace Elastic.Managed
 			throw new ElasticsearchCleanExitException($"Failed to start node: {node} before the configured timeout of: {waitForStarted}");
 		}
 
-		internal IConsoleLineWriter Writer { get; private set; }
+		internal IConsoleLineHandler Writer { get; private set; }
 
 		public IDisposable SubscribeLines() => this.SubscribeLines(new LineHighlightWriter());
-		public IDisposable SubscribeLines(IConsoleLineWriter writer) =>
+		public IDisposable SubscribeLines(IConsoleLineHandler writer) =>
 			this.SubscribeLines(writer, delegate { }, delegate { }, delegate { });
 
-		public IDisposable SubscribeLines(IConsoleLineWriter writer, Action<LineOut> onNext) =>
+		public IDisposable SubscribeLines(IConsoleLineHandler writer, Action<LineOut> onNext) =>
 			this.SubscribeLines(writer, onNext, delegate { }, delegate { });
 
-		public IDisposable SubscribeLines(IConsoleLineWriter writer, Action<LineOut> onNext, Action<Exception> onError) =>
+		public IDisposable SubscribeLines(IConsoleLineHandler writer, Action<LineOut> onNext, Action<Exception> onError) =>
 			this.SubscribeLines(writer, onNext, onError, delegate { });
 
-		public IDisposable SubscribeLines(IConsoleLineWriter writer, Action<LineOut> onNext, Action<Exception> onError, Action onCompleted)
+		public IDisposable SubscribeLines(IConsoleLineHandler writer, Action<LineOut> onNext, Action<Exception> onError, Action onCompleted)
 		{
 			this.Writer = writer;
 			var node = this.NodeConfiguration.DesiredNodeName;
@@ -99,13 +99,13 @@ namespace Elastic.Managed
 			writer?.WriteDiagnostic($"Settings: {{{string.Join(" ", this.NodeConfiguration.CommandLineArguments)}}}", node);
 			return this.SubscribeLines(
 				l => {
-					writer?.Write(l);
+					writer?.Handle(l);
 					onNext?.Invoke(l);
 				},
 				e =>
 				{
 					this.LastSeenException = e;
-					writer?.Write(e);
+					writer?.Handle(e);
 					onError?.Invoke(e);
 					this._startedHandle.Set();
 				},

@@ -3,11 +3,11 @@ using ProcNet.Std;
 
 namespace Elastic.Managed.ConsoleWriters
 {
-	internal class NoopConsoleLineWriter : IConsoleLineWriter
+	internal class NoopConsoleLineWriter : IConsoleLineHandler
 	{
 		public static NoopConsoleLineWriter Instance { get; } = new NoopConsoleLineWriter();
-		public void Write(LineOut lineOut) { }
+		public void Handle(LineOut lineOut) { }
 
-		public void Write(Exception e) { }
+		public void Handle(Exception e) { }
 	}
 }

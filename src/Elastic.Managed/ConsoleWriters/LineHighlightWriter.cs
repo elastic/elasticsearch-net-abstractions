@@ -6,7 +6,7 @@ using ProcNet.Std;
 
 namespace Elastic.Managed.ConsoleWriters
 {
-	public class LineHighlightWriter : IConsoleLineWriter
+	public class LineHighlightWriter : IConsoleLineHandler
 	{
 		private static readonly ConsoleColor[] AvailableNodeColors =
 		{
@@ -35,7 +35,7 @@ namespace Elastic.Managed.ConsoleWriters
 			this._nodeColors = colors;
 		}
 
-		public void Write(Exception e)
+		public void Handle(Exception e)
 		{
 			lock (Lock)
 			{
@@ -46,7 +46,7 @@ namespace Elastic.Managed.ConsoleWriters
 			}
 		}
 
-		public void Write(LineOut lineOut)
+		public void Handle(LineOut lineOut)
 		{
 			var parsed = LineOutParser.TryParse(lineOut.Line, out var date, out var level, out var section, out var node, out var message, out _);
 			if (parsed) Write(lineOut.Error, date, level, section, node, message, NodeColor);

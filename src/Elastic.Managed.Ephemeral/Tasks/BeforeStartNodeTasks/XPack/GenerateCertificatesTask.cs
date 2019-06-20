@@ -3,6 +3,7 @@ using System.IO.Compression;
 using System.Linq;
 using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.FileSystem;
+using ProcNet.Std;
 
 namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 {
@@ -68,7 +69,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 					});
 		}
 
-		private static void GenerateCertificates(IEphemeralCluster<EphemeralClusterConfiguration> cluster, string silentModeConfigFile, IConsoleLineWriter writer)
+		private static void GenerateCertificates(IEphemeralCluster<EphemeralClusterConfiguration> cluster, string silentModeConfigFile, IConsoleLineHandler writer)
 		{
 			var config = cluster.ClusterConfiguration;
 			var name = config.FileSystem.CertificateFolderName;
@@ -76,7 +77,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 			NewOrCachedCertificates(cluster, name, path, silentModeConfigFile, writer);
 		}
 
-		private static void GenerateUnusedCertificates(IEphemeralCluster<EphemeralClusterConfiguration> cluster, string silentModeConfigFile, IConsoleLineWriter writer)
+		private static void GenerateUnusedCertificates(IEphemeralCluster<EphemeralClusterConfiguration> cluster, string silentModeConfigFile, IConsoleLineHandler writer)
 		{
 			var config = cluster.ClusterConfiguration;
 			var name = config.FileSystem.UnusedCertificateFolderName;
@@ -84,7 +85,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 			NewOrCachedCertificates(cluster, name, path, silentModeConfigFile, writer);
 		}
 
-		private static void NewOrCachedCertificates(IEphemeralCluster<EphemeralClusterConfiguration> cluster, string name, string path, string silentModeConfigFile, IConsoleLineWriter writer)
+		private static void NewOrCachedCertificates(IEphemeralCluster<EphemeralClusterConfiguration> cluster, string name, string path, string silentModeConfigFile, IConsoleLineHandler writer)
 		{
 			var config = cluster.ClusterConfiguration;
 			var cachedEsHomeFolder = Path.Combine(config.FileSystem.LocalFolder, cluster.GetCacheFolderName());
@@ -111,7 +112,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 			UnpackCertificatesZip(zipLocation, path, writer);
 		}
 
-		private static void GenerateCertificate(EphemeralClusterConfiguration config, string name, string path, string zipLocation, string silentModeConfigFile, IConsoleLineWriter writer)
+		private static void GenerateCertificate(EphemeralClusterConfiguration config, string name, string path, string zipLocation, string silentModeConfigFile, IConsoleLineHandler writer)
 		{
 			var @out = config.Version.Major < 6 ? $"{name}.zip" : zipLocation;
 			var fs = config.FileSystem;
@@ -134,7 +135,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 		}
 
 
-		private static void UnpackCertificatesZip(string zipLocation, string outFolder, IConsoleLineWriter writer)
+		private static void UnpackCertificatesZip(string zipLocation, string outFolder, IConsoleLineHandler writer)
 		{
 			if (Directory.Exists(outFolder)) return;
 

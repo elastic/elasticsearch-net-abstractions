@@ -1,5 +1,6 @@
 using System.IO;
 using Elastic.Managed.ConsoleWriters;
+using ProcNet.Std;
 
 namespace Elastic.Managed.Ephemeral.Tasks.AfterNodeStoppedTasks
 {
@@ -42,7 +43,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.AfterNodeStoppedTasks
 			}
 		}
 
-		private static void DeleteDirectory(IConsoleLineWriter w, string description, string path)
+		private static void DeleteDirectory(IConsoleLineHandler w, string description, string path)
 		{
 			if (!Directory.Exists(path)) return;
 			w.WriteDiagnostic($"{{{nameof(CleanUpDirectoriesAfterNodeStopped)}}} attempting to delete [{description}]: {{{path}}}");
