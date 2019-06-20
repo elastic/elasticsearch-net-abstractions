@@ -26,10 +26,10 @@ namespace ScratchPad
 
 			var plugins =
 				new ElasticsearchPlugins(ElasticsearchPlugin.IngestGeoIp, ElasticsearchPlugin.AnalysisKuromoji);
-			var config = new EphemeralClusterConfiguration(version, None , null, numberOfNodes: 1)
+			var config = new EphemeralClusterConfiguration(version, Security | XPack , plugins, numberOfNodes: 1)
 			{
 				HttpFiddlerAware = true,
-				ShowElasticsearchOutputAfterStarted = false,
+				ShowElasticsearchOutputAfterStarted = true,
 				PrintYamlFilesInConfigFolder = true,
 				CacheEsHomeInstallation = false,
 				TrialMode = XPackTrialMode.Trial,
