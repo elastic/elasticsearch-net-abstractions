@@ -5,7 +5,7 @@
     <IsPackable>False</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Proc" Version="0.6.0" />
+    <PackageReference Include="Proc" Version="0.6.1" />
     <!--<ProjectReference Include="..\..\..\..\..\proc\src\Proc\Proc.csproj" />-->
     <ProjectReference Include="..\..\Elastic.Managed.Ephemeral\Elastic.Managed.Ephemeral.csproj" />
     <PackageReference Include="NEST" Version="6.0.1" />

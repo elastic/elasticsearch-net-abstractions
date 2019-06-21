@@ -19,7 +19,7 @@
     <PackageTags>elastic,elasticsearch,cluster,observable,rx</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Proc" Version="0.6.0" />
+    <PackageReference Include="Proc" Version="0.6.1" />
     <!--<ProjectReference Include="..\..\..\..\proc\src\Proc\Proc.csproj" />-->
     <PackageReference Include="SemanticVersioning" Version="0.8.0" />
     <PackageReference Condition="'$(TargetFramework)' == 'net46'" Include="System.Net.Http" Version="4.3.1" />
