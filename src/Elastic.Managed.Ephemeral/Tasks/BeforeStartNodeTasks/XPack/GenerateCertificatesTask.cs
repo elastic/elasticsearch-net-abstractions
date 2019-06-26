@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Reflection;
 using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.FileSystem;
 using ProcNet.Std;
@@ -65,6 +66,11 @@ namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 						"instances:",
 						$"    - name : \"{config.FileSystem.CertificateNodeName}\"",
 						$"    - name : \"{config.FileSystem.ClientCertificateName}\"",
+						$"      ip:",
+						$"          - \"127.0.0.1\"",
+						$"      dns:",
+						$"          - \"localhost\"",
+						$"          - \"ipv4.fiddler\"",
 						$"      filename : \"{config.FileSystem.ClientCertificateFilename}\"",
 					});
 		}
@@ -117,13 +123,22 @@ namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 			var @out = config.Version.Major < 6 ? $"{name}.zip" : zipLocation;
 			var fs = config.FileSystem;
 			var binary = config.Version >= "6.3.0"
-				? Path.Combine(fs.ElasticsearchHome, "bin", "elasticsearch-certgen") + BinarySuffix
+				? config.Version < "8.0.0"
+					? Path.Combine(fs.ElasticsearchHome, "bin", "elasticsearch-certgen") + BinarySuffix
+					: Path.Combine(fs.ElasticsearchHome, "bin", "elasticsearch-certutil") + BinarySuffix
 				: Path.Combine(fs.ElasticsearchHome, "bin", "x-pack", "certgen") + BinarySuffix;
 
 
 			if (!Directory.Exists(path))
-				ExecuteBinary(config, writer, binary, "generating ssl certificates for this session",
-					"-in", silentModeConfigFile, "-out", @out);
+			{
+				if (config.Version < "7.0.0")
+					ExecuteBinary(config, writer, binary, "generating ssl certificates for this session",
+						"-in", silentModeConfigFile, "-out", @out);
+				else
+					ExecuteBinary(config, writer, binary, "generating ssl certificates for this session",
+						"cert",
+						"-in", silentModeConfigFile, "-out", @out);
+			}
 
 			var badLocation = Path.Combine(config.FileSystem.ElasticsearchHome, "config", "x-pack", @out);
 			//not necessary anymore now that we patch .in.bat i think

@@ -22,11 +22,11 @@ namespace ScratchPad
 
 		private static void ManualConfigRun()
 		{
-			ElasticsearchVersion version = "7.0.0";
+			ElasticsearchVersion version = "7.1.0";
 
 			var plugins =
 				new ElasticsearchPlugins(ElasticsearchPlugin.IngestGeoIp, ElasticsearchPlugin.AnalysisKuromoji);
-			var config = new EphemeralClusterConfiguration(version, Security | XPack , plugins, numberOfNodes: 1)
+			var config = new EphemeralClusterConfiguration(version, Security | XPack | SSL , plugins, numberOfNodes: 1)
 			{
 				HttpFiddlerAware = true,
 				ShowElasticsearchOutputAfterStarted = true,
