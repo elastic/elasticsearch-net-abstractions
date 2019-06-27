@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using Elastic.Managed.Configuration;
@@ -86,7 +87,16 @@ namespace Elastic.Managed.Ephemeral
 				foreach (var p in config.Plugins.OrderBy(p=>p.Moniker))
 					sb.Append(p.Moniker.ToLowerInvariant());
 			}
-			return sb.ToString();
+			var name = sb.ToString();
+
+			return CalculateSha1(name, Encoding.UTF8);
+		}
+		public static string CalculateSha1(string text, Encoding enc)
+		{
+			var buffer = enc.GetBytes(text);
+			var cryptoTransformSha1 = new SHA1CryptoServiceProvider();
+			return BitConverter.ToString(cryptoTransformSha1.ComputeHash(buffer))
+				.Replace("-", "").ToLowerInvariant().Substring(0,12);
 		}
 
 	}

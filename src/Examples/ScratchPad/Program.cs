@@ -30,8 +30,8 @@ namespace ScratchPad
 			{
 				HttpFiddlerAware = true,
 				ShowElasticsearchOutputAfterStarted = true,
-				PrintYamlFilesInConfigFolder = true,
-				CacheEsHomeInstallation = false,
+				//PrintYamlFilesInConfigFolder = true,
+				CacheEsHomeInstallation = true,
 				TrialMode = XPackTrialMode.Trial,
 				NoCleanupAfterNodeStopped = false,
 			};
