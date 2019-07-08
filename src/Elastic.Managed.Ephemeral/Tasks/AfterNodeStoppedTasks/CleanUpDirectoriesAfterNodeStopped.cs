@@ -30,9 +30,10 @@ namespace Elastic.Managed.Ephemeral.Tasks.AfterNodeStoppedTasks
 			{
 				var extractedFolder = Path.Combine(fs.LocalFolder, v.FolderInZip);
 				if (extractedFolder != fs.ElasticsearchHome)
-				{
 					DeleteDirectory(w, "ephemeral ES_HOME", fs.ElasticsearchHome);
-				}
+				//if the node was not started delete the cached extractedFolder
+				if (!nodeStarted)
+					DeleteDirectory(w, "cached extracted folder - node failed to start", extractedFolder);
 			}
 
 			//if the node did not start make sure we delete the cached folder as we can not assume its in a good state

@@ -38,9 +38,11 @@ namespace Elastic.Managed.Configuration
 			if (this.Major >= 7)
 			{
 				this.Zip = this.Zip.Replace(".zip", $"-{OsSuffix()}.{OsFileType()}");
-				
 			}
-			this.DownloadLocations = new  ElasticsearchDownloadLocations(this);
+			else 
+				this.Zip = this.Zip.Replace(".zip", $".{OsFileType()}");
+			
+			this.DownloadLocations = new ElasticsearchDownloadLocations(this);
 		}
 		
 		private static string OsFileType()
