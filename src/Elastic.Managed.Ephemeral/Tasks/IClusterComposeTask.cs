@@ -5,8 +5,10 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Security;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -82,14 +84,20 @@ namespace Elastic.Managed.Ephemeral.Tasks
 				AutomaticDecompression =
 					DecompressionMethods.Deflate | DecompressionMethods.GZip | DecompressionMethods.None,
 			};
-			cluster.Writer.WriteDiagnostic($"{{{nameof(Call)}}} [{statusUrl}] Security: {cluster.ClusterConfiguration.EnableSsl} Security: {cluster.ClusterConfiguration.EnableSecurity}");
+			cluster.Writer.WriteDiagnostic($"{{{nameof(Call)}}} [{statusUrl}] SSL: {cluster.ClusterConfiguration.EnableSsl} Security: {cluster.ClusterConfiguration.EnableSecurity}");
 			if (cluster.ClusterConfiguration.EnableSsl)
 			{
+#if !NETSTANDARD
+				ServicePointManager.ServerCertificateValidationCallback += ServerCertificateValidationCallback;
+#else
 				handler.ServerCertificateCustomValidationCallback += (m, c, cn, p) => true;
+#endif
+				
 			}
 
 			using (var client = new HttpClient(handler) {Timeout = TimeSpan.FromSeconds(20)})
 			{
+				
 				if (cluster.ClusterConfiguration.EnableSecurity)
 				{
 					var byteArray =
@@ -115,10 +123,19 @@ namespace Elastic.Managed.Ephemeral.Tasks
 					cluster.Writer.WriteError($"{{{nameof(Call)}}} [{statusUrl}] exception: {e}");
 					// ignored
 				}
+				finally
+				{
+					
+#if !NETSTANDARD
+				ServicePointManager.ServerCertificateValidationCallback -= ServerCertificateValidationCallback;
+#endif
+				}
 			}
 
 			return null;
 		}
+
+		private static bool ServerCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslpolicyerrors) => true;
 
 		protected static void WriteFileIfNotExist(string fileLocation, string contents)
 		{

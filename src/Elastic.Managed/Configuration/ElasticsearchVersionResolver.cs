@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Xml.Linq;
+using Elastic.Managed.Configuration.Artifacts;
 using SemVer;
 using Version = SemVer.Version;
 
@@ -12,11 +16,6 @@ namespace Elastic.Managed.Configuration
 {
 	public static class ElasticsearchVersionResolver
 	{
-		private static readonly Lazy<string> LatestVersion = new Lazy<string>(ResolveLatestVersion, LazyThreadSafetyMode.ExecutionAndPublication);
-		private static readonly Lazy<string> LatestSnapshot = new Lazy<string>(ResolveLatestSnapshot, LazyThreadSafetyMode.ExecutionAndPublication);
-		private static readonly object Lock = new { };
-		private static readonly ConcurrentDictionary<string, string> SnapshotVersions = new ConcurrentDictionary<string, string>();
-
 		public static readonly string WindowsSuffix = "windows-x86_64";
 		public static readonly string LinuxSuffix = "linux-x86_64";
 		public static readonly string OsxSuffix = "darwin-x86_64";
@@ -36,14 +35,22 @@ namespace Elastic.Managed.Configuration
 			switch (version)
 			{
 				case "latest":
-					version = LatestVersion.Value;
+					version = ArtifactsResolver.LatestReleaseOrSnapshot.ToString();
+					zip = $"elasticsearch-{version}.zip";
 					state = version.Contains("SNAPSHOT") ? ReleaseState.Snapshot : ReleaseState.Released;
-					zip = LatestSnapshot.Value;
-					localFolder = zip?.Replace(".zip", "").Replace("elasticsearch-", "");
+					if (state == ReleaseState.Snapshot)
+						localFolder = zip?.Replace(".zip", "").Replace("elasticsearch-", "");
+					break;
+				case string _ when version.StartsWith("latest-", StringComparison.OrdinalIgnoreCase):
+					var major = int.Parse(version.Replace("latest-", ""));
+					version = ArtifactsResolver.LatestReleaseOrSnapshotForMajor(major).ToString();
+					zip = $"elasticsearch-{version}.zip";
+					state = version.Contains("SNAPSHOT") ? ReleaseState.Snapshot : ReleaseState.Released;
+					if (state == ReleaseState.Snapshot)
+						localFolder = zip?.Replace(".zip", "").Replace("elasticsearch-", "");
 					break;
 				case string _ when version.EndsWith("-snapshot", StringComparison.OrdinalIgnoreCase):
 					state = ReleaseState.Snapshot;
-					zip = SnapshotZipFilename(version);
 					localFolder = zip?.Replace(".zip", "").Replace("elasticsearch-", "");
 					break;
 				case string _ when TryParseBuildCandidate(version, out var v, out var gitHash):
@@ -59,19 +66,6 @@ namespace Elastic.Managed.Configuration
 			return new ElasticsearchVersion(version, zip, state, localFolder);
 		}
 
-		public static string SnapshotZipFilename(string version)
-		{
-			lock (Lock)
-			{
-				if (SnapshotVersions.TryGetValue(version, out var zipLocation))
-					return zipLocation;
-
-				zipLocation = ResolveLatestSnapshotFor(version);
-				SnapshotVersions.TryAdd(version, zipLocation);
-				return zipLocation;
-			}
-		}
-
 		public static bool TryParseBuildCandidate(string passedVersion, out string version, out string gitHash)
 		{
 			version = null;
@@ -82,60 +76,5 @@ namespace Elastic.Managed.Configuration
 			gitHash = tokens[0].Trim();
 			return true;
 		}
-
-		private static string ResolveLatestSnapshot()
-		{
-			var version = LatestVersion.Value;
-			return ResolveLatestSnapshotFor(version);
-		}
-
-		private static string LoadUrl(string url)
-		{
-			var http = new HttpClient();
-			using (var stream = http.GetStreamAsync(new Uri(url)).GetAwaiter().GetResult())
-			using (var fileStream = new StreamReader(stream))
-				return fileStream.ReadToEnd();
-		}
-
-		private static string ResolveLatestSnapshotFor(string version)
-		{
-			var url = $"{ElasticsearchDownloadLocations.SonaTypeUrl}/{version}/maven-metadata.xml";
-			try
-			{
-				var mavenMetadata = XElement.Parse(LoadUrl(url));
-				var snapshot = mavenMetadata.Descendants("versioning").Descendants("snapshot").FirstOrDefault();
-				// ReSharper disable PossibleNullReferenceException
-				// dont care let it blow up whatevs
-				var snapshotTimestamp = snapshot.Descendants("timestamp").FirstOrDefault().Value;
-				var snapshotBuildNumber = snapshot.Descendants("buildNumber").FirstOrDefault().Value;
-				// ReSharper restore PossibleNullReferenceException
-				var identifier = $"{snapshotTimestamp}-{snapshotBuildNumber}";
-				var zip = $"elasticsearch-{version.Replace("SNAPSHOT", "")}{identifier}.zip";
-				return zip;
-
-			}
-			catch (Exception e)
-			{
-				throw new Exception($"Can not download maven data from {url}", e);
-			}
-		}
-
-		private static string ResolveLatestVersion()
-		{
-			var url = $"{ElasticsearchDownloadLocations.SonaTypeUrl}/maven-metadata.xml";
-			try
-			{
-				var versions = XElement.Parse(LoadUrl(url))
-					.Descendants("version")
-					.Select(n => new Version(n.Value))
-					.OrderByDescending(n => n);
-				return versions.First().ToString();
-			}
-			catch (Exception e)
-			{
-				throw new Exception($"Can not download maven data from {url}", e);
-			}
-		}
-
 	}
 }

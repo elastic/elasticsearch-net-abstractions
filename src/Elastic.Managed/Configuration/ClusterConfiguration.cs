@@ -52,7 +52,7 @@ namespace Elastic.Managed.Configuration
 			this.NumberOfNodes = numberOfNodes;
 
 			var fs = this.FileSystem;
-			this.Add("node.max_local_storage_nodes", numberOfNodes.ToString(CultureInfo.InvariantCulture));
+			this.Add("node.max_local_storage_nodes", numberOfNodes.ToString(CultureInfo.InvariantCulture), "<8.0.0");
 
 			if (version < "7.0.0-beta1")
 				this.Add("discovery.zen.minimum_master_nodes", Quorum(numberOfNodes).ToString(CultureInfo.InvariantCulture));

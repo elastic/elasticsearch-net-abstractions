@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using Elastic.Managed.Configuration;
+using Elastic.Managed.Configuration.Artifacts;
 using Elastic.Managed.Ephemeral;
 using Elastic.Managed.Ephemeral.Plugins;
 using Elasticsearch.Net;
@@ -22,12 +24,11 @@ namespace ScratchPad
 
 		private static void ManualConfigRun()
 		{
-			ElasticsearchVersion version = "7.1.0";
+			ElasticsearchVersion version = "latest";
 
-			var plugins =
-				new ElasticsearchPlugins(ElasticsearchPlugin.IngestGeoIp, ElasticsearchPlugin.AnalysisKuromoji);
+			var plugins = new ElasticsearchPlugins(ElasticsearchPlugin.IngestGeoIp, ElasticsearchPlugin.AnalysisKuromoji);
 			var features = Security | XPack | SSL;
-			var config = new EphemeralClusterConfiguration(version, None, plugins, numberOfNodes: 1)
+			var config = new EphemeralClusterConfiguration(version, features, null, numberOfNodes: 1)
 			{
 				HttpFiddlerAware = true,
 				ShowElasticsearchOutputAfterStarted = true,
@@ -61,7 +62,14 @@ namespace ScratchPad
 
 		private static void ResolveVersions()
 		{
-			var versions = new[] {"7.0.0-beta1", "6.6.1", "7.0.0-alpha1-SNAPSHOT", "latest", "7.0.0-beta1"};
+			Console.WriteLine(string.Join(",", ArtifactsResolver.AvailableVersions.Value.Select(v=>v.ToString())));
+			Console.WriteLine(ArtifactsResolver.LatestReleaseOrSnapshot);
+			Console.WriteLine(ArtifactsResolver.LatestSnapshotForMajor(7));
+			Console.WriteLine(ArtifactsResolver.LatestReleaseOrSnapshotForMajor(6));
+			Console.WriteLine(ArtifactsResolver.LatestSnapshotForMajor(6));
+			
+			var versions = new[] {"8.0.0-SNAPSHOT",  "7.0.0-beta1", "6.6.1", "latest-7", "latest", "7.0.0-beta1"};
+			//var versions = new[] {"latest", "latest-7", "latest-6", "latest-8"};
 			foreach (var v in versions)
 			{
 				var r = ElasticsearchVersion.From(v);
@@ -69,7 +77,7 @@ namespace ScratchPad
 				Console.WriteLine(v);
 				Console.ForegroundColor = ConsoleColor.Blue;
 				Console.WriteLine($"\t{r}");
-				Console.WriteLine($"\t{r.Zip}");
+				Console.WriteLine($"\t{r.Archive}");
 				Console.WriteLine($"\t{r.ReleaseState}");
 				Console.WriteLine($"\t{r.FolderInZip}");
 				Console.WriteLine($"\tfolder: {r.ExtractFolderName}");

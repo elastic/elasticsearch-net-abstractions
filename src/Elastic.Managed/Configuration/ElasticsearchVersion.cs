@@ -28,19 +28,19 @@ namespace Elastic.Managed.Configuration
 			return v != null;
 		}
 
-		internal ElasticsearchVersion(string version, string zip, ReleaseState state, string localFolder) : base(version)
+		internal ElasticsearchVersion(string version, string archive, ReleaseState state, string localFolder) : base(version)
 		{
 			this.Version = version;
 			this.ReleaseState = state;
-			this.Zip = zip;
+			this.Archive = archive;
 			this.ExtractFolderName = localFolder;
 			//after 7 OS suffix is added e.g: elasticsearch-7.0.0-beta1-windows-x86_64.zip
 			if (this.Major >= 7)
 			{
-				this.Zip = this.Zip.Replace(".zip", $"-{OsSuffix()}.{OsFileType()}");
+				this.Archive = this.Archive.Replace(".zip", $"-{OsSuffix()}.{OsFileType()}");
 			}
 			else 
-				this.Zip = this.Zip.Replace(".zip", $".{OsFileType()}");
+				this.Archive = this.Archive.Replace(".zip", $".{OsFileType()}");
 			
 			this.DownloadLocations = new ElasticsearchDownloadLocations(this);
 		}
@@ -66,10 +66,8 @@ namespace Elastic.Managed.Configuration
 
 		public ElasticsearchDownloadLocations DownloadLocations { get; }
 
-		/// <summary>
-		/// The zip file name for this version
-		/// </summary>
-		public string Zip { get; }
+		/// <summary> The archive file name for this version </summary>
+		public string Archive { get; }
 
 		/// <summary>
 		/// Original string representation for this version
@@ -84,7 +82,7 @@ namespace Elastic.Managed.Configuration
 		/// <summary>
 		/// Returns the version in elasticsearch-{version} format, for SNAPSHOTS this includes a /// datetime suffix
 		/// </summary>
-		public string FullyQualifiedVersion => this.Zip
+		public string FullyQualifiedVersion => this.Archive
 			?.Replace(".zip", "")
 			?.Replace(".tar.gz", "")
 			.Replace("elasticsearch-", "");

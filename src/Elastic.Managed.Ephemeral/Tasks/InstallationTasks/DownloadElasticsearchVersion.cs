@@ -14,7 +14,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 			var fs = cluster.FileSystem;
 			var v = cluster.ClusterConfiguration.Version;
 			var from = v.DownloadLocations.ElasticsearchDownloadUrl;
-			var to = Path.Combine(fs.LocalFolder, v.Zip);
+			var to = Path.Combine(fs.LocalFolder, v.Archive);
 			if (File.Exists(to))
 			{
 				cluster.Writer?.WriteDiagnostic($"{{{nameof(DownloadElasticsearchVersion)}}} {v} was already downloaded");
