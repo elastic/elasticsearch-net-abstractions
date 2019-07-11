@@ -17,8 +17,8 @@ namespace ScratchPad
 		public static int Main()
 		{
 			ResolveVersions();
-			//ManualConfigRun();
-			ValidateCombinations.Run();
+			ManualConfigRun();
+			//ValidateCombinations.Run();
 			return 0;
 		}
 
