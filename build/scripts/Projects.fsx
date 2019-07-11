@@ -14,7 +14,7 @@ module Projects =
         | BenchmarkDotNetExporter
         | Stack
 
-        static member All = [Managed; Ephemeral; Xunit; BenchmarkDotNetExporter]
+        static member All = [Managed; Ephemeral; Xunit; BenchmarkDotNetExporter; Stack;]
 
     type ProjectInfo = { name: string; moniker: string; project: Project}
 
