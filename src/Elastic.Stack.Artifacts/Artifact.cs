@@ -44,7 +44,7 @@ namespace Elastic.Stack.Artifacts
 		{
 			get
 			{
-				var hashed = string.IsNullOrWhiteSpace(BuildHash) ? string.Empty : $"-build+{BuildHash}";
+				var hashed = string.IsNullOrWhiteSpace(BuildHash) ? string.Empty : $"-build-{BuildHash}";
 				switch (State)
 				{
 					case ArtifactBuildState.Released:

@@ -21,7 +21,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 				return;
 			}
 
-			var from = Path.Combine(fs.LocalFolder, a.FolderInZip);
+			var from = Path.Combine(fs.LocalFolder, a.Archive);
 			var extractedFolder = Path.Combine(fs.LocalFolder, a.FolderInZip);
 			if (!Directory.Exists(extractedFolder))
 			{

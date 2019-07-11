@@ -18,7 +18,6 @@ namespace Elastic.Managed.Ephemeral.Tasks.AfterNodeStoppedTasks
 				return;
 			}
 
-
 			DeleteDirectory(w, "cluster data", fs.DataPath);
 			DeleteDirectory(w, "cluster config", fs.ConfigPath);
 			DeleteDirectory(w, "cluster logs", fs.LogsPath);
@@ -38,11 +37,11 @@ namespace Elastic.Managed.Ephemeral.Tasks.AfterNodeStoppedTasks
 			}
 
 			//if the node did not start make sure we delete the cached folder as we can not assume its in a good state
+			var cachedEsHomeFolder = Path.Combine(fs.LocalFolder, cluster.GetCacheFolderName());
 			if (cluster.ClusterConfiguration.CacheEsHomeInstallation && !nodeStarted)
-			{
-				var cachedEsHomeFolder = Path.Combine(fs.LocalFolder, cluster.GetCacheFolderName());
 				DeleteDirectory(w, "cached installation - node failed to start", cachedEsHomeFolder);
-			}
+			else 
+				w.WriteDiagnostic($"{{{nameof(CleanUpDirectoriesAfterNodeStopped)}}} Leaving [cached folder] on disk: {{{cachedEsHomeFolder}}}");
 		}
 
 		private static void DeleteDirectory(IConsoleLineHandler w, string description, string path)

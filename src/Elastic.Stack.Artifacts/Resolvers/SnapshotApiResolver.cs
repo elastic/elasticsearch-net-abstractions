@@ -36,7 +36,7 @@ namespace Elastic.Stack.Artifacts.Resolvers
 			var json = FetchJson($"search/{version}/{query}");
 			var packages = JsonSerializer.Parse<ArtifactsSearchResponse>(json).Packages;
 			if (packages == null || packages.Count == 0) return false;
-			foreach (var kv in packages)
+			foreach (var kv in packages.OrderByDescending(k => k.Value.Classifier == null ? 1 : 0))
 			{
 				var tokens = PackageProductRegex.Split(kv.Key).Where(s=>!string.IsNullOrWhiteSpace(s)).ToArray();
 				if (tokens.Length < 2) continue;
