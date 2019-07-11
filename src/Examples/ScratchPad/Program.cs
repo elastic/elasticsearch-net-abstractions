@@ -16,9 +16,9 @@ namespace ScratchPad
 	{
 		public static int Main()
 		{
-			//ResolveVersions();
-			ManualConfigRun();
-			//ValidateCombinations.Run();
+			ResolveVersions();
+			//ManualConfigRun();
+			ValidateCombinations.Run();
 			return 0;
 		}
 
@@ -65,7 +65,11 @@ namespace ScratchPad
 		private static void ResolveVersions()
 		{
 			var versions = new[]
-				{"8.0.0-SNAPSHOT", "7.0.0-beta1", "6.6.1", "latest-7", "latest", "7.0.0", "7.4.0-SNAPSHOT", "957e3089:7.2.0"};
+			{
+				"8.0.0-SNAPSHOT", "7.0.0-beta1", "6.6.1", "latest-7", "latest", "7.0.0", "7.4.0-SNAPSHOT",
+				"957e3089:7.2.0", "latest-6"
+			};
+			//versions = new[] {"latest-6"};
 			var products = new Product[]
 			{
 				Product.Elasticsearch,
@@ -82,16 +86,22 @@ namespace ScratchPad
 					Console.ForegroundColor = ConsoleColor.Green;
 					Console.Write(v);
 					Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write($"\t{p.Moniker}");
+					Console.Write($"\t{p.Moniker}");
 					Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.Write($"\t\t{r.ArtifactBuildState.GetStringValue()}");
+					Console.Write($"\t\t{r.ArtifactBuildState.GetStringValue()}");
 					Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine($"\t{a?.BuildHash}");
+					Console.WriteLine($"\t{a?.BuildHash}");
 					Console.ForegroundColor = ConsoleColor.Blue;
 //                    Console.WriteLine($"\t{a.Archive}");
 //                    Console.WriteLine($"\t{r.ArtifactBuildState}");
 //                    Console.WriteLine($"\t{a.FolderInZip}");
 //                    Console.WriteLine($"\tfolder: {a.LocalFolderName}");
+					if (a == null) 
+					{
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("\tArtifact not resolved");
+                        continue;
+					}
 					Console.WriteLine($"\t{a.DownloadUrl}");
 					var found = false;
 					try

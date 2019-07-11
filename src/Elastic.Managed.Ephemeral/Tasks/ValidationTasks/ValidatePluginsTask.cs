@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
 using Elastic.Managed.ConsoleWriters;
+using Elastic.Managed.Ephemeral.Tasks.InstallationTasks;
+using Elastic.Stack.Artifacts;
 
 namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 {
@@ -12,6 +14,11 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 			if (v.Major == 2)
 			{
 				cluster.Writer?.WriteDiagnostic($"{{{nameof(ValidatePluginsTask)}}} skipping validate plugins on {{2.x}} version: [{v}]");
+				return;
+			}
+			if (v.Major < 7 && v.ArtifactBuildState == ArtifactBuildState.Snapshot)
+			{
+				cluster.Writer?.WriteDiagnostic($"{{{nameof(InstallPlugins)}}} skipping validate SNAPSHOT plugins on < {{7.x}} version: [{v}]");
 				return;
 			}
 

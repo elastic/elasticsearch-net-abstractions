@@ -28,6 +28,11 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 				cluster.Writer?.WriteDiagnostic($"{{{nameof(InstallPlugins)}}} skipping install plugins on {{2.x}} version: [{v}]");
 				return;
 			}
+			if (v.Major < 7 && v.ArtifactBuildState == ArtifactBuildState.Snapshot)
+			{
+				cluster.Writer?.WriteDiagnostic($"{{{nameof(InstallPlugins)}}} skipping install SNAPSHOT plugins on < {{7.x}} version: [{v}]");
+				return;
+			}
 
 			var fs = cluster.FileSystem;
 			var requiredPlugins = cluster.ClusterConfiguration.Plugins;

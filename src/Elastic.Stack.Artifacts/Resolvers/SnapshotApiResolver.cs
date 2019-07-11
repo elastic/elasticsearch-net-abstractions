@@ -22,22 +22,44 @@ namespace Elastic.Stack.Artifacts.Resolvers
 
 		private static Regex PackageProductRegex { get; } = new Regex(@"(.*?)-(\d+\.\d+\.\d+(?:-(?:SNAPSHOT|alpha\d+|beta\d+|rc\d+))?)");
 		private static Regex BuildHashRegex { get; } = new Regex(@"https://snapshots.elastic.co/(\d+\.\d+\.\d+-([^/]+)?)");
+
+		private static Version IncludeOsMoniker { get; } = new Version("7.0.0");
 		
 		public static bool TryResolve(Product product, Version version, OSPlatform os, string filters, out Artifact artifact)
 		{
 			artifact = null;
 			var p = product.SubProduct?.SubProductName ?? product.ProductName; 
 			var query = p;
-			if (product.PlatformDependant)
+			if (product.PlatformDependant && version > product.PlatformSuffixAfter)
 				query += $",{OsMonikers.From(os)}";
+			else if (product.PlatformDependant)
+				query += $",{OsMonikers.CurrentPlatformSearchFilter()}";
 			if (!string.IsNullOrWhiteSpace(filters)) 
 				query += $",{filters}";
 			
 			var json = FetchJson($"search/{version}/{query}");
-			var packages = JsonSerializer.Parse<ArtifactsSearchResponse>(json).Packages;
-			if (packages == null || packages.Count == 0) return false;
-			foreach (var kv in packages.OrderByDescending(k => k.Value.Classifier == null ? 1 : 0))
+			Dictionary<string, SearchPackage> packages = new Dictionary<string, SearchPackage>();
+			try
 			{
+				// if packages is empty it turns into an array[] otherwise its a dictionary :/
+				packages = JsonSerializer.Parse<ArtifactsSearchResponse>(json).Packages;
+			}
+			catch { }
+			
+			if (packages == null || packages.Count == 0) return false;
+			var list = packages
+				.OrderByDescending(k => k.Value.Classifier == null ? 1 : 0)
+				.ToArray();
+			
+			var ext = OsMonikers.CurrentPlatformArchiveExtension();
+			var shouldEndWith = $"{version}.{ext}";
+			if (product.PlatformDependant && version > product.PlatformSuffixAfter)
+				shouldEndWith = $"{version}-{OsMonikers.CurrentPlatformPackageSuffix()}.{ext}";
+			foreach (var kv in list)
+			{
+				if (product.PlatformDependant && !kv.Key.EndsWith(shouldEndWith)) continue;
+				
+				
 				var tokens = PackageProductRegex.Split(kv.Key).Where(s=>!string.IsNullOrWhiteSpace(s)).ToArray();
 				if (tokens.Length < 2) continue;
 				

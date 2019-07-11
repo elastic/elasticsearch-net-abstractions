@@ -45,5 +45,14 @@ namespace Elastic.Stack.Artifacts.Platform
 			throw new Exception($"{RuntimeInformation.OSDescription} is currently not supported please open an issue @elastic/elasticsearch-net-abstractions");
 		}
 
+		internal static string CurrentPlatformSearchFilter()
+		{
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return "zip";
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return "tar";
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) return "tar";
+
+			throw new Exception($"{RuntimeInformation.OSDescription} is currently not supported please open an issue @elastic/elasticsearch-net-abstractions");
+		}
+
 	}
 }

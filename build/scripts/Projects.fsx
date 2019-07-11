@@ -12,6 +12,7 @@ module Projects =
         | Ephemeral
         | Xunit
         | BenchmarkDotNetExporter
+        | Stack
 
         static member All = [Managed; Ephemeral; Xunit; BenchmarkDotNetExporter]
 
@@ -23,6 +24,7 @@ module Projects =
         | Ephemeral -> "Elastic.Managed.Ephemeral"
         | Xunit -> "Elastic.Xunit"
         | BenchmarkDotNetExporter -> "Elastic.BenchmarkDotNetExporter"
+        | Stack -> "Elastic.Stack.Artifacts"
 
     let monikerOf project = 
         match project with
@@ -30,6 +32,7 @@ module Projects =
         | Ephemeral -> "Ephemeral"
         | Xunit -> "Xunit"
         | BenchmarkDotNetExporter -> "BDNetExporter"
+        | Stack -> "Stack"
 
     let infoOf project = { name = project |> nameOf; moniker = project |> monikerOf; project = project }
 

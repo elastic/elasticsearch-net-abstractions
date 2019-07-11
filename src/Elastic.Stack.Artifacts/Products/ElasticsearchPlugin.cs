@@ -39,13 +39,13 @@ namespace Elastic.Stack.Artifacts.Products
 		public static ElasticsearchPlugin IngestGeoIp { get; } =
 			new ElasticsearchPlugin("ingest-geoip", version => version >= "5.0.0-alpha3")
 			{
-				ShippedByDefaultAsOf = "6.7.0"
+				ShippedByDefaultAsOf = "6.6.1"
 			};
 
 		public static ElasticsearchPlugin IngestUserAgent { get; } =
 			new ElasticsearchPlugin("ingest-user-agent", version => version >= "5.0.0-alpha3")
 			{
-				ShippedByDefaultAsOf = "6.7.0"
+				ShippedByDefaultAsOf = "6.6.1"
 			};
 
 		public static ElasticsearchPlugin MapperAttachment { get; } = new ElasticsearchPlugin("mapper-attachments");

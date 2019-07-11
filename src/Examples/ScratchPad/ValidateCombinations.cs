@@ -12,10 +12,10 @@ namespace ScratchPad
 		public static void Run()
 		{
 			var plugins = new ElasticsearchPlugins(ElasticsearchPlugin.IngestGeoIp, ElasticsearchPlugin.AnalysisKuromoji);
-			var versions = new string[] {"7.0.0-beta1", "6.6.1", "5.6.15"};
+			var versions = new string[] {"7.0.0-beta1", "latest", "latest-7", "latest-6", "957e3089:7.2.0", "6.6.1", "5.6.15" };
 			var features = new[]
 			{
-//				ClusterFeatures.None,
+				ClusterFeatures.None,
 //				ClusterFeatures.XPack,
 //				ClusterFeatures.XPack | ClusterFeatures.Security,
 				ClusterFeatures.XPack | ClusterFeatures.SSL | ClusterFeatures.Security
@@ -26,13 +26,14 @@ namespace ScratchPad
 				foreach (var f in features)
 				{
 					Console.Clear();
+					var reset = Console.ForegroundColor;
+					Console.ForegroundColor = ConsoleColor.Cyan;
+					Console.WriteLine($"{v} {f}");
+
+					Console.ForegroundColor = reset;
 					var config = new EphemeralClusterConfiguration(v, f, plugins, numberOfNodes: 1)
 					{
 						HttpFiddlerAware = true,
-						ShowElasticsearchOutputAfterStarted = false,
-						CacheEsHomeInstallation = false,
-						TrialMode = XPackTrialMode.Trial,
-						NoCleanupAfterNodeStopped = false,
 					};
 
 					using (var cluster = new EphemeralCluster(config))
@@ -57,7 +58,6 @@ namespace ScratchPad
 						catch (Exception e)
 						{
 							Console.WriteLine(e);
-							var reset = Console.ForegroundColor;
 							Console.ForegroundColor = ConsoleColor.Cyan;
 							Console.WriteLine($"{v} {f}");
 
