@@ -52,7 +52,7 @@ namespace Elastic.Stack.Artifacts
 					case ArtifactBuildState.Snapshot:
 						return $"{ProductName}-{Version}{hashed}";
 					case ArtifactBuildState.BuildCandidate:
-						return $"{Version}{hashed}";
+						return $"{ProductName}-{Version}{hashed}";
 					default:
 						throw new ArgumentOutOfRangeException(nameof(State), $"{State} not expected here");
 				}
