@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.FileSystem;
+using Elastic.Stack.Artifacts.Products;
 
 namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 {
@@ -13,8 +14,9 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 
 			var fs = cluster.FileSystem;
 			var v = cluster.ClusterConfiguration.Version;
-			var from = v.DownloadLocations.ElasticsearchDownloadUrl;
-			var to = Path.Combine(fs.LocalFolder, v.Archive);
+			var a = cluster.ClusterConfiguration.Artifact;
+			var from = v.Artifact(Product.Elasticsearch).DownloadUrl;
+			var to = Path.Combine(fs.LocalFolder, a.Archive);
 			if (File.Exists(to))
 			{
 				cluster.Writer?.WriteDiagnostic($"{{{nameof(DownloadElasticsearchVersion)}}} {v} was already downloaded");

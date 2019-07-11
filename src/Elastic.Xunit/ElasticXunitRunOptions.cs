@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Elastic.Managed.Configuration;
+using Elastic.Stack.Artifacts;
 using Elastic.Xunit.XunitPlumbing;
 
 namespace Elastic.Xunit
@@ -45,7 +46,7 @@ namespace Elastic.Xunit
 		/// Informs the runner what version of Elasticsearch is under test. Required for
 		/// <see cref="SkipVersionAttribute"/> to kick in
 		/// </summary>
-		public ElasticsearchVersion Version { get; set; }
+		public ElasticVersion Version { get; set; }
 
 		/// <summary>
 		/// Called when the tests have finished running successfully

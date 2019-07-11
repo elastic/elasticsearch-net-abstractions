@@ -6,6 +6,8 @@ using System.Text.RegularExpressions;
 using Elastic.Managed.Configuration;
 using Elastic.Managed.Ephemeral.Plugins;
 using Elastic.Managed.Ephemeral.Tasks;
+using Elastic.Stack.Artifacts;
+using Elastic.Stack.Artifacts.Products;
 
 namespace Elastic.Managed.Ephemeral
 {
@@ -14,17 +16,17 @@ namespace Elastic.Managed.Ephemeral
 		private static string UniqueishSuffix => Guid.NewGuid().ToString("N").Substring(0, 6);
 		private static string EphemeralClusterName => $"ephemeral-cluster-{UniqueishSuffix}";
 
-		public EphemeralClusterConfiguration(ElasticsearchVersion version, ElasticsearchPlugins plugins = null, int numberOfNodes = 1)
+		public EphemeralClusterConfiguration(ElasticVersion version, ElasticsearchPlugins plugins = null, int numberOfNodes = 1)
 			: this(version, ClusterFeatures.None, plugins, numberOfNodes) { }
 
-		public EphemeralClusterConfiguration(ElasticsearchVersion version, ClusterFeatures features, ElasticsearchPlugins plugins = null, int numberOfNodes = 1)
+		public EphemeralClusterConfiguration(ElasticVersion version, ClusterFeatures features, ElasticsearchPlugins plugins = null, int numberOfNodes = 1)
 			: base(version, (v, s) => new EphemeralFileSystem(v, s), numberOfNodes, EphemeralClusterName)
 		{
 			this.TrialMode = XPackTrialMode.None;
 			this.Features = features;
 
 			var pluginsList = plugins?.ToList() ?? new List<ElasticsearchPlugin>();
-			if (this.Features.HasFlag(ClusterFeatures.XPack) && pluginsList.All(p => p.Moniker != "x-pack"))
+			if (this.Features.HasFlag(ClusterFeatures.XPack) && pluginsList.All(p => p.SubProductName != "x-pack"))
 				pluginsList.Add(ElasticsearchPlugin.XPack);
 
 			this.Plugins = new ElasticsearchPlugins(pluginsList);
@@ -51,7 +53,7 @@ namespace Elastic.Managed.Ephemeral
 
 		public bool XPackInstalled => this.Features.HasFlag(ClusterFeatures.XPack)
 		                              || this.Version >= "6.3.0"
-		                              || this.Plugins.Any(p => p.Moniker == "x-pack")
+		                              || this.Plugins.Any(p => p.SubProductName == "x-pack")
 		                              || this.EnableSsl
 		                              || this.EnableSecurity;
 
@@ -87,7 +89,7 @@ namespace Elastic.Managed.Ephemeral
 
 		protected virtual string NodePrefix => "ephemeral";
 
-		private static readonly ElasticsearchVersion LastVersionThatAcceptedShieldSettings = "5.0.0-alpha1";
+		private static readonly ElasticVersion LastVersionThatAcceptedShieldSettings = "5.0.0-alpha1";
 
 		public void AddSecuritySetting(string key, string value) => AddSecuritySetting(key, value, null);
 

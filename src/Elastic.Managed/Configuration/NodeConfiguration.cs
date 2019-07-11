@@ -1,13 +1,14 @@
 using System;
 using System.Globalization;
 using Elastic.Managed.FileSystem;
+using Elastic.Stack.Artifacts;
 using ProcNet;
 
 namespace Elastic.Managed.Configuration
 {
 	public class NodeConfiguration
 	{
-		public NodeConfiguration(ElasticsearchVersion version, int? port = null) : this(new ClusterConfiguration(version), port)
+		public NodeConfiguration(ElasticVersion version, int? port = null) : this(new ClusterConfiguration(version), port)
 		{
 		}
 
@@ -51,7 +52,7 @@ namespace Elastic.Managed.Configuration
 		public NodeSettings Settings { get; }
 
 		public INodeFileSystem FileSystem => this.ClusterConfiguration.FileSystem;
-		public ElasticsearchVersion Version => this.ClusterConfiguration.Version;
+		public ElasticVersion Version => this.ClusterConfiguration.Version;
 		public string[] CommandLineArguments => this.Settings.ToCommandLineArguments(this.Version);
 
 		public void InitialMasterNodes(string initialMasterNodes) => Settings.Add("cluster.initial_master_nodes", initialMasterNodes, ">=7.0.0.beta1");

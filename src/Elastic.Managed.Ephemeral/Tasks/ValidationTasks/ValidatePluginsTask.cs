@@ -18,7 +18,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 			var requestPlugins = cluster.ClusterConfiguration.Plugins
 				.Where(p => p.IsValid(v))
 				.Where(p => !p.IsIncludedOutOfTheBox(v))
-				.Select(p => p.ListedPluginName(v))
+				.Select(p => p.GetExistsMoniker(v))
 				.ToList();
 			if (!requestPlugins.Any()) return;
 

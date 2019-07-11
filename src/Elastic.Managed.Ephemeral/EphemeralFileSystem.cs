@@ -2,19 +2,21 @@
 using System.IO;
 using Elastic.Managed.Configuration;
 using Elastic.Managed.FileSystem;
+using Elastic.Stack.Artifacts;
+using Elastic.Stack.Artifacts.Products;
 
 namespace Elastic.Managed.Ephemeral
 {
 	public class EphemeralFileSystem : NodeFileSystem
 	{
-		public EphemeralFileSystem(ElasticsearchVersion version, string clusterName) : base(version, EphemeralHome(version, clusterName))
+		public EphemeralFileSystem(ElasticVersion version, string clusterName) : base(version, EphemeralHome(version, clusterName))
 		{
 			this.ClusterName = clusterName;
 		}
 
 		private string ClusterName { get; }
 
-		public string TempFolder => Path.Combine(Path.GetTempPath(), SubFolder, this.Version.FolderInZip, this.ClusterName);
+		public string TempFolder => Path.Combine(Path.GetTempPath(), SubFolder, this.Artifact.LocalFolderName, this.ClusterName);
 
 		public override string ConfigPath => Path.Combine(TempFolder, "config");
 		public override string LogsPath => Path.Combine(TempFolder, "logs");
@@ -41,9 +43,9 @@ namespace Elastic.Managed.Ephemeral
 		public string UnusedClientCertificate => Path.Combine(this.UnusedCertificatesPath, this.ClientCertificateFilename, this.ClientCertificateFilename) + ".crt";
 
 
-		protected static string EphemeralHome(ElasticsearchVersion version, string clusterName)
+		protected static string EphemeralHome(ElasticVersion version, string clusterName)
 		{
-		 	var temp = Path.Combine(Path.GetTempPath(), SubFolder, version.FolderInZip, clusterName);
+		 	var temp = Path.Combine(Path.GetTempPath(), SubFolder, version.Artifact(Product.Elasticsearch).LocalFolderName, clusterName);
 			return Path.Combine(temp, "home");
 		}
 	}

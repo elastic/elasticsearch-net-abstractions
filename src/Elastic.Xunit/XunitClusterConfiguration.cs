@@ -2,13 +2,14 @@
 using Elastic.Managed.Configuration;
 using Elastic.Managed.Ephemeral;
 using Elastic.Managed.Ephemeral.Plugins;
+using Elastic.Stack.Artifacts;
 
 namespace Elastic.Xunit
 {
 	public class XunitClusterConfiguration : EphemeralClusterConfiguration
 	{
 		public XunitClusterConfiguration(
-			ElasticsearchVersion version,
+			ElasticVersion version,
 			ClusterFeatures features = ClusterFeatures.None,
 			ElasticsearchPlugins plugins = null,
 			int numberOfNodes = 1)

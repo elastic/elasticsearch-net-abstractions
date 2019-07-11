@@ -1,6 +1,7 @@
 using System;
 using Elastic.Managed.Ephemeral;
 using Elastic.Managed.Ephemeral.Plugins;
+using Elastic.Stack.Artifacts.Products;
 using Elasticsearch.Net;
 using Nest;
 

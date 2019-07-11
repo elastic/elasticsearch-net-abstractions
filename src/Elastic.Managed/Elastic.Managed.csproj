@@ -21,9 +21,9 @@
   <ItemGroup>
     <PackageReference Include="Proc" Version="0.6.1" />
     <!--<ProjectReference Include="..\..\..\..\proc\src\Proc\Proc.csproj" />-->
-    <PackageReference Include="SemanticVersioning" Version="0.8.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
-    <PackageReference Condition="'$(TargetFramework)' == 'net461'" Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
-    <PackageReference Include="System.Text.Json" Version="4.6.0-preview6.19303.8" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Elastic.Stack.Artifacts\Elastic.Stack.Artifacts.csproj" />
   </ItemGroup>
 </Project>

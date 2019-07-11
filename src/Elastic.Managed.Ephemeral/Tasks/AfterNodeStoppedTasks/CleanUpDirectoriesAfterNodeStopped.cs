@@ -11,6 +11,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.AfterNodeStoppedTasks
 			var fs = cluster.FileSystem;
 			var w = cluster.Writer;
 			var v = cluster.ClusterConfiguration.Version;
+			var a = cluster.ClusterConfiguration.Artifact;
 			if (cluster.ClusterConfiguration.NoCleanupAfterNodeStopped)
 			{
 				w.WriteDiagnostic($"{{{nameof(CleanUpDirectoriesAfterNodeStopped)}}} skipping cleanup as requested on cluster configuration");
@@ -28,7 +29,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.AfterNodeStoppedTasks
 
 			if (efs != null)
 			{
-				var extractedFolder = Path.Combine(fs.LocalFolder, v.FolderInZip);
+				var extractedFolder = Path.Combine(fs.LocalFolder, a.FolderInZip);
 				if (extractedFolder != fs.ElasticsearchHome)
 					DeleteDirectory(w, "ephemeral ES_HOME", fs.ElasticsearchHome);
 				//if the node was not started delete the cached extractedFolder

@@ -2,6 +2,7 @@
 using Elastic.Managed.Configuration;
 using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.FileSystem;
+using Elastic.Stack.Artifacts;
 
 namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack
 {
@@ -22,7 +23,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack
 			PatchPlugin(v, fileSystem);
 		}
 
-		private static void PatchPlugin(ElasticsearchVersion v, INodeFileSystem fileSystem)
+		private static void PatchPlugin(ElasticVersion v, INodeFileSystem fileSystem)
 		{
 			var h = fileSystem.ElasticsearchHome;
 			var file = Path.Combine(h, "bin", "x-pack", ".in.bat");

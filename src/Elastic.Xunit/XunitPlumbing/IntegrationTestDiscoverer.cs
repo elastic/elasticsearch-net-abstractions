@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Elastic.Managed.Configuration;
 using Elastic.Managed.Ephemeral;
+using Elastic.Stack.Artifacts;
 using Elastic.Xunit.Sdk;
 using SemVer;
 using Xunit;
@@ -55,7 +56,7 @@ namespace Elastic.Xunit.XunitPlumbing
 				return true;
 			}
 
-			var elasticsearchVersion = discoveryOptions.GetValue<ElasticsearchVersion>(nameof(ElasticXunitRunOptions.Version));
+			var elasticsearchVersion = discoveryOptions.GetValue<ElasticVersion>(nameof(ElasticXunitRunOptions.Version));
 
 			// Skip if the version we are testing against is attributed to be skipped do not run the test nameof(SkipVersionAttribute.Ranges)
 			var skipVersionAttribute = GetAttributes<SkipVersionAttribute>(testMethod).FirstOrDefault();

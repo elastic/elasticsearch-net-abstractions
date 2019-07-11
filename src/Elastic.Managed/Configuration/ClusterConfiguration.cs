@@ -2,6 +2,8 @@ using System;
 using System.Globalization;
 using System.IO;
 using Elastic.Managed.FileSystem;
+using Elastic.Stack.Artifacts;
+using Elastic.Stack.Artifacts.Products;
 
 namespace Elastic.Managed.Configuration
 {
@@ -11,7 +13,7 @@ namespace Elastic.Managed.Configuration
 
 		string ClusterName { get; }
 		NodeSettings DefaultNodeSettings { get; }
-		ElasticsearchVersion Version { get; }
+		ElasticVersion Version { get; }
 		int NumberOfNodes { get; }
 		int StartingPortNumber { get; set; }
 		bool NoCleanupAfterNodeStopped { get; set; }
@@ -24,10 +26,10 @@ namespace Elastic.Managed.Configuration
 
 	public class ClusterConfiguration : ClusterConfiguration<NodeFileSystem>
 	{
-		public ClusterConfiguration(ElasticsearchVersion version, string esHome, int numberOfNodes = 1)
+		public ClusterConfiguration(ElasticVersion version, string esHome, int numberOfNodes = 1)
 			: base(version, (v, s) => new NodeFileSystem(v, esHome), numberOfNodes , null) { }
 
-		public ClusterConfiguration(ElasticsearchVersion version, Func<ElasticsearchVersion, string, NodeFileSystem> fileSystem = null, int numberOfNodes = 1, string clusterName = null)
+		public ClusterConfiguration(ElasticVersion version, Func<ElasticVersion, string, NodeFileSystem> fileSystem = null, int numberOfNodes = 1, string clusterName = null)
 			: base(version, fileSystem ?? ((v, s) => new NodeFileSystem(v, s)), numberOfNodes , clusterName) { }
 	}
 
@@ -42,12 +44,13 @@ namespace Elastic.Managed.Configuration
 		/// Passed the Elasticsearch version and the Cluster name</param>
 		/// <param name="numberOfNodes">The number of nodes in the cluster</param>
 		/// <param name="clusterName">The name of the cluster</param>
-		public ClusterConfiguration(ElasticsearchVersion version, Func<ElasticsearchVersion, string, TFileSystem> fileSystem, int numberOfNodes = 1, string clusterName = null)
+		public ClusterConfiguration(ElasticVersion version, Func<ElasticVersion, string, TFileSystem> fileSystem, int numberOfNodes = 1, string clusterName = null)
 		{
 			if (fileSystem == null) throw new ArgumentException(nameof(fileSystem));
 
 			this.ClusterName = clusterName;
 			this.Version = version;
+			this.Artifact = version.Artifact(Product.Elasticsearch);
 			this.FileSystem = fileSystem(this.Version, this.ClusterName);
 			this.NumberOfNodes = numberOfNodes;
 
@@ -68,7 +71,8 @@ namespace Elastic.Managed.Configuration
 		}
 
 		public string ClusterName { get; }
-		public ElasticsearchVersion Version { get; }
+		public ElasticVersion Version { get; }
+		public Artifact Artifact { get; }
 		public TFileSystem FileSystem { get; }
 		public int NumberOfNodes { get; }
 		public int StartingPortNumber { get; set; } = 9200;

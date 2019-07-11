@@ -1,5 +1,4 @@
-﻿using System;
-using Elastic.Managed.Configuration;
+﻿using Elastic.Stack.Artifacts;
 using Elastic.Xunit.ExampleComplex;
 
 [assembly: Xunit.TestFrameworkAttribute("Elastic.Xunit.Sdk.ElasticTestFramework", "Elastic.Xunit")]
@@ -12,7 +11,7 @@ namespace Elastic.Xunit.ExampleComplex
 	/// </summary>
 	public class MyRunOptions : ElasticXunitRunOptions
 	{
-		public static ElasticsearchVersion TestVersion { get; } = "6.3.0";
+		public static ElasticVersion TestVersion { get; } = "6.3.0";
 		public MyRunOptions()
 		{
 			this.ClusterFilter = "";

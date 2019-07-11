@@ -2,6 +2,8 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using Elastic.Managed.Configuration;
+using Elastic.Stack.Artifacts;
+using Elastic.Stack.Artifacts.Products;
 
 namespace Elastic.Managed.FileSystem
 {
@@ -10,7 +12,8 @@ namespace Elastic.Managed.FileSystem
 	{
 		protected const string SubFolder = "ElasticManaged";
 
-		protected ElasticsearchVersion Version { get; }
+		protected ElasticVersion Version { get; }
+		protected Artifact Artifact { get; }
 
 		private static bool IsMono { get; } = Type.GetType("Mono.Runtime") != null;
 
@@ -37,26 +40,27 @@ namespace Elastic.Managed.FileSystem
 
 		public string ConfigEnvironmentVariableName { get; }
 
-		public NodeFileSystem(ElasticsearchVersion version, string elasticsearchHome = null)
+		public NodeFileSystem(ElasticVersion version, string elasticsearchHome = null)
 		{
 			this.Version = version;
+			this.Artifact = version.Artifact(Product.Elasticsearch);
 			this.LocalFolder = AppDataFolder(version);
 			this.ElasticsearchHome = elasticsearchHome ?? GetEsHomeVariable() ?? throw new ArgumentNullException(nameof(elasticsearchHome));
 
 			this.ConfigEnvironmentVariableName = version.Major >= 6 ? "ES_PATH_CONF" : "CONF_DIR";
 		}
 
-		protected static string AppDataFolder(ElasticsearchVersion version)
+		protected static string AppDataFolder(ElasticVersion version)
 		{
 			var appData = GetApplicationDataDirectory();
-			return Path.Combine(appData, SubFolder, version.FullyQualifiedVersion);
+			return Path.Combine(appData, SubFolder, version.Artifact(Product.Elasticsearch).LocalFolderName);
 		}
 
 		protected static string GetEsHomeVariable() => Environment.GetEnvironmentVariable("ES_HOME");
 
 		protected static string GetApplicationDataDirectory() =>
-			RuntimeInformation.IsOSPlatform(OSPlatform.Windows) 
-				? Environment.GetEnvironmentVariable("LocalAppData") 
+			RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+				? Environment.GetEnvironmentVariable("LocalAppData")
 				: Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create);
 	}
 }

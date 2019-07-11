@@ -7,12 +7,13 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using Elastic.Managed.Configuration;
+using Elastic.Stack.Artifacts;
 
 namespace Elastic.Managed.Ephemeral
 {
 	public class EphemeralCluster : EphemeralCluster<EphemeralClusterConfiguration>
 	{
-		public EphemeralCluster(ElasticsearchVersion version, int numberOfNodes = 1)
+		public EphemeralCluster(ElasticVersion version, int numberOfNodes = 1)
 			: base(new EphemeralClusterConfiguration(version, ClusterFeatures.None, numberOfNodes: numberOfNodes)) { }
 
 		public EphemeralCluster(EphemeralClusterConfiguration clusterConfiguration) : base(clusterConfiguration) { }
@@ -84,8 +85,8 @@ namespace Elastic.Managed.Ephemeral
 			if (config.Plugins != null && config.Plugins.Count > 0)
 			{
 				sb.Append("-");
-				foreach (var p in config.Plugins.OrderBy(p=>p.Moniker))
-					sb.Append(p.Moniker.ToLowerInvariant());
+				foreach (var p in config.Plugins.OrderBy(p=>p.SubProductName))
+					sb.Append(p.SubProductName.ToLowerInvariant());
 			}
 			var name = sb.ToString();
 

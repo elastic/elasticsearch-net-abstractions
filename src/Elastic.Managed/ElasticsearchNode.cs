@@ -5,6 +5,7 @@ using System.Threading;
 using Elastic.Managed.Configuration;
 using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.FileSystem;
+using Elastic.Stack.Artifacts;
 using ProcNet;
 using ProcNet.Std;
 
@@ -21,7 +22,7 @@ namespace Elastic.Managed
 		public override int? ProcessId => this.JavaProcessId ?? base.ProcessId;
 		public int? HostProcessId => base.ProcessId;
 
-		public ElasticsearchNode(ElasticsearchVersion version, string elasticsearchHome = null)
+		public ElasticsearchNode(ElasticVersion version, string elasticsearchHome = null)
 			: this(new NodeConfiguration(new ClusterConfiguration(version, fileSystem: (v, s) => new NodeFileSystem(v, elasticsearchHome)))) { }
 
 		public ElasticsearchNode(NodeConfiguration config) : base(StartArgs(config)) => this.NodeConfiguration = config;
@@ -29,7 +30,7 @@ namespace Elastic.Managed
 		private static StartArguments StartArgs(NodeConfiguration config)
 		{
 			//var args = new[] {config.FileSystem.Binary}.Concat(config.CommandLineArguments);
-			
+
 			var startArguments = new StartArguments(config.FileSystem.Binary, config.CommandLineArguments)
 			{
 				SendControlCFirst = true,

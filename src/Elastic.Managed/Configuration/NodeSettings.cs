@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Elastic.Stack.Artifacts;
 
 namespace Elastic.Managed.Configuration
 {
@@ -21,9 +22,9 @@ namespace Elastic.Managed.Configuration
 
 		public void Add(string key, string value, string versionRange) => this.Add(new NodeSetting(key, value, versionRange));
 
-		private static readonly ElasticsearchVersion LastVersionWithoutPrefixForSettings = ElasticsearchVersion.From("5.0.0-alpha2");
+		private static readonly ElasticVersion LastVersionWithoutPrefixForSettings = ElasticVersion.From("5.0.0-alpha2");
 
-		public string[] ToCommandLineArguments(ElasticsearchVersion version)
+		public string[] ToCommandLineArguments(ElasticVersion version)
 		{
 			var settingsPrefix = version > LastVersionWithoutPrefixForSettings ? "" : "es.";
 			var settingArgument = version.Major >= 5 ? "-E " : "-D";
