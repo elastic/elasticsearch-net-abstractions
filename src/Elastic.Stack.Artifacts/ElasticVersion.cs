@@ -10,9 +10,9 @@ namespace Elastic.Stack.Artifacts
 	public class ElasticVersion : Version, IComparable<string>
 	{
 		public ArtifactBuildState ArtifactBuildState { get; }
-		public string BuildHash { get; }
+		private string BuildHash { get; }
 
-		protected ElasticVersion(string version, ArtifactBuildState state, string buildHash) : base(version)
+		protected ElasticVersion(string version, ArtifactBuildState state, string buildHash = null) : base(version)
 		{
 			ArtifactBuildState = state;
 			BuildHash = buildHash;

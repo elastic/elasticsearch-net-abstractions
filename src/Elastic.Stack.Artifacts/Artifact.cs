@@ -18,7 +18,7 @@ namespace Elastic.Stack.Artifacts
 			State = state;
 			BuildHash = buildHash;
 		}
-		internal Artifact(Product product, Version version, SnapshotApiResolver.SearchPackage package)
+		internal Artifact(Product product, Version version, SnapshotApiResolver.SearchPackage package, string buildHash = null)
 		{
 			ProductName = product.ProductName;
 			Version = version;
@@ -26,6 +26,7 @@ namespace Elastic.Stack.Artifacts
 			DownloadUrl = product?.PatchDownloadUrl(package.DownloadUrl);
 			ShaUrl = package.ShaUrl;
 			AscUrl = package.AscUrl;
+			BuildHash = buildHash;
 		}
 
 		// ReSharper disable UnusedAutoPropertyAccessor.Global

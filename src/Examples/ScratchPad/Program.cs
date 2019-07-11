@@ -66,8 +66,6 @@ namespace ScratchPad
 		{
 			var versions = new[]
 				{"8.0.0-SNAPSHOT", "7.0.0-beta1", "6.6.1", "latest-7", "latest", "7.0.0", "7.4.0-SNAPSHOT", "957e3089:7.2.0"};
-			versions = new[]
-				{"957e3089:7.2.0"};
 			var products = new Product[]
 			{
 				Product.Elasticsearch,
@@ -88,7 +86,7 @@ namespace ScratchPad
 					Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.Write($"\t\t{r.ArtifactBuildState.GetStringValue()}");
 					Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine($"\t{r.BuildHash}");
+                    Console.WriteLine($"\t{a?.BuildHash}");
 					Console.ForegroundColor = ConsoleColor.Blue;
 //                    Console.WriteLine($"\t{a.Archive}");
 //                    Console.WriteLine($"\t{r.ArtifactBuildState}");

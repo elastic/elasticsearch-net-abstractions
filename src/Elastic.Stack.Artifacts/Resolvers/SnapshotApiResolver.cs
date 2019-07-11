@@ -21,6 +21,7 @@ namespace Elastic.Stack.Artifacts.Resolvers
 		public static readonly Lazy<IReadOnlyCollection<Version>> AvailableVersions = new Lazy<IReadOnlyCollection<Version>>(LoadVersions, LazyThreadSafetyMode.ExecutionAndPublication);
 
 		private static Regex PackageProductRegex { get; } = new Regex(@"(.*?)-(\d+\.\d+\.\d+(?:-(?:SNAPSHOT|alpha\d+|beta\d+|rc\d+))?)");
+		private static Regex BuildHashRegex { get; } = new Regex(@"https://snapshots.elastic.co/(\d+\.\d+\.\d+-([^/]+)?)");
 		
 		public static bool TryResolve(Product product, Version version, OSPlatform os, string filters, out Artifact artifact)
 		{
@@ -42,12 +43,21 @@ namespace Elastic.Stack.Artifacts.Resolvers
 				
 				if (!tokens[0].Equals(p, StringComparison.CurrentCultureIgnoreCase)) continue;
 				if (!tokens[1].Equals(version.ToString(), StringComparison.CurrentCultureIgnoreCase)) continue;
-				
-				artifact = new Artifact(product, version, kv.Value);
+				// https://snapshots.elastic.co/7.4.0-677857dd/downloads/elasticsearch-plugins/analysis-icu/analysis-icu-7.4.0-SNAPSHOT.zip
+				var buildHash = GetBuildHash(kv.Value.DownloadUrl);
+				artifact = new Artifact(product, version, kv.Value, buildHash);
 			}
 			return false;
 		}
-		
+
+		private static string GetBuildHash(string url)
+		{
+			var tokens = BuildHashRegex.Split(url).Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
+			if (tokens.Length < 2) return null;
+
+			return tokens[1];
+		}
+
 		private static IReadOnlyCollection<Version> LoadVersions()
 		{
 			var json = FetchJson("versions");
