@@ -21,6 +21,13 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 				cluster.Writer?.WriteDiagnostic($"{{{nameof(EnsureJavaHomeEnvironmentVariableIsSet)}}} JAVA_HOME is not SET exiting..");
 				throw new Exception("The elasticsearch bat files are resillient to JAVA_HOME not being set, however the shield tooling is not");
 			}
+			else if (cluster.ClusterConfiguration.Version >= "7.0.0" && !string.IsNullOrWhiteSpace(javaHome))
+			{
+				//prefer bundled jdk
+				cluster.Writer?.WriteDiagnostic($"{{{nameof(EnsureJavaHomeEnvironmentVariableIsSet)}}} JAVA_HOME is set, unsetting for process to prefer bundled jdk..");
+				Environment.SetEnvironmentVariable("JAVA_HOME", null);
+			}
+			
 
 			else cluster.Writer?.WriteDiagnostic($"{{{nameof(EnsureJavaHomeEnvironmentVariableIsSet)}}} JAVA_HOME is set proceeding or using default JDK");
 
