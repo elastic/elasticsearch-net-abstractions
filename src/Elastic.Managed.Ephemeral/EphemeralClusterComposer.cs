@@ -23,6 +23,7 @@ namespace Elastic.Managed.Ephemeral
 			new EnsureJavaHomeEnvironmentVariableIsSet(),
 			new DownloadElasticsearchVersion(),
 			new UnzipElasticsearch(),
+			new SetElasticsearchBundledJdkJavaHome(),
 			new InstallPlugins(),
 
 			new EnsureElasticsearchBatWorksAcrossDrives(),

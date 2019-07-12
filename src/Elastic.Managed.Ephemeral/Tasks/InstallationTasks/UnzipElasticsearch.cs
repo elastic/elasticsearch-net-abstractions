@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.IO.Compression;
 using Elastic.Managed.ConsoleWriters;
 using Elastic.Managed.FileSystem;
@@ -30,7 +29,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
                 
                 cluster.Writer?.WriteDiagnostic($"{{{nameof(UnzipElasticsearch)}}} extracted version [{v}] to {{{fs.LocalFolder}}}");
 			}
-
+			
 			if (extractedFolder == fs.ElasticsearchHome) return;
 
 			cluster.Writer?.WriteDiagnostic($"{{{nameof(UnzipElasticsearch)}}} Copying extracted folder {{{extractedFolder}}} => {fs.ElasticsearchHome}");
