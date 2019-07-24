@@ -19,7 +19,7 @@ namespace Elastic.Stack.Artifacts.Resolvers
 			var p = product.Moniker;
 			var stagingRoot = string.Format(StagingUrlFormat, version, buildHash);
 			var archive = $"{p}-{version}-{OsMonikers.CurrentPlatformPackageSuffix()}.{product.Extension}";
-			if (!product.PlatformDependant || version <= product.PlatformSuffixAfter)
+			if (!product.PlatformDependent || version <= product.PlatformSuffixAfter)
 				archive = $"{p}-{version}.{product.Extension}";
 
 			var downloadUrl = $"{stagingRoot}/downloads/{product}/{archive}";

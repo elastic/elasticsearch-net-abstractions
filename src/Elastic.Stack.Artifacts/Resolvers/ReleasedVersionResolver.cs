@@ -14,7 +14,7 @@ namespace Elastic.Stack.Artifacts.Resolvers
 			var p = product.Moniker;
 			var downloadPath = $"{ArtifactsUrl}/downloads/{product}";
 			var archive = $"{p}-{version}-{OsMonikers.CurrentPlatformPackageSuffix()}.{product.Extension}";
-			if (!product.PlatformDependant || version <= product.PlatformSuffixAfter)
+			if (!product.PlatformDependent || version <= product.PlatformSuffixAfter)
 				archive = $"{p}-{version}.{product.Extension}";
 
 			var downloadUrl = $"{downloadPath}/{archive}";

@@ -8,7 +8,8 @@ namespace Elastic.Stack.Artifacts.Products
 		private static readonly ConcurrentDictionary<string, Product> CachedProducts = new ConcurrentDictionary<string, Product>();
 
 		public static Product From(string product, SubProduct subProduct = null, ElasticVersion platformInZipAfter = null) =>
-			CachedProducts.GetOrAdd($"{product}/{subProduct}", k => new Product(product, subProduct, platformInZipAfter));
+			CachedProducts.GetOrAdd(subProduct == null? $"{product}" : $"{product}/{subProduct.SubProductName}",
+				k => new Product(product, subProduct, platformInZipAfter));
 
 		private static readonly  ElasticVersion DefaultIncludePlatformSuffix = ElasticVersion.From("7.0.0-alpha1");
 
@@ -24,11 +25,11 @@ namespace Elastic.Stack.Artifacts.Products
 
 		public string Moniker => SubProduct?.SubProductName ?? ProductName;
 
-		public string Extension => PlatformDependant ? OsMonikers.CurrentPlatformArchiveExtension() : "zip";
+		public string Extension => PlatformDependent ? OsMonikers.CurrentPlatformArchiveExtension() : "zip";
 
 		public string ProductName { get; }
 
-		public bool PlatformDependant => SubProduct?.PlatformDependent ?? true;
+		public bool PlatformDependent => SubProduct?.PlatformDependent ?? true;
 
 		public ElasticVersion PlatformSuffixAfter { get; }
 
@@ -38,7 +39,7 @@ namespace Elastic.Stack.Artifacts.Products
 
 		public static Product Kibana { get; } = From("kibana", platformInZipAfter: "1.0.0");
 
-		public override string ToString() => SubProduct != null ? $"{ProductName}/{SubProduct}" : ProductName;
+		public override string ToString() => SubProduct != null ? $"{ProductName}/{SubProduct.SubProductName}" : ProductName;
 
 		public string PatchDownloadUrl(string downloadUrl) => SubProduct?.PatchDownloadUrl(downloadUrl) ?? downloadUrl;
 	}
