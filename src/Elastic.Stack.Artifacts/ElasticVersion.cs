@@ -21,8 +21,8 @@ namespace Elastic.Stack.Artifacts
 		private readonly ConcurrentDictionary<string, Artifact> _resolved = new ConcurrentDictionary<string, Artifact>();
 		public Artifact Artifact(Product product)
 		{
-			Artifact artifact;
-			if (_resolved.TryGetValue(product.ProductName, out artifact))
+			var cacheKey = product.ToString();
+			if (_resolved.TryGetValue(cacheKey, out var artifact))
 				return artifact;
 			switch (ArtifactBuildState)
 			{
@@ -39,7 +39,7 @@ namespace Elastic.Stack.Artifacts
 					throw new ArgumentOutOfRangeException(nameof(ArtifactBuildState), $"{ArtifactBuildState} not expected here");
 			}
 
-			_resolved.TryAdd(product.ProductName, artifact);
+			_resolved.TryAdd(cacheKey, artifact);
 
 			return artifact;
 		}
