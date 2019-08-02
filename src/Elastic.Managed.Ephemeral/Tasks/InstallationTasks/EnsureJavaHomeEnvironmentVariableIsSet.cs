@@ -37,11 +37,9 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 			}
 			else if (cluster.ClusterConfiguration.Version >= "7.0.0" && !string.IsNullOrWhiteSpace(javaHome))
 			{
-				
 				cluster.Writer?.WriteDiagnostic($"{{{nameof(EnsureJavaHomeEnvironmentVariableIsSet)}}} [JAVA_HOME] is set, unsetting for process to prefer bundled jdk..");
 				Environment.SetEnvironmentVariable("JAVA_HOME", null);
 			}
-			
 
 			else cluster.Writer?.WriteDiagnostic($"{{{nameof(EnsureJavaHomeEnvironmentVariableIsSet)}}} JAVA_HOME is set proceeding or using default JDK");
 

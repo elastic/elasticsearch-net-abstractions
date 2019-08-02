@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Elastic.Managed.Configuration;
 using Elastic.Managed.ConsoleWriters;
@@ -98,6 +97,11 @@ namespace Elastic.Managed
 			var node = this.NodeConfiguration.DesiredNodeName;
 			writer?.WriteDiagnostic($"Elasticsearch location: [{this.Binary}]", node);
 			writer?.WriteDiagnostic($"Settings: {{{string.Join(" ", this.NodeConfiguration.CommandLineArguments)}}}", node);
+
+			var javaHome = Environment.GetEnvironmentVariable("JAVA_HOME");
+			writer?.WriteDiagnostic($"JAVA_HOME: {{{javaHome}}}", node);
+			this.Process.StartInfo.EnvironmentVariables.Add("JAVA_HOME", javaHome);
+			
 			return this.SubscribeLines(
 				l => {
 					writer?.Handle(l);
