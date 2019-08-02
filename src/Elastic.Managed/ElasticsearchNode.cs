@@ -100,7 +100,7 @@ namespace Elastic.Managed
 
 			var javaHome = Environment.GetEnvironmentVariable("JAVA_HOME");
 			writer?.WriteDiagnostic($"JAVA_HOME: {{{javaHome}}}", node);
-			this.Process.StartInfo.EnvironmentVariables.Add("JAVA_HOME", javaHome);
+			this.Process.StartInfo.Environment["JAVA_HOME"] = javaHome;
 			
 			return this.SubscribeLines(
 				l => {

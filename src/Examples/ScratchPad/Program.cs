@@ -16,7 +16,7 @@ namespace ScratchPad
 	{
 		public static int Main()
 		{
-			ResolveVersions();
+			//ResolveVersions();
 			ManualConfigRun();
 			//ValidateCombinations.Run();
 			return 0;
@@ -24,7 +24,7 @@ namespace ScratchPad
 
 		private static void ManualConfigRun()
 		{
-			ElasticVersion version = "latest-7";
+			ElasticVersion version = "latest";
 
 			var plugins =
 				new ElasticsearchPlugins(ElasticsearchPlugin.IngestGeoIp, ElasticsearchPlugin.AnalysisKuromoji);
