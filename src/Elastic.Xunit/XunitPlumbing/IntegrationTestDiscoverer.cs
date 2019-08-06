@@ -76,7 +76,8 @@ namespace Elastic.Xunit.XunitPlumbing
 					for (var index = 0; index < skipVersionRanges.Count; index++)
 					{
 						var range = skipVersionRanges[index];
-						if (!range.IsSatisfied(elasticsearchVersion)) continue;
+						// inrange takes prereleases into account
+						if (!elasticsearchVersion.InRange(range)) continue;
 						skipReason = $"{nameof(SkipVersionAttribute)} has range {range} that {elasticsearchVersion} satisfies";
 						if (!string.IsNullOrWhiteSpace(reason)) skipReason += $": {reason}";
 						return true;

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using Elastic.Stack.Artifacts.Platform;
 using Elastic.Stack.Artifacts.Products;
 using Elastic.Stack.Artifacts.Resolvers;
+using SemVer;
 using Version = SemVer.Version;
 
 namespace Elastic.Stack.Artifacts
@@ -96,6 +97,11 @@ namespace Elastic.Stack.Artifacts
 		public bool InRange(string range)
 		{
 			var versionRange = new SemVer.Range(range);
+			return InRange(versionRange);
+		}
+
+		public bool InRange(Range versionRange)
+		{
 			var satisfied = versionRange.IsSatisfied(this);
 			if (this.ArtifactBuildState != ArtifactBuildState.Released || satisfied) return satisfied;
 
