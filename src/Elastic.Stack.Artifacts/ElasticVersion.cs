@@ -103,7 +103,7 @@ namespace Elastic.Stack.Artifacts
 		public bool InRange(Range versionRange)
 		{
 			var satisfied = versionRange.IsSatisfied(this);
-			if (this.ArtifactBuildState != ArtifactBuildState.Released || satisfied) return satisfied;
+			if (satisfied) return true;
 
 			//Semver can only match snapshot version with ranges on the same major and minor
 			//anything else fails but we want to know e.g 2.4.5-SNAPSHOT satisfied by <5.0.0;

@@ -16,8 +16,28 @@ namespace ScratchPad
 	{
 		public static int Main()
 		{
+		
+		    var range = new SemVer.Range(">=7.2.0-alpha2");
+		    var v = ElasticVersion.From("7.4.0-SNAPSHOT");
+		    var vLatest = ElasticVersion.From("latest-7");
+		    var v3 = ElasticVersion.From("7.2.0");
+		    var v5 = ElasticVersion.From("7.1.0");
+		    var v4 = ElasticVersion.From("7.2.0-alpha1");
+		    
+		    
+		    Console.WriteLine(v.InRange(range));
+		    Console.WriteLine(vLatest.InRange(range));
+		    Console.WriteLine(v3.InRange(range));
+		    Console.WriteLine(v4.InRange(range));
+		    Console.WriteLine(v5.InRange(range));
+		    
+		    
+		    
+		    
+		
+		
 			//ResolveVersions();
-			ManualConfigRun();
+			//ManualConfigRun();
 			//ValidateCombinations.Run();
 			return 0;
 		}
