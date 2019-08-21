@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Runtime.InteropServices;
+using System.Security.Authentication;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -106,7 +108,11 @@ namespace Elastic.Stack.Artifacts.Resolvers
 				.FirstOrDefault(v => range.IsSatisfied(v.ToString().Replace("-SNAPSHOT", "")));
 		}
 
-		private static HttpClient HttpClient { get; } = new HttpClient() { BaseAddress = new Uri(ArtifactsApiUrl) };
+		private static HttpClient HttpClient { get; } = new HttpClient(new HttpClientHandler
+		{
+			SslProtocols = SslProtocols.Tls12
+		}) { BaseAddress = new Uri(ArtifactsApiUrl) };
+
 		private static string FetchJson(string path)
 		{
 			using (var stream = HttpClient.GetStreamAsync(path).GetAwaiter().GetResult())
