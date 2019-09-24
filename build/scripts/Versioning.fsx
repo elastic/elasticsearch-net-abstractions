@@ -67,7 +67,7 @@ module Versioning =
         let bdVersion = match project with | BenchmarkDotNetExporter -> pre version | _ -> pre <| globalJson.Versions.Bdnetexporter
         let stack = match project with | Stack -> pre version | _ -> pre <| globalJson.Versions.Stack
         
-        writeVersionsJson reposVersion managedVersion ephemeralVersion xunitVersion bdVersion
+        writeVersionsJson reposVersion managedVersion ephemeralVersion xunitVersion bdVersion stack
         traceImportant <| sprintf "%s bumped version to (%O) in global.json " (nameOf project) version
 
     let writeVersionIntoVersionsJson project version =
