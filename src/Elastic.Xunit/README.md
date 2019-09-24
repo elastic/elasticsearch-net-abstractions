@@ -16,7 +16,7 @@ from core but you can also use a full framework project.
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-beta1-build3642" />
