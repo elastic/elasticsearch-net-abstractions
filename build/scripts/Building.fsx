@@ -80,7 +80,7 @@ module Build =
         {
             p with 
                 Configuration = "Release"
-                OutputPath = sprintf @"..\..\%s" Paths.NugetOutput
+                OutputPath = sprintf "%s" Paths.NugetOutput
                 TimeOut = TimeSpan.FromMinutes(3.)
                 Project = Paths.SolutionFile
                 AdditionalArgs = props

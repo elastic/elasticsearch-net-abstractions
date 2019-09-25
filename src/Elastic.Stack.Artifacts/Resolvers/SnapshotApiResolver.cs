@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Security.Authentication;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -44,7 +45,7 @@ namespace Elastic.Stack.Artifacts.Resolvers
 			try
 			{
 				// if packages is empty it turns into an array[] otherwise its a dictionary :/
-				packages = JsonSerializer.Parse<ArtifactsSearchResponse>(json).Packages;
+				packages = JsonSerializer.Deserialize<ArtifactsSearchResponse>(json).Packages;
 			}
 			catch { }
 
@@ -85,7 +86,7 @@ namespace Elastic.Stack.Artifacts.Resolvers
 		private static IReadOnlyCollection<Version> LoadVersions()
 		{
 			var json = FetchJson("versions");
-			var versions = JsonSerializer.Parse<ArtifactsVersionsResponse>(json).Versions;
+			var versions = JsonSerializer.Deserialize<ArtifactsVersionsResponse>(json).Versions;
 
 			return new List<Version>(versions.Select(v => new Version(v)));
 		}
