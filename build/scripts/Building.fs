@@ -1,11 +1,5 @@
-﻿#I @"../../packages/build/FAKE/tools"
-#I @"../../packages/build/FSharp.Data/lib/net45"
-#r @"FakeLib.dll"
-#r @"FSharp.Data.dll"
-
-#load @"Paths.fsx"
-#load @"Tooling.fsx"
-#load @"Versioning.fsx"
+﻿
+namespace Script
 
 open System 
 open Fake 

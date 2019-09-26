@@ -1,8 +1,7 @@
-﻿#I @"../../packages/build/FAKE/tools"
-#r @"FakeLib.dll"
+﻿namespace Script
 
 open System
-open Fake
+open Fake.Core
 
 [<AutoOpen>]
 module Projects = 
@@ -39,14 +38,14 @@ module Projects =
     let projectsStartingWith partial =
         Project.All 
         |> Seq.map monikerOf 
-        |> Seq.filter (fun s -> s |> toLower |> startsWith (partial |> toLower) && partial |> isNotNullOrEmpty) 
+        |> Seq.filter (fun s -> s |> String.toLower |> String.startsWith (partial |> String.toLower) && partial |> String.isNotNullOrEmpty) 
         |> Seq.toList
 
     let tryFind partial =
         let projectsStartingWith = 
             Project.All 
             |> Seq.map infoOf
-            |> Seq.filter (fun s -> partial |> isNotNullOrEmpty && s.moniker |> toLower |> startsWith (partial |> toLower)) 
+            |> Seq.filter (fun s -> partial |> String.isNotNullOrEmpty && s.moniker |> String.toLower |> String.startsWith (partial |> String.toLower)) 
             |> Seq.toList
 
         match projectsStartingWith with 

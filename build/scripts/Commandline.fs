@@ -1,14 +1,11 @@
-#I @"../../packages/build/FAKE/tools"
-#r @"FakeLib.dll"
-#load @"Projects.fsx"
-#load @"Versioning.fsx"
+namespace Script
 
 open Fake
 open Projects
-open Versioning
-open SemVerHelper
 
-let private usage = """
+module Commandline =
+
+    let private usage = """
 USAGE:
 
 build [project] <target> [params] [skiptests]
@@ -22,8 +19,6 @@ Targets:
     build pack xunit 1.1.1 managed 1.0.0
 
 """
-
-module Commandline =
 
     let private args = getBuildParamOrDefault "cmdline" "" |> split ' '
 
@@ -60,4 +55,7 @@ module Commandline =
 
         List.append providedProjects allProjects |> List.distinctBy (fun p -> p.Project.name)
 
-    let parse () = ignore()
+    let parse (args: string list) =
+        
+        
+        

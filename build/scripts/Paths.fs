@@ -1,15 +1,11 @@
-﻿#I @"../../packages/build/FAKE/tools"
-#r @"FakeLib.dll"
-#r @"System.IO.Compression.FileSystem.dll"
-
-#load @"Projects.fsx"
+﻿namespace Script
 
 open System
 open System.IO
 open System.Diagnostics
 open System.Net
 
-open Fake
+open Fake.Core
 open Projects
 
 
@@ -34,7 +30,7 @@ module Paths =
     let Build(folder) = sprintf "%s/%s" BuildFolder folder
 
     let BinFolder(folder) = 
-        let f = replace @"\" "/" folder
+        let f = String.replace @"\" "/" folder
         sprintf "%s/%s/bin/Release" SourceFolder f
 
     let SolutionFile = sprintf "%s/Elastic.Abstractions.sln" SourceFolder
