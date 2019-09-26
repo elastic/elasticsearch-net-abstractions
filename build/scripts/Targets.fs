@@ -1,6 +1,7 @@
 namespace Scripts
 
 open System
+open System.Runtime.InteropServices
 open Bullseye
 open Fake.Tools.Git
 open ProcNet
@@ -12,7 +13,9 @@ module Main =
     let private conditional optional name action = target name (if optional then action else (fun _ -> skip name)) 
     let private command name dependencies action = Targets.Target(name, dependencies, new Action(action))
     
-    let versionChanged = ref false
+    let private versionChanged = ref false
+    
+    let private isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) 
     
     let [<EntryPoint>] main args = 
         let parsed = Commandline.parse (args |> Array.toList)
@@ -35,7 +38,7 @@ module Main =
 
         target "Restore" Build.Restore
 
-        target "RewriteBenchmark" Build.RewriteBenchmarkDotNetExporter
+        conditional isWindows "RewriteBenchmark" Build.RewriteBenchmarkDotNetExporter
 
         target "FullBuild"  <| fun _ -> 
             Build.Compile parsed.Projects

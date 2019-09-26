@@ -16,6 +16,7 @@
     <PackageReference Include="Bullseye" Version="3.0.0-rc.1" />
     <PackageReference Include="FSharp.Data" Version="3.3.2" />
     <PackageReference Include="Proc" Version="0.6.1" />
+    <PackageReference Include="ILRepack" Version="2.1.0-beta1" />
     <PackageReference Include="Elastic.Managed" Version="0.1.0-ci20190925T065816" />
   </ItemGroup>
   <ItemGroup>
@@ -27,5 +28,9 @@
     <Compile Include="Building.fs" />
     <Compile Include="Targets.fs" />
     <Content Include="versions.example.json" CopyToOutputDirectory="true" CopyToPublishDirectory="true" />
+    <Content Include="dotnet-tools.json" />
   </ItemGroup>
+  <Target Name="CopyToolPackages" AfterTargets="Build">
+    <Copy SourceFiles="$(PkgILRepack)\tools\ILRepack.exe" DestinationFolder="$(OutDir)" />
+  </Target>
 </Project>

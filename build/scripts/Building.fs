@@ -14,11 +14,13 @@ module Build =
         let props = projects |> msBuildProperties
         DotNet.Exec (["build"; Paths.SolutionFile; "-c"; "Release"] @ props) |> ignore
             
-    let RewriteBenchmarkDotNetExporter () = 
-        let assemblyRewriter = Paths.PaketDotNetGlobalTool "assembly-rewriter" @"tools\netcoreapp2.1\any\assembly-rewriter.dll"
-        let bdOutput = sprintf @"%s\%s" (Paths.Source @"Elastic.BenchmarkDotNetExporter") @"bin\Release\netstandard2.0"
+    let RewriteBenchmarkDotNetExporter () =
+        DotNet.Exec ["tool"; "restore"]
+        
+        let assemblyRewriter = "assembly-rewriter"
+        let bdOutput = sprintf @"%s/%s" (Paths.Source @"Elastic.BenchmarkDotNetExporter") @"bin/Release/netstandard2.0"
         let outDllName s = match s with | "Elastic.BenchmarkDotNetExporter" -> s | _ -> sprintf "Elastic.Internal.%s" s
-        let dllName s = sprintf @"%s\%s.dll" bdOutput s
+        let dllName s = sprintf @"%s/%s.dll" bdOutput s
         let names = [@"Elastic.BenchmarkDotNetExporter"; "Elasticsearch.Net"; "Nest"] 
         let dlls = 
             names

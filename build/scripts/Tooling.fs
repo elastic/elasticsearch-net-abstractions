@@ -59,8 +59,6 @@ module Tooling =
         member this.ExecIn workingDirectory arguments = this.ExecInWithTimeout workingDirectory arguments timeout
         member this.Exec arguments = this.ExecWithTimeout arguments timeout
 
-    let nugetFile = Path.GetFullPath "build/scripts/bin/Release/netcoreapp3.0/NuGet.exe" 
-    let Nuget = BuildTooling(None, nugetFile)
     let ILRepack = BuildTooling(None, "build/scripts/bin/Release/netcoreapp3.0/ILRepack.exe")
     let DotNet = BuildTooling(Some <| TimeSpan.FromMinutes(5.), "dotnet")
 
