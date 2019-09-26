@@ -6,12 +6,13 @@
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.7.0" />
     
-    <PackageReference Include="Bullseye" Version="3.0.0-rc.1" />
     <PackageReference Include="Fake.Core.Environment" Version="5.15.0" />
     <PackageReference Include="Fake.Core.SemVer" Version="5.15.0" />
     <PackageReference Include="Fake.IO.FileSystem" Version="5.15.0" />
     <PackageReference Include="Fake.IO.Zip" Version="5.15.0" />
     <PackageReference Include="Fake.Tools.Git" Version="5.15.0" />
+
+    <PackageReference Include="Bullseye" Version="3.0.0-rc.1" />
     <PackageReference Include="FSharp.Data" Version="3.3.2" />
     <PackageReference Include="Proc" Version="0.6.1" />
     <PackageReference Include="Elastic.Managed" Version="0.1.0-ci20190925T065816" />
@@ -19,10 +20,10 @@
   <ItemGroup>
     <Compile Include="Projects.fs" />
     <Compile Include="Paths.fs" />
-    <Compile Include="Tooling.fs" />
     <Compile Include="Versioning.fs" />
-    <Compile Include="Building.fs" />
     <Compile Include="Commandline.fs" />
+    <Compile Include="Tooling.fs" />
+    <Compile Include="Building.fs" />
     <Compile Include="Targets.fs" />
   </ItemGroup>
 </Project>

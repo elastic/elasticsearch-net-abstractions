@@ -2,6 +2,7 @@ namespace Scripts
 
 open System
 open Bullseye
+open Fake.Tools.Git
 
 module Main =
 
@@ -10,23 +11,23 @@ module Main =
     let private conditional optional name action = target name (if optional then action else (fun _ -> skip name)) 
     let private command name dependencies action = Targets.Target(name, dependencies, new Action(action))
     
+    let versionChanged = ref false
+    
     let [<EntryPoint>] main args = 
         let parsed = Commandline.parse (args |> Array.toList)
         
         let isRelease = parsed.Target = "release"
         
         conditional isRelease "VerifyClean" <| fun _ -> 
-            match isCleanWorkingCopy "." with 
-            | true -> traceHeader "Current checkout is clean, proceeding with release" 
+            match Information.isCleanWorkingCopy "." with 
+            | true -> printfn "Current checkout is clean, proceeding with release" 
             | false -> 
-                traceError "Current working dir is NOT clean aborting"
                 failwithf "Current working dir is NOT clean aborting"
 
         conditional isRelease "VerifyVersionChange" <| fun _ -> 
-            match getBuildParam "versionchanged" with
-            | "1" -> Versioning.BumpGlobalVersion Commandline.providedProjects
+            match !versionChanged with
+            | true -> Versioning.BumpGlobalVersion parsed.Projects
             | _ ->
-                traceError "None of the packages seem to have bumped versions so we can not release at this time"
                 failwithf "None of the packages seem to have bumped versions so we can not release at this time"
             
         target "Clean" Build.Clean
@@ -36,21 +37,21 @@ module Main =
         target "RewriteBenchmarkDotNetExporter" Build.RewriteBenchmarkDotNetExporter
 
         target "FullBuild"  <| fun _ -> 
-            Build.Compile Commandline.projects
+            Build.Compile parsed.Projects
 
         conditional isRelease "Version" <| fun _ -> 
             let changedResults = 
-                Commandline.projects
+                parsed.Projects
                 |> List.map (fun p -> Versioning.writeVersionIntoVersionsJson (p.Project.project) (p.Informational.ToString()))
                 |> List.contains true
 
-            setBuildParam "versionchanged" (if changedResults then "1" else "0")
+            versionChanged := changedResults
 
-        command "Build" [ "VerifyClean"; "Version"; "VerifyVersionChange"; "Restore"; "FullBuild"] <| fun _ -> printfn "Finished Build %O" artifactsVersion
+        command "Build" [ "VerifyClean"; "Version"; "VerifyVersionChange"; "Restore"; "FullBuild"] <| fun _ -> printfn "Finished Build" 
 
         command "Pack" [ "Build"; "RewriteBenchmark"] <| fun _ -> 
-            Build.CreateNugetPackage Commandline.projects
-            Versioning.ValidateArtifacts Commandline.projects
+            Build.CreateNugetPackage parsed.Projects
+            Versioning.ValidateArtifacts parsed.Projects
             
         command "Release" ["Pack";] <| fun _ -> printfn "Ran release"
         

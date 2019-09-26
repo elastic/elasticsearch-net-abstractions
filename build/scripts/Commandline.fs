@@ -1,7 +1,6 @@
-namespace Script
+namespace Scripts
 
-open Fake
-open Projects
+open Fake.Core
 
 module Commandline =
 
@@ -20,16 +19,10 @@ Targets:
 
 """
 
-    let private args = getBuildParamOrDefault "cmdline" "" |> split ' '
 
-    let private (|IsAVersion|_|) version = match SemVerHelper.isValidSemVer version with | true -> Some (parse version) | _ -> None
+    let private (|IsAVersion|_|) version = match SemVer.isValid version with | true -> Some (SemVer.parse version) | _ -> None
 
     let private (|IsATarget|_|) candidate = match candidate with | "pack" | "build" | "release" | "canary" -> Some candidate | _ -> None
-
-    let target = 
-        let t = match args with | IsATarget t::_ -> t | _ -> "build"
-        setBuildParam "target" t
-        t
 
     let private (|IsAProject|_|) candidate =
         let names = projectsStartingWith candidate 
@@ -37,25 +30,33 @@ Targets:
         | [name] -> tryFind name
         | [] -> None
         | _ ->
-            traceError (sprintf "'%s' yields more then one project '%A' and therefor ambiguous" candidate names)
+            failwithf "'%s' yields more then one project '%A' and therefor ambiguous" candidate names
             exit 2
 
-    let providedProjects =
-        let rec a args bucket = 
-            match args with
-            | IsATarget _::IsAProject project::IsAVersion version::tail -> 
-                Versioning.FullVersionInfo project version :: a tail bucket 
-            | IsAProject project::IsAVersion version::tail -> 
-                Versioning.FullVersionInfo project version :: a tail bucket 
-            | _ -> bucket
-        a args []
 
-    let projects = 
-        let allProjects = Project.All |> List.map Versioning.VersionInfo
-
-        List.append providedProjects allProjects |> List.distinctBy (fun p -> p.Project.name)
-
+    type PassedArguments = {
+        Target: string
+        Projects: Versioning.AssemblyVersionInfo list
+    }
     let parse (args: string list) =
+        
+        let target = match args with | IsATarget t::_ -> t | _ -> "build"
+        let providedProjects =
+            let rec a args bucket = 
+                match args with
+                | IsATarget _::IsAProject project::IsAVersion version::tail -> 
+                    Versioning.FullVersionInfo project version :: a tail bucket 
+                | IsAProject project::IsAVersion version::tail -> 
+                    Versioning.FullVersionInfo project version :: a tail bucket 
+                | _ -> bucket
+            a args []
+        let projects =
+            let vInfo = Versioning.VersionInfo target
+            let allProjects = Project.All |> List.map vInfo 
+            List.append providedProjects allProjects |> List.distinctBy (fun p -> p.Project.name)
+        
+        { Target = target; Projects = projects }
+        
         
         
         

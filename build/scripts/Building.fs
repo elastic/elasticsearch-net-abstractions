@@ -1,18 +1,9 @@
-﻿
-namespace Script
+﻿namespace Scripts
 
-open System 
-open Fake 
-open FSharp.Data 
-
-open Paths
-open Versioning
+open Fake.IO
 open Tooling
 
 module Build =
-
-    type private GlobalJson = JsonProvider<"../../global.json", InferTypesFromValues = false>
-    let private pinnedSdkVersion = GlobalJson.GetSample().Sdk.Version
 
     let msBuildProperties (projects: Versioning.AssemblyVersionInfo list) = 
         let props = (projects |> List.collect Versioning.MsBuildArgs)
@@ -20,20 +11,8 @@ module Build =
         [(sprintf "/p:ReposVersion=v%s" v)] |> List.append props
 
     let Compile (projects: Versioning.AssemblyVersionInfo list) = 
-        if not (DotNetCli.isInstalled()) then failwith  "You need to install the dotnet command line SDK to build for .NET Core"
-        let runningSdkVersion = DotNetCli.getVersion()
-        if (runningSdkVersion <> pinnedSdkVersion) then failwithf "Attempting to run with dotnet.exe with %s but global.json mandates %s" runningSdkVersion pinnedSdkVersion
-
         let props = projects |> msBuildProperties
-        DotNetCli.Build
-            (fun p -> 
-                { p with 
-                    Configuration = "Release" 
-                    Project = Paths.SolutionFile
-                    TimeOut = TimeSpan.FromMinutes(3.)
-                    AdditionalArgs = props
-                }
-            ) |> ignore
+        DotNet.Exec (["build"; Paths.SolutionFile; "-c"; "Release"] @ props) |> ignore
             
     let RewriteBenchmarkDotNetExporter () = 
         let assemblyRewriter = Paths.PaketDotNetGlobalTool "assembly-rewriter" @"tools\netcoreapp2.1\any\assembly-rewriter.dll"
@@ -46,37 +25,21 @@ module Build =
             |> Seq.map (fun s -> sprintf @"-i ""%s"" -o ""%s"" " (dllName s) (dllName <| outDllName s))
             |> Seq.fold (+) " "
         let mergeCommand = sprintf @"%s %s" assemblyRewriter dlls
-        DotNetCli.RunCommand (fun p -> { p with TimeOut = TimeSpan.FromMinutes(3.) }) mergeCommand |> ignore
+        DotNet.Exec [mergeCommand]
         
         let keyFile = Paths.Keys "keypair.snk"
         let ilMergeArgs = ["/internalize"; (sprintf "/keyfile:%s" keyFile); (sprintf "/out:%s" (dllName (names |> Seq.head)))]
-        let mergeDlls = names |> Seq.map (fun s -> dllName <| outDllName s)
-        Tooling.ILRepack.Exec (ilMergeArgs |> Seq.append mergeDlls) |> ignore
+        let mergeDlls = names |> List.map (fun s -> dllName <| outDllName s)
+        Tooling.ILRepack.Exec (ilMergeArgs @ mergeDlls) |> ignore
 
-    let Restore () =
-        DotNetCli.Restore
-            (fun p -> 
-                { p with 
-                    Project = Paths.SolutionFile
-                    TimeOut = TimeSpan.FromMinutes(3.)
-                }
-            ) |> ignore
+    let Restore () = DotNet.Exec <| ["restore"; Paths.SolutionFile; ] 
 
     let Clean() =
-        CleanDir Paths.BuildOutput
-        let cleanCommand = sprintf "clean %s -c Release" Paths.SolutionFile
-        DotNetCli.RunCommand (fun p -> { p with TimeOut = TimeSpan.FromMinutes(3.) }) cleanCommand |> ignore
+        Directory.delete Paths.BuildOutput
+        DotNet.Exec <| ["clean"; Paths.SolutionFile; "-c"; "release";] 
 
     let CreateNugetPackage (projects: Versioning.AssemblyVersionInfo list) = 
 
         let props = projects |> msBuildProperties |> List.append ["--no-build"]
-        DotNetCli.Pack(fun p -> 
-        {
-            p with 
-                Configuration = "Release"
-                OutputPath = sprintf "%s" Paths.NugetOutput
-                TimeOut = TimeSpan.FromMinutes(3.)
-                Project = Paths.SolutionFile
-                AdditionalArgs = props
-                
-        })
+        let output = sprintf "%s" Paths.NugetOutput
+        DotNet.Exec <| ["pack"; Paths.SolutionFile; "-c"; "release"; "-o"; output] @ props

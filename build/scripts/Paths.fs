@@ -1,13 +1,6 @@
-﻿namespace Script
-
-open System
-open System.IO
-open System.Diagnostics
-open System.Net
+﻿namespace Scripts
 
 open Fake.Core
-open Projects
-
 
 module Paths =
 

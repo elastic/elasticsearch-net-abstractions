@@ -1,40 +1,38 @@
-﻿namespace Script
+﻿namespace Scripts
 
 open System.Diagnostics
 open System.IO
 open System
 open System.Reflection
 
-open Projects
 open Fake.Core
 open Fake.IO
 open FSharp.Data
 open Fake.IO.Globbing.Operators
-open Fake.Tools.Git
 open Fake.Tools.Git
 
 module Versioning =
     type AssemblyVersionInfo = { Informational: SemVerInfo; Assembly: SemVerInfo; AssemblyFile: SemVerInfo; Project: ProjectInfo; }
     type private VersionsJson = JsonProvider<"../../versions.json">
 
-    let private canaryVersionOrCurrent version = 
-        match getBuildParam "target" with
+    let private canaryVersionOrCurrent target version = 
+        match target with
         | "canary" ->
             let timestampedVersion = (sprintf "ci%s" (DateTime.UtcNow.ToString("yyyyMMddTHHmmss")))
             printfn "Canary suffix %s " timestampedVersion
             let v = version |> SemVer.parse
-            let canaryVersion = SemVer.parse ((sprintf "%d.%d.0-%s" v.Major (v.Minor + 1) timestampedVersion).Trim())
+            let canaryVersion = SemVer.parse ((sprintf "%d.%d.0-%s" v.Major (v.Minor + 1u) timestampedVersion).Trim())
             canaryVersion
         | _ -> version |> SemVer.parse
 
-    let private versionOf project =
+    let private versionOf target project =
         let globalJson = VersionsJson.Load("../../versions.json");
         match project with
-        | Managed -> canaryVersionOrCurrent <| globalJson.Versions.Managed.Remove(0, 1)
-        | Ephemeral -> canaryVersionOrCurrent <| globalJson.Versions.Ephemeral.Remove(0, 1)
-        | Xunit -> canaryVersionOrCurrent <| globalJson.Versions.Xunit.Remove(0, 1)
-        | BenchmarkDotNetExporter -> canaryVersionOrCurrent <| globalJson.Versions.Bdnetexporter.Remove(0, 1)
-        | Stack -> canaryVersionOrCurrent <| globalJson.Versions.Stack.Remove(0, 1)
+        | Managed -> canaryVersionOrCurrent target <| globalJson.Versions.Managed.Remove(0, 1)
+        | Ephemeral -> canaryVersionOrCurrent target <| globalJson.Versions.Ephemeral.Remove(0, 1)
+        | Xunit -> canaryVersionOrCurrent target <| globalJson.Versions.Xunit.Remove(0, 1)
+        | BenchmarkDotNetExporter -> canaryVersionOrCurrent target <| globalJson.Versions.Bdnetexporter.Remove(0, 1)
+        | Stack -> canaryVersionOrCurrent target <| globalJson.Versions.Stack.Remove(0, 1)
         
     let reposVersion () =
         let globalJson = VersionsJson.Load("../../versions.json");
@@ -105,8 +103,8 @@ module Versioning =
 
     let FullVersionInfo project v = 
         { Informational= v; Assembly= assemblyVersionOf v; AssemblyFile = assemblyFileVersionOf v; Project = infoOf project }
-    let VersionInfo project = 
-        let v = versionOf project
+    let VersionInfo target project = 
+        let v = versionOf target project
         { Informational= v; Assembly= assemblyVersionOf v; AssemblyFile = assemblyFileVersionOf v; Project = infoOf project }
 
     let MsBuildArgs info =

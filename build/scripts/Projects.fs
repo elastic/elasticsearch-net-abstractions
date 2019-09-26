@@ -1,4 +1,4 @@
-﻿namespace Script
+﻿namespace Scripts
 
 open System
 open Fake.Core

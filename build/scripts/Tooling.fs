@@ -1,13 +1,9 @@
-﻿namespace Script
+﻿namespace Scripts
 
 open System
 open System.IO
-open System.Diagnostics
-open System.Net
 
 open Elastic.Managed.ConsoleWriters
-open System
-open System.IO
 open ProcNet
 open ProcNet.Std
 
