@@ -28,7 +28,6 @@
     <Compile Include="Building.fs" />
     <Compile Include="Targets.fs" />
     <Content Include="versions.example.json" CopyToOutputDirectory="true" CopyToPublishDirectory="true" />
-    <Content Include="dotnet-tools.json" />
   </ItemGroup>
   <Target Name="CopyToolPackages" AfterTargets="Build">
     <Copy SourceFiles="$(PkgILRepack)\tools\ILRepack.exe" DestinationFolder="$(OutDir)" />
