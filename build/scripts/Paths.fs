@@ -1,6 +1,7 @@
 ﻿namespace Scripts
 
 open Fake.Core
+open System.IO
 
 module Paths =
 
@@ -8,6 +9,7 @@ module Paths =
 
     let BuildFolder = "build"
     let BuildOutput = sprintf "%s/output" BuildFolder
+    let VersionsJson = Path.GetFullPath "versions.json"
 
     let Tool tool = sprintf "packages/build/%s" tool
     let CheckedInToolsFolder = "build/Tools"

@@ -13,7 +13,7 @@ open Fake.Tools.Git
 
 module Versioning =
     type AssemblyVersionInfo = { Informational: SemVerInfo; Assembly: SemVerInfo; AssemblyFile: SemVerInfo; Project: ProjectInfo; }
-    type private VersionsJson = JsonProvider<"../../versions.json">
+    type private VersionsJson = JsonProvider<"versions.example.json">
 
     let private canaryVersionOrCurrent target version = 
         match target with
@@ -26,7 +26,7 @@ module Versioning =
         | _ -> version |> SemVer.parse
 
     let private versionOf target project =
-        let globalJson = VersionsJson.Load("../../versions.json");
+        let globalJson = VersionsJson.Load(Paths.VersionsJson);
         match project with
         | Managed -> canaryVersionOrCurrent target <| globalJson.Versions.Managed.Remove(0, 1)
         | Ephemeral -> canaryVersionOrCurrent target <| globalJson.Versions.Ephemeral.Remove(0, 1)
@@ -35,7 +35,7 @@ module Versioning =
         | Stack -> canaryVersionOrCurrent target <| globalJson.Versions.Stack.Remove(0, 1)
         
     let reposVersion () =
-        let globalJson = VersionsJson.Load("../../versions.json");
+        let globalJson = VersionsJson.Load(Paths.VersionsJson);
         globalJson.Versions.Repos.Remove(0, 1);
 
     let private assemblyVersionOf v = sprintf "%i.0.0" v.Major |> SemVer.parse
@@ -44,16 +44,15 @@ module Versioning =
 
     //write it with a leading v in the json, needed for the json type provider to keep things strings
     let writeVersionsJson reposVersion managedVersion ephemeralVersion xunitVersion bdVersion stackVersion =
-        let globalJson = VersionsJson.Load("../../versions.json");
         let versionsNode = VersionsJson.Versions(reposVersion, managedVersion, ephemeralVersion, xunitVersion, bdVersion, stackVersion)
 
         let newVersionsJson = VersionsJson.Root (versionsNode)
-        use tw = new StreamWriter("versions.json")
+        use tw = new StreamWriter(Paths.VersionsJson)
         newVersionsJson.JsonValue.WriteTo(tw, JsonSaveOptions.None)
 
     let private pre (v: string) = match (v.StartsWith("v")) with | true -> v | _ -> sprintf "v%s" v
     let private bumpVersion project version = 
-        let globalJson = VersionsJson.Load("../../versions.json");
+        let globalJson = VersionsJson.Load(Paths.VersionsJson);
         let reposVersion = pre <| globalJson.Versions.Repos
         let managedVersion = match project with | Managed -> pre version | _ -> pre <| globalJson.Versions.Managed
         let ephemeralVersion = match project with | Ephemeral -> pre version | _ -> pre <| globalJson.Versions.Ephemeral
@@ -65,7 +64,7 @@ module Versioning =
         printfn "%s bumped version to (%O) in global.json " (nameOf project) version
 
     let writeVersionIntoVersionsJson project version =
-        let globalJson = VersionsJson.Load("../../versions.json");
+        let globalJson = VersionsJson.Load(Paths.VersionsJson);
         let pv = pre version
         let changed = 
             match project with
@@ -83,7 +82,7 @@ module Versioning =
         changed
 
     let BumpGlobalVersion (projects: AssemblyVersionInfo list) = 
-        let globalJson = VersionsJson.Load("../../versions.json");
+        let globalJson = VersionsJson.Load(Paths.VersionsJson);
         let v = globalJson.Versions.Repos.Remove(0, 1) |> SemVer.parse
         let bumpedVersion = sprintf "v%i.%i.%i" v.Major v.Minor (v.Patch + 1u)
 

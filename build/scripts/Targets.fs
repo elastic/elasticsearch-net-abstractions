@@ -3,6 +3,7 @@ namespace Scripts
 open System
 open Bullseye
 open Fake.Tools.Git
+open ProcNet
 
 module Main =
 
@@ -34,7 +35,7 @@ module Main =
 
         target "Restore" Build.Restore
 
-        target "RewriteBenchmarkDotNetExporter" Build.RewriteBenchmarkDotNetExporter
+        target "RewriteBenchmark" Build.RewriteBenchmarkDotNetExporter
 
         target "FullBuild"  <| fun _ -> 
             Build.Compile parsed.Projects
@@ -56,6 +57,8 @@ module Main =
         command "Release" ["Pack";] <| fun _ -> printfn "Ran release"
         
         command "Canary" ["Pack";] <| fun _ -> printfn "Ran canary"
+        
+        Targets.RunTargetsAndExit([parsed.Target], fun e -> e.GetType() = typeof<ProcExecException>)
         
         0
         

@@ -1,0 +1,10 @@
+{
+  "versions": {
+    "repos": "v0.0.0",
+    "managed": "v0.0.0",
+    "ephemeral": "v0.0.0",
+    "xunit": "v0.0.0",
+    "bdnetexporter": "v0.0.o",
+    "stack": "v0.0.0"
+  }
+}

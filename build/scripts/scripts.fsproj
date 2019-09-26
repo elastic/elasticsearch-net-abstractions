@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <IsPackable>False</IsPackable>
   </PropertyGroup>
@@ -25,5 +26,6 @@
     <Compile Include="Tooling.fs" />
     <Compile Include="Building.fs" />
     <Compile Include="Targets.fs" />
+    <Content Include="versions.example.json" CopyToOutputDirectory="true" CopyToPublishDirectory="true" />
   </ItemGroup>
 </Project>
