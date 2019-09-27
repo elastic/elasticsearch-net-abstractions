@@ -16,28 +16,8 @@ namespace ScratchPad
 	{
 		public static int Main()
 		{
-		
-		    var range = new SemVer.Range(">=7.2.0-alpha2");
-		    var v = ElasticVersion.From("7.4.0-SNAPSHOT");
-		    var vLatest = ElasticVersion.From("latest-7");
-		    var v3 = ElasticVersion.From("7.2.0");
-		    var v5 = ElasticVersion.From("7.1.0");
-		    var v4 = ElasticVersion.From("7.2.0-alpha1");
-		    
-		    
-		    Console.WriteLine(v.InRange(range));
-		    Console.WriteLine(vLatest.InRange(range));
-		    Console.WriteLine(v3.InRange(range));
-		    Console.WriteLine(v4.InRange(range));
-		    Console.WriteLine(v5.InRange(range));
-		    
-		    
-		    
-		    
-		
-		
 			//ResolveVersions();
-			//ManualConfigRun();
+			ManualConfigRun();
 			//ValidateCombinations.Run();
 			return 0;
 		}
@@ -47,9 +27,9 @@ namespace ScratchPad
 			ElasticVersion version = "latest";
 
 			var plugins =
-				new ElasticsearchPlugins(ElasticsearchPlugin.IngestGeoIp, ElasticsearchPlugin.AnalysisKuromoji);
+				new ElasticsearchPlugins(ElasticsearchPlugin.IngestGeoIp, ElasticsearchPlugin.IngestAttachment);
 			var features = Security | XPack | SSL;
-			var config = new EphemeralClusterConfiguration(version, features, null, numberOfNodes: 1)
+			var config = new EphemeralClusterConfiguration(version, features, plugins, numberOfNodes: 1)
 			{
 				HttpFiddlerAware = true,
 				ShowElasticsearchOutputAfterStarted = true,
@@ -116,7 +96,7 @@ namespace ScratchPad
 //                    Console.WriteLine($"\t{r.ArtifactBuildState}");
 //                    Console.WriteLine($"\t{a.FolderInZip}");
 //                    Console.WriteLine($"\tfolder: {a.LocalFolderName}");
-					if (a == null) 
+					if (a == null)
 					{
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("\tArtifact not resolved");

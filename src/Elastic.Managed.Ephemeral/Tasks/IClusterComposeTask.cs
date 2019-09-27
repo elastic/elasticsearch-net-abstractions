@@ -92,12 +92,12 @@ namespace Elastic.Managed.Ephemeral.Tasks
 #else
 				handler.ServerCertificateCustomValidationCallback += (m, c, cn, p) => true;
 #endif
-				
+
 			}
 
 			using (var client = new HttpClient(handler) {Timeout = TimeSpan.FromSeconds(20)})
 			{
-				
+
 				if (cluster.ClusterConfiguration.EnableSecurity)
 				{
 					var byteArray =
@@ -125,7 +125,7 @@ namespace Elastic.Managed.Ephemeral.Tasks
 				}
 				finally
 				{
-					
+
 #if !NETSTANDARD
 				ServicePointManager.ServerCertificateValidationCallback -= ServerCertificateValidationCallback;
 #endif
@@ -182,7 +182,7 @@ namespace Elastic.Managed.Ephemeral.Tasks
 			if (errorOut.Any() && config.Version < "5.2.0")
 				errorOut = errorOut.Where(e => !e.Line.Contains("No log4j2 configuration file found")).ToList();
 
-			if (errorOut.Any(e => !string.IsNullOrWhiteSpace(e.Line)) && !binary.Contains("cert"))
+			if (errorOut.Any(e => !string.IsNullOrWhiteSpace(e.Line)) && (!binary.EndsWith("-plugin") && !binary.Contains("cert")))
 				throw new Exception(
 					$"Recieved error out with exitCode ({result.ExitCode}) while executing {description}: {command}");
 
