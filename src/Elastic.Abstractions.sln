@@ -7,20 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScratchPad", "Examples\Scra
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "scripts", "..\build\scripts\scripts.fsproj", "{D6997ADC-E933-418E-831C-DE1A78897493}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{73A4EA23-1EB6-428F-8713-A37C09627DB3}"
-	ProjectSection(SolutionItems) = preProject
-		..\.editorconfig = ..\.editorconfig
-		..\.gitignore = ..\.gitignore
-		..\build.bat = ..\build.bat
-		..\build.sh = ..\build.sh
-		..\global.json = ..\global.json
-		..\paket.dependencies = ..\paket.dependencies
-		..\build\Versioning.targets = ..\build\Common.targets
-		..\appveyor.yml = ..\appveyor.yml
-		..\README.md = ..\README.md
-		..\versions.json = ..\versions.json
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elastic.Managed", "Elastic.Managed\Elastic.Managed.csproj", "{0FCE020D-F4BD-4933-A0AB-27537EFA273E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elastic.Managed.Ephemeral", "Elastic.Managed.Ephemeral\Elastic.Managed.Ephemeral.csproj", "{F5D3D2D7-CDA1-462A-81FD-A446C4CEB287}"
@@ -50,7 +36,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{D6997ADC-E933-418E-831C-DE1A78897493} = {73A4EA23-1EB6-428F-8713-A37C09627DB3}
 		{A660CA00-91E4-4994-BBA2-406BC5259C33} = {9D154338-4AA8-40A9-A378-B27C05D45791}
 		{E7AD2461-309A-4BA7-A6EB-5C1F4F882BC2} = {9D154338-4AA8-40A9-A378-B27C05D45791}
 		{93EA909E-7CA6-4263-9E27-0B53BC90CF48} = {9D154338-4AA8-40A9-A378-B27C05D45791}
@@ -67,6 +52,7 @@ Global
 		{D6997ADC-E933-418E-831C-DE1A78897493}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6997ADC-E933-418E-831C-DE1A78897493}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D6997ADC-E933-418E-831C-DE1A78897493}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6997ADC-E933-418E-831C-DE1A78897493}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0FCE020D-F4BD-4933-A0AB-27537EFA273E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0FCE020D-F4BD-4933-A0AB-27537EFA273E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0FCE020D-F4BD-4933-A0AB-27537EFA273E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

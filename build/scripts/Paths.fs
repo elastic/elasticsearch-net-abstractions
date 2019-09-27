@@ -1,17 +1,7 @@
-﻿#I @"../../packages/build/FAKE/tools"
-#r @"FakeLib.dll"
-#r @"System.IO.Compression.FileSystem.dll"
+﻿namespace Scripts
 
-#load @"Projects.fsx"
-
-open System
+open Fake.Core
 open System.IO
-open System.Diagnostics
-open System.Net
-
-open Fake
-open Projects
-
 
 module Paths =
 
@@ -19,6 +9,7 @@ module Paths =
 
     let BuildFolder = "build"
     let BuildOutput = sprintf "%s/output" BuildFolder
+    let VersionsJson = Path.GetFullPath "versions.json"
 
     let Tool tool = sprintf "packages/build/%s" tool
     let CheckedInToolsFolder = "build/Tools"
@@ -34,7 +25,7 @@ module Paths =
     let Build(folder) = sprintf "%s/%s" BuildFolder folder
 
     let BinFolder(folder) = 
-        let f = replace @"\" "/" folder
+        let f = String.replace @"\" "/" folder
         sprintf "%s/%s/bin/Release" SourceFolder f
 
     let SolutionFile = sprintf "%s/Elastic.Abstractions.sln" SourceFolder
