@@ -24,7 +24,7 @@ namespace ScratchPad
 
 		private static void ManualConfigRun()
 		{
-			ElasticVersion version = "latest";
+			ElasticVersion version = "latest-6";
 
 			var plugins =
 				new ElasticsearchPlugins(ElasticsearchPlugin.IngestGeoIp, ElasticsearchPlugin.IngestAttachment);
