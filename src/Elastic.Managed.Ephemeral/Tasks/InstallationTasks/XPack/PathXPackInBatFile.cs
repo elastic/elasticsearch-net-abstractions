@@ -17,7 +17,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks.XPack
 			var v = config.Version;
 
 			if (v.Major != 5) return;
-			if (IsMono || Path.DirectorySeparatorChar == '/') return;
+			if (!IsWindows) return;
 
 			cluster.Writer?.WriteDiagnostic($"{{{nameof(PathXPackInBatFile)}}} patching x-pack .in.bat to accept CONF_DIR");
 			PatchPlugin(v, fileSystem);
