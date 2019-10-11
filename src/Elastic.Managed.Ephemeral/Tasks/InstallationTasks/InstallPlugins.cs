@@ -75,7 +75,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 				ExecuteBinary(
 					cluster.ClusterConfiguration,
 					cluster.Writer,
-					fs.PluginBinary + BinarySuffix,
+					fs.PluginBinary,
 					$"install elasticsearch plugin: {plugin.SubProductName}",
 					"install --batch", installParameter);
 
