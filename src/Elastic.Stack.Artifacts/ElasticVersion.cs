@@ -51,13 +51,17 @@ namespace Elastic.Stack.Artifacts
 		/// </summary>
 		public static ElasticVersion From(string managedVersionString)
 		{
-			ArtifactBuildState IsSnapshot(string s) =>
-				s.EndsWith("-SNAPSHOT") ? ArtifactBuildState.Snapshot : ArtifactBuildState.Released;
+			ArtifactBuildState GetReleaseState(string s) =>
+				s.EndsWith("-SNAPSHOT")
+					? ArtifactBuildState.Snapshot
+					: ApiResolver.IsReleasedVersion(s)
+						? ArtifactBuildState.Released
+						: ArtifactBuildState.BuildCandidate;
 
 			if (string.IsNullOrWhiteSpace(managedVersionString)) return null;
 
 			var version = managedVersionString;
-			var state = IsSnapshot(version);
+			var state = GetReleaseState(version);
 			var buildHash = string.Empty;
 
 			switch (managedVersionString)
@@ -65,7 +69,9 @@ namespace Elastic.Stack.Artifacts
 				case string _ when managedVersionString.StartsWith("latest-", StringComparison.OrdinalIgnoreCase):
 					var major = int.Parse(managedVersionString.Replace("latest-", ""));
 					version = SnapshotApiResolver.LatestReleaseOrSnapshotForMajor(major).ToString();
-					state = IsSnapshot(version);
+					state = GetReleaseState(version);
+					if (state == ArtifactBuildState.BuildCandidate)
+						buildHash = ApiResolver.LatestBuildHash(version);
 					break;
 				case string _ when managedVersionString.EndsWith("-snapshot", StringComparison.OrdinalIgnoreCase):
 					state = ArtifactBuildState.Snapshot;
@@ -76,7 +82,7 @@ namespace Elastic.Stack.Artifacts
 					break;
 				case "latest":
 					version = SnapshotApiResolver.LatestReleaseOrSnapshot.ToString();
-					state = IsSnapshot(version);
+					state = GetReleaseState(version);
 					break;
 			}
 

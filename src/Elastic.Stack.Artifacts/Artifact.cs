@@ -18,7 +18,7 @@ namespace Elastic.Stack.Artifacts
 			State = state;
 			BuildHash = buildHash;
 		}
-		internal Artifact(Product product, Version version, SnapshotApiResolver.SearchPackage package, string buildHash = null)
+		internal Artifact(Product product, Version version, SearchPackage package, string buildHash = null)
 		{
 			ProductName = product.ProductName;
 			Version = version;
@@ -33,14 +33,14 @@ namespace Elastic.Stack.Artifacts
 		public string ProductName { get; }
 		public Version Version { get; }
 		public string DownloadUrl { get; }
-		
+
 		public ArtifactBuildState State { get; }
 		public string BuildHash { get; }
 		public string ShaUrl { get; }
 		public string AscUrl { get; }
 		// ReSharper restore UnusedAutoPropertyAccessor.Global
 
-		public string LocalFolderName 
+		public string LocalFolderName
 		{
 			get
 			{
@@ -60,7 +60,7 @@ namespace Elastic.Stack.Artifacts
 		}
 
 		public string FolderInZip => $"{ProductName}-{Version}";
-		
+
 		private static readonly Uri BaseUri = new Uri("http://localhost");
 		public string Archive
 		{

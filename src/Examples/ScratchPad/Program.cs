@@ -5,6 +5,7 @@ using Elastic.Managed.Ephemeral;
 using Elastic.Managed.Ephemeral.Plugins;
 using Elastic.Stack.Artifacts;
 using Elastic.Stack.Artifacts.Products;
+using Elastic.Stack.Artifacts.Resolvers;
 using Elasticsearch.Net;
 using Nest;
 using static Elastic.Managed.Ephemeral.ClusterFeatures;
@@ -16,8 +17,8 @@ namespace ScratchPad
 	{
 		public static int Main()
 		{
-			//ResolveVersions();
-			ManualConfigRun();
+			ResolveVersions();
+			//ManualConfigRun();
 			//ValidateCombinations.Run();
 			return 0;
 		}
@@ -69,13 +70,14 @@ namespace ScratchPad
 				"8.0.0-SNAPSHOT", "7.0.0-beta1", "6.6.1", "latest-7", "latest", "7.0.0", "7.4.0-SNAPSHOT",
 				"957e3089:7.2.0", "latest-6"
 			};
-			//versions = new[] {"latest-6"};
+			//versions = new[] {"latest-7"};
 			var products = new Product[]
 			{
 				Product.Elasticsearch,
 				Product.Kibana,
 				Product.ElasticsearchPlugin(ElasticsearchPlugin.AnalysisIcu)
 			};
+			var x = SnapshotApiResolver.AvailableVersions.Value;
 
 			foreach (var v in versions)
 			{

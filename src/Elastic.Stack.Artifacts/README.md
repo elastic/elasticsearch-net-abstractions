@@ -14,6 +14,7 @@ Supports:
 
 3. Released versions
     * `MAJOR.MINOR.PATH` where `MAJOR` is still supported as defined by the EOL policy of Elastic.
+    * Note if the version exists but is not yet released it will resolve as a build candidate
     
 
 ## Usage
