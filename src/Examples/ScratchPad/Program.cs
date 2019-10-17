@@ -17,15 +17,15 @@ namespace ScratchPad
 	{
 		public static int Main()
 		{
-			ResolveVersions();
-			//ManualConfigRun();
+			//ResolveVersions();
+			ManualConfigRun();
 			//ValidateCombinations.Run();
 			return 0;
 		}
 
 		private static void ManualConfigRun()
 		{
-			ElasticVersion version = "latest-6";
+			ElasticVersion version = "latest-7";
 
 			var plugins =
 				new ElasticsearchPlugins(ElasticsearchPlugin.IngestGeoIp, ElasticsearchPlugin.IngestAttachment);

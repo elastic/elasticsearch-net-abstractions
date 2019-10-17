@@ -15,10 +15,12 @@ module Versioning =
     type AssemblyVersionInfo = { Informational: SemVerInfo; Assembly: SemVerInfo; AssemblyFile: SemVerInfo; Project: ProjectInfo; }
     type private VersionsJson = JsonProvider<"versions.example.json">
 
+    let defaultCanaryDate = DateTime.UtcNow.ToString("yyyyMMddTHHmmss")
+
     let private canaryVersionOrCurrent target version = 
         match target with
         | "canary" ->
-            let timestampedVersion = (sprintf "ci%s" (DateTime.UtcNow.ToString("yyyyMMddTHHmmss")))
+            let timestampedVersion = (sprintf "ci%s" (defaultCanaryDate))
             printfn "Canary suffix %s " timestampedVersion
             let v = version |> SemVer.parse
             let canaryVersion = SemVer.parse ((sprintf "%d.%d.0-%s" v.Major (v.Minor + 1u) timestampedVersion).Trim())
