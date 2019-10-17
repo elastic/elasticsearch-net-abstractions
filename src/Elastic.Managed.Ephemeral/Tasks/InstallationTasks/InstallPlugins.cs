@@ -71,14 +71,14 @@ namespace Elastic.Managed.Ephemeral.Tasks.InstallationTasks
 				cluster.Writer?.WriteDiagnostic($"{{{nameof(Run)}}} attempting install [{plugin.SubProductName}] as it's not OOTB: {{{plugin.ShippedByDefaultAsOf}}} and valid for {v}: {{{plugin.IsValid(v)}}}");
 				//var installParameter = v.ReleaseState == ReleaseState.Released ? plugin.Moniker : UseHttpPluginLocation(cluster.Writer, fs, plugin, v);
 				var installParameter = UseHttpPluginLocation(cluster.Writer, fs, plugin, v);
-				if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-					ExecuteBinary(cluster.ClusterConfiguration, cluster.Writer, "cmd", $"install elasticsearch plugin: {plugin.SubProductName}", $"/c CALL {fs.PluginBinary} install --batch", installParameter);
-				else
-				{
-					if (!Directory.Exists(fs.ConfigPath)) Directory.CreateDirectory(fs.ConfigPath);
-					ExecuteBinary(cluster.ClusterConfiguration, cluster.Writer, fs.PluginBinary, $"install elasticsearch plugin: {plugin.SubProductName}", "install --batch", installParameter);
-				}
-				
+				if (!Directory.Exists(fs.ConfigPath)) Directory.CreateDirectory(fs.ConfigPath);
+				ExecuteBinary(
+					cluster.ClusterConfiguration,
+					cluster.Writer,
+					fs.PluginBinary,
+					$"install elasticsearch plugin: {plugin.SubProductName}",
+					"install --batch", installParameter);
+
 				CopyConfigDirectoryToHomeCacheConfigDirectory(cluster, plugin);
 			}
 

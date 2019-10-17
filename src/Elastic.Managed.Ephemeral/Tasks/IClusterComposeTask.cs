@@ -39,8 +39,8 @@ namespace Elastic.Managed.Ephemeral.Tasks
 	{
 		public abstract void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster);
 
-		protected static bool IsMono { get; } = Type.GetType("Mono.Runtime") != null;
-		protected static string BinarySuffix => IsMono || Path.DirectorySeparatorChar == '/' ? "" : ".bat";
+		protected static bool IsWindows { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+		protected static string BinarySuffix => IsWindows ? ".bat" : string.Empty;
 
 		protected static void DownloadFile(string from, string to)
 		{
