@@ -39,7 +39,9 @@ namespace Nest.TypescriptGenerator
 				typeof (Type),
 				typeof (Exception),
 				typeof (IApiCallDetails),
-				typeof (Node)
+				typeof (Node),
+				typeof (RequestConfiguration),
+				typeof (IRequestConfiguration),
 			});
 
 		private readonly HashSet<Type> _typesToIgnore = new HashSet<Type>(new[]
@@ -48,11 +50,15 @@ namespace Nest.TypescriptGenerator
 				typeof (Node),
 				typeof (Audit),
 				typeof (AuditEvent),
-				typeof (Types.AllTypesMarker),
+				typeof (IConnectionConfigurationValues),
+				typeof (BasicAuthenticationCredentials),
+				typeof (ApiKeyAuthenticationCredentials),
+				typeof (RequestConfiguration),
+				typeof (IRequestConfiguration),
+				typeof (IRequest),
 				typeof (Indices.AllIndicesMarker),
 				typeof (AllField),
 				typeof (Indices.ManyIndices),
-				typeof (Types.ManyTypes),
 			});
 
 		private readonly Dictionary<Type, string[]> _typesPropertiesToIgnore = new Dictionary<Type, string[]>
@@ -68,6 +74,10 @@ namespace Nest.TypescriptGenerator
 
 		protected override void AppendClassDefinition(TsClass classModel, ScriptBuilder sb, TsGeneratorOutput generatorOutput)
 		{
+			if (classModel.Name == "ConnectionConfigurationValues") return;
+			if (classModel.Name == "RequestData") return;
+			if (classModel.Name == "ISortOrder") return;
+
 			if (classModel.Type.IsInterface && CsharpTypeInfoProvider.ExposedInterfaces.Contains(classModel.Type))
 			{
 				AppendInterfaceDef(classModel, sb, generatorOutput);
@@ -209,6 +219,9 @@ namespace Nest.TypescriptGenerator
 		private void AddNamespaceHeader(string name, ScriptBuilder sb)
 		{
 			var n = "common";
+			if (name == "SearchRequest")
+			{
+			}
 			if (this._sourceDirectory.TypeNameToNamespaceMapping.TryGetValue(name, out var ns))
 				n = string.Join('.', ns.Split(".").Select(StringExtensions.SnakeCase));
 
@@ -253,6 +266,8 @@ namespace Nest.TypescriptGenerator
 
 			var i = classModel.Name;
 			if (!ClientTypesExporter.InterfaceRegex.IsMatch(i)) i = $"I{i}";
+
+			if (this._restSpec.SkipRequestImplementation(i)) return;
 			if (!this._restSpec.Requests.TryGetValue(i, out var mapping))
 			{
 				throw new Exception($"Could not get {i} original rest spec file name");

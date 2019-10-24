@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Nest.TypescriptGenerator
 {
@@ -12,7 +13,9 @@ namespace Nest.TypescriptGenerator
 			from f in Directory.GetFiles(directory, $"*.cs", SearchOption.AllDirectories)
 			let dir = new DirectoryInfo(f)
 			where dir?.Parent != null && !SkipFolders.Contains(dir.Parent.Name)
-			select new CSharpSourceFile(new FileInfo(f));
+			let fi = new FileInfo(f)
+			where !Regex.IsMatch(fi.Name, $@"(Requests|Descriptors)\..*?\.cs")
+			select new CSharpSourceFile(fi);
 
 		public CSharpSourceDirectory(string directory)
 		{

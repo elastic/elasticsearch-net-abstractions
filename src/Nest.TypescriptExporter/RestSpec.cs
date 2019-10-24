@@ -54,7 +54,7 @@ namespace Nest.TypescriptGenerator
 
 		public Dictionary<string, RestSpecMapping> Requests { get; }
 
-		private readonly Regex _descriptorRe = new Regex(@"DescriptorFor\(""(?<descriptor>.+?)""");
+		private readonly Regex _mapsApiRe = new Regex(@"MapsApi\(""(?<descriptor>.+?)(?:\.json)?""");
 		private readonly string[] _ignoredApis =
 		{
 			//not mapped un purpose in NEST
@@ -100,6 +100,11 @@ namespace Nest.TypescriptGenerator
 		{
 			if (typeName == "IRequest") return true;
 			if (typeName == "ICovariantSearchRequest") return true;
+			if (typeName == "ITypedSearchRequest") return true;
+			if (typeName == "IProxyRequest") return true;
+			if (typeName == "ISqlRequest") return true;
+			if (typeName == "IUpgradeRequest") return true;
+			if (typeName == "IUpgradeStatusRequest") return true;
 			if (ClientTypesExporter.InterfaceRegex.IsMatch(typeName)) typeName = typeName.Substring(1);
 			return !typeName.EndsWith("Request")
 			       || _helperRequests.Contains(typeName)
@@ -110,7 +115,7 @@ namespace Nest.TypescriptGenerator
 		{
 			foreach (var l in File.ReadAllLines(file.FullName))
 			{
-				var matches = _descriptorRe.Match(l);
+				var matches = _mapsApiRe.Match(l);
 				if (!matches.Success) continue;
 				specFileName = matches.Groups["descriptor"].Value;
 				break;

@@ -21,8 +21,8 @@ namespace Nest.TypescriptGenerator
 
 		public static readonly Type[] StringAbstractions = new[]
 		{
-			typeof(DateMath), typeof(Types), typeof(TypeName), typeof(Indices), typeof(IndexName), typeof(RelationName), typeof(Id), typeof(Names), typeof(Name), typeof(NodeIds),
-			typeof(Metrics), typeof(IndexMetrics), typeof(CategoryId), typeof(ActionIds), typeof(Field), typeof(Fields), typeof(PropertyName), typeof(Routing), typeof(TaskId),
+			typeof(DateMath), typeof(Indices), typeof(IndexName), typeof(RelationName), typeof(Id), typeof(Names), typeof(Name), typeof(NodeIds),
+			typeof(Metrics), typeof(IndexMetrics), typeof(Field), typeof(Fields), typeof(PropertyName), typeof(Routing), typeof(TaskId),
 			typeof(DateMathExpression), typeof(IDateMath)
 		};
 
@@ -42,10 +42,20 @@ namespace Nest.TypescriptGenerator
 				.Concat(ExposedInterfacesImplementations.Where(t=>!t.IsGenericType))
 				.ToArray();
 
-			this.RequestParameters = lowLevelAssembly
+			var requestParams = lowLevelAssembly
 				.GetTypes()
 				.Where(t => t.IsClass && t.Name.EndsWith("RequestParameters"))
-				.ToDictionary(t=>t.Name.Replace("Parameters", ""));
+				.Where(t => t.Namespace != "Elasticsearch.Net.Specification.SlmApi")
+				.ToList();
+
+			var doubles = requestParams
+				.GroupBy(t => t.Name.Replace("Parameters", ""))
+				.Where(g => g.Count() > 1)
+				.ToList();
+
+
+			this.RequestParameters = requestParams
+				.ToDictionary(t => t.Name.Replace("Parameters", ""));
 		}
 
 		public Dictionary<string, Type> RequestParameters { get; }

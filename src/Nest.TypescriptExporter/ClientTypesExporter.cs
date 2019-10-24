@@ -81,6 +81,8 @@ namespace Nest.TypescriptGenerator
 				? ClientTypescriptGenerator.TypeRenames[tsClass.Name]
 				: tsClass.Name;
 
+			if (type.Type == typeof(HistogramOrder)) return "HistogramOrder";
+
 			if (InterfaceRegex.IsMatch(name) && !CsharpTypeInfoProvider.ExposedInterfaces.Contains(type.Type)) name = name.Substring(1);
 
 			if (!tsClass.GenericArguments.Any()) return name;

@@ -15,7 +15,7 @@ namespace Nest.TypescriptGenerator
 		public static int Main(string[] args)
 		{
 			const string defaultTsFile = "typedefinitions.ts";
-			const string defaultNestSourceFolder = @"..\..\..\net-master\src\Nest";
+			const string defaultNestSourceFolder = @"../../../net-7/src/Nest";
 			var command = args.Length > 0 ? args[0] : "generate";
 			var definitionFile = args.Length > 1 ? args[1] : defaultTsFile;
 			var nestSourceFolder = args.Length > 2 ? args[2] : defaultNestSourceFolder;
@@ -25,7 +25,7 @@ namespace Nest.TypescriptGenerator
 				case "generate": return Generate(definitionFile, nestSourceFolder, restSpec);
 				case "both":
 				case "split":
-					var outFolder = args.Length > 3 ? args[3] : @"..\..\..\elastic-client-generator\specification\specs";
+					var outFolder = args.Length > 3 ? args[3] : @"../../../elastic-client-generator/specification/specs";
 					var r = 0;
 					if (command == "both") r += Generate(definitionFile, nestSourceFolder, restSpec);
 					r += Split(definitionFile, restSpec, outFolder);
