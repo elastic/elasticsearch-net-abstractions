@@ -57,7 +57,9 @@ namespace Nest.TypescriptGenerator
 				typeof (IRequestConfiguration),
 				typeof (IRequest),
 				typeof (Indices.AllIndicesMarker),
+#pragma warning disable 618
 				typeof (AllField),
+#pragma warning restore 618
 				typeof (Indices.ManyIndices),
 			});
 

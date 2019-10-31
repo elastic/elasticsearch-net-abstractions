@@ -17,7 +17,8 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 
 			cluster.Writer.WriteDiagnostic($"{{{nameof(PostLicenseTask)}}} attempting to post license json");
 
-			var postResponse = this.Post(cluster, "_xpack/license", "", cluster.ClusterConfiguration.XPackLicenseJson);
+			var licenseUrl = cluster.ClusterConfiguration.Version.Major < 8 ? "_xpack/license" : "_license";
+			var postResponse = this.Post(cluster, licenseUrl, "", cluster.ClusterConfiguration.XPackLicenseJson);
 			if (postResponse != null && postResponse.IsSuccessStatusCode) return;
 
 			var details = postResponse != null ? this.GetResponseException(postResponse) : "";
@@ -34,11 +35,12 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 				return;
 			}
 
+			var licenseUrl = cluster.ClusterConfiguration.Version.Major < 8 ? "_xpack/license" : "_license";
 			if (c.TrialMode == XPackTrialMode.Trial)
 			{
 				//TODO make this configurable for either trial or basic
 				cluster.Writer.WriteDiagnostic($"{{{nameof(PostLicenseTask)}}} attempt to start trial license");
-				var postResponse = this.Post(cluster, "_xpack/license/start_trial", "acknowledge=true", string.Empty);
+				var postResponse = this.Post(cluster, $"{licenseUrl}/start_trial", "acknowledge=true", string.Empty);
 				if (postResponse != null && postResponse.IsSuccessStatusCode) return;
 			}
 
@@ -46,7 +48,7 @@ namespace Elastic.Managed.Ephemeral.Tasks.ValidationTasks
 			{
 				//TODO make this configurable for either trial or basic
 				cluster.Writer.WriteDiagnostic($"{{{nameof(PostLicenseTask)}}} attempt to start basic license");
-				var postResponse = this.Post(cluster, "_xpack/license/start_basic", "acknowledge=true", string.Empty);
+				var postResponse = this.Post(cluster, $"{licenseUrl}/start_basic", "acknowledge=true", string.Empty);
 				if (postResponse != null && postResponse.IsSuccessStatusCode) return;
 			}
 

@@ -166,7 +166,7 @@ namespace Elastic.BenchmarkDotNetExporter
 				Version = summary.HostEnvironmentInfo.RuntimeVersion,
 				DotNetSdkVersion = summary.HostEnvironmentInfo.DotNetSdkVersion.Value,
 				HasRyuJit = summary.HostEnvironmentInfo.HasRyuJit,
-				JitModules = summary.HostEnvironmentInfo.JitModules,
+				//JitModules = summary.HostEnvironmentInfo.,
 				JitInfo = summary.HostEnvironmentInfo.JitInfo,
 				BuildConfiguration = summary.HostEnvironmentInfo.Configuration,
 				BenchmarkDotNetCaption = HostEnvironmentInfo.BenchmarkDotNetCaption,
