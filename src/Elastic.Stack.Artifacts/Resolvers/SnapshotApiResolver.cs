@@ -34,10 +34,10 @@ namespace Elastic.Stack.Artifacts.Resolvers
 			if (!string.IsNullOrWhiteSpace(filters))
 				query += $",{filters}";
 
-			var json = ApiResolver.FetchJson($"search/{version}/{query}");
-			Dictionary<string, SearchPackage> packages = new Dictionary<string, SearchPackage>();
+			var packages = new Dictionary<string, SearchPackage>();
 			try
 			{
+				var json = ApiResolver.FetchJson($"search/{version}/{query}");
 				// if packages is empty it turns into an array[] otherwise its a dictionary :/
 				packages = JsonSerializer.Deserialize<ArtifactsSearchResponse>(json).Packages;
 			}

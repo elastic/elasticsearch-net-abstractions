@@ -90,7 +90,7 @@ namespace Elastic.Stack.Artifacts.Resolvers
 		[JsonPropertyName("asc_url")] public string AscUrl { get; set; }
 		[JsonPropertyName("type")] public string Type { get; set; }
 		[JsonPropertyName("architecture")] public string Architecture { get; set; }
-		[JsonPropertyName("os")] public string OperatingSystem { get; set; }
+		[JsonPropertyName("os")] public string[] OperatingSystem { get; set; }
 		[JsonPropertyName("classifier")] public string Classifier { get; set; }
 	}
 }
