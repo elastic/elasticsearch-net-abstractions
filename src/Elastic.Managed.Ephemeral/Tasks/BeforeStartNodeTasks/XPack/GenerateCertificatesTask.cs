@@ -65,6 +65,12 @@ namespace Elastic.Managed.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 					{
 						"instances:",
 						$"    - name : \"{config.FileSystem.CertificateNodeName}\"",
+						$"      ip:",
+						$"          - \"127.0.0.1\"",
+						$"      dns:",
+						$"          - \"127.0.0.1\"",
+						$"          - \"localhost\"",
+						$"          - \"ipv4.fiddler\"",
 						$"    - name : \"{config.FileSystem.ClientCertificateName}\"",
 						$"      ip:",
 						$"          - \"127.0.0.1\"",

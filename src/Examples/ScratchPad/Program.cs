@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using Elastic.Managed.Ephemeral;
@@ -17,8 +18,8 @@ namespace ScratchPad
 	{
 		public static int Main()
 		{
-			ResolveVersions();
-			//ManualConfigRun();
+			//ResolveVersions();
+			ManualConfigRun();
 			//ValidateCombinations.Run();
 			return 0;
 		}
@@ -34,7 +35,7 @@ namespace ScratchPad
 			{
 				HttpFiddlerAware = true,
 				ShowElasticsearchOutputAfterStarted = true,
-				CacheEsHomeInstallation = true,
+				CacheEsHomeInstallation = false,
 				TrialMode = XPackTrialMode.Trial,
 				NoCleanupAfterNodeStopped = false,
 			};
@@ -53,6 +54,19 @@ namespace ScratchPad
 					settings = settings.ServerCertificateValidationCallback(CertificateValidations.AllowAll);
 
 				var client = new ElasticClient(settings);
+
+				var clusterConfiguration = new Dictionary<string, object>()
+				{
+					{"cluster.routing.use_adaptive_replica_selection", true},
+					{"cluster.remote.remote-cluster.seeds", "127.0.0.1:9300"}
+				};
+
+
+				var putSettingsResponse = client.ClusterPutSettings(new ClusterPutSettingsRequest
+				{
+					Transient = clusterConfiguration
+				});
+
 
 				Console.Write(client.XPackInfo().DebugInformation);
 				Console.WriteLine("Press any key to exit");
