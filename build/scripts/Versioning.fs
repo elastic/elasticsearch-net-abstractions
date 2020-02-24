@@ -33,7 +33,6 @@ module Versioning =
         | Managed -> canaryVersionOrCurrent target <| globalJson.Versions.Managed.Remove(0, 1)
         | Ephemeral -> canaryVersionOrCurrent target <| globalJson.Versions.Ephemeral.Remove(0, 1)
         | Xunit -> canaryVersionOrCurrent target <| globalJson.Versions.Xunit.Remove(0, 1)
-        | BenchmarkDotNetExporter -> canaryVersionOrCurrent target <| globalJson.Versions.Bdnetexporter.Remove(0, 1)
         | Stack -> canaryVersionOrCurrent target <| globalJson.Versions.Stack.Remove(0, 1)
         
     let reposVersion () =
@@ -45,8 +44,8 @@ module Versioning =
     let private assemblyFileVersionOf v = sprintf "%i.%i.%i.0" v.Major v.Minor v.Patch |> SemVer.parse
 
     //write it with a leading v in the json, needed for the json type provider to keep things strings
-    let writeVersionsJson reposVersion managedVersion ephemeralVersion xunitVersion bdVersion stackVersion =
-        let versionsNode = VersionsJson.Versions(reposVersion, managedVersion, ephemeralVersion, xunitVersion, bdVersion, stackVersion)
+    let writeVersionsJson reposVersion managedVersion ephemeralVersion xunitVersion stackVersion =
+        let versionsNode = VersionsJson.Versions(reposVersion, managedVersion, ephemeralVersion, xunitVersion, stackVersion)
 
         let newVersionsJson = VersionsJson.Root (versionsNode)
         use tw = new StreamWriter(Paths.VersionsJson)
@@ -59,10 +58,9 @@ module Versioning =
         let managedVersion = match project with | Managed -> pre version | _ -> pre <| globalJson.Versions.Managed
         let ephemeralVersion = match project with | Ephemeral -> pre version | _ -> pre <| globalJson.Versions.Ephemeral
         let xunitVersion = match project with | Xunit -> pre version | _ -> pre <| globalJson.Versions.Xunit
-        let bdVersion = match project with | BenchmarkDotNetExporter -> pre version | _ -> pre <| globalJson.Versions.Bdnetexporter
         let stack = match project with | Stack -> pre version | _ -> pre <| globalJson.Versions.Stack
         
-        writeVersionsJson reposVersion managedVersion ephemeralVersion xunitVersion bdVersion stack
+        writeVersionsJson reposVersion managedVersion ephemeralVersion xunitVersion stack
         printfn "%s bumped version to (%O) in global.json " (nameOf project) version
 
     let writeVersionIntoVersionsJson project version =
@@ -73,7 +71,6 @@ module Versioning =
             | Managed -> pv <> (pre <| globalJson.Versions.Managed)
             | Ephemeral -> pv <> (pre <| globalJson.Versions.Ephemeral)
             | Xunit -> pv <> (pre <| globalJson.Versions.Xunit)
-            | BenchmarkDotNetExporter -> pv <> (pre <| globalJson.Versions.Bdnetexporter)
             | Stack -> pv <> (pre <| globalJson.Versions.Stack)
 
         match changed with 
@@ -91,9 +88,8 @@ module Versioning =
         let managedVersion = pre <| globalJson.Versions.Managed
         let ephemeralVersion = pre <| globalJson.Versions.Ephemeral
         let xunitVersion = pre <| globalJson.Versions.Xunit
-        let bdVersion = pre <| globalJson.Versions.Bdnetexporter
         let stackVersion = pre <| globalJson.Versions.Stack
-        writeVersionsJson bumpedVersion managedVersion ephemeralVersion xunitVersion bdVersion stackVersion
+        writeVersionsJson bumpedVersion managedVersion ephemeralVersion xunitVersion stackVersion
         printfn "bumped repos version to (%s) in global.json"  bumpedVersion
 
         let header p = sprintf "%s %O" p.Project.name p.Informational

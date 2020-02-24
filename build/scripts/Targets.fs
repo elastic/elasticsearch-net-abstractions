@@ -38,8 +38,6 @@ module Main =
 
         target "Restore" Build.Restore
 
-        conditional isWindows "RewriteBenchmark" Build.RewriteBenchmarkDotNetExporter
-
         target "FullBuild"  <| fun _ -> 
             Build.Compile parsed.Projects
 
@@ -53,7 +51,7 @@ module Main =
 
         command "Build" [ "VerifyClean"; "Version"; "VerifyVersionChange"; "Restore"; "FullBuild"] <| fun _ -> printfn "Finished Build" 
 
-        command "Pack" [ "Build"; "RewriteBenchmark"] <| fun _ -> 
+        command "Pack" [ "Build";] <| fun _ -> 
             Build.CreateNugetPackage parsed.Projects
             Versioning.ValidateArtifacts parsed.Projects
             
