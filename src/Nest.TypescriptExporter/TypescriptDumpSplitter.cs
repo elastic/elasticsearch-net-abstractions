@@ -40,7 +40,7 @@ namespace Nest.TypescriptGenerator
 				CopyTsConfig();
 				pbar.Tick($"copied tsconfig.json");
 				WriteTsLintFile();
-				pbar.Tick($"wrote empty tslint.json");
+				pbar.Tick($"wrote empty tslint.json in {this._outFolder}");
 				return 0;
 			}
 		}

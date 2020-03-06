@@ -912,7 +912,7 @@ enum FieldValueFactorModifier {
 	sqrt = 8,
 	reciprocal = 9
 }
-/** namespace:query_dsl.geo.shape **/
+/** namespace:common **/
 enum GeoShapeFormat {
 	GeoJson = 0,
 	WellKnownText = 1
@@ -1322,16 +1322,16 @@ enum WatcherState {
 @namespace("document.multiple.bulk.bulk_response_item")
 class BulkResponseItemBase {
 	error: MainError;
-	id: string;
-	index: string;
+	_id: string;
+	_index: string;
 	operation: string;
-	primary_term: long;
+	_primary_term: long;
 	result: string;
-	sequence_number: long;
-	shards: ShardStatistics;
+	_seq_no: long;
+	_shards: ShardStatistics;
 	status: integer;
-	type: string;
-	version: long;
+	_type: string;
+	_version: long;
 	is_valid: boolean;
 }
 @namespace("x_pack.security.role_mapping.rules.role")
@@ -1389,7 +1389,7 @@ class PlainRequestBase<TParameters> extends RequestBase {
 }
 @namespace("cluster")
 class NodesResponseBase extends ResponseBase implements IResponse {
-	node_statistics: NodeStatistics;
+	_nodes: NodeStatistics;
 }
 @namespace("common_abstractions.response")
 class AcknowledgedResponseBase extends ResponseBase implements IResponse {
@@ -1398,18 +1398,18 @@ class AcknowledgedResponseBase extends ResponseBase implements IResponse {
 }
 @namespace("common_abstractions.response")
 class ShardsOperationResponseBase extends ResponseBase implements IResponse {
-	shards: ShardStatistics;
+	_shards: ShardStatistics;
 }
 @namespace("document.single")
 class WriteResponseBase extends ResponseBase implements IResponse {
-	id: string;
-	index: string;
-	primary_term: long;
+	_id: string;
+	_index: string;
+	_primary_term: long;
 	result: Result;
-	sequence_number: long;
-	shards: ShardStatistics;
-	type: string;
-	version: long;
+	_seq_no: long;
+	_shards: ShardStatistics;
+	_type: string;
+	_version: long;
 }
 @namespace("mapping.types")
 class PropertyBase implements IProperty {
@@ -1425,7 +1425,7 @@ class DictionaryResponseBase<TKey, TValue> extends ResponseBase {
 }
 @namespace("common_abstractions.response")
 class IndicesResponseBase extends AcknowledgedResponseBase implements IResponse {
-	shards_hit: ShardStatistics;
+	_shards: ShardStatistics;
 }
 @namespace("mapping.types")
 class CorePropertyBase extends PropertyBase {
@@ -1478,10 +1478,10 @@ class ClusterRerouteCommand {
 }
 @namespace("document.multiple.bulk.bulk_operation")
 class BulkOperation {
-	id: Id;
-	index: IndexName;
+	_id: Id;
+	_index: IndexName;
 	operation: string;
-	retries_on_conflict: integer;
+	retry_on_conflict: integer;
 	routing: Routing;
 	version: long;
 	version_type: VersionType;
@@ -1490,7 +1490,7 @@ class BulkOperation {
 class QueryContainer {
 	bool: BoolQuery;
 	boosting: BoostingQuery;
-	common_terms: CommonTermsQuery;
+	common: CommonTermsQuery;
 	constant_score: ConstantScoreQuery;
 	dis_max: DisMaxQuery;
 	exists: ExistsQuery;
@@ -1528,9 +1528,9 @@ class QueryContainer {
 	script_score: ScriptScoreQuery;
 	simple_query_string: SimpleQueryStringQuery;
 	span_containing: SpanContainingQuery;
-	span_field_masking: SpanFieldMaskingQuery;
+	field_masking_span: SpanFieldMaskingQuery;
 	span_first: SpanFirstQuery;
-	span_multi_term: SpanMultiTermQuery;
+	span_multi: SpanMultiTermQuery;
 	span_near: SpanNearQuery;
 	span_not: SpanNotQuery;
 	span_or: SpanOrQuery;
@@ -1551,7 +1551,7 @@ class Query {
 	is_strict: boolean;
 	is_verbatim: boolean;
 	is_writable: boolean;
-	name: string;
+	_name: string;
 }
 @namespace("query_dsl.compound.function_score.functions")
 class ScoreFunction {
@@ -1562,7 +1562,7 @@ class ScoreFunction {
 class BoundingBox {
 	bottom_right: GeoLocation;
 	top_left: GeoLocation;
-	well_known_text: string;
+	wkt: string;
 }
 @namespace("query_dsl.abstractions.field_lookup")
 class FieldLookup {
@@ -1578,7 +1578,7 @@ class GeoShape {
 @namespace("search.search.inner_hits")
 class InnerHits {
 	collapse: FieldCollapse;
-	doc_value_fields: Field[];
+	docvalue_fields: Field[];
 	explain: boolean;
 	from: integer;
 	highlight: Highlight;
@@ -1587,7 +1587,7 @@ class InnerHits {
 	script_fields: Dictionary<string, ScriptField>;
 	size: integer;
 	sort: Sort[];
-	source: Union<boolean, SourceFilter>;
+	_source: Union<boolean, SourceFilter>;
 	version: boolean;
 }
 @namespace("search.search.collapsing")
@@ -1704,10 +1704,10 @@ class Fuzziness {
 }
 @namespace("query_dsl.specialized.more_like_this.like")
 class LikeDocument {
-	document: any;
+	doc: any;
 	fields: Field[];
-	id: Id;
-	index: IndexName;
+	_id: Id;
+	_index: IndexName;
 	per_field_analyzer: Dictionary<Field, string>;
 	routing: Routing;
 }
@@ -1725,10 +1725,10 @@ class SlicedScroll {
 @namespace("document.multiple.multi_get.request")
 class MultiGetOperation {
 	can_be_flattened: boolean;
-	id: Id;
-	index: IndexName;
+	_id: Id;
+	_index: IndexName;
 	routing: string;
-	source: Union<boolean, SourceFilter>;
+	_source: Union<boolean, SourceFilter>;
 	stored_fields: Field[];
 	version: long;
 	version_type: VersionType;
@@ -1748,11 +1748,11 @@ class MultiGetHit<TDocument> {
 }
 @namespace("document.multiple.multi_term_vectors")
 class MultiTermVectorOperation {
-	document: any;
+	doc: any;
 	field_statistics: boolean;
 	filter: TermVectorFilter;
-	id: Id;
-	index: IndexName;
+	_id: Id;
+	_index: IndexName;
 	offsets: boolean;
 	payloads: boolean;
 	positions: boolean;
@@ -1764,13 +1764,13 @@ class MultiTermVectorOperation {
 }
 @namespace("document.single.term_vectors")
 class TermVectorFilter {
-	maximum_document_frequency: integer;
-	maximum_number_of_terms: integer;
-	maximum_term_frequency: integer;
-	maximum_word_length: integer;
-	minimum_document_frequency: integer;
-	minimum_term_frequency: integer;
-	minimum_word_length: integer;
+	max_doc_freq: integer;
+	max_num_terms: integer;
+	max_term_freq: integer;
+	max_word_length: integer;
+	min_doc_freq: integer;
+	min_term_freq: integer;
+	min_word_length: integer;
 }
 @namespace("document.single.term_vectors")
 class TermVectors {
@@ -1796,7 +1796,7 @@ class ReindexSource {
 	size: integer;
 	slice: SlicedScroll;
 	sort: Sort[];
-	source: Field[];
+	_source: Field[];
 }
 @namespace("document.multiple.reindex_on_server")
 class RemoteSource {
@@ -1811,7 +1811,7 @@ class LazyDocument {
 class InlineGet<TDocument> {
 	fields: Dictionary<string, LazyDocument>;
 	found: boolean;
-	source: TDocument;
+	_source: TDocument;
 }
 @namespace("indices.alias_management.alias.actions")
 class AliasAction {
@@ -1831,14 +1831,14 @@ class TypeMapping {
 	dynamic: Union<boolean, DynamicMapping>;
 	dynamic_date_formats: string[];
 	dynamic_templates: Dictionary<string, DynamicTemplate>;
-	field_names_field: FieldNamesField;
+	_field_names: FieldNamesField;
 	index_field: IndexField;
-	meta: Dictionary<string, any>;
+	_meta: Dictionary<string, any>;
 	numeric_detection: boolean;
 	properties: Dictionary<PropertyName, IProperty>;
-	routing_field: RoutingField;
-	size_field: SizeField;
-	source_field: SourceField;
+	_routing: RoutingField;
+	_size: SizeField;
+	_source: SourceField;
 }
 @namespace("mapping.meta_fields")
 class FieldMapping {
@@ -1890,9 +1890,9 @@ class Processor {
 }
 @namespace("ingest.simulate_pipeline")
 class SimulatePipelineDocument {
-	id: Id;
-	index: IndexName;
-	source: any;
+	_id: Id;
+	_index: IndexName;
+	_source: any;
 }
 @namespace("mapping.types")
 class PropertyWithClrOrigin {
@@ -1919,8 +1919,8 @@ class FielddataRegexFilter {
 }
 @namespace("mapping.types.core.text")
 class TextIndexPrefixes {
-	max_characters: integer;
-	min_characters: integer;
+	max_chars: integer;
+	min_chars: integer;
 }
 @namespace("mapping.types.specialized.completion")
 class SuggestContext {
@@ -1974,7 +1974,7 @@ class AutoFollowPattern {
 	leader_index_patterns: string[];
 	max_outstanding_read_requests: long;
 	max_outstanding_write_requests: integer;
-	max_poll_timeout: Time;
+	read_poll_timeout: Time;
 	max_read_request_operation_count: integer;
 	max_read_request_size: string;
 	max_retry_delay: Time;
@@ -1995,8 +1995,8 @@ class GraphVertexDefinition {
 	exclude: string[];
 	field: Field;
 	include: GraphVertexInclude[];
-	minimum_document_count: long;
-	shard_minimum_document_count: long;
+	min_doc_count: long;
+	shard_min_doc_count: long;
 	size: integer;
 }
 @namespace("x_pack.graph.explore.request")
@@ -2026,7 +2026,7 @@ class Phases {
 @namespace("x_pack.ilm")
 class Phase {
 	actions: Dictionary<string, LifecycleAction>;
-	minimum_age: Time;
+	min_age: Time;
 }
 @namespace("x_pack.ilm.actions")
 class LifecycleAction {
@@ -2039,9 +2039,9 @@ class Page {
 @namespace("aggregations")
 class AggregationContainer {
 	adjacency_matrix: AdjacencyMatrixAggregation;
-	aggregations: Dictionary<string, AggregationContainer>;
-	average: AverageAggregation;
-	average_bucket: AverageBucketAggregation;
+	aggs: Dictionary<string, AggregationContainer>;
+	avg: AverageAggregation;
+	avg_bucket: AverageBucketAggregation;
 	bucket_script: BucketScriptAggregation;
 	bucket_selector: BucketSelectorAggregation;
 	bucket_sort: BucketSortAggregation;
@@ -2061,8 +2061,8 @@ class AggregationContainer {
 	geo_bounds: GeoBoundsAggregation;
 	geo_centroid: GeoCentroidAggregation;
 	geo_distance: GeoDistanceAggregation;
-	geo_hash: GeoHashGridAggregation;
-	geo_tile: GeoTileGridAggregation;
+	geohash_grid: GeoHashGridAggregation;
+	geotile_grid: GeoTileGridAggregation;
 	global: GlobalAggregation;
 	histogram: HistogramAggregation;
 	ip_range: IpRangeAggregation;
@@ -2073,8 +2073,8 @@ class AggregationContainer {
 	min: MinAggregation;
 	min_bucket: MinBucketAggregation;
 	missing: MissingAggregation;
-	moving_average: MovingAverageAggregation;
-	moving_function: MovingFunctionAggregation;
+	moving_avg: MovingAverageAggregation;
+	moving_fn: MovingFunctionAggregation;
 	nested: NestedAggregation;
 	parent: ParentAggregation;
 	percentile_ranks: PercentileRanksAggregation;
@@ -2085,7 +2085,7 @@ class AggregationContainer {
 	reverse_nested: ReverseNestedAggregation;
 	sampler: SamplerAggregation;
 	scripted_metric: ScriptedMetricAggregation;
-	serial_differencing: SerialDifferencingAggregation;
+	serial_diff: SerialDifferencingAggregation;
 	significant_terms: SignificantTermsAggregation;
 	significant_text: SignificantTextAggregation;
 	stats: StatsAggregation;
@@ -2095,7 +2095,7 @@ class AggregationContainer {
 	terms: TermsAggregation;
 	top_hits: TopHitsAggregation;
 	value_count: ValueCountAggregation;
-	weighted_average: WeightedAverageAggregation;
+	weighted_avg: WeightedAverageAggregation;
 	median_absolute_deviation: MedianAbsoluteDeviationAggregation;
 }
 @namespace("aggregations")
@@ -2141,16 +2141,16 @@ class PercentilesMethod {
 }
 @namespace("aggregations.bucket.significant_terms.heuristics")
 class ChiSquareHeuristic {
-	background_is_super_set: boolean;
+	background_is_superset: boolean;
 	include_negatives: boolean;
 }
 @namespace("aggregations.bucket.significant_terms.heuristics")
 class GoogleNormalizedDistanceHeuristic {
-	background_is_super_set: boolean;
+	background_is_superset: boolean;
 }
 @namespace("aggregations.bucket.significant_terms.heuristics")
 class MutualInformationHeuristic {
-	background_is_super_set: boolean;
+	background_is_superset: boolean;
 	include_negatives: boolean;
 }
 @namespace("aggregations.bucket.significant_terms.heuristics")
@@ -2229,7 +2229,7 @@ class Rescore {
 }
 @namespace("search.search.rescoring")
 class RescoreQuery {
-	query: QueryContainer;
+	rescore_query: QueryContainer;
 	query_weight: double;
 	rescore_query_weight: double;
 	score_mode: ScoreMode;
@@ -2281,8 +2281,8 @@ class DirectGenerator {
 	field: Field;
 	max_edits: integer;
 	max_inspections: float;
-	max_term_frequency: float;
-	min_doc_frequency: float;
+	max_term_freq: float;
+	min_doc_freq: float;
 	min_word_length: integer;
 	post_filter: string;
 	pre_filter: string;
@@ -2347,7 +2347,7 @@ class ApiKeyPrivileges {
 }
 @namespace("x_pack.security.privileges.has_privileges")
 class ApplicationPrivilegesCheck {
-	name: string;
+	application: string;
 	privileges: string[];
 	resources: string[];
 }
@@ -2473,7 +2473,7 @@ class Input {
 }
 @namespace("x_pack.watcher.input")
 class HttpInputRequest {
-	authentication: HttpInputAuthentication;
+	auth: HttpInputAuthentication;
 	body: string;
 	connection_timeout: Time;
 	headers: Dictionary<string, string>;
@@ -2533,7 +2533,7 @@ class TimeOfWeek {
 @namespace("x_pack.watcher.schedule")
 class TimeOfYear {
 	at: string[];
-	in: Month[];
+	int: Month[];
 	on: integer[];
 }
 @namespace("aggregations")
@@ -2542,14 +2542,14 @@ class Aggregate {
 }
 @namespace("search.search.hits")
 class HitMetadata<TDocument> {
-	id: string;
-	index: string;
-	primary_term: long;
-	routing: string;
-	sequence_number: long;
-	source: TDocument;
-	type: string;
-	version: long;
+	_id: string;
+	_index: string;
+	_primary_term: long;
+	_routing: string;
+	_seq_no: long;
+	_source: TDocument;
+	_type: string;
+	_version: long;
 }
 @namespace("search.search.hits")
 class HitsMetadata<T> {
@@ -2574,15 +2574,15 @@ class Suggest<T> {
 class SuggestOption<TDocument> {
 	collate_match: boolean;
 	contexts: Dictionary<string, Context[]>;
-	document_score: double;
+	_score: double;
 	fields: Dictionary<string, LazyDocument>;
-	frequency: long;
+	freq: long;
 	highlighted: string;
-	id: string;
-	index: IndexName;
+	_id: string;
+	_index: IndexName;
 	score: double;
-	source: TDocument;
-	suggest_score: double;
+	_source: TDocument;
+	score: double;
 	text: string;
 }
 @namespace("x_pack.slm")
@@ -2672,8 +2672,8 @@ class BoolQuery {
 @namespace("query_dsl.compound.boosting")
 class BoostingQuery {
 	negative_boost: double;
-	negative_query: QueryContainer;
-	positive_query: QueryContainer;
+	negative: QueryContainer;
+	positive: QueryContainer;
 }
 @namespace("query_dsl.abstractions.field_name")
 class FieldNameQuery {
@@ -2767,12 +2767,12 @@ class MoreLikeThisQuery {
 	fields: Field[];
 	include: boolean;
 	like: Like[];
-	max_document_frequency: integer;
+	max_doc_freq: integer;
 	max_query_terms: integer;
 	max_word_length: integer;
-	min_document_frequency: integer;
+	min_doc_freq: integer;
 	minimum_should_match: MinimumShouldMatch;
-	min_term_frequency: integer;
+	min_term_freq: integer;
 	min_word_length: integer;
 	per_field_analyzer: Dictionary<Field, string>;
 	routing: Routing;
@@ -2844,7 +2844,7 @@ class QueryStringQuery {
 	fuzzy_rewrite: MultiTermQueryRewrite;
 	fuzzy_transpositions: boolean;
 	lenient: boolean;
-	maximum_determinized_states: integer;
+	max_determinized_states: integer;
 	minimum_should_match: MinimumShouldMatch;
 	phrase_slop: double;
 	query: string;
@@ -2887,10 +2887,10 @@ class SimpleQueryStringQuery {
 @namespace("query_dsl.span")
 class SpanQuery {
 	span_containing: SpanContainingQuery;
-	span_field_masking: SpanFieldMaskingQuery;
+	field_masking_span: SpanFieldMaskingQuery;
 	span_first: SpanFirstQuery;
 	span_gap: SpanGapQuery;
-	span_multi_term: SpanMultiTermQuery;
+	span_multi: SpanMultiTermQuery;
 	span_near: SpanNearQuery;
 	span_not: SpanNotQuery;
 	span_or: SpanOrQuery;
@@ -3042,8 +3042,8 @@ class TermSuggester {
 	lowercase_terms: boolean;
 	max_edits: integer;
 	max_inspections: integer;
-	max_term_frequency: float;
-	min_doc_frequency: float;
+	max_term_freq: float;
+	min_doc_freq: float;
 	min_word_length: integer;
 	prefix_length: integer;
 	shard_size: integer;
@@ -3118,21 +3118,21 @@ class HourlySchedule {
 }
 @namespace("search.search.hits")
 class Hit<TDocument> {
-	explanation: Explanation;
+	_explanation: Explanation;
 	fields: Dictionary<string, LazyDocument>;
 	highlight: Dictionary<string, string[]>;
 	inner_hits: Dictionary<string, InnerHitsResult>;
 	matched_queries: string[];
-	nested: NestedIdentity;
-	score: double;
-	sorts: any[];
+	_nested: NestedIdentity;
+	_score: double;
+	sort: any[];
 }
 @namespace("query_dsl.full_text.common_terms")
 class CommonTermsQuery {
 	analyzer: string;
 	cutoff_frequency: double;
-	high_frequency_operator: Operator;
-	low_frequency_operator: Operator;
+	high_freq_operator: Operator;
+	low_freq_operator: Operator;
 	minimum_should_match: MinimumShouldMatch;
 	query: string;
 }
@@ -3215,7 +3215,7 @@ class RangeQuery {
 @namespace("query_dsl.term_level.regexp")
 class RegexpQuery {
 	flags: string;
-	maximum_determinized_states: integer;
+	max_determinized_states: integer;
 	value: string;
 }
 @namespace("query_dsl.span.containing")
@@ -3332,7 +3332,7 @@ class DateHistogramAggregation {
 	interval: Union<DateInterval, Time>;
 	calendar_interval: Union<DateInterval, Time>;
 	fixed_interval: Union<DateInterval, Time>;
-	minimum_document_count: integer;
+	min_doc_count: integer;
 	missing: Date;
 	offset: string;
 	order: HistogramOrder;
@@ -3418,7 +3418,7 @@ class HistogramAggregation {
 	extended_bounds: ExtendedBounds<double>;
 	field: Field;
 	interval: double;
-	minimum_document_count: integer;
+	min_doc_count: integer;
 	missing: double;
 	offset: double;
 	order: HistogramOrder;
@@ -3497,7 +3497,7 @@ class RareTermsAggregation {
 	exclude: TermsExclude;
 	field: Field;
 	include: TermsInclude;
-	maximum_document_count: long;
+	max_doc_count: long;
 	missing: any;
 	precision: double;
 }
@@ -3531,13 +3531,13 @@ class SignificantTermsAggregation {
 	exclude: IncludeExclude;
 	execution_hint: TermsAggregationExecutionHint;
 	field: Field;
-	google_normalized_distance: GoogleNormalizedDistanceHeuristic;
+	gnd: GoogleNormalizedDistanceHeuristic;
 	include: IncludeExclude;
-	minimum_document_count: long;
+	min_doc_count: long;
 	mutual_information: MutualInformationHeuristic;
-	percentage_score: PercentageScoreHeuristic;
-	script: ScriptedHeuristic;
-	shard_minimum_document_count: long;
+	percentage: PercentageScoreHeuristic;
+	script_heuristic: ScriptedHeuristic;
+	shard_min_doc_count: long;
 	shard_size: integer;
 	size: integer;
 }
@@ -3549,13 +3549,13 @@ class SignificantTextAggregation {
 	execution_hint: TermsAggregationExecutionHint;
 	field: Field;
 	filter_duplicate_text: boolean;
-	google_normalized_distance: GoogleNormalizedDistanceHeuristic;
+	gnd: GoogleNormalizedDistanceHeuristic;
 	include: IncludeExclude;
-	minimum_document_count: long;
+	min_doc_count: long;
 	mutual_information: MutualInformationHeuristic;
-	percentage_score: PercentageScoreHeuristic;
-	script: ScriptedHeuristic;
-	shard_minimum_document_count: long;
+	percentage: PercentageScoreHeuristic;
+	script_heuristic: ScriptedHeuristic;
+	shard_min_doc_count: long;
 	shard_size: integer;
 	size: integer;
 	source_fields: Field[];
@@ -3579,7 +3579,7 @@ class TermsAggregation {
 	execution_hint: TermsAggregationExecutionHint;
 	field: Field;
 	include: TermsInclude;
-	minimum_document_count: integer;
+	min_doc_count: integer;
 	missing: any;
 	order: TermsOrder[];
 	script: Script;
@@ -3589,14 +3589,14 @@ class TermsAggregation {
 }
 @namespace("aggregations.metric.top_hits")
 class TopHitsAggregation {
-	doc_value_fields: Field[];
+	docvalue_fields: Field[];
 	explain: boolean;
 	from: integer;
 	highlight: Highlight;
 	script_fields: Dictionary<string, ScriptField>;
 	size: integer;
 	sort: Sort[];
-	source: Union<boolean, SourceFilter>;
+	_source: Union<boolean, SourceFilter>;
 	stored_fields: Field[];
 	track_scores: boolean;
 	version: boolean;
@@ -3635,7 +3635,7 @@ class AllocationDecision {
 class CurrentNode {
 	id: string;
 	name: string;
-	node_attributes: Dictionary<string, string>;
+	attributes: Dictionary<string, string>;
 	transport_address: string;
 	weight_ranking: integer;
 }
@@ -3692,7 +3692,7 @@ class PendingTask {
 	priority: string;
 	source: string;
 	time_in_queue: string;
-	time_in_queue_milliseconds: integer;
+	time_in_queue_millis: integer;
 }
 @namespace("cluster.cluster_reroute")
 class ClusterRerouteExplanation {
@@ -3726,7 +3726,7 @@ class NodeStatistics {
 class ClusterIndicesStats {
 	completion: CompletionStats;
 	count: long;
-	documents: DocStats;
+	docs: DocStats;
 	fielddata: FielddataStats;
 	query_cache: QueryCacheStats;
 	segments: SegmentsStats;
@@ -3764,7 +3764,7 @@ class SegmentsStats {
 	fixed_bit_set_memory_in_bytes: long;
 	index_writer_max_memory_in_bytes: long;
 	index_writer_memory_in_bytes: long;
-	maximum_unsafe_auto_id_timestamp: long;
+	max_unsafe_auto_id_timestamp: long;
 	memory_in_bytes: long;
 	norms_memory_in_bytes: long;
 	points_memory_in_bytes: long;
@@ -3807,10 +3807,10 @@ class StoreStats {
 class ClusterNodesStats {
 	count: ClusterNodeCount;
 	discovery_types: Dictionary<string, integer>;
-	file_system: ClusterFileSystem;
+	fs: ClusterFileSystem;
 	jvm: ClusterJvm;
 	network_types: ClusterNetworkTypes;
-	operating_system: ClusterOperatingSystemStats;
+	os: ClusterOperatingSystemStats;
 	packaging_types: NodePackagingType[];
 	plugins: PluginStats[];
 	process: ClusterProcess;
@@ -3833,8 +3833,8 @@ class ClusterFileSystem {
 }
 @namespace("cluster.cluster_stats")
 class ClusterJvm {
-	max_uptime_in_milliseconds: long;
-	memory: ClusterJvmMemory;
+	max_uptime_in_millis: long;
+	mem: ClusterJvmMemory;
 	threads: long;
 	versions: ClusterJvmVersion[];
 }
@@ -3862,16 +3862,16 @@ class ClusterNetworkTypes {
 class ClusterOperatingSystemStats {
 	allocated_processors: integer;
 	available_processors: integer;
-	memory: OperatingSystemMemoryInfo;
+	mem: OperatingSystemMemoryInfo;
 	names: ClusterOperatingSystemName[];
 	pretty_names: ClusterOperatingSystemPrettyNane[];
 }
 @namespace("cluster.cluster_stats")
 class OperatingSystemMemoryInfo {
-	free_bytes: long;
+	free_in_bytes: long;
 	free_percent: integer;
-	total_bytes: long;
-	used_bytes: long;
+	total_in_bytes: long;
+	used_in_bytes: long;
 	used_percent: integer;
 }
 @namespace("cluster.cluster_stats")
@@ -3892,7 +3892,7 @@ class NodePackagingType {
 }
 @namespace("common_options.stats")
 class PluginStats {
-	class_name: string;
+	classname: string;
 	description: string;
 	elasticsearch_version: string;
 	extended_plugins: string[];
@@ -3932,7 +3932,7 @@ class NodeInfo {
 	jvm: NodeJvmInfo;
 	name: string;
 	network: NodeInfoNetwork;
-	operating_system: NodeOperatingSystemInfo;
+	os: NodeOperatingSystemInfo;
 	plugins: PluginStats[];
 	process: NodeProcessInfo;
 	roles: NodeRole[];
@@ -3952,14 +3952,14 @@ class NodeInfoHttp {
 @namespace("cluster.nodes_info")
 class NodeJvmInfo {
 	gc_collectors: string[];
-	memory: NodeInfoJvmMemory;
+	mem: NodeInfoJvmMemory;
 	memory_pools: string[];
 	pid: integer;
-	start_time: long;
+	start_time_in_millis: long;
 	version: string;
-	v_m_name: string;
-	v_m_vendor: string;
-	v_m_version: string;
+	vm_name: string;
+	vm_vendor: string;
+	vm_version: string;
 }
 @namespace("cluster.nodes_info")
 class NodeInfoJvmMemory {
@@ -3987,13 +3987,13 @@ class NodeInfoNetworkInterface {
 }
 @namespace("cluster.nodes_info")
 class NodeOperatingSystemInfo {
-	architecture: string;
+	arch: string;
 	available_processors: integer;
 	cpu: NodeInfoOSCPU;
 	mem: NodeInfoMemory;
 	name: string;
 	pretty_name: string;
-	refresh_interval: integer;
+	refresh_interval_in_millis: integer;
 	swap: NodeInfoMemory;
 	version: string;
 }
@@ -4016,8 +4016,8 @@ class NodeInfoMemory {
 @namespace("cluster.nodes_info")
 class NodeProcessInfo {
 	id: long;
-	mlock_all: boolean;
-	refresh_interval_in_milliseconds: long;
+	mlockall: boolean;
+	refresh_interval_in_millis: long;
 }
 @namespace("cluster.nodes_info")
 class NodeThreadPoolInfo {
@@ -4037,7 +4037,7 @@ class NodeInfoTransport {
 class NodeStats {
 	adaptive_selection: Dictionary<string, AdaptiveSelectionStats>;
 	breakers: Dictionary<string, BreakerStats>;
-	file_system: FileSystemStats;
+	fs: FileSystemStats;
 	host: string;
 	http: HttpStats;
 	indices: IndexStats;
@@ -4045,7 +4045,7 @@ class NodeStats {
 	ip: string[];
 	jvm: NodeJvmStats;
 	name: string;
-	operating_system: OperatingSystemStats;
+	os: OperatingSystemStats;
 	process: ProcessStats;
 	roles: NodeRole[];
 	script: ScriptStats;
@@ -4056,11 +4056,11 @@ class NodeStats {
 }
 @namespace("cluster.nodes_stats")
 class AdaptiveSelectionStats {
-	average_queue_size: long;
-	average_response_time: long;
-	average_response_time_in_nanoseconds: long;
-	average_service_time: string;
-	average_service_time_in_nanoseconds: long;
+	avg_queue_size: long;
+	avg_response_time: long;
+	avg_response_time_ns: long;
+	avg_service_time: string;
+	avg_service_time_ns: long;
 	outgoing_searches: long;
 	rank: string;
 }
@@ -4087,7 +4087,7 @@ class HttpStats {
 @namespace("indices.monitoring.indices_stats")
 class IndexStats {
 	completion: CompletionStats;
-	documents: DocStats;
+	docs: DocStats;
 	fielddata: FielddataStats;
 	flush: FlushStats;
 	get: GetStats;
@@ -4108,70 +4108,70 @@ class FlushStats {
 	periodic: long;
 	total: long;
 	total_time: string;
-	total_time_in_milliseconds: long;
+	total_time_in_millis: long;
 }
 @namespace("common_options.stats")
 class GetStats {
 	current: long;
 	exists_time: string;
-	exists_time_in_milliseconds: long;
+	exists_time_in_millis: long;
 	exists_total: long;
 	missing_time: string;
-	missing_time_in_milliseconds: long;
+	missing_time_in_millis: long;
 	missing_total: long;
 	time: string;
-	time_in_milliseconds: long;
+	time_in_millis: long;
 	total: long;
 }
 @namespace("common_options.stats")
 class IndexingStats {
-	current: long;
+	index_current: long;
 	delete_current: long;
 	delete_time: string;
-	delete_time_in_milliseconds: long;
+	delete_time_in_millis: long;
 	delete_total: long;
 	is_throttled: boolean;
 	noop_update_total: long;
 	throttle_time: string;
-	throttle_time_in_milliseconds: long;
-	time: string;
-	time_in_milliseconds: long;
-	total: long;
+	throttle_time_in_millis: long;
+	index_time: string;
+	index_time_in_millis: long;
+	index_total: long;
 	types: Dictionary<string, IndexingStats>;
 }
 @namespace("common_options.stats")
 class MergesStats {
 	current: long;
-	current_documents: long;
+	current_docs: long;
 	current_size: string;
 	current_size_in_bytes: long;
 	total: long;
 	total_auto_throttle: string;
 	total_auto_throttle_in_bytes: long;
-	total_documents: long;
+	total_docs: long;
 	total_size: string;
 	total_size_in_bytes: long;
 	total_stopped_time: string;
-	total_stopped_time_in_milliseconds: long;
+	total__stopped_time_in_millis: long;
 	total_throttled_time: string;
-	total_throttled_time_in_milliseconds: long;
+	total_throttled_time_in_millis: long;
 	total_time: string;
-	total_time_in_milliseconds: long;
+	total_time_in_millis: long;
 }
 @namespace("common_options.stats")
 class RecoveryStats {
 	current_as_source: long;
 	current_as_target: long;
 	throttle_time: string;
-	throttle_time_in_milliseconds: long;
+	throttle_time_in_millis: long;
 }
 @namespace("common_options.stats")
 class RefreshStats {
 	total: long;
 	total_time: string;
-	total_time_in_milliseconds: long;
+	total_time_in_millis: long;
 	external_total: long;
-	external_total_time_in_milliseconds: long;
+	external_total_time_in_millis: long;
 }
 @namespace("common_options.stats")
 class RequestCacheStats {
@@ -4184,17 +4184,17 @@ class RequestCacheStats {
 @namespace("common_options.stats")
 class SearchStats {
 	fetch_current: long;
-	fetch_time_in_milliseconds: long;
+	fetch_time_in_millis: long;
 	fetch_total: long;
 	open_contexts: long;
 	query_current: long;
-	query_time_in_milliseconds: long;
+	query_time_in_millis: long;
 	query_total: long;
 	scroll_current: long;
-	scroll_time_in_milliseconds: long;
+	scroll_time_in_millis: long;
 	scroll_total: long;
 	suggest_current: long;
-	suggest_time_in_milliseconds: long;
+	suggest_time_in_millis: long;
 	suggest_total: long;
 }
 @namespace("common_options.stats")
@@ -4212,7 +4212,7 @@ class WarmerStats {
 	current: long;
 	total: long;
 	total_time: string;
-	total_time_in_milliseconds: long;
+	total_time_in_millis: long;
 }
 @namespace("cluster.nodes_stats.statistics")
 class NodeIngestStats {
@@ -4224,7 +4224,7 @@ class IngestStats {
 	count: long;
 	current: long;
 	failed: long;
-	time_in_milliseconds: long;
+	time_in_millis: long;
 	processors: KeyedProcessorStats[];
 }
 @namespace("cluster.nodes_stats.statistics")
@@ -4234,8 +4234,8 @@ class KeyedProcessorStats {
 }
 @namespace("cluster.nodes_stats")
 class ProcessStats {
-	c_p_u: CPUStats;
-	memory: MemoryStats;
+	cpu: CPUStats;
+	mem: MemoryStats;
 	open_file_descriptors: integer;
 	timestamp: long;
 }
@@ -4243,17 +4243,17 @@ class ProcessStats {
 class NodeJvmStats {
 	buffer_pools: Dictionary<string, NodeBufferPool>;
 	classes: JvmClassesStats;
-	garbage_collection: GarbageCollectionStats;
-	memory: MemoryStats;
+	gc: GarbageCollectionStats;
+	mem: MemoryStats;
 	threads: ThreadStats;
 	timestamp: long;
 	uptime: string;
-	uptime_in_milliseconds: long;
+	uptime_in_millis: long;
 }
 @namespace("cluster.nodes_stats")
 class OperatingSystemStats {
 	cpu: CPUStats;
-	memory: ExtendedMemoryStats;
+	mem: ExtendedMemoryStats;
 	swap: MemoryStats;
 	timestamp: long;
 }
@@ -4327,8 +4327,8 @@ class TaskState {
 	id: long;
 	node: string;
 	parent_task_id: TaskId;
-	running_time_in_nano_seconds: long;
-	start_time_in_milliseconds: long;
+	running_time_in_nanos: long;
+	start_time_in_millis: long;
 	status: TaskStatus;
 	type: string;
 }
@@ -4340,8 +4340,8 @@ class TaskStatus {
 	noops: long;
 	requests_per_second: float;
 	retries: TaskRetries;
-	throttled_milliseconds: long;
-	throttled_until_milliseconds: long;
+	throttled_millis: long;
+	throttled_until_millis: long;
 	total: long;
 	updated: long;
 	version_conflicts: long;
@@ -4360,8 +4360,8 @@ class TaskInfo {
 	headers: Dictionary<string, string>;
 	id: long;
 	node: string;
-	running_time_in_nanoseconds: long;
-	start_time_in_milliseconds: long;
+	running_time_in_nanos: long;
+	start_time_in_millis: long;
 	status: TaskStatus;
 	type: string;
 }
@@ -4397,17 +4397,17 @@ class TermVector {
 }
 @namespace("document.single.term_vectors")
 class FieldStatistics {
-	document_count: integer;
-	sum_of_document_frequencies: integer;
-	sum_of_total_term_frequencies: integer;
+	doc_count: integer;
+	sum_doc_freq: integer;
+	sum_ttf: integer;
 }
 @namespace("document.single.term_vectors")
 class TermVectorTerm {
-	document_frequency: integer;
-	term_frequency: integer;
+	doc_freq: integer;
+	term_freq: integer;
 	score: double;
 	tokens: Token[];
-	total_term_frequency: integer;
+	ttf: integer;
 }
 @namespace("document.single.term_vectors")
 class Token {
@@ -4436,8 +4436,8 @@ class ReindexTask {
 	description: string;
 	id: long;
 	node: string;
-	running_time_in_nanoseconds: long;
-	start_time_in_milliseconds: long;
+	running_time_in_nanos: long;
+	start_time_in_millis: long;
 	status: ReindexStatus;
 	type: string;
 }
@@ -4449,8 +4449,8 @@ class ReindexStatus {
 	noops: long;
 	requests_per_second: float;
 	retries: Retries;
-	throttled_in_milliseconds: long;
-	throttled_until_in_milliseconds: long;
+	throttled_millis: long;
+	throttled_until_millis: long;
 	total: long;
 	updated: long;
 	version_conflicts: long;
@@ -4469,9 +4469,9 @@ class AliasDefinition {
 }
 @namespace("indices.analyze")
 class AnalyzeDetail {
-	char_filters: CharFilterDetail[];
+	charfilters: CharFilterDetail[];
 	custom_analyzer: boolean;
-	filters: TokenDetail[];
+	tokenfilters: TokenDetail[];
 	tokenizer: TokenDetail;
 }
 @namespace("indices.analyze")
@@ -4490,9 +4490,9 @@ class ExplainAnalyzeToken {
 	end_offset: long;
 	keyword: boolean;
 	position: long;
-	position_length: long;
+	positionLength: long;
 	start_offset: long;
-	term_frequency: long;
+	termFrequency: long;
 	token: string;
 	type: string;
 }
@@ -4535,10 +4535,10 @@ class ShardRecovery {
 	source: RecoveryOrigin;
 	stage: string;
 	start: RecoveryStartStatus;
-	start_time: Date;
-	stop_time: Date;
+	start_time_in_millis: Date;
+	stop_time_in_millis: Date;
 	target: RecoveryOrigin;
-	total_time_in_milliseconds: long;
+	total_time_in_millis: long;
 	translog: RecoveryTranslogStatus;
 	type: string;
 	verify_index: RecoveryVerifyIndex;
@@ -4548,9 +4548,9 @@ class RecoveryIndexStatus {
 	bytes: RecoveryBytes;
 	files: RecoveryFiles;
 	size: RecoveryBytes;
-	source_throttle_time_in_milliseconds: long;
-	target_throttle_time_in_milliseconds: long;
-	total_time_in_milliseconds: long;
+	source_throttle_time_in_millis: long;
+	target_throttle_time_in_millis: long;
+	total_time_in_millis: long;
 }
 @namespace("indices.monitoring.indices_recovery")
 class RecoveryBytes {
@@ -4575,7 +4575,7 @@ class RecoveryFileDetails {
 }
 @namespace("indices.monitoring.indices_recovery")
 class RecoveryOrigin {
-	host_name: string;
+	hostname: string;
 	id: string;
 	ip: string;
 	name: string;
@@ -4583,7 +4583,7 @@ class RecoveryOrigin {
 @namespace("indices.monitoring.indices_recovery")
 class RecoveryStartStatus {
 	check_index_time: long;
-	total_time_in_milliseconds: string;
+	total_time_in_millis: string;
 }
 @namespace("indices.monitoring.indices_recovery")
 class RecoveryTranslogStatus {
@@ -4592,12 +4592,12 @@ class RecoveryTranslogStatus {
 	total: long;
 	total_on_start: long;
 	total_time: string;
-	total_time_in_milliseconds: long;
+	total_time_in_millis: long;
 }
 @namespace("indices.monitoring.indices_recovery")
 class RecoveryVerifyIndex {
-	check_index_time_in_milliseconds: long;
-	total_time_in_milliseconds: long;
+	check_index_time_in_millis: long;
+	total_time_in_millis: long;
 }
 @namespace("indices.monitoring.indices_segments")
 class IndexSegment {
@@ -4605,9 +4605,9 @@ class IndexSegment {
 }
 @namespace("indices.monitoring.indices_segments")
 class ShardsSegment {
-	committed_segments: integer;
+	num_committed_segments: integer;
 	routing: ShardSegmentRouting;
-	search_segments: integer;
+	num_search_segments: integer;
 	segments: Dictionary<string, Segment>;
 }
 @namespace("indices.monitoring.indices_segments")
@@ -4621,12 +4621,12 @@ class Segment {
 	attributes: Dictionary<string, string>;
 	committed: boolean;
 	compound: boolean;
-	deleted_documents: long;
+	deleted_docs: long;
 	generation: integer;
 	memory_in_bytes: double;
 	search: boolean;
 	size_in_bytes: double;
-	total_documents: long;
+	num_docs: long;
 	version: string;
 }
 @namespace("indices.monitoring.indices_shard_stores")
@@ -4658,19 +4658,19 @@ class IndicesStats {
 	primaries: IndexStats;
 	shards: Dictionary<string, ShardStats[]>;
 	total: IndexStats;
-	u_u_i_d: string;
+	uuid: string;
 }
 @namespace("indices.monitoring.indices_stats")
 class ShardStats {
 	commit: ShardCommit;
 	completion: ShardCompletion;
-	documents: ShardDocs;
+	docs: ShardDocs;
 	fielddata: ShardFielddata;
 	flush: ShardFlush;
 	get: ShardGet;
 	indexing: ShardIndexing;
 	merges: ShardMerges;
-	path: ShardPath;
+	shard_path: ShardPath;
 	query_cache: ShardQueryCache;
 	recovery: ShardStatsRecovery;
 	refresh: ShardRefresh;
@@ -4678,16 +4678,16 @@ class ShardStats {
 	routing: ShardRouting;
 	search: ShardSearch;
 	segments: ShardSegments;
-	sequence_number: ShardSequenceNumber;
+	seq_no: ShardSequenceNumber;
 	store: ShardStatsStore;
-	transaction_log: ShardTransactionLog;
+	translog: ShardTransactionLog;
 	warmer: ShardWarmer;
 }
 @namespace("indices.monitoring.indices_stats")
 class ShardCommit {
 	generation: integer;
 	id: string;
-	number_of_documents: long;
+	num_docs: long;
 	user_data: Dictionary<string, string>;
 }
 @namespace("indices.monitoring.indices_stats")
@@ -4707,43 +4707,43 @@ class ShardFielddata {
 @namespace("indices.monitoring.indices_stats")
 class ShardFlush {
 	total: long;
-	total_time_in_milliseconds: long;
+	total_time_in_millis: long;
 }
 @namespace("indices.monitoring.indices_stats")
 class ShardGet {
 	current: long;
-	exists_time_in_milliseconds: long;
+	exists_time_in_millis: long;
 	exists_total: long;
-	missing_time_in_milliseconds: long;
+	missing_time_in_millis: long;
 	missing_total: long;
-	time_in_milliseconds: long;
+	time_in_millis: long;
 	total: long;
 }
 @namespace("indices.monitoring.indices_stats")
 class ShardIndexing {
 	delete_current: long;
-	delete_time_in_milliseconds: long;
+	delete_time_in_millis: long;
 	delete_total: long;
 	index_current: long;
 	index_failed: long;
-	index_time_in_milliseconds: long;
+	index_time_in_millis: long;
 	index_total: long;
 	is_throttled: boolean;
 	noop_update_total: long;
-	throttle_time_in_milliseconds: long;
+	throttle_time_in_millis: long;
 }
 @namespace("indices.monitoring.indices_stats")
 class ShardMerges {
 	current: long;
-	current_documents: long;
+	current_docs: long;
 	current_size_in_bytes: long;
 	total: long;
 	total_auto_throttle_in_bytes: long;
-	total_documents: long;
+	total_docs: long;
 	total_size_in_bytes: long;
-	total_stopped_time_in_milliseconds: long;
-	total_throttled_time_in_milliseconds: long;
-	total_time_in_milliseconds: long;
+	total_stopped_time_in_millis: long;
+	total_throttled_time_in_millis: long;
+	total_time_in_millis: long;
 }
 @namespace("indices.monitoring.indices_stats")
 class ShardPath {
@@ -4765,13 +4765,13 @@ class ShardQueryCache {
 class ShardStatsRecovery {
 	current_as_source: long;
 	current_as_target: long;
-	throttle_time_in_milliseconds: long;
+	throttle_time_in_millis: long;
 }
 @namespace("indices.monitoring.indices_stats")
 class ShardRefresh {
 	listeners: long;
 	total: long;
-	total_time_in_milliseconds: long;
+	total_time_in_millis: long;
 }
 @namespace("indices.monitoring.indices_stats")
 class ShardRequestCache {
@@ -4790,27 +4790,27 @@ class ShardRouting {
 @namespace("indices.monitoring.indices_stats")
 class ShardSearch {
 	fetch_current: long;
-	fetch_time_in_milliseconds: long;
+	fetch_time_in_millis: long;
 	fetch_total: long;
 	open_contexts: long;
 	query_current: long;
-	query_time_in_milliseconds: long;
+	query_time_in_millis: long;
 	query_total: long;
 	scroll_current: long;
-	scroll_time_in_milliseconds: long;
+	scroll_time_in_millis: long;
 	scroll_total: long;
 	suggest_current: long;
-	suggest_time_in_milliseconds: long;
+	suggest_time_in_millis: long;
 	suggest_total: long;
 }
 @namespace("indices.monitoring.indices_stats")
 class ShardSegments {
 	count: long;
-	document_values_memory_in_bytes: long;
+	doc_values_memory_in_bytes: long;
 	file_sizes: Dictionary<string, ShardFileSizeInfo>;
-	fixed_bit_memory_in_bytes: long;
+	fixed_bit_set_memory_in_bytes: long;
 	index_writer_memory_in_bytes: long;
-	max_unsafe_auto_id_time_stamp: long;
+	max_unsafe_auto_id_timestamp: long;
 	memory_in_bytes: long;
 	norms_memory_in_bytes: long;
 	points_memory_in_bytes: long;
@@ -4823,7 +4823,7 @@ class ShardSegments {
 class ShardSequenceNumber {
 	global_checkpoint: long;
 	local_checkpoint: long;
-	maximum_sequence_number: long;
+	max_seq_no: long;
 }
 @namespace("indices.monitoring.indices_stats")
 class ShardStatsStore {
@@ -4840,23 +4840,23 @@ class ShardTransactionLog {
 class ShardWarmer {
 	current: long;
 	total: long;
-	total_time_in_milliseconds: long;
+	total_time_in_millis: long;
 }
 @namespace("ingest.simulate_pipeline")
 class PipelineSimulation {
-	document: DocumentSimulation;
+	doc: DocumentSimulation;
 	processor_results: PipelineSimulation[];
 	tag: string;
 }
 @namespace("ingest.simulate_pipeline")
 class DocumentSimulation {
-	id: string;
-	index: string;
-	ingest: Ingest;
-	parent: string;
-	routing: string;
-	source: LazyDocument;
-	type: string;
+	_id: string;
+	_index: string;
+	_ingest: Ingest;
+	_parent: string;
+	_routing: string;
+	_source: LazyDocument;
+	_type: string;
 }
 @namespace("ingest.simulate_pipeline")
 class Ingest {
@@ -4879,20 +4879,20 @@ class CompactNodeInfo {
 @namespace("modules.snapshot_and_restore.restore")
 class SnapshotRestore {
 	indices: IndexName[];
-	name: string;
+	snapshot: string;
 	shards: ShardStatistics;
 }
 @namespace("modules.snapshot_and_restore.snapshot")
 class Snapshot {
-	duration_in_milliseconds: long;
+	duration_in_millis: long;
 	end_time: Date;
-	end_time_in_milliseconds: long;
+	end_time_in_millis: long;
 	failures: SnapshotShardFailure[];
 	indices: IndexName[];
-	name: string;
+	snapshot: string;
 	shards: ShardStatistics;
 	start_time: Date;
-	start_time_in_milliseconds: long;
+	start_time_in_millis: long;
 	state: string;
 	metadata: Dictionary<string, any>;
 }
@@ -4913,7 +4913,7 @@ class SnapshotStatus {
 	snapshot: string;
 	state: string;
 	stats: SnapshotStats;
-	u_u_i_d: string;
+	uuid: string;
 }
 @namespace("modules.snapshot_and_restore.snapshot.snapshot_status")
 class SnapshotIndexStats {
@@ -4934,8 +4934,8 @@ class SnapshotShardsStats {
 class SnapshotStats {
 	incremental: FileCountSnapshotStats;
 	total: FileCountSnapshotStats;
-	start_time_in_milliseconds: long;
-	time_in_milliseconds: long;
+	start_time_in_millis: long;
+	time_in_millis: long;
 }
 @namespace("modules.snapshot_and_restore.snapshot.snapshot_status")
 class FileCountSnapshotStats {
@@ -4950,18 +4950,18 @@ class GraphVertexInclude {
 @namespace("x_pack.graph.explore.request")
 class SampleDiversity {
 	field: Field;
-	max_documents_per_value: integer;
+	max_docs_per_value: integer;
 }
 @namespace("x_pack.license.get_license")
 class License {
-	expiry_date_in_milliseconds: long;
-	issue_date_in_milliseconds: long;
+	expiry_date_in_millis: long;
+	issue_date_in_millis: long;
 	issued_to: string;
 	issuer: string;
 	max_nodes: long;
 	signature: string;
 	type: LicenseType;
-	u_i_d: string;
+	uid: string;
 }
 @namespace("x_pack.machine_learning.post_calendar_events")
 class ScheduledEvent {
@@ -4973,8 +4973,8 @@ class ScheduledEvent {
 }
 @namespace("aggregations.bucket.histogram")
 class ExtendedBounds<T> {
-	maximum: T;
-	minimum: T;
+	max: T;
+	min: T;
 }
 @namespace("aggregations.bucket.terms")
 class TermsExclude {
@@ -4983,7 +4983,7 @@ class TermsExclude {
 }
 @namespace("aggregations.bucket.terms")
 class TermsInclude {
-	number_of_partitions: long;
+	num_partitions: long;
 	partition: long;
 	pattern: string;
 	values: string[];
@@ -5014,7 +5014,7 @@ class WatchStatus {
 }
 @namespace("x_pack.watcher.acknowledge_watch")
 class ActionStatus {
-	acknowledgement: AcknowledgeState;
+	ack: AcknowledgeState;
 	last_execution: ExecutionState;
 	last_successful_execution: ExecutionState;
 	last_throttle: ThrottleState;
@@ -5092,7 +5092,7 @@ class InnerHitsMetadata {
 @namespace("search.search.hits")
 class NestedIdentity {
 	field: Field;
-	nested: NestedIdentity;
+	_nested: NestedIdentity;
 	offset: integer;
 }
 @namespace("search.search.hits")
@@ -5114,7 +5114,7 @@ class ShardProfile {
 class AggregationProfile {
 	breakdown: AggregationBreakdown;
 	description: string;
-	time_in_nanoseconds: long;
+	time_in_nanos: long;
 	type: string;
 }
 @namespace("search.search.profile")
@@ -5124,7 +5124,7 @@ class AggregationBreakdown {
 	collect: long;
 	collect_count: long;
 	initialize: long;
-	initialize_count: long;
+	intialize_count: long;
 	reduce: long;
 	reduce_count: long;
 }
@@ -5139,14 +5139,14 @@ class Collector {
 	children: Collector[];
 	name: string;
 	reason: string;
-	time_in_nanoseconds: long;
+	time_in_nanos: long;
 }
 @namespace("search.search.profile")
 class QueryProfile {
 	breakdown: QueryBreakdown;
 	children: QueryProfile[];
 	description: string;
-	time_in_nanoseconds: long;
+	time_in_nanos: long;
 	type: string;
 }
 @namespace("search.search.profile")
@@ -5178,33 +5178,33 @@ class FollowIndexShardStats {
 	follower_global_checkpoint: long;
 	follower_index: string;
 	follower_mapping_version: long;
-	follower_max_sequence_number: long;
+	follower_max_seq_no: long;
 	follower_settings_version: long;
 	follower_aliases_version: long;
-	last_requested_sequence_number: long;
+	last_requested_seq_no: long;
 	leader_global_checkpoint: long;
 	leader_index: string;
-	leader_max_sequence_number: long;
+	leader_max_seq_no: long;
 	operations_read: long;
 	operations_written: long;
 	outstanding_read_requests: integer;
-	outstanding_write_request: integer;
+	outstanding_write_requests: integer;
 	remote_cluster: string;
 	shard_id: integer;
 	successful_read_requests: long;
 	successful_write_requests: long;
-	total_read_remote_execution_time_in_milliseconds: long;
-	total_read_time_in_milliseconds: long;
-	total_write_time_in_milliseconds: long;
+	total_read_remote_exec_time_millis: long;
+	total_read_time_millis: long;
+	total_write_time_millis: long;
 	write_buffer_operation_count: long;
 	write_buffer_size_in_bytes: long;
 	read_exceptions: FollowIndexReadException[];
-	time_since_last_read_in_milliseconds: long;
+	time_since_last_read_millis: long;
 	fatal_exception: ErrorCause;
 }
 @namespace("x_pack.cross_cluster_replication.follow.follow_index_stats")
 class FollowIndexReadException {
-	from_squence_number: long;
+	from_seq_no: long;
 	retries: integer;
 	exception: ErrorCause;
 }
@@ -5218,15 +5218,15 @@ class FollowerInfo {
 }
 @namespace("x_pack.cross_cluster_replication.follow.follow_info")
 class FollowConfig {
-	maximum_read_request_operation_count: integer;
-	maximum_read_request_size: string;
-	maximum_outstanding_read_requests: integer;
-	maximum_write_request_operation_count: integer;
-	maximum_write_request_size: string;
-	maximum_outstanding_write_requests: integer;
-	maximum_write_buffer_count: integer;
-	maximum_write_buffer_size: string;
-	maximum_retry_delay: Time;
+	max_read_request_operation_count: integer;
+	max_read_request_size: string;
+	max_outstanding_read_requests: integer;
+	max_write_request_operation_count: integer;
+	max_write_request_size: string;
+	max_outstanding_write_requests: integer;
+	max_write_buffer_count: integer;
+	max_write_buffer_size: string;
+	max_retry_delay: Time;
 	read_poll_timeout: Time;
 }
 @namespace("x_pack.cross_cluster_replication.stats")
@@ -5240,7 +5240,7 @@ class CcrAutoFollowStats {
 @namespace("x_pack.cross_cluster_replication.stats")
 class AutoFollowedCluster {
 	cluster_name: string;
-	time_since_last_check: Date;
+	time_since_last_check_millis: Date;
 	last_seen_metadata_version: long;
 }
 @namespace("x_pack.cross_cluster_replication.stats")
@@ -5249,7 +5249,7 @@ class CcrFollowStats {
 }
 @namespace("x_pack.graph.explore.response")
 class GraphConnection {
-	document_count: long;
+	doc_count: long;
 	source: long;
 	target: long;
 	weight: double;
@@ -5264,17 +5264,17 @@ class GraphVertex {
 @namespace("x_pack.ilm.explain_lifecycle")
 class LifecycleExplain {
 	action: string;
-	action_time: Date;
+	action_time_millis: Date;
 	failed_step: string;
 	index: IndexName;
-	lifecycle_date: Date;
+	lifecycle_date_millis: Date;
 	managed: boolean;
 	phase: string;
-	phase_time: Date;
+	phase_time_millis: Date;
 	policy: string;
 	step: string;
 	step_info: Dictionary<string, any>;
-	step_time: Date;
+	step_time_millis: Date;
 	age: Time;
 }
 @namespace("x_pack.ilm.get_lifecycle")
@@ -5297,7 +5297,7 @@ class XPackFeatures {
 	graph: XPackFeature;
 	ilm: XPackFeature;
 	logstash: XPackFeature;
-	machine_learning: XPackFeature;
+	ml: XPackFeature;
 	monitoring: XPackFeature;
 	rollup: XPackFeature;
 	security: XPackFeature;
@@ -5310,7 +5310,7 @@ class XPackFeature {
 	available: boolean;
 	description: string;
 	enabled: boolean;
-	native_code_information: NativeCodeInformation;
+	native_code_info: NativeCodeInformation;
 }
 @namespace("x_pack.info.x_pack_info")
 class NativeCodeInformation {
@@ -5319,11 +5319,11 @@ class NativeCodeInformation {
 }
 @namespace("x_pack.info.x_pack_info")
 class MinimalLicenseInformation {
-	expiry_date_in_milliseconds: long;
+	expiry_date_in_millis: long;
 	mode: LicenseType;
 	status: LicenseStatus;
 	type: LicenseType;
-	u_i_d: string;
+	uid: string;
 }
 @namespace("x_pack.info.x_pack_usage")
 class XPackUsage {
@@ -5340,20 +5340,20 @@ class QueryUsage {
 @namespace("x_pack.info.x_pack_usage")
 class IlmUsage {
 	policy_count: integer;
-	policy_statistics: IlmPolicyStatistics[];
+	policy_stats: IlmPolicyStatistics[];
 }
 @namespace("x_pack.license.get_license")
 class LicenseInformation {
 	expiry_date: Date;
-	expiry_date_in_milliseconds: long;
+	expiry_date_in_millis: long;
 	issue_date: Date;
-	issue_date_in_milliseconds: long;
+	issue_date_in_millis: long;
 	issued_to: string;
 	issuer: string;
 	max_nodes: long;
 	status: LicenseStatus;
 	type: LicenseType;
-	u_i_d: string;
+	uid: string;
 }
 @namespace("x_pack.license.post_license")
 class LicenseAcknowledgement {
@@ -5417,7 +5417,7 @@ class Bucket {
 	is_interim: boolean;
 	job_id: string;
 	partition_scores: PartitionScore[];
-	processing_time_milliseconds: double;
+	processing_time_ms: double;
 	result_type: string;
 	timestamp: Date;
 }
@@ -5476,10 +5476,10 @@ class DiscoveryNode {
 @namespace("x_pack.machine_learning.datafeed")
 class DatafeedTimingStats {
 	bucket_count: long;
-	exponential_average_search_time_per_hour_milliseconds: double;
+	exponential_average_search_time_per_hour_ms: double;
 	job_id: string;
 	search_count: long;
-	total_search_time_milliseconds: double;
+	total_search_time_ms: double;
 }
 @namespace("x_pack.machine_learning.datafeed")
 class DatafeedConfig {
@@ -5504,7 +5504,7 @@ class Filter {
 class JobStats {
 	assignment_explanation: string;
 	data_counts: DataCounts;
-	forecasts: JobForecastStatistics;
+	forecasts_stats: JobForecastStatistics;
 	job_id: string;
 	model_size_stats: ModelSizeStats;
 	node: DiscoveryNode;
@@ -5535,7 +5535,7 @@ class DataCounts {
 @namespace("x_pack.machine_learning.job.config")
 class JobForecastStatistics {
 	memory_bytes: JobStatistics;
-	processing_time_milliseconds: JobStatistics;
+	processing_time_ms: JobStatistics;
 	records: JobStatistics;
 	status: Dictionary<string, long>;
 	total: long;
@@ -5557,11 +5557,11 @@ class ModelSizeStats {
 class TimingStats {
 	job_id: string;
 	bucket_count: long;
-	minimum_bucket_processing_time_milliseconds: double;
-	maximum_bucket_processing_time_milliseconds: double;
-	average_bucket_processing_time_milliseconds: double;
-	exponential_average_bucket_processing_time_milliseconds: double;
-	exponential_average_bucket_processing_time_per_hour_milliseconds: double;
+	minimum_bucket_processing_time_ms: double;
+	maximum_bucket_processing_time_ms: double;
+	average_bucket_processing_time_ms: double;
+	exponential_average_bucket_processing_time_ms: double;
+	exponential_average_bucket_processing_time_per_hour_ms: double;
 }
 @namespace("x_pack.info.x_pack_usage")
 class Job {
@@ -5574,7 +5574,7 @@ class Job {
 	finished_time: Date;
 	job_id: string;
 	job_type: string;
-	model_plot_config: ModelPlotConfig;
+	model_plot: ModelPlotConfig;
 	model_snapshot_id: string;
 	model_snapshot_retention_days: long;
 	renormalization_window_days: long;
@@ -5680,9 +5680,9 @@ class RollupJobStats {
 	trigger_count: long;
 	search_failures: long;
 	index_failures: long;
-	index_time_in_milliseconds: long;
+	index_time_in_ms: long;
 	index_total: long;
-	search_time_in_milliseconds: long;
+	search_time_in_ms: long;
 	search_total: long;
 }
 @namespace("x_pack.roll_up.get_rollup_job")
@@ -5793,20 +5793,20 @@ class XPackUser {
 }
 @namespace("x_pack.slm")
 class SnapshotLifecyclePolicyMetadata {
-	modified_date: Date;
-	next_execution: Date;
+	modified_date_millis: Date;
+	next_execution_millis: Date;
 	policy: SnapshotLifecyclePolicy;
 	version: integer;
 	in_progress: SnapshotLifecycleInProgress;
 	last_success: SnapshotLifecycleInvocationRecord;
 	last_failure: SnapshotLifecycleInvocationRecord;
 }
-@namespace("common")
+@namespace("x_pack.slm")
 class SnapshotLifecycleInProgress {
 	name: string;
-	u_u_i_d: string;
+	uuid: string;
 	state: string;
-	start_time: Date;
+	start_time_millis: Date;
 }
 @namespace("x_pack.slm")
 class SnapshotLifecycleInvocationRecord {
@@ -5823,7 +5823,7 @@ class ClusterCertificateInformation {
 	path: string;
 	alias: string;
 	format: string;
-	subject_domain_name: string;
+	subject_dn: string;
 	serial_number: string;
 	has_private_key: boolean;
 	expiry: Date;
@@ -5860,7 +5860,7 @@ class ExecutionResultAction {
 	id: string;
 	index: IndexActionResult;
 	logging: LoggingActionResult;
-	pager_duty: PagerDutyActionResult;
+	pagerduty: PagerDutyActionResult;
 	reason: string;
 	slack: SlackActionResult;
 	status: Status;
@@ -5918,7 +5918,7 @@ class PagerDutyActionEventResult {
 class HttpInputResponseResult {
 	body: string;
 	headers: Dictionary<string, string[]>;
-	status_code: integer;
+	status: integer;
 }
 @namespace("x_pack.watcher.execution.slack")
 class SlackActionResult {
@@ -5985,8 +5985,8 @@ class CatAliasesRecord implements ICatRecord {
 	alias: string;
 	filter: string;
 	index: string;
-	index_routing: string;
-	search_routing: string;
+	indexRouting: string;
+	searchRouting: string;
 }
 @namespace("cat.cat_aliases")
 class CatAliasesResponse extends ResponseBase {
@@ -5994,9 +5994,9 @@ class CatAliasesResponse extends ResponseBase {
 }
 @namespace("cat.cat_allocation")
 class CatAllocationRecord implements ICatRecord {
-	disk_available: string;
-	disk_ratio: string;
-	disk_used: string;
+	diskAvail: string;
+	diskRatio: string;
+	diskUsed: string;
 	ip: string;
 	node: string;
 	shards: string;
@@ -6032,16 +6032,16 @@ class CatFielddataResponse extends ResponseBase {
 class CatHealthRecord implements ICatRecord {
 	cluster: string;
 	epoch: string;
-	initializing: string;
-	node_data: string;
-	node_total: string;
+	init: string;
+	'node.data': string;
+	'node.total': string;
 	pending_tasks: string;
-	primary: string;
-	relocating: string;
+	pri: string;
+	relo: string;
 	shards: string;
 	status: string;
 	timestamp: string;
-	unassigned: string;
+	unassign: string;
 }
 @namespace("cat.cat_health")
 class CatHealthResponse extends ResponseBase {
@@ -6057,17 +6057,17 @@ class CatHelpResponse extends ResponseBase {
 }
 @namespace("cat.cat_indices")
 class CatIndicesRecord implements ICatRecord {
-	docs_count: string;
-	docs_deleted: string;
+	'docs.count': string;
+	'docs.deleted': string;
 	health: string;
 	index: string;
-	u_u_i_d: string;
-	primary: string;
-	primary_store_size: string;
-	replica: string;
+	uuid: string;
+	pri: string;
+	'pri.store.size': string;
+	rep: string;
 	status: string;
-	store_size: string;
-	total_memory: string;
+	'store.size': string;
+	tm: string;
 }
 @namespace("cat.cat_indices")
 class CatIndicesResponse extends ResponseBase {
@@ -6085,13 +6085,13 @@ class CatMasterResponse extends ResponseBase {
 }
 @namespace("cat.cat_node_attributes")
 class CatNodeAttributesRecord implements ICatRecord {
-	attribute: string;
+	attr: string;
 	host: string;
 	id: string;
 	ip: string;
 	node: string;
 	port: long;
-	process_id: long;
+	pid: long;
 	value: string;
 }
 @namespace("cat.cat_node_attributes")
@@ -6102,7 +6102,7 @@ class CatNodeAttributesResponse extends ResponseBase {
 class CatNodesRecord implements ICatRecord {
 	build: string;
 	completion_size: string;
-	c_p_u: string;
+	cpu: string;
 	disk_available: string;
 	fielddata_evictions: string;
 	fielddata_memory: string;
@@ -6132,9 +6132,9 @@ class CatNodesRecord implements ICatRecord {
 	indexing_index_total: string;
 	ip: string;
 	jdk: string;
-	load_fifteen_minute: string;
-	load_five_minute: string;
-	load_one_minute: string;
+	load_15m: string;
+	load_5m: string;
+	load_1m: string;
 	master: string;
 	merges_current: string;
 	merges_current_docs: string;
@@ -6178,10 +6178,10 @@ class CatNodesResponse extends ResponseBase {
 }
 @namespace("cat.cat_pending_tasks")
 class CatPendingTasksRecord implements ICatRecord {
-	insert_order: integer;
+	insertOrder: integer;
 	priority: string;
 	source: string;
-	time_in_queue: string;
+	timeInQueue: string;
 }
 @namespace("cat.cat_pending_tasks")
 class CatPendingTasksResponse extends ResponseBase {
@@ -6244,18 +6244,18 @@ class CatRepositoriesResponse extends ResponseBase {
 class CatSegmentsRecord implements ICatRecord {
 	committed: string;
 	compound: string;
-	docs_count: string;
-	docs_deleted: string;
+	'docs.count': string;
+	'docs.deleted': string;
 	generation: string;
 	id: string;
 	index: string;
 	ip: string;
-	primary_replica: string;
+	prirep: string;
 	searchable: string;
 	segment: string;
 	shard: string;
 	size: string;
-	size_memory: string;
+	'size.memory': string;
 	version: string;
 }
 @namespace("cat.cat_segments")
@@ -6264,64 +6264,64 @@ class CatSegmentsResponse extends ResponseBase {
 }
 @namespace("cat.cat_shards")
 class CatShardsRecord implements ICatRecord {
-	completion_size: string;
+	'completion.size': string;
 	docs: string;
-	fielddata_evictions: string;
-	fielddata_memory_size: string;
-	filter_cache_memory_size: string;
-	flush_total: string;
-	flush_total_time: string;
-	get_current: string;
-	get_exists_time: string;
-	get_exists_total: string;
-	get_missing_time: string;
-	get_missing_total: string;
-	get_time: string;
-	get_total: string;
+	'fielddata.evictions': string;
+	'fielddata.memory_size': string;
+	'filter_cache.memory_size': string;
+	'flush.total': string;
+	'flush.total_time': string;
+	'get.current': string;
+	'get.exists_time': string;
+	'get.exists_total': string;
+	'get.missing_time': string;
+	'get.missing_total': string;
+	'get.time': string;
+	'get.total': string;
 	id: string;
-	id_cache_memory_size: string;
+	'id_cache.memory_size': string;
 	index: string;
-	indexing_delete_current: string;
-	indexing_delete_time: string;
-	indexing_delete_total: string;
-	indexing_index_current: string;
-	indexing_index_time: string;
-	indexing_index_total: string;
+	'indexing.delete_current': string;
+	'indexing.delete_time': string;
+	'indexing.delete_total': string;
+	'indexing.index_current': string;
+	'indexing.index_time': string;
+	'indexing.index_total': string;
 	ip: string;
-	merges_current: string;
-	merges_current_docs: string;
-	merges_current_size: string;
-	merges_total_docs: string;
-	merges_total_size: string;
-	merges_total_time: string;
+	'merges.current': string;
+	'merges.current_docs': string;
+	'merges.current_size': string;
+	'merges.total_docs': string;
+	'merges.total_size': string;
+	'merges.total_time': string;
 	node: string;
-	percolate_current: string;
-	percolate_memory_size: string;
-	percolate_queries: string;
-	percolate_time: string;
-	percolate_total: string;
-	primary_or_replica: string;
-	refresh_time: string;
-	refresh_total: string;
-	search_fetch_current: string;
-	search_fetch_time: string;
-	search_fetch_total: string;
-	search_open_contexts: string;
-	search_query_current: string;
-	search_query_time: string;
-	search_query_total: string;
-	segments_count: string;
-	segments_fixed_bitset_memory: string;
-	segments_index_writer_max_memory: string;
-	segments_index_writer_memory: string;
-	segments_memory: string;
-	segments_version_map_memory: string;
+	'percolate.current': string;
+	'percolate.memory_size': string;
+	'percolate.queries': string;
+	'percolate.time': string;
+	'percolate.total': string;
+	prirep: string;
+	'refresh.time': string;
+	'refresh.total': string;
+	'search.fetch_current': string;
+	'search.fetch_time': string;
+	'search.fetch_total': string;
+	'search.open_contexts': string;
+	'search.query_current': string;
+	'search.query_time': string;
+	'search.query_total': string;
+	'segments.count': string;
+	'segments.fixed_bitset_memory': string;
+	'segments.index_writer_max_memory': string;
+	'segments.index_writer_memory': string;
+	'segments.memory': string;
+	'segments.version_map_memory': string;
 	shard: string;
 	state: string;
 	store: string;
-	warmer_current: string;
-	warmer_total: string;
-	warmer_total_time: string;
+	'warmer.current': string;
+	'warmer.total': string;
+	'warmer.total_time': string;
 }
 @namespace("cat.cat_shards")
 class CatShardsResponse extends ResponseBase {
@@ -6382,13 +6382,13 @@ class CatThreadPoolRecord implements ICatRecord {
 	ip: string;
 	keep_alive: Time;
 	largest: integer;
-	maximum: integer;
+	max: integer;
 	name: string;
 	node_id: string;
 	node_name: string;
 	pool_size: integer;
 	port: integer;
-	process_id: integer;
+	pid: integer;
 	queue: integer;
 	queue_size: integer;
 	rejected: long;
@@ -6467,7 +6467,7 @@ class MonitoringUsage extends XPackUsage {
 class SecurityUsage extends XPackUsage {
 	anonymous: SecurityFeatureToggle;
 	audit: AuditUsage;
-	ip_filter: IpFilterUsage;
+	ipfilter: IpFilterUsage;
 	realms: Dictionary<string, RealmUsage>;
 	role_mapping: Dictionary<string, RoleMappingUsage>;
 	roles: Dictionary<string, RoleUsage>;
@@ -6478,7 +6478,7 @@ class SecurityUsage extends XPackUsage {
 class VectorUsage extends XPackUsage {
 	dense_vector_fields_count: integer;
 	sparse_vector_fields_count: integer;
-	dense_vector_dimensions_average_count: integer;
+	dense_vector_dims_avg_count: integer;
 }
 @namespace("x_pack.watcher.watcher_stats")
 class WatchRecordStats extends WatchRecordQueuedStats {
@@ -6508,8 +6508,8 @@ class Id extends String {}
 class Routing extends String {}
 @namespace("query_dsl.geo")
 class GeoLocation {
-	latitude: double;
-	longitude: double;
+	lat: double;
+	lon: double;
 }
 @namespace("common_abstractions.infer.relation_name")
 class RelationName extends String {}
@@ -6549,8 +6549,8 @@ class FingerprintAnalyzer extends AnalyzerBase {
 	max_output_size: integer;
 	preserve_original: boolean;
 	separator: string;
-	stop_words: StopWords;
-	stop_words_path: string;
+	stopwords: StopWords;
+	stopwords_path: string;
 }
 @namespace("analysis.analyzers")
 class KeywordAnalyzer extends AnalyzerBase {
@@ -6558,15 +6558,15 @@ class KeywordAnalyzer extends AnalyzerBase {
 @namespace("analysis.analyzers")
 class LanguageAnalyzer extends AnalyzerBase {
 	language: Language;
-	stem_exclusion_list: string[];
-	stop_words: StopWords;
+	stem_exclusion: string[];
+	stopwords: StopWords;
 	stopwords_path: string;
 	type: string;
 }
 @namespace("analysis.analyzers")
 class NoriAnalyzer extends AnalyzerBase {
 	decompound_mode: NoriDecompoundMode;
-	stop_tags: string[];
+	stoptags: string[];
 	user_dictionary: string;
 }
 @namespace("analysis.analyzers")
@@ -6574,7 +6574,7 @@ class PatternAnalyzer extends AnalyzerBase {
 	flags: string;
 	lowercase: boolean;
 	pattern: string;
-	stop_words: StopWords;
+	stopwords: StopWords;
 }
 @namespace("analysis.analyzers")
 class SimpleAnalyzer extends AnalyzerBase {
@@ -6582,16 +6582,16 @@ class SimpleAnalyzer extends AnalyzerBase {
 @namespace("analysis.analyzers")
 class SnowballAnalyzer extends AnalyzerBase {
 	language: SnowballLanguage;
-	stop_words: StopWords;
+	stopwords: StopWords;
 }
 @namespace("analysis.analyzers")
 class StandardAnalyzer extends AnalyzerBase {
 	max_token_length: integer;
-	stop_words: StopWords;
+	stopwords: StopWords;
 }
 @namespace("analysis.analyzers")
 class StopAnalyzer extends AnalyzerBase {
-	stop_words: StopWords;
+	stopwords: StopWords;
 	stopwords_path: string;
 }
 @namespace("analysis.analyzers")
@@ -6619,15 +6619,15 @@ class IcuAnalyzer extends AnalyzerBase {
 @namespace("analysis.plugins.icu")
 class IcuCollationTokenFilter extends TokenFilterBase {
 	alternate: IcuCollationAlternate;
-	case_first: IcuCollationCaseFirst;
-	case_level: boolean;
+	caseFirst: IcuCollationCaseFirst;
+	caseLevel: boolean;
 	country: string;
 	decomposition: IcuCollationDecomposition;
-	hiragana_quaternary_mode: boolean;
+	hiraganaQuaternaryMode: boolean;
 	language: string;
 	numeric: boolean;
 	strength: IcuCollationStrength;
-	variable_top: string;
+	variableTop: string;
 	variant: string;
 }
 @namespace("analysis.plugins.icu")
@@ -6649,7 +6649,7 @@ class IcuTokenizer extends TokenizerBase {
 }
 @namespace("analysis.plugins.icu")
 class IcuTransformTokenFilter extends TokenFilterBase {
-	direction: IcuTransformDirection;
+	dir: IcuTransformDirection;
 	id: string;
 }
 @namespace("analysis.plugins.kuromoji")
@@ -6664,7 +6664,7 @@ class KuromojiIterationMarkCharFilter extends CharFilterBase {
 }
 @namespace("analysis.plugins.kuromoji")
 class KuromojiPartOfSpeechTokenFilter extends TokenFilterBase {
-	stop_tags: string[];
+	stoptags: string[];
 }
 @namespace("analysis.plugins.kuromoji")
 class KuromojiReadingFormTokenFilter extends TokenFilterBase {
@@ -6678,16 +6678,16 @@ class KuromojiStemmerTokenFilter extends TokenFilterBase {
 class KuromojiTokenizer extends TokenizerBase {
 	discard_punctuation: boolean;
 	mode: KuromojiTokenizationMode;
-	n_best_cost: integer;
-	n_best_examples: string;
+	nbest_cost: integer;
+	nbest_examples: string;
 	user_dictionary: string;
 	user_dictionary_rules: string[];
 }
 @namespace("analysis.plugins.phonetic")
 class PhoneticTokenFilter extends TokenFilterBase {
 	encoder: PhoneticEncoder;
-	language_set: PhoneticLanguage[];
-	max_code_length: integer;
+	languageset: PhoneticLanguage[];
+	max_code_len: integer;
 	name_type: PhoneticNameType;
 	replace: boolean;
 	rule_type: PhoneticRuleType;
@@ -6706,7 +6706,7 @@ class CommonGramsTokenFilter extends TokenFilterBase {
 @namespace("analysis.token_filters")
 class ConditionTokenFilter extends TokenFilterBase {
 	script: Script;
-	filters: string[];
+	filter: string[];
 }
 @namespace("analysis.token_filters.delimited_payload")
 class DelimitedPayloadTokenFilter extends TokenFilterBase {
@@ -6783,7 +6783,7 @@ class NGramTokenFilter extends TokenFilterBase {
 }
 @namespace("analysis.token_filters")
 class NoriPartOfSpeechTokenFilter extends TokenFilterBase {
-	stop_tags: string[];
+	stoptags: string[];
 }
 @namespace("analysis.token_filters")
 class PatternCaptureTokenFilter extends TokenFilterBase {
@@ -6835,8 +6835,8 @@ class StemmerTokenFilter extends TokenFilterBase {
 class StopTokenFilter extends TokenFilterBase {
 	ignore_case: boolean;
 	remove_trailing: boolean;
-	stop_words: StopWords;
-	stop_words_path: string;
+	stopwords: StopWords;
+	stopwords_path: string;
 }
 @namespace("analysis.token_filters.synonym")
 class SynonymGraphTokenFilter extends TokenFilterBase {
@@ -6880,7 +6880,7 @@ class WordDelimiterGraphTokenFilter extends TokenFilterBase {
 	generate_word_parts: boolean;
 	preserve_original: boolean;
 	protected_words: string[];
-	protected_words_path: string;
+	protected_words_path : string;
 	split_on_case_change: boolean;
 	split_on_numerics: boolean;
 	stem_english_possessive: boolean;
@@ -6896,7 +6896,7 @@ class WordDelimiterTokenFilter extends TokenFilterBase {
 	generate_word_parts: boolean;
 	preserve_original: boolean;
 	protected_words: string[];
-	protected_words_path: string;
+	protected_words_path : string;
 	split_on_case_change: boolean;
 	split_on_numerics: boolean;
 	stem_english_possessive: boolean;
@@ -6905,7 +6905,7 @@ class WordDelimiterTokenFilter extends TokenFilterBase {
 }
 @namespace("analysis.tokenizers")
 class CharGroupTokenizer extends TokenizerBase {
-	tokenize_on_characters: string[];
+	tokenize_on_chars: string[];
 }
 @namespace("analysis.tokenizers")
 class KeywordTokenizer extends TokenizerBase {
@@ -6977,7 +6977,7 @@ class CatResponse<TCatRecord> extends ResponseBase implements IResponse {
 class ClusterAllocationExplainResponse extends ResponseBase implements IResponse {
 	allocate_explanation: string;
 	allocation_delay: string;
-	allocation_delay_in_milliseconds: long;
+	allocation_delay_in_millis: long;
 	can_allocate: Decision;
 	can_move_to_other_node: Decision;
 	can_rebalance_cluster: Decision;
@@ -6986,7 +6986,7 @@ class ClusterAllocationExplainResponse extends ResponseBase implements IResponse
 	can_remain_decisions: AllocationDecision[];
 	can_remain_on_current_node: Decision;
 	configured_delay: string;
-	configured_delay_in_milliseconds: long;
+	configured_delay_in_mills: long;
 	current_node: CurrentNode;
 	current_state: string;
 	index: string;
@@ -6995,9 +6995,9 @@ class ClusterAllocationExplainResponse extends ResponseBase implements IResponse
 	primary: boolean;
 	rebalance_explanation: string;
 	remaining_delay: string;
-	remaining_delay_in_milliseconds: long;
+	remaining_delay_in_millis: long;
 	shard: integer;
-	unassigned_information: UnassignedInformation;
+	unassigned_info: UnassignedInformation;
 }
 @namespace("cluster.cluster_health")
 class ClusterHealthResponse extends ResponseBase implements IResponse {
@@ -7014,7 +7014,7 @@ class ClusterHealthResponse extends ResponseBase implements IResponse {
 	number_of_pending_tasks: integer;
 	relocating_shards: integer;
 	status: Health;
-	task_max_wait_time_in_queue_in_milliseconds: long;
+	task_max_waiting_in_queue_millis: long;
 	timed_out: boolean;
 	unassigned_shards: integer;
 }
@@ -7049,7 +7049,7 @@ class PingResponse extends ResponseBase implements IResponse {
 class RootNodeInfoResponse extends ResponseBase implements IResponse {
 	name: string;
 	cluster_name: string;
-	cluster_u_u_i_d: string;
+	cluster_uuid: string;
 	version: ElasticsearchVersionInfo;
 	tagline: string;
 }
@@ -7093,8 +7093,8 @@ class DeleteByQueryResponse extends ResponseBase implements IResponse {
 	retries: Retries;
 	slice_id: integer;
 	task: TaskId;
-	throttled_milliseconds: long;
-	throttled_until_milliseconds: long;
+	throttled_millis: long;
+	throttled_until_millis: long;
 	timed_out: boolean;
 	took: long;
 	total: long;
@@ -7107,7 +7107,7 @@ class MultiGetResponse extends ResponseBase implements IResponse {
 }
 @namespace("document.multiple.multi_term_vectors")
 class MultiTermVectorsResponse extends ResponseBase implements IResponse {
-	documents: TermVectors[];
+	docs: TermVectors[];
 }
 @namespace("document.multiple.reindex_on_server")
 class ReindexOnServerResponse extends ResponseBase implements IResponse {
@@ -7148,12 +7148,12 @@ class UpdateByQueryResponse extends ResponseBase implements IResponse {
 class TermVectorsResponse extends ResponseBase implements IResponse {
 	is_valid: boolean;
 	found: boolean;
-	id: string;
-	index: string;
+	_id: string;
+	_index: string;
 	term_vectors: Dictionary<Field, TermVector>;
 	took: long;
-	type: string;
-	version: long;
+	_type: string;
+	_version: long;
 }
 @namespace("indices.alias_management.delete_alias")
 class DeleteAliasResponse extends ResponseBase implements IResponse {
@@ -7173,7 +7173,7 @@ class ExistsResponse extends ResponseBase implements IResponse {
 @namespace("indices.monitoring.indices_segments")
 class SegmentsResponse extends ResponseBase implements IResponse {
 	indices: Dictionary<string, IndexSegment>;
-	shards: ShardStatistics;
+	_shards: ShardStatistics;
 }
 @namespace("indices.monitoring.indices_shard_stores")
 class IndicesShardStoresResponse extends ResponseBase implements IResponse {
@@ -7182,8 +7182,8 @@ class IndicesShardStoresResponse extends ResponseBase implements IResponse {
 @namespace("indices.monitoring.indices_stats")
 class IndicesStatsResponse extends ResponseBase implements IResponse {
 	indices: Dictionary<string, IndicesStats>;
-	shards: ShardStatistics;
-	stats: IndicesStats;
+	_shards: ShardStatistics;
+	_all: IndicesStats;
 }
 @namespace("ingest.processor")
 class GrokProcessorPatternsResponse extends ResponseBase implements IResponse {
@@ -7191,7 +7191,7 @@ class GrokProcessorPatternsResponse extends ResponseBase implements IResponse {
 }
 @namespace("ingest.simulate_pipeline")
 class SimulatePipelineResponse extends ResponseBase implements IResponse {
-	documents: PipelineSimulation[];
+	docs: PipelineSimulation[];
 }
 @namespace("modules.scripting.get_script")
 class GetScriptResponse extends ResponseBase implements IResponse {
@@ -7232,7 +7232,7 @@ class CronExpression extends ScheduleBase {
 @namespace("search.count")
 class CountResponse extends ResponseBase implements IResponse {
 	count: long;
-	shards: ShardStatistics;
+	_shards: ShardStatistics;
 }
 @namespace("search.field_capabilities")
 class FieldCapabilitiesResponse extends ResponseBase implements IResponse {
@@ -7260,7 +7260,7 @@ class RenderSearchTemplateResponse extends ResponseBase implements IResponse {
 @namespace("search.validate")
 class ValidateQueryResponse extends ResponseBase implements IResponse {
 	explanations: ValidationExplanation[];
-	shards: ShardStatistics;
+	_shards: ShardStatistics;
 	valid: boolean;
 }
 @namespace("x_pack.cross_cluster_replication.auto_follow.get_auto_follow_pattern")
@@ -7283,7 +7283,7 @@ class FollowInfoResponse extends ResponseBase implements IResponse {
 }
 @namespace("x_pack.cross_cluster_replication.follow.forget_follower_index")
 class ForgetFollowerIndexResponse extends ResponseBase implements IResponse {
-	shards: ShardStatistics;
+	_shards: ShardStatistics;
 }
 @namespace("x_pack.cross_cluster_replication.stats")
 class CcrStatsResponse extends ResponseBase implements IResponse {
@@ -7325,12 +7325,12 @@ class XPackUsageResponse extends ResponseBase implements IResponse {
 	data_frame: XPackUsage;
 	flattened: XPackUsage;
 	data_science: XPackUsage;
-	index_lifecycle_management: IlmUsage;
+	ilm: IlmUsage;
 	ccr: CcrUsage;
-	alerting: AlertingUsage;
+	watcher: AlertingUsage;
 	graph: XPackUsage;
 	logstash: XPackUsage;
-	machine_learning: MachineLearningUsage;
+	ml: MachineLearningUsage;
 	monitoring: MonitoringUsage;
 	security: SecurityUsage;
 	vectors: VectorUsage;
@@ -7341,7 +7341,7 @@ class DeleteLicenseResponse extends ResponseBase implements IResponse {
 }
 @namespace("x_pack.license.get_basic_license_status")
 class GetBasicLicenseStatusResponse extends ResponseBase implements IResponse {
-	eligable_to_start_basic: boolean;
+	eligible_to_start_basic: boolean;
 }
 @namespace("x_pack.license.get_license")
 class GetLicenseResponse extends ResponseBase implements IResponse {
@@ -7514,7 +7514,7 @@ class PutJobResponse extends ResponseBase implements IResponse {
 	description: string;
 	job_id: string;
 	job_type: string;
-	model_plot_config: ModelPlotConfig;
+	model_plot: ModelPlotConfig;
 	model_snapshot_id: string;
 	model_snapshot_retention_days: long;
 	renormalization_window_days: long;
@@ -7616,10 +7616,10 @@ class GetUserPrivilegesResponse extends ResponseBase implements IResponse {
 }
 @namespace("x_pack.security.privileges.has_privileges")
 class HasPrivilegesResponse extends ResponseBase implements IResponse {
-	applications: Dictionary<string, ResourcePrivileges[]>;
-	clusters: Dictionary<string, boolean>;
+	application: Dictionary<string, ResourcePrivileges[]>;
+	cluster: Dictionary<string, boolean>;
 	has_all_requested: boolean;
-	indices: ResourcePrivileges[];
+	index: ResourcePrivileges[];
 	username: string;
 }
 @namespace("x_pack.security.role_mapping.delete_role_mapping")
@@ -7713,28 +7713,28 @@ class DeactivateWatchResponse extends ResponseBase implements IResponse {
 @namespace("x_pack.watcher.delete_watch")
 class DeleteWatchResponse extends ResponseBase implements IResponse {
 	found: boolean;
-	id: string;
-	version: integer;
+	_id: string;
+	_version: integer;
 }
 @namespace("x_pack.watcher.execute_watch")
 class ExecuteWatchResponse extends ResponseBase implements IResponse {
-	id: string;
+	_id: string;
 	watch_record: WatchRecord;
 }
 @namespace("x_pack.watcher.get_watch")
 class GetWatchResponse extends ResponseBase implements IResponse {
 	found: boolean;
-	id: string;
+	_id: string;
 	status: WatchStatus;
 	watch: Watch;
 }
 @namespace("x_pack.watcher.put_watch")
 class PutWatchResponse extends ResponseBase implements IResponse {
 	created: boolean;
-	id: string;
-	version: integer;
-	sequence_number: long;
-	primary_term: long;
+	_id: string;
+	_version: integer;
+	_seq_no: long;
+	_primary_term: long;
 }
 @namespace("x_pack.watcher.watcher_stats")
 class WatcherStatsResponse extends ResponseBase implements IResponse {
@@ -7745,7 +7745,7 @@ class WatcherStatsResponse extends ResponseBase implements IResponse {
 @namespace("cluster.cluster_stats")
 class ClusterStatsResponse extends NodesResponseBase implements IResponse {
 	cluster_name: string;
-	cluster_u_u_i_d: string;
+	cluster_uuid: string;
 	indices: ClusterIndicesStats;
 	nodes: ClusterNodesStats;
 	status: ClusterStatus;
@@ -7783,14 +7783,14 @@ class DeleteResponse extends ResponseBase implements IResponse {
 class GetResponse<TDocument> extends ResponseBase {
 	fields: Dictionary<string, LazyDocument>;
 	found: boolean;
-	id: string;
-	index: string;
-	primary_term: long;
-	routing: string;
-	sequence_number: long;
-	source: TDocument;
-	type: string;
-	version: long;
+	_id: string;
+	_index: string;
+	_primary_term: long;
+	_routing: string;
+	_seq_no: long;
+	_source: TDocument;
+	_type: string;
+	_version: long;
 }
 @namespace("document.single.index")
 class IndexResponse extends ResponseBase implements IResponse {
@@ -7909,16 +7909,16 @@ class ExplainResponse<TDocument> extends ResponseBase {
 @namespace("search.search")
 class SearchResponse<TDocument> extends ResponseBase {
 	aggregations: Dictionary<string, Aggregate>;
-	clusters: ClusterStatistics;
+	_clusters: ClusterStatistics;
 	documents: TDocument[];
 	fields: Dictionary<string, LazyDocument>;
 	hits: Hit<TDocument>[];
-	hits_metadata: HitsMetadata<TDocument>;
+	hits: HitsMetadata<TDocument>;
 	max_score: double;
-	number_of_reduce_phases: long;
+	num_reduce_phases: long;
 	profile: Profile;
-	scroll_id: string;
-	shards: ShardStatistics;
+	_scroll_id: string;
+	_shards: ShardStatistics;
 	suggest: SuggestDictionary<TDocument>;
 	terminated_early: boolean;
 	timed_out: boolean;
@@ -8517,9 +8517,9 @@ class ClusterStateRequest extends RequestBase {
 class ClusterStateResponse extends ResponseBase {
 	state: string[];
 	cluster_name: string;
-	cluster_u_u_i_d: string;
+	cluster_uuid: string;
 	master_node: string;
-	state_u_u_i_d: string;
+	state_uuid: string;
 	version: long;
 }
 @namespace("cluster.cluster_stats")
@@ -8672,7 +8672,7 @@ class DeleteByQueryRethrottleRequest extends RequestBase {
 class DeleteByQueryRequest extends RequestBase {
 	query: QueryContainer;
 	slice: SlicedScroll;
-	maximum_documents: long;
+	max_docs: long;
 	@request_parameter()
 	allow_no_indices: boolean;
 	@request_parameter()
@@ -8743,7 +8743,7 @@ class DeleteByQueryRequest extends RequestBase {
 class MultiGetRequest extends RequestBase {
 	@request_parameter()
 	stored_fields: Field[];
-	documents: MultiGetOperation[];
+	docs: MultiGetOperation[];
 	@request_parameter()
 	preference: string;
 	@request_parameter()
@@ -8762,7 +8762,7 @@ class MultiGetRequest extends RequestBase {
 @namespace("document.multiple.multi_term_vectors")
 @rest_spec_name("mtermvectors")
 class MultiTermVectorsRequest extends RequestBase {
-	documents: MultiTermVectorOperation[];
+	docs: MultiTermVectorOperation[];
 	ids: Id[];
 	@request_parameter()
 	field_statistics: boolean;
@@ -8791,10 +8791,10 @@ class MultiTermVectorsRequest extends RequestBase {
 @rest_spec_name("reindex")
 class ReindexOnServerRequest extends RequestBase {
 	conflicts: Conflicts;
-	destination: ReindexDestination;
+	dest: ReindexDestination;
 	script: Script;
 	size: long;
-	maximum_documents: long;
+	max_docs: long;
 	source: ReindexSource;
 	@request_parameter()
 	refresh: boolean;
@@ -8829,7 +8829,7 @@ class UpdateByQueryRequest extends RequestBase {
 	slice: SlicedScroll;
 	query: QueryContainer;
 	script: Script;
-	maximum_documents: long;
+	max_docs: long;
 	@request_parameter()
 	allow_no_indices: boolean;
 	@request_parameter()
@@ -9014,7 +9014,7 @@ class SourceRequest extends RequestBase {
 @namespace("document.single.term_vectors")
 @rest_spec_name("termvectors")
 class TermVectorsRequest<TDocument> extends RequestBase {
-	document: TDocument;
+	doc: TDocument;
 	filter: TermVectorFilter;
 	per_field_analyzer: Dictionary<Field, string>;
 	@request_parameter()
@@ -9048,7 +9048,7 @@ class UpdateRequest<TDocument, TPartialDocument> extends RequestBase {
 	doc_as_upsert: boolean;
 	script: Script;
 	scripted_upsert: boolean;
-	source: Union<boolean, SourceFilter>;
+	_source: Union<boolean, SourceFilter>;
 	upsert: TDocument;
 	@request_parameter()
 	if_primary_term: long;
@@ -9585,7 +9585,7 @@ class GrokProcessorPatternsRequest extends RequestBase {
 @namespace("ingest.simulate_pipeline")
 @rest_spec_name("ingest.simulate")
 class SimulatePipelineRequest extends RequestBase {
-	documents: SimulatePipelineDocument[];
+	docs: SimulatePipelineDocument[];
 	pipeline: Pipeline;
 	@request_parameter()
 	verbose: boolean;
@@ -9761,7 +9761,7 @@ class CreateFollowIndexRequest extends RequestBase {
 	leader_index: IndexName;
 	max_read_request_operation_count: long;
 	max_outstanding_read_requests: long;
-	max_request_size: string;
+	max_read_request_size: string;
 	max_write_request_operation_count: long;
 	max_write_request_size: string;
 	max_outstanding_write_requests: long;
@@ -9783,7 +9783,7 @@ class FollowIndexStatsRequest extends RequestBase {
 class ForgetFollowerIndexRequest extends RequestBase {
 	follower_cluster: string;
 	follower_index: IndexName;
-	follower_index_u_u_i_d: string;
+	follower_index_uuid: string;
 	leader_remote_cluster: string;
 }
 @namespace("x_pack.cross_cluster_replication.auto_follow.get_auto_follow_pattern")
@@ -9799,7 +9799,7 @@ class PauseFollowIndexRequest extends RequestBase {
 class ResumeFollowIndexRequest extends RequestBase {
 	max_read_request_operation_count: long;
 	max_outstanding_read_requests: long;
-	max_request_size: string;
+	max_read_request_size: string;
 	max_write_request_operation_count: long;
 	max_write_request_size: string;
 	max_outstanding_write_requests: long;
@@ -9993,7 +9993,7 @@ class FlushJobRequest extends RequestBase {
 	@request_parameter()
 	skip_time: string;
 	advance_time: Date;
-	calculate_interim: boolean;
+	calc_interim: boolean;
 	end: Date;
 	start: Date;
 }
@@ -10007,7 +10007,7 @@ class ForecastJobRequest extends RequestBase {
 @rest_spec_name("ml.get_buckets")
 class GetBucketsRequest extends RequestBase {
 	anomaly_score: double;
-	descending: boolean;
+	desc: boolean;
 	end: Date;
 	exclude_interim: boolean;
 	expand: boolean;
@@ -10083,7 +10083,7 @@ class GetJobsRequest extends RequestBase {
 @namespace("x_pack.machine_learning.get_model_snapshots")
 @rest_spec_name("ml.get_model_snapshots")
 class GetModelSnapshotsRequest extends RequestBase {
-	descending: boolean;
+	desc: boolean;
 	end: Date;
 	page: Page;
 	sort: Field;
@@ -10103,7 +10103,7 @@ class GetOverallBucketsRequest extends RequestBase {
 @namespace("x_pack.machine_learning.get_anomaly_records")
 @rest_spec_name("ml.get_records")
 class GetAnomalyRecordsRequest extends RequestBase {
-	descending: boolean;
+	desc: boolean;
 	end: Date;
 	exclude_interim: boolean;
 	page: Page;
@@ -10173,7 +10173,7 @@ class PutJobRequest extends RequestBase {
 	analysis_limits: AnalysisLimits;
 	data_description: DataDescription;
 	description: string;
-	model_plot_config: ModelPlotConfig;
+	model_plot: ModelPlotConfig;
 	model_snapshot_retention_days: long;
 	results_index_name: IndexName;
 }
@@ -10242,7 +10242,7 @@ class ValidateJobRequest extends RequestBase {
 	analysis_limits: AnalysisLimits;
 	data_description: DataDescription;
 	description: string;
-	model_plot_config: ModelPlotConfig;
+	model_plot: ModelPlotConfig;
 	model_snapshot_retention_days: long;
 	results_index_name: IndexName;
 }
@@ -10258,7 +10258,7 @@ class DeprecationInfoRequest extends RequestBase {
 @namespace("search.scroll.clear_scroll")
 @rest_spec_name("clear_scroll")
 class ClearScrollRequest extends RequestBase {
-	scroll_ids: string[];
+	scroll_id: string[];
 }
 @namespace("search.count")
 @rest_spec_name("count")
@@ -10426,7 +10426,7 @@ class RollupSearchRequest extends RequestBase {
 	total_hits_as_integer: boolean;
 	@request_parameter()
 	typed_keys: boolean;
-	aggregations: Dictionary<string, AggregationContainer>;
+	aggs: Dictionary<string, AggregationContainer>;
 	query: QueryContainer;
 	size: integer;
 }
@@ -10470,7 +10470,7 @@ class CreateApiKeyRequest extends RequestBase {
 	refresh: Refresh;
 	expiration: Time;
 	name: string;
-	roles: Dictionary<string, ApiKeyRole>;
+	role_descriptors: Dictionary<string, ApiKeyRole>;
 }
 @namespace("x_pack.security.privileges.delete_privileges")
 @rest_spec_name("security.delete_privileges")
@@ -10937,10 +10937,10 @@ class SearchRequest extends RequestBase {
 	total_hits_as_integer: boolean;
 	@request_parameter()
 	typed_keys: boolean;
-	aggregations: Dictionary<string, AggregationContainer>;
+	aggs: Dictionary<string, AggregationContainer>;
 	collapse: FieldCollapse;
 	@request_parameter()
-	doc_value_fields: Field[];
+	docvalue_fields: Field[];
 	explain: boolean;
 	from: integer;
 	highlight: Highlight;
@@ -10955,7 +10955,7 @@ class SearchRequest extends RequestBase {
 	size: integer;
 	slice: SlicedScroll;
 	sort: Sort[];
-	source: Union<boolean, SourceFilter>;
+	_source: Union<boolean, SourceFilter>;
 	@request_parameter()
 	stored_fields: Field[];
 	suggest: Dictionary<string, SuggestBucket>;
@@ -11234,7 +11234,7 @@ class FloatRangeProperty extends RangePropertyBase {
 @namespace("mapping.types.core.range.integer_range")
 class IntegerRangeProperty extends RangePropertyBase {
 }
-@namespace("mapping.types.core.range.ip")
+@namespace("mapping.types.core.range.ip_range")
 class IpRangeProperty extends RangePropertyBase {
 }
 @namespace("mapping.types.core.range.long_range")
@@ -11464,12 +11464,12 @@ class TotalFileSystemStats {
 @namespace("cluster.nodes_stats")
 class CPUStats {
 	percent: integer;
-	system: string;
-	system_in_milliseconds: long;
+	sys: string;
+	sys_in_millis: long;
 	total: string;
-	total_in_milliseconds: long;
+	total_in_millis: long;
 	user: string;
-	user_in_milliseconds: long;
+	user_in_millis: long;
 }
 @namespace("cluster.nodes_stats")
 class MemoryStats {
@@ -11502,7 +11502,7 @@ class GarbageCollectionStats {
 class GarbageCollectionGenerationStats {
 	collection_count: long;
 	collection_time: string;
-	collection_time_in_milliseconds: long;
+	collection_time_in_millis: long;
 }
 @namespace("cluster.nodes_stats")
 class ThreadStats {
@@ -11527,9 +11527,9 @@ class ExtendedMemoryStats extends MemoryStats {
 }
 @namespace("cluster.nodes_stats")
 class LoadAverageStats {
-	fifteen_minute: float;
-	five_minute: float;
-	one_minute: float;
+	'15m': float;
+	'5m': float;
+	'1m': float;
 }
 @namespace("x_pack.info.x_pack_usage")
 class IlmPolicyStatistics {
@@ -11548,7 +11548,7 @@ class AlertingExecution {
 @namespace("x_pack.info.x_pack_usage")
 class ExecutionAction {
 	total: long;
-	total_in_milliseconds: long;
+	total_in_ms: long;
 }
 @namespace("x_pack.info.x_pack_usage")
 class AlertingInput {
@@ -11561,16 +11561,16 @@ class DataFeed {
 }
 @namespace("x_pack.info.x_pack_usage")
 class JobStatistics {
-	average: double;
-	maximum: double;
-	minimum: double;
+	avg: double;
+	max: double;
+	min: double;
 	total: double;
 }
 @namespace("x_pack.info.x_pack_usage")
 class ForecastStatistics {
-	jobs: long;
+	forecasted_jobs: long;
 	memory_bytes: JobStatistics;
-	processing_time_milliseconds: JobStatistics;
+	processing_time_ms: JobStatistics;
 	records: JobStatistics;
 	status: Dictionary<string, long>;
 	total: long;

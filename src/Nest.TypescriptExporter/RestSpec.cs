@@ -23,7 +23,7 @@ namespace Nest.TypescriptGenerator
 			using (var pbar = new ProgressBar(2, "reading NEST's REST API spec folder"))
 			{
 
-				this.RestSpecificationFolder = Path.GetFullPath(Path.Combine(nestSourceFolder, "..", "CodeGeneration", "ApiGenerator", "RestSpecification"));
+				this.RestSpecificationFolder = Path.GetFullPath(Path.Combine(nestSourceFolder, "..", "ApiGenerator", "RestSpecification"));
 
 				var jsonFiles = Directory.GetFiles(this.RestSpecificationFolder, $"*.json", SearchOption.AllDirectories)
 					.Where(f => !f.EndsWith(".patch.json") && !f.EndsWith("_common.json"))

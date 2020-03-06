@@ -16,7 +16,7 @@ namespace Nest.TypescriptGenerator
 		{
 			const string defaultTsFile = "typedefinitions.ts";
 			const string defaultNestSourceFolder = @"../../../net-7/src/Nest";
-			var command = args.Length > 0 ? args[0] : "generate";
+			var command = args.Length > 0 ? args[0] : "both";
 			var definitionFile = args.Length > 1 ? args[1] : defaultTsFile;
 			var nestSourceFolder = args.Length > 2 ? args[2] : defaultNestSourceFolder;
 			var restSpec = new RestSpec(nestSourceFolder);

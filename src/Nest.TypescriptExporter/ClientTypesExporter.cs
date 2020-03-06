@@ -62,10 +62,19 @@ namespace Nest.TypescriptGenerator
 			if (attributes.Any(a => a.TypeId.ToString() == "Nest.Json.JsonIgnoreAttribute"))
 				property.IsIgnored = true;
 
+			if (attributes.Any(a => a.TypeId.ToString() == "System.Runtime.Serialization.DataMemberAttribute"))
+				property.IsIgnored = true;
+
 			var jsonPropertyAttribute = attributes.FirstOrDefault(a => a.TypeId.ToString() == "Nest.Json.JsonPropertyAttribute");
 			if (jsonPropertyAttribute != null)
 			{
 				var v = jsonPropertyAttribute.GetType().GetProperty("PropertyName").GetGetMethod().Invoke(jsonPropertyAttribute, new object[] {});
+				return ((string) v ?? propertyName.SnakeCase()).QuoteMaybe();
+			}
+			var dataMemberAtt = attributes.FirstOrDefault(a => a.TypeId.ToString() == "System.Runtime.Serialization.DataMemberAttribute");
+			if (dataMemberAtt != null)
+			{
+				var v = dataMemberAtt.GetType().GetProperty("Name").GetGetMethod().Invoke(dataMemberAtt, new object[] {});
 				return ((string) v ?? propertyName.SnakeCase()).QuoteMaybe();
 			}
 			return propertyName.SnakeCase().QuoteMaybe();
