@@ -2,15 +2,14 @@
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
-using System;
-using Elastic.Xunit.Sdk;
-using Elastic.Xunit.XunitPlumbing;
+using Elastic.Elasticsearch.Xunit;
+using Elastic.Elasticsearch.Xunit.XunitPlumbing;
 using Elasticsearch.Net;
 using FluentAssertions;
 using Nest;
 
 // we need to put this assembly attribute in place for xunit to use our custom test execution pipeline
-[assembly: Xunit.TestFrameworkAttribute("Elastic.Xunit.Sdk.ElasticTestFramework", "Elastic.Xunit")]
+[assembly: Xunit.TestFrameworkAttribute("Elastic.Elasticsearch.Xunit.Sdk.ElasticTestFramework", "Elastic.Elasticsearch.Xunit")]
 
 namespace Elastic.Xunit.ExampleMinimal
 {
@@ -21,7 +20,7 @@ namespace Elastic.Xunit.ExampleMinimal
 		/// We pass our configuration instance to the base class.
 		/// We only configure it to run version 6.2.3 here but lots of additional options are available.
 		/// </summary>
-		public MyTestCluster() : base(new XunitClusterConfiguration("6.2.0") { })
+		public MyTestCluster() : base(new XunitClusterConfiguration("8.0.0-SNAPSHOT") { })
 		{
 		}
 
@@ -36,7 +35,7 @@ namespace Elastic.Xunit.ExampleMinimal
 			//
 			// 1) We do not want to prescribe how to create an instance of the client
 			//
-			// 2) We do not want Elastic.Xunit to depend on NEST. Elastic.Xunit can start 2.x, 5.x and 6.x clusters
+			// 2) We do not want Elastic.Elasticsearch.Xunit to depend on NEST. Elastic.Elasticsearch.Xunit can start 2.x, 5.x and 6.x clusters
 			//    and NEST Major.x is only tested and supported against Elasticsearch Major.x.
 			//
 			this.Client = cluster.GetOrAddClient(c =>

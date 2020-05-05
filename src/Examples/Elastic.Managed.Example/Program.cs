@@ -3,9 +3,8 @@
 // See the LICENSE file in the project root for more information
 
 using System;
-using Elastic.Managed.Configuration;
-using Elastic.Managed.ConsoleWriters;
-using Elastic.Managed.FileSystem;
+using Elastic.Elasticsearch.Managed;
+using Elastic.Elasticsearch.Managed.Configuration;
 
 namespace Elastic.Managed.Example
 {

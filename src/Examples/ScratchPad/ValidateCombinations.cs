@@ -3,9 +3,9 @@
 // See the LICENSE file in the project root for more information
 
 using System;
-using Elastic.Managed.Ephemeral;
-using Elastic.Managed.Ephemeral.Plugins;
-using Elastic.Stack.Artifacts.Products;
+using Elastic.Elasticsearch.Ephemeral;
+using Elastic.Elasticsearch.Ephemeral.Plugins;
+using Elastic.Stack.ArtifactsApi.Products;
 using Elasticsearch.Net;
 using Nest;
 

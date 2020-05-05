@@ -5,7 +5,8 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <IsPackable>False</IsPackable>
   </PropertyGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\..\Elastic.Managed\Elastic.Managed.csproj"/>
+    <ProjectReference Include="..\..\Elastic.Elasticsearch.Managed\Elastic.Elasticsearch.Managed.csproj" />
   </ItemGroup>
 </Project>

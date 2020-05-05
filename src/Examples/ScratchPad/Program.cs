@@ -6,15 +6,14 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using Elastic.Managed.Ephemeral;
-using Elastic.Managed.Ephemeral.Plugins;
-using Elastic.Stack.Artifacts;
-using Elastic.Stack.Artifacts.Products;
-using Elastic.Stack.Artifacts.Resolvers;
+using Elastic.Elasticsearch.Ephemeral;
+using Elastic.Elasticsearch.Ephemeral.Plugins;
+using Elastic.Stack.ArtifactsApi;
+using Elastic.Stack.ArtifactsApi.Products;
+using Elastic.Stack.ArtifactsApi.Resolvers;
 using Elasticsearch.Net;
 using Nest;
-using static Elastic.Managed.Ephemeral.ClusterFeatures;
-using HttpMethod = Elasticsearch.Net.HttpMethod;
+using static Elastic.Elasticsearch.Ephemeral.ClusterFeatures;
 
 namespace ScratchPad
 {

@@ -7,11 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScratchPad", "Examples\Scra
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "scripts", "..\build\scripts\scripts.fsproj", "{D6997ADC-E933-418E-831C-DE1A78897493}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elastic.Managed", "Elastic.Managed\Elastic.Managed.csproj", "{0FCE020D-F4BD-4933-A0AB-27537EFA273E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elastic.Elasticsearch.Managed", "Elastic.Elasticsearch.Managed\Elastic.Elasticsearch.Managed.csproj", "{0FCE020D-F4BD-4933-A0AB-27537EFA273E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elastic.Managed.Ephemeral", "Elastic.Managed.Ephemeral\Elastic.Managed.Ephemeral.csproj", "{F5D3D2D7-CDA1-462A-81FD-A446C4CEB287}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elastic.Elasticsearch.Ephemeral", "Elastic.Elasticsearch.Ephemeral\Elastic.Elasticsearch.Ephemeral.csproj", "{F5D3D2D7-CDA1-462A-81FD-A446C4CEB287}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elastic.Xunit", "Elastic.Xunit\Elastic.Xunit.csproj", "{681C6112-B885-4553-A06C-4CD9C262FC49}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elastic.Elasticsearch.Xunit", "Elastic.Elasticsearch.Xunit\Elastic.Elasticsearch.Xunit.csproj", "{681C6112-B885-4553-A06C-4CD9C262FC49}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elastic.Xunit.Example", "Examples\Elastic.Xunit.ExampleComplex\Elastic.Xunit.ExampleComplex.csproj", "{A660CA00-91E4-4994-BBA2-406BC5259C33}"
 EndProject
@@ -23,7 +23,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elastic.Managed.Example", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nest.TypescriptExporter", "Nest.TypescriptExporter\Nest.TypescriptExporter.csproj", "{C05F7B36-EEF7-4BCD-86A2-F5F1BB8CFEB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elastic.Stack.Artifacts", "Elastic.Stack.Artifacts\Elastic.Stack.Artifacts.csproj", "{80DE8673-CB3E-4D0B-99F4-A5CECF6BE752}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elastic.Stack.ArtifactsApi", "Elastic.Stack.ArtifactsApi\Elastic.Stack.ArtifactsApi.csproj", "{80DE8673-CB3E-4D0B-99F4-A5CECF6BE752}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

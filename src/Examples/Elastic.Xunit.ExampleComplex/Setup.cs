@@ -2,11 +2,12 @@
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
-using Elastic.Stack.Artifacts;
+using Elastic.Elasticsearch.Xunit;
+using Elastic.Stack.ArtifactsApi;
 using Elastic.Xunit.ExampleComplex;
 
-[assembly: Xunit.TestFrameworkAttribute("Elastic.Xunit.Sdk.ElasticTestFramework", "Elastic.Xunit")]
-[assembly: Elastic.Xunit.ElasticXunitConfiguration(typeof(MyRunOptions))]
+[assembly: Xunit.TestFrameworkAttribute("Elastic.Elasticsearch.Xunit.Sdk.ElasticTestFramework", "Elastic.Elasticsearch.Xunit")]
+[assembly: Elastic.Elasticsearch.Xunit.ElasticXunitConfiguration(typeof(MyRunOptions))]
 
 namespace Elastic.Xunit.ExampleComplex
 {
@@ -15,7 +16,7 @@ namespace Elastic.Xunit.ExampleComplex
 	/// </summary>
 	public class MyRunOptions : ElasticXunitRunOptions
 	{
-		public static ElasticVersion TestVersion { get; } = "6.3.0";
+		public static ElasticVersion TestVersion { get; } = "8.0.0-SNAPSHOT";
 		public MyRunOptions()
 		{
 			this.ClusterFilter = "";
