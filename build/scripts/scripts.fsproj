@@ -37,14 +37,8 @@
     <Content Include="..\..\build.sh">
       <Link>build.sh</Link>
     </Content>
-    <Content Include="..\..\dotnet-tools.json">
-      <Link>dotnet-tools.json</Link>
-    </Content>
     <Content Include="..\..\global.json">
       <Link>global.json</Link>
-    </Content>
-    <Content Include="..\..\nuget.config">
-      <Link>nuget.config</Link>
     </Content>
     <Content Include="..\..\versions.json">
       <Link>versions.json</Link>
