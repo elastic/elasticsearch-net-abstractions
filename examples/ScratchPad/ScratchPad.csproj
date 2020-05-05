@@ -10,6 +10,6 @@
     <PackageReference Include="NEST" Version="6.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Elastic.Elasticsearch.Ephemeral\Elastic.Elasticsearch.Ephemeral.csproj" />
+    <ProjectReference Include="..\..\src\Elastic.Elasticsearch.Ephemeral\Elastic.Elasticsearch.Ephemeral.csproj" />
   </ItemGroup>
 </Project>

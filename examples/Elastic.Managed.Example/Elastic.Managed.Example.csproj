@@ -7,6 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Elastic.Elasticsearch.Managed\Elastic.Elasticsearch.Managed.csproj" />
+    <ProjectReference Include="..\..\src\Elastic.Elasticsearch.Managed\Elastic.Elasticsearch.Managed.csproj" />
   </ItemGroup>
 </Project>

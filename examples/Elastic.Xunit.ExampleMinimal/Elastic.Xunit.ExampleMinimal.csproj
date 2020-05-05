@@ -17,6 +17,6 @@
     <PackageReference Condition="'$(TargetFramework)' == 'net461'" Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="All" Version="1.0.0-preview.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Elastic.Elasticsearch.Xunit\Elastic.Elasticsearch.Xunit.csproj" />
+    <ProjectReference Include="..\..\src\Elastic.Elasticsearch.Xunit\Elastic.Elasticsearch.Xunit.csproj" />
   </ItemGroup>
 </Project>

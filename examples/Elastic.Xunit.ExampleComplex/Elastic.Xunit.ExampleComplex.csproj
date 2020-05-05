@@ -7,7 +7,7 @@
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-beta1-build3642" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Elastic.Elasticsearch.Ephemeral\Elastic.Elasticsearch.Ephemeral.csproj" />
+    <ProjectReference Include="..\..\src\Elastic.Elasticsearch.Ephemeral\Elastic.Elasticsearch.Ephemeral.csproj" />
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
@@ -15,6 +15,6 @@
     <PackageReference Include="NEST" Version="6.0.1" />
     <PackageReference Include="FluentAssertions" Version="5.1.2" />
     <PackageReference Condition="'$(TargetFramework)' == 'net461'" Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="All" Version="1.0.0-preview.2" />
-    <ProjectReference Include="..\..\Elastic.Elasticsearch.Xunit\Elastic.Elasticsearch.Xunit.csproj" />
+    <ProjectReference Include="..\..\src\Elastic.Elasticsearch.Xunit\Elastic.Elasticsearch.Xunit.csproj" />
   </ItemGroup>
 </Project>
