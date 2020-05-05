@@ -3,12 +3,11 @@
     <Import Project="..\..\build\Common.targets" />
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
-        
         <Version>$(StackVersion)</Version>
         <InformationalVersion>$(StackVersion)</InformationalVersion>
         <AssemblyVersion>$(StackAssemblyVersion)</AssemblyVersion>
         <FileVersion>$(StackAssemblyFileVersion)</FileVersion>
-        <PackageId>Elastic.Stack.Artifacts</PackageId>
+        <PackageId>Elastic.Stack.ArtifactsApi</PackageId>
         <Authors>Elastic and contributors</Authors>
         <Description>Provides a set of classes to resolve the location of Elastic stack products in various stages: released, snapshot and build candidates</Description>
         <PackageTags>elastic,elasticsearch,stack,versioning,artifacts</PackageTags>

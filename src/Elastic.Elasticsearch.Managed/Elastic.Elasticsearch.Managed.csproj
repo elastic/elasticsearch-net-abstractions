@@ -8,7 +8,7 @@
     <InformationalVersion>$(ManagedVersion)</InformationalVersion>
     <AssemblyVersion>$(ManagedAssemblyVersion)</AssemblyVersion>
     <FileVersion>$(ManagedAssemblyFileVersion)</FileVersion>
-    <PackageId>Elastic.Managed</PackageId>
+    <PackageId>Elastic.Elasticsearch.Managed</PackageId>
     <Authors>Elastic and contributors</Authors>
     <Description>
       Provides an observable ElasticsearchNode abstraction that can be used to wrap an elasticsearch process. 
