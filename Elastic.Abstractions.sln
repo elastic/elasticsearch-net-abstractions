@@ -28,6 +28,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{77E78EDE-60D5-469A-B431-443A7966A243}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{F75ACC18-D314-4F1F-88A3-2002EAC4E207}"
+ProjectSection(SolutionItems) = preProject
+	dotnet-tools.json = dotnet-tools.json
+	version.json = version.json
+	Directory.Build.props = Directory.Build.props
+EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
