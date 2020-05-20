@@ -14,14 +14,14 @@ namespace Elastic.Xunit.ExampleComplex
 
 		[I] public void SomeTest()
 		{
-			var info = this.Client.RootNodeInfo();
+			var info = Client.RootNodeInfo();
 
 			info.IsValid.Should().BeTrue();
 
-			this.Client.CreateIndex("INASda");
+			Client.CreateIndex("INASda");
 
 
-			this.Client.LowLevel.Search<StringResponse>(PostData.Serializable(new
+			Client.LowLevel.Search<StringResponse>(PostData.Serializable(new
 			{
 				query = new { query_string = 1 }
 			}));
@@ -52,13 +52,10 @@ namespace Elastic.Xunit.ExampleComplex
 
 		[I] public void SomeTest()
 		{
-			var info = this.Client.RootNodeInfo();
+			var info = Client.RootNodeInfo();
 
 			info.IsValid.Should().BeTrue();
 		}
-		[U] public void UnitTest()
-		{
-			(1 + 1).Should().Be(2);
-		}
+		[U] public void UnitTest() => (1 + 1).Should().Be(2);
 	}
 }

@@ -29,30 +29,30 @@ namespace Nest.TypescriptGenerator
 			} while (dirInfo != null && dirInfo.Name != "src");
 			namespaces.Reverse();
 			namespaces.Remove("Nest");
-			this.Namespace = string.Join(".", namespaces);
+			Namespace = string.Join(".", namespaces);
 
 			var ast = CSharpSyntaxTree.ParseText(code);
-			this.Visit(ast.GetRoot());
+			Visit(ast.GetRoot());
 		}
 
 		public override void VisitClassDeclaration(ClassDeclarationSyntax node)
 		{
 			var c = node.Identifier.Text;
-			if (!Skip.Contains(c)) this.Declarations.Add(c);
+			if (!Skip.Contains(c)) Declarations.Add(c);
 			base.VisitClassDeclaration(node);
 		}
 
 		public override void VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
 		{
 			var c = node.Identifier.Text;
-			if (!Skip.Contains(c)) this.Declarations.Add(c);
+			if (!Skip.Contains(c)) Declarations.Add(c);
 			base.VisitInterfaceDeclaration(node);
 		}
 
 		public override void VisitEnumDeclaration(EnumDeclarationSyntax node)
 		{
 			var c = node.Identifier.Text;
-			if (!Skip.Contains(c)) this.Declarations.Add(c);
+			if (!Skip.Contains(c)) Declarations.Add(c);
 			base.VisitEnumDeclaration(node);
 		}
 	}

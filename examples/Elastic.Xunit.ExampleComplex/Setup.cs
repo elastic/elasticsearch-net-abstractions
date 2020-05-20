@@ -7,7 +7,7 @@ using Elastic.Stack.ArtifactsApi;
 using Elastic.Xunit.ExampleComplex;
 
 [assembly: Xunit.TestFrameworkAttribute("Elastic.Elasticsearch.Xunit.Sdk.ElasticTestFramework", "Elastic.Elasticsearch.Xunit")]
-[assembly: Elastic.Elasticsearch.Xunit.ElasticXunitConfiguration(typeof(MyRunOptions))]
+[assembly: ElasticXunitConfiguration(typeof(MyRunOptions))]
 
 namespace Elastic.Xunit.ExampleComplex
 {
@@ -19,11 +19,11 @@ namespace Elastic.Xunit.ExampleComplex
 		public static ElasticVersion TestVersion { get; } = "8.0.0-SNAPSHOT";
 		public MyRunOptions()
 		{
-			this.ClusterFilter = "";
-			this.RunUnitTests = false;
-			this.RunIntegrationTests = true;
-			this.IntegrationTestsMayUseAlreadyRunningNode = true;
-			this.Version = TestVersion;
+			ClusterFilter = "";
+			RunUnitTests = false;
+			RunIntegrationTests = true;
+			IntegrationTestsMayUseAlreadyRunningNode = true;
+			Version = TestVersion;
 		}
 	}
 }

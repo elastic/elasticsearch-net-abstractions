@@ -22,7 +22,7 @@ namespace Nest.TypescriptGenerator
 
 		public ClientTypesExporter(CsharpTypeInfoProvider typeInfoProvider, ClientTypescriptGenerator scriptGenerator)
 		{
-			this._scriptGenerator = scriptGenerator;
+			_scriptGenerator = scriptGenerator;
 			var d = TypeScript.Definitions(scriptGenerator)
 				.WithTypeFormatter(FormatType)
 				.WithMemberFormatter(FormatMember)
@@ -33,10 +33,10 @@ namespace Nest.TypescriptGenerator
 				.For<AnalyzerBase>()
 				.WithModuleNameFormatter(module => string.Empty);
 
-			this._definitions = typeInfoProvider.ExposedTypes.Aggregate(d, (def, t) => def.For(t));
+			_definitions = typeInfoProvider.ExposedTypes.Aggregate(d, (def, t) => def.For(t));
 		}
 
-		public string Generate() => this._definitions.Generate();
+		public string Generate() => _definitions.Generate();
 
 		private static string FormatMemberType(TsProperty tsProperty, string memberTypeName)
 		{

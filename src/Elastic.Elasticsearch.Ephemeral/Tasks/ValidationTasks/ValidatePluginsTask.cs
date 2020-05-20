@@ -34,7 +34,7 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.ValidationTasks
 			if (!requestPlugins.Any()) return;
 
 			cluster.Writer.WriteDiagnostic($"{{{nameof(ValidatePluginsTask)}}} validating the cluster is running the requested plugins");
-			var catPlugins = this.Get(cluster, "_cat/plugins", "h=component");
+			var catPlugins = Get(cluster, "_cat/plugins", "h=component");
 			if (catPlugins == null || !catPlugins.IsSuccessStatusCode) throw new Exception($"Calling _cat/plugins did not result in an OK response {GetResponseException(catPlugins)}");
 
 			var installedPlugins = GetResponseString(catPlugins).Split(new [] {'\n'}, StringSplitOptions.RemoveEmptyEntries).ToList();

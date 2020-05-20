@@ -23,10 +23,10 @@ namespace Elastic.Elasticsearch.Managed.FileSystem
 		protected static string BinarySuffix => IsMono || Path.DirectorySeparatorChar == '/' ? "" : ".bat";
 
 		/// <inheritdoc />
-		public string Binary => Path.Combine(this.ElasticsearchHome, "bin", "elasticsearch") + BinarySuffix;
+		public string Binary => Path.Combine(ElasticsearchHome, "bin", "elasticsearch") + BinarySuffix;
 
 		/// <inheritdoc />
-		public string PluginBinary => Path.Combine(this.ElasticsearchHome, "bin", (this.Version.Major >= 5 ? "elasticsearch-" : "" ) +"plugin") + BinarySuffix;
+		public string PluginBinary => Path.Combine(ElasticsearchHome, "bin", (Version.Major >= 5 ? "elasticsearch-" : "" ) +"plugin") + BinarySuffix;
 
 		/// <inheritdoc />
 		public string ElasticsearchHome { get; }
@@ -45,12 +45,12 @@ namespace Elastic.Elasticsearch.Managed.FileSystem
 
 		public NodeFileSystem(ElasticVersion version, string elasticsearchHome = null)
 		{
-			this.Version = version;
-			this.Artifact = version.Artifact(Product.Elasticsearch);
-			this.LocalFolder = AppDataFolder(version);
-			this.ElasticsearchHome = elasticsearchHome ?? GetEsHomeVariable() ?? throw new ArgumentNullException(nameof(elasticsearchHome));
+			Version = version;
+			Artifact = version.Artifact(Product.Elasticsearch);
+			LocalFolder = AppDataFolder(version);
+			ElasticsearchHome = elasticsearchHome ?? GetEsHomeVariable() ?? throw new ArgumentNullException(nameof(elasticsearchHome));
 
-			this.ConfigEnvironmentVariableName = version.Major >= 6 ? "ES_PATH_CONF" : "CONF_DIR";
+			ConfigEnvironmentVariableName = version.Major >= 6 ? "ES_PATH_CONF" : "CONF_DIR";
 		}
 
 		protected static string AppDataFolder(ElasticVersion version)

@@ -29,7 +29,7 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.ValidationTasks
 		private string LicenseInfo(IEphemeralCluster<EphemeralClusterConfiguration> cluster, string filter, int retries = 0)
 		{
 			var licenseUrl = cluster.ClusterConfiguration.Version.Major < 8 ? "_xpack/license" : "_license";
-			var getLicense = this.Get(cluster, licenseUrl, "filter_path=" + filter);
+			var getLicense = Get(cluster, licenseUrl, "filter_path=" + filter);
 			if ((getLicense == null || !getLicense.IsSuccessStatusCode) && retries >= 5)
 				throw new Exception($"Calling GET _xpack/license did not result in an OK response after trying {retries} {GetResponseException(getLicense)}");
 
@@ -39,7 +39,7 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.ValidationTasks
 				return LicenseInfo(cluster, filter, ++retries);
 			}
 
-			var licenseStatusString = this.GetResponseString(getLicense)
+			var licenseStatusString = GetResponseString(getLicense)
 				.Where(c => !new[] {' ', '\n', '{', '"', '}'}.Contains(c))
 				.ToArray();
 			var status = new string(licenseStatusString).Replace($"{filter.Replace(".", ":")}:", "");

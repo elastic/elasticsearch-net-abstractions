@@ -49,6 +49,6 @@ namespace Elastic.Elasticsearch.Ephemeral.Plugins
 				ElasticsearchPlugin.XPack,
 			});
 
-		public override string ToString() => string.Join(", ", this.Items.Select(s => s.SubProductName));
+		public override string ToString() => string.Join(", ", Items.Select(s => s.SubProductName));
 	}
 }

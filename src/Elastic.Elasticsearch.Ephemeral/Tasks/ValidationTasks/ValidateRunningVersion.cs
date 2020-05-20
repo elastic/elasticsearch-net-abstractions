@@ -17,7 +17,7 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.ValidationTasks
 			cluster.Writer?.WriteDiagnostic(
 				$"{{{nameof(ValidateRunningVersion)}}} validating the cluster is running the requested version: {requestedVersion}");
 
-			var catNodes = this.Get(cluster, "_cat/nodes", "h=version");
+			var catNodes = Get(cluster, "_cat/nodes", "h=version");
 			if (catNodes == null || !catNodes.IsSuccessStatusCode)
 				throw new Exception(
 					$"Calling _cat/nodes for version checking did not result in an OK response {GetResponseException(catNodes)}");

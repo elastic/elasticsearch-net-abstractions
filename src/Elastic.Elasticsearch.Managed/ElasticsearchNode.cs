@@ -22,13 +22,13 @@ namespace Elastic.Elasticsearch.Managed
 		public NodeConfiguration NodeConfiguration { get; }
 
 		private int? JavaProcessId { get; set; }
-		public override int? ProcessId => this.JavaProcessId ?? base.ProcessId;
+		public override int? ProcessId => JavaProcessId ?? base.ProcessId;
 		public int? HostProcessId => base.ProcessId;
 
 		public ElasticsearchNode(ElasticVersion version, string elasticsearchHome = null)
 			: this(new NodeConfiguration(new ClusterConfiguration(version, fileSystem: (v, s) => new NodeFileSystem(v, elasticsearchHome)))) { }
 
-		public ElasticsearchNode(NodeConfiguration config) : base(StartArgs(config)) => this.NodeConfiguration = config;
+		public ElasticsearchNode(NodeConfiguration config) : base(StartArgs(config)) => NodeConfiguration = config;
 
 		private static StartArguments StartArgs(NodeConfiguration config)
 		{
@@ -70,58 +70,58 @@ namespace Elastic.Elasticsearch.Managed
 			return false;
 		}
 
-		public IDisposable Start() => this.Start(TimeSpan.FromMinutes(2));
+		public IDisposable Start() => Start(TimeSpan.FromMinutes(2));
 
-		public IDisposable Start(TimeSpan waitForStarted) => this.Start(new LineHighlightWriter(), waitForStarted);
+		public IDisposable Start(TimeSpan waitForStarted) => Start(new LineHighlightWriter(), waitForStarted);
 
 		public IDisposable Start(IConsoleLineHandler writer, TimeSpan waitForStarted)
 		{
-			var node = this.NodeConfiguration.DesiredNodeName;
-			var subscription = this.SubscribeLines(writer);
-			if (this.WaitForStarted(waitForStarted)) return subscription;
+			var node = NodeConfiguration.DesiredNodeName;
+			var subscription = SubscribeLines(writer);
+			if (WaitForStarted(waitForStarted)) return subscription;
 			subscription.Dispose();
 			throw new ElasticsearchCleanExitException($"Failed to start node: {node} before the configured timeout of: {waitForStarted}");
 		}
 
 		internal IConsoleLineHandler Writer { get; private set; }
 
-		public IDisposable SubscribeLines() => this.SubscribeLines(new LineHighlightWriter());
+		public IDisposable SubscribeLines() => SubscribeLines(new LineHighlightWriter());
 		public IDisposable SubscribeLines(IConsoleLineHandler writer) =>
-			this.SubscribeLines(writer, delegate { }, delegate { }, delegate { });
+			SubscribeLines(writer, delegate { }, delegate { }, delegate { });
 
 		public IDisposable SubscribeLines(IConsoleLineHandler writer, Action<LineOut> onNext) =>
-			this.SubscribeLines(writer, onNext, delegate { }, delegate { });
+			SubscribeLines(writer, onNext, delegate { }, delegate { });
 
 		public IDisposable SubscribeLines(IConsoleLineHandler writer, Action<LineOut> onNext, Action<Exception> onError) =>
-			this.SubscribeLines(writer, onNext, onError, delegate { });
+			SubscribeLines(writer, onNext, onError, delegate { });
 
 		public IDisposable SubscribeLines(IConsoleLineHandler writer, Action<LineOut> onNext, Action<Exception> onError, Action onCompleted)
 		{
-			this.Writer = writer;
-			var node = this.NodeConfiguration.DesiredNodeName;
-			writer?.WriteDiagnostic($"Elasticsearch location: [{this.Binary}]", node);
-			writer?.WriteDiagnostic($"Settings: {{{string.Join(" ", this.NodeConfiguration.CommandLineArguments)}}}", node);
+			Writer = writer;
+			var node = NodeConfiguration.DesiredNodeName;
+			writer?.WriteDiagnostic($"Elasticsearch location: [{Binary}]", node);
+			writer?.WriteDiagnostic($"Settings: {{{string.Join(" ", NodeConfiguration.CommandLineArguments)}}}", node);
 
 			var javaHome = Environment.GetEnvironmentVariable("JAVA_HOME");
 			writer?.WriteDiagnostic($"JAVA_HOME: {{{javaHome}}}", node);
-			this.Process.StartInfo.Environment["JAVA_HOME"] = javaHome;
+			Process.StartInfo.Environment["JAVA_HOME"] = javaHome;
 
-			return this.SubscribeLines(
+			return SubscribeLines(
 				l => {
 					writer?.Handle(l);
 					onNext?.Invoke(l);
 				},
 				e =>
 				{
-					this.LastSeenException = e;
+					LastSeenException = e;
 					writer?.Handle(e);
 					onError?.Invoke(e);
-					this._startedHandle.Set();
+					_startedHandle.Set();
 				},
 				() =>
 				{
 					onCompleted?.Invoke();
-					this._startedHandle.Set();
+					_startedHandle.Set();
 				});
 		}
 
@@ -129,11 +129,11 @@ namespace Elastic.Elasticsearch.Managed
 
 		private readonly ManualResetEvent _startedHandle = new ManualResetEvent(false);
 		public WaitHandle StartedHandle => _startedHandle;
-		public bool WaitForStarted(TimeSpan timeout) => this._startedHandle.WaitOne(timeout);
+		public bool WaitForStarted(TimeSpan timeout) => _startedHandle.WaitOne(timeout);
 
 		protected override void OnBeforeSetCompletedHandle()
 		{
-			this._startedHandle.Set();
+			_startedHandle.Set();
 			base.OnBeforeSetCompletedHandle();
 		}
 
@@ -144,8 +144,8 @@ namespace Elastic.Elasticsearch.Managed
 			// Proc will successfully kill the host but will leave the JavaProcess the bat file starts running
 			// The elasticsearch jar is closing down so won't leak but might prevent EphemeralClusterComposer to do its clean up.
 			// We do a hard kill on both here to make sure both processes are gone.
-			HardKill(this.HostProcessId);
-			HardKill(this.JavaProcessId);
+			HardKill(HostProcessId);
+			HardKill(JavaProcessId);
 		}
 
 		private static void HardKill(int? processId)
@@ -161,7 +161,7 @@ namespace Elastic.Elasticsearch.Managed
 
 		protected override bool ContinueReadingFromProcessReaders()
 		{
-			if (!this.NodeStarted) return true;
+			if (!NodeStarted) return true;
 			return true;
 
 			// some how if we return false here it leads to Task starvation in Proc and tests in e.g will Elastic.Elasticsearch.Xunit will start
@@ -173,40 +173,40 @@ namespace Elastic.Elasticsearch.Managed
 		protected override bool KeepBufferingLines(LineOut c)
 		{
 			//if the node is already started only keep buffering lines while we have a writer and the nodeconfiguration wants output after started
-			if (this.NodeStarted)
+			if (NodeStarted)
 			{
-				var keepBuffering = this.Writer != null && this.NodeConfiguration.ShowElasticsearchOutputAfterStarted;
-				if (!keepBuffering) this.CancelAsyncReads();
+				var keepBuffering = Writer != null && NodeConfiguration.ShowElasticsearchOutputAfterStarted;
+				if (!keepBuffering) CancelAsyncReads();
 				return keepBuffering;
 			}
 
 			var parsed = LineOutParser.TryParse(c?.Line, out _, out _, out var section, out _, out var message, out var started);
 
-			if (!parsed) return this.Writer != null;
+			if (!parsed) return Writer != null;
 
-			if (this.JavaProcessId == null && LineOutParser.TryParseNodeInfo(section, message, out var version, out var pid))
+			if (JavaProcessId == null && LineOutParser.TryParseNodeInfo(section, message, out var version, out var pid))
 			{
-				this.JavaProcessId = pid;
-				this.Version = version;
+				JavaProcessId = pid;
+				Version = version;
 			}
 			else if (LineOutParser.TryGetPortNumber(section, message, out var port))
 			{
-				this.Port = port;
-				var dp = this.NodeConfiguration.DesiredPort;
-				if (dp.HasValue && this.Port != dp.Value)
+				Port = port;
+				var dp = NodeConfiguration.DesiredPort;
+				if (dp.HasValue && Port != dp.Value)
 					throw new ElasticsearchCleanExitException($"Node started on port {port} but {dp.Value} was requested");
 			}
 
 			if (!started) started = AssumedStartedStateChecker(section, message);
 			if (started)
 			{
-				if (!this.Port.HasValue) throw new ElasticsearchCleanExitException($"Node started but ElasticsearchNode did not grab its port number");
-				this.NodeStarted = true;
-				this._startedHandle.Set();
+				if (!Port.HasValue) throw new ElasticsearchCleanExitException($"Node started but ElasticsearchNode did not grab its port number");
+				NodeStarted = true;
+				_startedHandle.Set();
 			}
 
 			// if we have dont a writer always return true
-			if (this.Writer != null) return true;
+			if (Writer != null) return true;
 			//otherwise only keep buffering if we are not started
 			return !started;
 		}

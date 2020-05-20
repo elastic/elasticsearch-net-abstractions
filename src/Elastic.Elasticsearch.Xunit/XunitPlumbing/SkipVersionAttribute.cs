@@ -29,7 +29,7 @@ namespace Elastic.Elasticsearch.Xunit.XunitPlumbing
 		public SkipVersionAttribute(string skipVersionRangesSeparatedByComma, string reason)
 		{
 			Reason = reason;
-			this.Ranges = string.IsNullOrEmpty(skipVersionRangesSeparatedByComma)
+			Ranges = string.IsNullOrEmpty(skipVersionRangesSeparatedByComma)
 				? new List<Range>()
 				: skipVersionRangesSeparatedByComma.Split(',')
 					.Select(r => r.Trim())

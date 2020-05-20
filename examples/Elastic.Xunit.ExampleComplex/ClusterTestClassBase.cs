@@ -12,11 +12,8 @@ namespace Elastic.Xunit.ExampleComplex
 		where TCluster : IEphemeralCluster<EphemeralClusterConfiguration>, IMyCluster, new()
 	{
 		public TCluster Cluster { get; }
-		public IElasticClient Client => this.Cluster.Client;
+		public IElasticClient Client => Cluster.Client;
 
-		protected ClusterTestClassBase(TCluster cluster)
-		{
-			this.Cluster = cluster;
-		}
+		protected ClusterTestClassBase(TCluster cluster) => Cluster = cluster;
 	}
 }

@@ -26,8 +26,8 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 			CancellationTokenSource cancellationTokenSource)
 			: base(testCollection, testCases, diagnosticMessageSink, messageBus, testCaseOrderer, aggregator, cancellationTokenSource)
 		{
-			this._assemblyFixtureMappings = assemblyFixtureMappings;
-			this._diagnosticMessageSink = diagnosticMessageSink;
+			_assemblyFixtureMappings = assemblyFixtureMappings;
+			_diagnosticMessageSink = diagnosticMessageSink;
 		}
 
 		protected override Task<RunSummary> RunTestClassAsync(ITestClass testClass, IReflectionTypeInfo @class, IEnumerable<IXunitTestCase> testCases)

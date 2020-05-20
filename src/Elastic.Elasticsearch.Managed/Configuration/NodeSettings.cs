@@ -19,12 +19,12 @@ namespace Elastic.Elasticsearch.Managed.Configuration
 			var s = setting.Split(new[] {'='}, 2, StringSplitOptions.RemoveEmptyEntries);
 			if (s.Length != 2)
 				throw new ArgumentException($"Can only add node settings in key=value from but received: {setting}");
-			this.Add(new NodeSetting(s[0], s[1], null));
+			Add(new NodeSetting(s[0], s[1], null));
 
 		}
-		public void Add(string key, string value) => this.Add(new NodeSetting(key, value, null));
+		public void Add(string key, string value) => Add(new NodeSetting(key, value, null));
 
-		public void Add(string key, string value, string versionRange) => this.Add(new NodeSetting(key, value, versionRange));
+		public void Add(string key, string value, string versionRange) => Add(new NodeSetting(key, value, versionRange));
 
 		private static readonly ElasticVersion LastVersionWithoutPrefixForSettings = ElasticVersion.From("5.0.0-alpha2");
 

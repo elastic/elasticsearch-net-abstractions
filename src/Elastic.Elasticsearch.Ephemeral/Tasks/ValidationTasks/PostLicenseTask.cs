@@ -15,17 +15,17 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.ValidationTasks
 			if (string.IsNullOrWhiteSpace(cluster.ClusterConfiguration.XPackLicenseJson))
 			{
 				cluster.Writer.WriteDiagnostic($"{{{nameof(PostLicenseTask)}}} no license file available to post");
-				this.StartTrial(cluster);
+				StartTrial(cluster);
 				return;
 			}
 
 			cluster.Writer.WriteDiagnostic($"{{{nameof(PostLicenseTask)}}} attempting to post license json");
 
 			var licenseUrl = cluster.ClusterConfiguration.Version.Major < 8 ? "_xpack/license" : "_license";
-			var postResponse = this.Post(cluster, licenseUrl, "", cluster.ClusterConfiguration.XPackLicenseJson);
+			var postResponse = Post(cluster, licenseUrl, "", cluster.ClusterConfiguration.XPackLicenseJson);
 			if (postResponse != null && postResponse.IsSuccessStatusCode) return;
 
-			var details = postResponse != null ? this.GetResponseException(postResponse) : "";
+			var details = postResponse != null ? GetResponseException(postResponse) : "";
 			throw new Exception($"The license that was posted was not accepted: {details}");
 		}
 
@@ -44,7 +44,7 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.ValidationTasks
 			{
 				//TODO make this configurable for either trial or basic
 				cluster.Writer.WriteDiagnostic($"{{{nameof(PostLicenseTask)}}} attempt to start trial license");
-				var postResponse = this.Post(cluster, $"{licenseUrl}/start_trial", "acknowledge=true", string.Empty);
+				var postResponse = Post(cluster, $"{licenseUrl}/start_trial", "acknowledge=true", string.Empty);
 				if (postResponse != null && postResponse.IsSuccessStatusCode) return;
 			}
 
@@ -52,7 +52,7 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.ValidationTasks
 			{
 				//TODO make this configurable for either trial or basic
 				cluster.Writer.WriteDiagnostic($"{{{nameof(PostLicenseTask)}}} attempt to start basic license");
-				var postResponse = this.Post(cluster, $"{licenseUrl}/start_basic", "acknowledge=true", string.Empty);
+				var postResponse = Post(cluster, $"{licenseUrl}/start_basic", "acknowledge=true", string.Empty);
 				if (postResponse != null && postResponse.IsSuccessStatusCode) return;
 			}
 

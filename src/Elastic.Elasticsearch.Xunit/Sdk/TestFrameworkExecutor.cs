@@ -20,19 +20,19 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 
 		public override void RunAll(IMessageSink executionMessageSink, ITestFrameworkDiscoveryOptions discoveryOptions, ITestFrameworkExecutionOptions executionOptions)
 		{
-			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.Version), this.Options.Version);
-			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), this.Options.RunIntegrationTests);
-			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.IntegrationTestsMayUseAlreadyRunningNode), this.Options.IntegrationTestsMayUseAlreadyRunningNode);
-			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), this.Options.RunUnitTests);
-			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.TestFilter), this.Options.TestFilter);
-			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.ClusterFilter), this.Options.ClusterFilter);
+			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.Version), Options.Version);
+			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), Options.RunIntegrationTests);
+			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.IntegrationTestsMayUseAlreadyRunningNode), Options.IntegrationTestsMayUseAlreadyRunningNode);
+			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), Options.RunUnitTests);
+			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.TestFilter), Options.TestFilter);
+			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.ClusterFilter), Options.ClusterFilter);
 
-			executionOptions.SetValue(nameof(ElasticXunitRunOptions.Version), this.Options.Version);
-			executionOptions.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), this.Options.RunIntegrationTests);
-			executionOptions.SetValue(nameof(ElasticXunitRunOptions.IntegrationTestsMayUseAlreadyRunningNode), this.Options.IntegrationTestsMayUseAlreadyRunningNode);
-			executionOptions.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), this.Options.RunUnitTests);
-			executionOptions.SetValue(nameof(ElasticXunitRunOptions.TestFilter), this.Options.TestFilter);
-			executionOptions.SetValue(nameof(ElasticXunitRunOptions.ClusterFilter), this.Options.ClusterFilter);
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.Version), Options.Version);
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), Options.RunIntegrationTests);
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.IntegrationTestsMayUseAlreadyRunningNode), Options.IntegrationTestsMayUseAlreadyRunningNode);
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), Options.RunUnitTests);
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.TestFilter), Options.TestFilter);
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.ClusterFilter), Options.ClusterFilter);
 
 			base.RunAll(executionMessageSink, discoveryOptions, executionOptions);
 		}
@@ -40,41 +40,41 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 
 		public override void RunTests(IEnumerable<ITestCase> testCases, IMessageSink executionMessageSink, ITestFrameworkExecutionOptions executionOptions)
 		{
-			executionOptions.SetValue(nameof(ElasticXunitRunOptions.Version), this.Options.Version);
-			executionOptions.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), this.Options.RunIntegrationTests);
-			executionOptions.SetValue(nameof(ElasticXunitRunOptions.IntegrationTestsMayUseAlreadyRunningNode), this.Options.IntegrationTestsMayUseAlreadyRunningNode);
-			executionOptions.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), this.Options.RunUnitTests);
-			executionOptions.SetValue(nameof(ElasticXunitRunOptions.TestFilter), this.Options.TestFilter);
-			executionOptions.SetValue(nameof(ElasticXunitRunOptions.ClusterFilter), this.Options.ClusterFilter);
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.Version), Options.Version);
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), Options.RunIntegrationTests);
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.IntegrationTestsMayUseAlreadyRunningNode), Options.IntegrationTestsMayUseAlreadyRunningNode);
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), Options.RunUnitTests);
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.TestFilter), Options.TestFilter);
+			executionOptions.SetValue(nameof(ElasticXunitRunOptions.ClusterFilter), Options.ClusterFilter);
 			base.RunTests(testCases, executionMessageSink, executionOptions);
 		}
 
 		protected override async void RunTestCases(IEnumerable<IXunitTestCase> testCases, IMessageSink sink, ITestFrameworkExecutionOptions options)
 		{
-			options.SetValue(nameof(ElasticXunitRunOptions.Version), this.Options.Version);
-			options.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), this.Options.RunIntegrationTests);
-			options.SetValue(nameof(ElasticXunitRunOptions.IntegrationTestsMayUseAlreadyRunningNode), this.Options.IntegrationTestsMayUseAlreadyRunningNode);
-			options.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), this.Options.RunUnitTests);
-			options.SetValue(nameof(ElasticXunitRunOptions.TestFilter), this.Options.TestFilter);
-			options.SetValue(nameof(ElasticXunitRunOptions.ClusterFilter), this.Options.ClusterFilter);
+			options.SetValue(nameof(ElasticXunitRunOptions.Version), Options.Version);
+			options.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), Options.RunIntegrationTests);
+			options.SetValue(nameof(ElasticXunitRunOptions.IntegrationTestsMayUseAlreadyRunningNode), Options.IntegrationTestsMayUseAlreadyRunningNode);
+			options.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), Options.RunUnitTests);
+			options.SetValue(nameof(ElasticXunitRunOptions.TestFilter), Options.TestFilter);
+			options.SetValue(nameof(ElasticXunitRunOptions.ClusterFilter), Options.ClusterFilter);
 			try
 			{
 				using (var runner = new TestAssemblyRunner(TestAssembly, testCases, DiagnosticMessageSink, sink, options))
 				{
-					this.Options.OnBeforeTestsRun();
+					Options.OnBeforeTestsRun();
 					await runner.RunAsync();
-					this.Options.OnTestsFinished(runner.ClusterTotals, runner.FailedCollections);
+					Options.OnTestsFinished(runner.ClusterTotals, runner.FailedCollections);
 				}
 			}
 			catch (Exception e)
 			{
 				if (e is ElasticsearchCleanExitException || e is AggregateException ae && ae.Flatten().InnerException is ElasticsearchCleanExitException)
 				{
-					sink.OnMessage(new TestAssemblyCleanupFailure(Enumerable.Empty<ITestCase>(), this.TestAssembly,
+					sink.OnMessage(new TestAssemblyCleanupFailure(Enumerable.Empty<ITestCase>(), TestAssembly,
 						new ElasticsearchCleanExitException("Node failed to start", e)));
 				}
 				else
-					sink.OnMessage(new TestAssemblyCleanupFailure(Enumerable.Empty<ITestCase>(), this.TestAssembly, e));
+					sink.OnMessage(new TestAssemblyCleanupFailure(Enumerable.Empty<ITestCase>(), TestAssembly, e));
 				throw;
 			}
 		}

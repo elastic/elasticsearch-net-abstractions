@@ -29,17 +29,15 @@ namespace Elastic.Elasticsearch.Xunit.XunitPlumbing
 			IMessageBus messageBus,
 			object[] constructorArguments,
 			ExceptionAggregator aggregator,
-			CancellationTokenSource cancellationTokenSource)
-		{
-			return new XunitTestCaseRunner(
+			CancellationTokenSource cancellationTokenSource) =>
+			new XunitTestCaseRunner(
 				this,
-				this.DisplayName,
-				this.SkipReason,
+				DisplayName,
+				SkipReason,
 				constructorArguments,
-				this.TestMethodArguments,
+				TestMethodArguments,
 				messageBus,
 				aggregator,
 				cancellationTokenSource).RunAsync();
-		}
 	}
 }

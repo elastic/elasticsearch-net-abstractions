@@ -22,7 +22,7 @@ namespace Elastic.Elasticsearch.Xunit
 		public ElasticXunitConfigurationAttribute(Type type)
 		{
 			var options = Activator.CreateInstance(type) as ElasticXunitRunOptions;
-			this.Options = options ?? new ElasticXunitRunOptions();
+			Options = options ?? new ElasticXunitRunOptions();
 		}
 
 		/// <summary>

@@ -25,14 +25,14 @@ namespace Elastic.Elasticsearch.Ephemeral
 		public EphemeralClusterConfiguration(ElasticVersion version, ClusterFeatures features, ElasticsearchPlugins plugins = null, int numberOfNodes = 1)
 			: base(version, (v, s) => new EphemeralFileSystem(v, s), numberOfNodes, EphemeralClusterName)
 		{
-			this.TrialMode = XPackTrialMode.None;
-			this.Features = features;
+			TrialMode = XPackTrialMode.None;
+			Features = features;
 
 			var pluginsList = plugins?.ToList() ?? new List<ElasticsearchPlugin>();
-			if (this.Features.HasFlag(ClusterFeatures.XPack) && pluginsList.All(p => p.SubProductName != "x-pack"))
+			if (Features.HasFlag(ClusterFeatures.XPack) && pluginsList.All(p => p.SubProductName != "x-pack"))
 				pluginsList.Add(ElasticsearchPlugin.XPack);
 
-			this.Plugins = new ElasticsearchPlugins(pluginsList);
+			Plugins = new ElasticsearchPlugins(pluginsList);
 
 			AddDefaultXPackSettings();
 		}
@@ -54,14 +54,14 @@ namespace Elastic.Elasticsearch.Ephemeral
 		/// </summary>
 		public bool ValidatePluginsToInstall { get; } = true;
 
-		public bool XPackInstalled => this.Features.HasFlag(ClusterFeatures.XPack)
-		                              || this.Version >= "6.3.0"
-		                              || this.Plugins.Any(p => p.SubProductName == "x-pack")
-		                              || this.EnableSsl
-		                              || this.EnableSecurity;
+		public bool XPackInstalled => Features.HasFlag(ClusterFeatures.XPack)
+		                              || Version >= "6.3.0"
+		                              || Plugins.Any(p => p.SubProductName == "x-pack")
+		                              || EnableSsl
+		                              || EnableSecurity;
 
-		public bool EnableSecurity => this.Features.HasFlag(ClusterFeatures.Security) || this.EnableSsl;
-		public bool EnableSsl => this.Features.HasFlag(ClusterFeatures.SSL);
+		public bool EnableSecurity => Features.HasFlag(ClusterFeatures.Security) || EnableSsl;
+		public bool EnableSsl => Features.HasFlag(ClusterFeatures.SSL);
 
 		public IList<IClusterComposeTask> AdditionalBeforeNodeStartedTasks { get; } = new List<IClusterComposeTask>();
 
@@ -87,7 +87,7 @@ namespace Elastic.Elasticsearch.Ephemeral
 		public override string CreateNodeName(int? node)
 		{
 			var suffix = Guid.NewGuid().ToString("N").Substring(0, 6);
-			return $"{this.NodePrefix}-node-{suffix}{node}";
+			return $"{NodePrefix}-node-{suffix}{node}";
 		}
 
 		protected virtual string NodePrefix => "ephemeral";
@@ -98,47 +98,47 @@ namespace Elastic.Elasticsearch.Ephemeral
 
 		public void AddSecuritySetting(string key, string value, string range)
 		{
-			if (!this.XPackInstalled) return;
-			var shieldOrSecurity = this.Version > LastVersionThatAcceptedShieldSettings ? "xpack.security" : "shield";
+			if (!XPackInstalled) return;
+			var shieldOrSecurity = Version > LastVersionThatAcceptedShieldSettings ? "xpack.security" : "shield";
 			key = Regex.Replace(key, @"^(?:xpack\.security|shield)\.", "");
-			this.Add($"{shieldOrSecurity}.{key}", value, range);
+			Add($"{shieldOrSecurity}.{key}", value, range);
 		}
 
 		private void AddDefaultXPackSettings()
 		{
-			if (!this.XPackInstalled) return;
+			if (!XPackInstalled) return;
 
-			var securityEnabled = this.EnableSecurity.ToString().ToLowerInvariant();
-            var sslEnabled = this.EnableSsl.ToString().ToLowerInvariant();
-			this.AddSecuritySetting("enabled", securityEnabled);
+			var securityEnabled = EnableSecurity.ToString().ToLowerInvariant();
+            var sslEnabled = EnableSsl.ToString().ToLowerInvariant();
+			AddSecuritySetting("enabled", securityEnabled);
 
-            this.AddSecuritySetting("http.ssl.enabled", sslEnabled);
-            this.AddSecuritySetting("transport.ssl.enabled", sslEnabled);
-			if (this.EnableSecurity && this.EnableSsl)
+            AddSecuritySetting("http.ssl.enabled", sslEnabled);
+            AddSecuritySetting("transport.ssl.enabled", sslEnabled);
+			if (EnableSecurity && EnableSsl)
 			{
-	           	this.AddSecuritySetting("authc.realms.pki1.enabled", sslEnabled, "<7.0.0-beta1");
-	           	this.AddSecuritySetting("authc.realms.pki.pki1.enabled", sslEnabled, ">=7.0.0-beta1");
+	           	AddSecuritySetting("authc.realms.pki1.enabled", sslEnabled, "<7.0.0-beta1");
+	           	AddSecuritySetting("authc.realms.pki.pki1.enabled", sslEnabled, ">=7.0.0-beta1");
 			}
 
-			if (this.EnableSsl)
+			if (EnableSsl)
 			{
-				this.AddSecuritySetting("authc.token.enabled", "true", ">=5.5.0");
-				if (this.Version < "7.0.0-beta1")
+				AddSecuritySetting("authc.token.enabled", "true", ">=5.5.0");
+				if (Version < "7.0.0-beta1")
 				{
-					this.Add("xpack.ssl.key", this.FileSystem.NodePrivateKey);
-					this.Add("xpack.ssl.certificate", this.FileSystem.NodeCertificate);
-					this.Add("xpack.ssl.certificate_authorities", this.FileSystem.CaCertificate);
+					Add("xpack.ssl.key", FileSystem.NodePrivateKey);
+					Add("xpack.ssl.certificate", FileSystem.NodeCertificate);
+					Add("xpack.ssl.certificate_authorities", FileSystem.CaCertificate);
 
 				}
 				else
 				{
-					this.Add("xpack.security.transport.ssl.key", this.FileSystem.NodePrivateKey);
-					this.Add("xpack.security.transport.ssl.certificate", this.FileSystem.NodeCertificate);
-					this.Add("xpack.security.transport.ssl.certificate_authorities", this.FileSystem.CaCertificate);
+					Add("xpack.security.transport.ssl.key", FileSystem.NodePrivateKey);
+					Add("xpack.security.transport.ssl.certificate", FileSystem.NodeCertificate);
+					Add("xpack.security.transport.ssl.certificate_authorities", FileSystem.CaCertificate);
 
-					this.Add("xpack.security.http.ssl.key", this.FileSystem.NodePrivateKey);
-					this.Add("xpack.security.http.ssl.certificate", this.FileSystem.NodeCertificate);
-					this.Add("xpack.security.http.ssl.certificate_authorities", this.FileSystem.CaCertificate);
+					Add("xpack.security.http.ssl.key", FileSystem.NodePrivateKey);
+					Add("xpack.security.http.ssl.certificate", FileSystem.NodeCertificate);
+					Add("xpack.security.http.ssl.certificate_authorities", FileSystem.CaCertificate);
 
 				}
 

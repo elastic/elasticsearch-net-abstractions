@@ -18,13 +18,13 @@ namespace Elastic.Elasticsearch.Managed.Configuration
 
 		public NodeConfiguration(IClusterConfiguration<NodeFileSystem> clusterConfiguration, int? port = null, string nodePrefix = null)
 		{
-			this.ClusterConfiguration = clusterConfiguration;
-			this.DesiredPort = port;
-			this.DesiredNodeName = this.CreateNodeName(port, nodePrefix) ?? clusterConfiguration.CreateNodeName(port);
-			this.Settings = new NodeSettings(clusterConfiguration.DefaultNodeSettings);
+			ClusterConfiguration = clusterConfiguration;
+			DesiredPort = port;
+			DesiredNodeName = CreateNodeName(port, nodePrefix) ?? clusterConfiguration.CreateNodeName(port);
+			Settings = new NodeSettings(clusterConfiguration.DefaultNodeSettings);
 
-			if (!string.IsNullOrWhiteSpace(this.DesiredNodeName)) this.Settings.Add("node.name", this.DesiredNodeName);
-			if (this.DesiredPort.HasValue) this.Settings.Add("http.port", this.DesiredPort.Value.ToString(CultureInfo.InvariantCulture));
+			if (!string.IsNullOrWhiteSpace(DesiredNodeName)) Settings.Add("node.name", DesiredNodeName);
+			if (DesiredPort.HasValue) Settings.Add("http.port", DesiredPort.Value.ToString(CultureInfo.InvariantCulture));
 		}
 
 		private IClusterConfiguration<NodeFileSystem> ClusterConfiguration { get; }
@@ -55,19 +55,19 @@ namespace Elastic.Elasticsearch.Managed.Configuration
 		/// </summary>
 		public NodeSettings Settings { get; }
 
-		public INodeFileSystem FileSystem => this.ClusterConfiguration.FileSystem;
-		public ElasticVersion Version => this.ClusterConfiguration.Version;
-		public string[] CommandLineArguments => this.Settings.ToCommandLineArguments(this.Version);
+		public INodeFileSystem FileSystem => ClusterConfiguration.FileSystem;
+		public ElasticVersion Version => ClusterConfiguration.Version;
+		public string[] CommandLineArguments => Settings.ToCommandLineArguments(Version);
 
 		public void InitialMasterNodes(string initialMasterNodes) => Settings.Add("cluster.initial_master_nodes", initialMasterNodes, ">=7.0.0.beta1");
 
 		public string AttributeKey(string attribute)
 		{
-			var attr = this.Version.Major >= 5 ? "attr." : "";
+			var attr = Version.Major >= 5 ? "attr." : "";
 			return $"node.{attr}{attribute}";
 		}
 
-		public void Add(string key, string value) => this.Settings.Add(key,value);
+		public void Add(string key, string value) => Settings.Add(key,value);
 
 		private string CreateNodeName(int? node, string prefix = null)
 		{

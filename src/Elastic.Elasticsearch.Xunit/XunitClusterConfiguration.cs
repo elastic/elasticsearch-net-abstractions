@@ -16,10 +16,8 @@ namespace Elastic.Elasticsearch.Xunit
 			ClusterFeatures features = ClusterFeatures.None,
 			ElasticsearchPlugins plugins = null,
 			int numberOfNodes = 1)
-			: base(version, features, plugins, numberOfNodes)
-		{
-			this.AdditionalAfterStartedTasks.Add(new PrintXunitAfterStartedTask());
-		}
+			: base(version, features, plugins, numberOfNodes) =>
+			AdditionalAfterStartedTasks.Add(new PrintXunitAfterStartedTask());
 
 		/// <inheritdoc />
 		protected override string NodePrefix => "xunit";

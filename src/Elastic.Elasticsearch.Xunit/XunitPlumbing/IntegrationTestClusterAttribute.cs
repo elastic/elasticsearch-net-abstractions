@@ -14,7 +14,7 @@ namespace Elastic.Elasticsearch.Xunit.XunitPlumbing
 		{
 			if (!TestAssemblyRunner.IsAnIntegrationTestClusterType(clusterType))
 				throw new ArgumentException($"Cluster must be subclass of {nameof(XunitClusterBase)} or {nameof(XunitClusterBase)}<>");
-			this.ClusterType = clusterType;
+			ClusterType = clusterType;
 		}
 
 		public Type ClusterType { get; }

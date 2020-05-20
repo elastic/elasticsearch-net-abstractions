@@ -14,7 +14,7 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 		{
 			var a = Assembly.Load(new AssemblyName(assemblyInfo.Name));
 			var options = a.GetCustomAttribute<ElasticXunitConfigurationAttribute>()?.Options ?? new ElasticXunitRunOptions();
-			this.Options = options;
+			Options = options;
 		}
 
 		/// <summary>
@@ -24,12 +24,12 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 
 		protected override bool FindTestsForType(ITestClass testClass, bool includeSourceInformation, IMessageBus messageBus, ITestFrameworkDiscoveryOptions discoveryOptions)
 		{
-			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.Version), this.Options.Version);
-			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), this.Options.RunIntegrationTests);
-			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.IntegrationTestsMayUseAlreadyRunningNode), this.Options.IntegrationTestsMayUseAlreadyRunningNode);
-			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), this.Options.RunUnitTests);
-			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.TestFilter), this.Options.TestFilter);
-			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.ClusterFilter), this.Options.ClusterFilter);
+			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.Version), Options.Version);
+			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.RunIntegrationTests), Options.RunIntegrationTests);
+			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.IntegrationTestsMayUseAlreadyRunningNode), Options.IntegrationTestsMayUseAlreadyRunningNode);
+			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.RunUnitTests), Options.RunUnitTests);
+			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.TestFilter), Options.TestFilter);
+			discoveryOptions.SetValue(nameof(ElasticXunitRunOptions.ClusterFilter), Options.ClusterFilter);
 			return base.FindTestsForType(testClass, includeSourceInformation, messageBus, discoveryOptions);
 		}
 	}

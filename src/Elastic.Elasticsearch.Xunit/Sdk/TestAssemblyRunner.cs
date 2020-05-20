@@ -44,14 +44,14 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 			: base(testAssembly, testCases, diagnosticMessageSink, executionMessageSink, executionOptions)
 		{
 			var tests = OrderTestCollections();
-			this.RunIntegrationTests = executionOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.RunIntegrationTests));
-			this.IntegrationTestsMayUseAlreadyRunningNode = executionOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.IntegrationTestsMayUseAlreadyRunningNode));
-			this.RunUnitTests = executionOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.RunUnitTests));
-			this.TestFilter = executionOptions.GetValue<string>(nameof(ElasticXunitRunOptions.TestFilter));
-			this.ClusterFilter = executionOptions.GetValue<string>(nameof(ElasticXunitRunOptions.ClusterFilter));
+			RunIntegrationTests = executionOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.RunIntegrationTests));
+			IntegrationTestsMayUseAlreadyRunningNode = executionOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.IntegrationTestsMayUseAlreadyRunningNode));
+			RunUnitTests = executionOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.RunUnitTests));
+			TestFilter = executionOptions.GetValue<string>(nameof(ElasticXunitRunOptions.TestFilter));
+			ClusterFilter = executionOptions.GetValue<string>(nameof(ElasticXunitRunOptions.ClusterFilter));
 
 			//bit side effecty, sets up _assemblyFixtureMappings before possibly letting xunit do its regular concurrency thing
-			this._grouped = (from c in tests
+			_grouped = (from c in tests
 							 let cluster = ClusterFixture(c.Item2.First().TestMethod.TestClass)
 							 let testcase = new GroupedByCluster { Collection = c.Item1, TestCases = c.Item2, Cluster = cluster }
 							 group testcase by testcase.Cluster
@@ -80,7 +80,7 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 			//threading guess
 			var defaultMaxConcurrency = Environment.ProcessorCount * 4;
 
-			if (this.RunUnitTests && !this.RunIntegrationTests)
+			if (RunUnitTests && !RunIntegrationTests)
 				return await UnitTestPipeline(defaultMaxConcurrency, messageBus, cancellationTokenSource);
 
 			return await IntegrationPipeline(defaultMaxConcurrency, messageBus, cancellationTokenSource);
@@ -93,35 +93,35 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 			//foreach (var g in this._grouped) g.Key?.Start();
 
 			var testFilters = CreateTestFilters(TestFilter);
-			await this._grouped.SelectMany(g => g)
+			await _grouped.SelectMany(g => g)
 				.ForEachAsync(defaultMaxConcurrency, async g => { await RunTestCollections(messageBus, ctx, g, testFilters); });
 			//foreach (var g in this._grouped) g.Key?.Dispose();
 
 			return new RunSummary
 			{
-				Total = this.Summaries.Sum(s => s.Total),
-				Failed = this.Summaries.Sum(s => s.Failed),
-				Skipped = this.Summaries.Sum(s => s.Skipped)
+				Total = Summaries.Sum(s => s.Total),
+				Failed = Summaries.Sum(s => s.Failed),
+				Skipped = Summaries.Sum(s => s.Skipped)
 			};
 		}
 
 		private async Task<RunSummary> IntegrationPipeline(int defaultMaxConcurrency, IMessageBus messageBus, CancellationTokenSource ctx)
 		{
 			var testFilters = CreateTestFilters(TestFilter);
-			foreach (var group in this._grouped)
+			foreach (var group in _grouped)
 			{
 				ElasticXunitRunner.CurrentCluster = @group.Key;
 				if (@group.Key == null)
 				{
 					var testCount = @group.SelectMany(q => q.TestCases).Count();
 					Console.WriteLine($" -> Several tests skipped because they have no cluster associated");
-					this.Summaries.Add(new RunSummary { Total = testCount, Skipped = testCount});
+					Summaries.Add(new RunSummary { Total = testCount, Skipped = testCount});
 					continue;
 				}
 
 				var type = @group.Key.GetType();
 				var clusterName = type.Name.Replace("Cluster", string.Empty) ?? "UNKNOWN";
-				if (!this.MatchesClusterFilter(clusterName)) continue;
+				if (!MatchesClusterFilter(clusterName)) continue;
 
 				var dop= @group.Key.ClusterConfiguration?.MaxConcurrency ?? defaultMaxConcurrency;
 				dop = dop <= 0 ? defaultMaxConcurrency : dop;
@@ -133,11 +133,11 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 				if (allSkipped)
 				{
 					Console.WriteLine($" -> All tests from {clusterName} are skipped under the current configuration");
-					this.Summaries.Add(new RunSummary { Total = skipReasons.Count, Skipped = skipReasons.Count});
+					Summaries.Add(new RunSummary { Total = skipReasons.Count, Skipped = skipReasons.Count});
 					continue;
 				}
 
-				this.ClusterTotals.Add(clusterName, Stopwatch.StartNew());
+				ClusterTotals.Add(clusterName, Stopwatch.StartNew());
 				bool ValidateRunningVersion()
 				{
 					try
@@ -154,19 +154,19 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 
 				using (@group.Key)
 				{
-					if (!this.IntegrationTestsMayUseAlreadyRunningNode || !ValidateRunningVersion())
+					if (!IntegrationTestsMayUseAlreadyRunningNode || !ValidateRunningVersion())
 						@group.Key?.Start(timeout);
 
 					await @group.ForEachAsync(dop, async g => { await RunTestCollections(messageBus, ctx, g, testFilters); });
 				}
-				this.ClusterTotals[clusterName].Stop();
+				ClusterTotals[clusterName].Stop();
 			}
 
 			return new RunSummary
 			{
-				Total = this.Summaries.Sum(s => s.Total),
-				Failed = this.Summaries.Sum(s => s.Failed),
-				Skipped = this.Summaries.Sum(s => s.Skipped)
+				Total = Summaries.Sum(s => s.Total),
+				Failed = Summaries.Sum(s => s.Failed),
+				Skipped = Summaries.Sum(s => s.Skipped)
 			};
 		}
 
@@ -182,8 +182,8 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 				var type = g.Cluster?.GetType();
 				var clusterName = type?.Name.Replace("Cluster", "") ?? "UNKNOWN";
 				if (summary.Failed > 0)
-					this.FailedCollections.Add(Tuple.Create(clusterName, test));
-				this.Summaries.Add(summary);
+					FailedCollections.Add(Tuple.Create(clusterName, test));
+				Summaries.Add(summary);
 			}
 			catch (TaskCanceledException)
 			{
@@ -204,8 +204,8 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 
 		private bool MatchesClusterFilter(string cluster)
 		{
-			if (string.IsNullOrWhiteSpace(cluster) || string.IsNullOrWhiteSpace(this.ClusterFilter)) return true;
-			return this.ClusterFilter
+			if (string.IsNullOrWhiteSpace(cluster) || string.IsNullOrWhiteSpace(ClusterFilter)) return true;
+			return ClusterFilter
 				.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
 				.Select(c => c.Trim())
 				.Any(c => cluster.IndexOf(c, StringComparison.OrdinalIgnoreCase) >= 0);

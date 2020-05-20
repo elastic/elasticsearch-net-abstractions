@@ -66,23 +66,23 @@ namespace Elastic.Elasticsearch.Ephemeral
 	public class EphemeralClusterComposer<TConfiguration> : EphemeralClusterComposerBase
 		where TConfiguration : EphemeralClusterConfiguration
 	{
-		public EphemeralClusterComposer(IEphemeralCluster<TConfiguration> cluster) => this.Cluster = cluster;
+		public EphemeralClusterComposer(IEphemeralCluster<TConfiguration> cluster) => Cluster = cluster;
 
 		private IEphemeralCluster<TConfiguration> Cluster { get; }
 
 		private bool NodeStarted { get; set; }
 
-		public void OnStop() => Itterate(NodeStoppedTasks, (t, c, fs) => t.Run(c, this.NodeStarted), callOnStop: false);
+		public void OnStop() => Itterate(NodeStoppedTasks, (t, c, fs) => t.Run(c, NodeStarted), callOnStop: false);
 
 		public void Install() => Itterate(InstallationTasks, (t, c, fs) => t.Run(c));
 
 		public void OnBeforeStart()
 		{
 			var tasks = new List<IClusterComposeTask>(BeforeStart);
-			if (this.Cluster.ClusterConfiguration.AdditionalBeforeNodeStartedTasks != null)
-				tasks.AddRange(this.Cluster.ClusterConfiguration.AdditionalBeforeNodeStartedTasks);
+			if (Cluster.ClusterConfiguration.AdditionalBeforeNodeStartedTasks != null)
+				tasks.AddRange(Cluster.ClusterConfiguration.AdditionalBeforeNodeStartedTasks);
 
-			if (this.Cluster.ClusterConfiguration.PrintYamlFilesInConfigFolder)
+			if (Cluster.ClusterConfiguration.PrintYamlFilesInConfigFolder)
 				tasks.Add(new PrintYamlContents());
 
 			Itterate(tasks, (t, c, fs) => t.Run(c));
@@ -92,10 +92,10 @@ namespace Elastic.Elasticsearch.Ephemeral
 
 		public void OnAfterStart()
 		{
-			if (this.Cluster.ClusterConfiguration.SkipBuiltInAfterStartTasks) return;
+			if (Cluster.ClusterConfiguration.SkipBuiltInAfterStartTasks) return;
 			var tasks = new List<IClusterComposeTask>(AfterStartedTasks);
-			if (this.Cluster.ClusterConfiguration.AdditionalAfterStartedTasks != null)
-				tasks.AddRange(this.Cluster.ClusterConfiguration.AdditionalAfterStartedTasks);
+			if (Cluster.ClusterConfiguration.AdditionalAfterStartedTasks != null)
+				tasks.AddRange(Cluster.ClusterConfiguration.AdditionalAfterStartedTasks);
 			Itterate(tasks, (t, c, fs) => t.Run(c), false);
 		}
 
@@ -104,7 +104,7 @@ namespace Elastic.Elasticsearch.Ephemeral
 		{
 			lock (_lock)
 			{
-				var cluster = this.Cluster;
+				var cluster = Cluster;
 				foreach (var task in collection)
 				{
 					try
@@ -113,7 +113,7 @@ namespace Elastic.Elasticsearch.Ephemeral
 					}
 					catch (Exception)
 					{
-						if (callOnStop) this.OnStop();
+						if (callOnStop) OnStop();
 						throw;
 					}
 				}

@@ -12,9 +12,8 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 {
 	internal static class ForEachAsyncExtensions
 	{
-		internal static Task ForEachAsync<T>(this IEnumerable<T> source, int dop, Func<T, Task> body)
-		{
-			return Task.WhenAll(
+		internal static Task ForEachAsync<T>(this IEnumerable<T> source, int dop, Func<T, Task> body) =>
+			Task.WhenAll(
 				from partition in Partitioner.Create(source).GetPartitions(dop)
 				select Task.Run(async delegate
 				{
@@ -22,7 +21,5 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 						while (partition.MoveNext())
 							await body(partition.Current);
 				}));
-		}
-
 	}
 }

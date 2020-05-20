@@ -11,14 +11,11 @@ namespace Elastic.Elasticsearch.Ephemeral
 {
 	public class EphemeralFileSystem : NodeFileSystem
 	{
-		public EphemeralFileSystem(ElasticVersion version, string clusterName) : base(version, EphemeralHome(version, clusterName))
-		{
-			this.ClusterName = clusterName;
-		}
+		public EphemeralFileSystem(ElasticVersion version, string clusterName) : base(version, EphemeralHome(version, clusterName)) => ClusterName = clusterName;
 
 		private string ClusterName { get; }
 
-		public string TempFolder => Path.Combine(Path.GetTempPath(), SubFolder, this.Artifact.LocalFolderName, this.ClusterName);
+		public string TempFolder => Path.Combine(Path.GetTempPath(), SubFolder, Artifact.LocalFolderName, ClusterName);
 
 		public override string ConfigPath => Path.Combine(TempFolder, "config");
 		public override string LogsPath => Path.Combine(TempFolder, "logs");
@@ -31,18 +28,18 @@ namespace Elastic.Elasticsearch.Ephemeral
 		public string ClientCertificateName => "cn=John Doe,ou=example,o=com";
 		public string ClientCertificateFilename => "john_doe";
 
-		public string CertificatesPath => Path.Combine(this.ConfigPath, this.CertificateFolderName);
+		public string CertificatesPath => Path.Combine(ConfigPath, CertificateFolderName);
 
-		public string CaCertificate => Path.Combine(this.CertificatesPath, "ca", "ca") + ".crt";
-		public string NodePrivateKey => Path.Combine(this.CertificatesPath, this.CertificateNodeName, this.CertificateNodeName) + ".key";
-		public string NodeCertificate => Path.Combine(this.CertificatesPath, this.CertificateNodeName, this.CertificateNodeName) + ".crt";
-		public string ClientCertificate => Path.Combine(this.CertificatesPath, this.ClientCertificateFilename, this.ClientCertificateFilename) + ".crt";
-		public string ClientPrivateKey => Path.Combine(this.CertificatesPath, this.ClientCertificateFilename, this.ClientCertificateFilename) + ".key";
+		public string CaCertificate => Path.Combine(CertificatesPath, "ca", "ca") + ".crt";
+		public string NodePrivateKey => Path.Combine(CertificatesPath, CertificateNodeName, CertificateNodeName) + ".key";
+		public string NodeCertificate => Path.Combine(CertificatesPath, CertificateNodeName, CertificateNodeName) + ".crt";
+		public string ClientCertificate => Path.Combine(CertificatesPath, ClientCertificateFilename, ClientCertificateFilename) + ".crt";
+		public string ClientPrivateKey => Path.Combine(CertificatesPath, ClientCertificateFilename, ClientCertificateFilename) + ".key";
 
 		public string UnusedCertificateFolderName => $"unused-{CertificateFolderName}";
-		public string UnusedCertificatesPath => Path.Combine(this.ConfigPath, this.UnusedCertificateFolderName);
-		public string UnusedCaCertificate => Path.Combine(this.UnusedCertificatesPath, "ca", "ca") + ".crt";
-		public string UnusedClientCertificate => Path.Combine(this.UnusedCertificatesPath, this.ClientCertificateFilename, this.ClientCertificateFilename) + ".crt";
+		public string UnusedCertificatesPath => Path.Combine(ConfigPath, UnusedCertificateFolderName);
+		public string UnusedCaCertificate => Path.Combine(UnusedCertificatesPath, "ca", "ca") + ".crt";
+		public string UnusedClientCertificate => Path.Combine(UnusedCertificatesPath, ClientCertificateFilename, ClientCertificateFilename) + ".crt";
 
 
 		protected static string EphemeralHome(ElasticVersion version, string clusterName)

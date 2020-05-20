@@ -16,9 +16,9 @@ namespace Elastic.Elasticsearch.Managed.Configuration
 
 		public NodeSetting(string key, string value, string range)
 		{
-			this.Key = key;
-			this.Value = value;
-			this.VersionRange = range;
+			Key = key;
+			Value = value;
+			VersionRange = range;
 		}
 
 		public override string ToString() => $"{Key}={Value}";

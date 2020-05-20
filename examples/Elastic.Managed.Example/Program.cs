@@ -9,9 +9,9 @@ using Elastic.Elasticsearch.Managed.Configuration;
 namespace Elastic.Managed.Example
 {
 	//TODO ship with a simple cluster implementation
-	class Program
+	public static class Program
 	{
-		static void Main(string[] args)
+		public static void Main(string[] args)
 		{
 			var version = "6.3.0";
 			var esHome = Environment.ExpandEnvironmentVariables($@"%LOCALAPPDATA%\ElasticManaged\{version}\elasticsearch-{version}");

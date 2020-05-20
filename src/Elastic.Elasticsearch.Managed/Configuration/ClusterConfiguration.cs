@@ -52,25 +52,25 @@ namespace Elastic.Elasticsearch.Managed.Configuration
 		{
 			if (fileSystem == null) throw new ArgumentException(nameof(fileSystem));
 
-			this.ClusterName = clusterName;
-			this.Version = version;
-			this.Artifact = version.Artifact(Product.Elasticsearch);
-			this.FileSystem = fileSystem(this.Version, this.ClusterName);
-			this.NumberOfNodes = numberOfNodes;
+			ClusterName = clusterName;
+			Version = version;
+			Artifact = version.Artifact(Product.Elasticsearch);
+			FileSystem = fileSystem(Version, ClusterName);
+			NumberOfNodes = numberOfNodes;
 
-			var fs = this.FileSystem;
-			this.Add("node.max_local_storage_nodes", numberOfNodes.ToString(CultureInfo.InvariantCulture), "<8.0.0");
+			var fs = FileSystem;
+			Add("node.max_local_storage_nodes", numberOfNodes.ToString(CultureInfo.InvariantCulture), "<8.0.0");
 
 			if (version < "7.0.0-beta1")
-				this.Add("discovery.zen.minimum_master_nodes", Quorum(numberOfNodes).ToString(CultureInfo.InvariantCulture));
+				Add("discovery.zen.minimum_master_nodes", Quorum(numberOfNodes).ToString(CultureInfo.InvariantCulture));
 
-			this.Add("cluster.name", clusterName);
-			this.Add("path.repo", fs.RepositoryPath);
-			this.Add("path.data", fs.DataPath);
+			Add("cluster.name", clusterName);
+			Add("path.repo", fs.RepositoryPath);
+			Add("path.data", fs.DataPath);
 			var logsPathDefault = Path.Combine(fs.ElasticsearchHome, "logs");
-			if (logsPathDefault != fs.LogsPath) this.Add("path.logs", fs.LogsPath);
+			if (logsPathDefault != fs.LogsPath) Add("path.logs", fs.LogsPath);
 
-			if (version.Major < 6) this.Add("path.conf", fs.ConfigPath);
+			if (version.Major < 6) Add("path.conf", fs.ConfigPath);
 
 		}
 
@@ -112,7 +112,7 @@ namespace Elastic.Elasticsearch.Managed.Configuration
 		/// </summary>
 		public string AttributeKey(string attribute)
 		{
-			var attr = this.Version.Major >= 5 ? "attr." : "";
+			var attr = Version.Major >= 5 ? "attr." : "";
 			return $"node.{attr}{attribute}";
 		}
 
@@ -122,7 +122,7 @@ namespace Elastic.Elasticsearch.Managed.Configuration
 		protected void Add(string key, string value)
 		{
 			if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value)) return;
-			this.DefaultNodeSettings.Add(key,value);
+			DefaultNodeSettings.Add(key,value);
 		}
 
 		/// <summary>
@@ -132,8 +132,8 @@ namespace Elastic.Elasticsearch.Managed.Configuration
 		protected void Add(string key, string value, string range)
 		{
 			if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value)) return;
-			if (string.IsNullOrWhiteSpace(range) || this.Version.InRange(range))
-				this.DefaultNodeSettings.Add(key, value, range);
+			if (string.IsNullOrWhiteSpace(range) || Version.InRange(range))
+				DefaultNodeSettings.Add(key, value, range);
 		}
 	}
 }

@@ -40,7 +40,7 @@ namespace Nest.TypescriptGenerator
 			var nestAssembly = typeof(IRequest<>).Assembly;
 			var lowLevelAssembly = typeof(IElasticLowLevelClient).Assembly;
 
-			this.ExposedTypes = nestAssembly
+			ExposedTypes = nestAssembly
 				.GetTypes()
 				.Where(TypeFilter)
 				.Concat(ExposedInterfacesImplementations.Where(t=>!t.IsGenericType))
@@ -58,7 +58,7 @@ namespace Nest.TypescriptGenerator
 				.ToList();
 
 
-			this.RequestParameters = requestParams
+			RequestParameters = requestParams
 				.ToDictionary(t => t.Name.Replace("Parameters", ""));
 		}
 

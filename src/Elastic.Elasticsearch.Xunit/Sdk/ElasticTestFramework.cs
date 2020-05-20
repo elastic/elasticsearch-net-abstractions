@@ -13,14 +13,14 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 		public ElasticTestFramework(IMessageSink messageSink) : base(messageSink) { }
 
 		protected override ITestFrameworkDiscoverer CreateDiscoverer(IAssemblyInfo assemblyInfo) =>
-			new ElasticTestFrameworkDiscoverer(assemblyInfo, this.SourceInformationProvider, this.DiagnosticMessageSink);
+			new ElasticTestFrameworkDiscoverer(assemblyInfo, SourceInformationProvider, DiagnosticMessageSink);
 
 		protected override ITestFrameworkExecutor CreateExecutor(AssemblyName assemblyName)
 		{
 			var assembly = Assembly.Load(assemblyName);
 			var options = assembly.GetCustomAttribute<ElasticXunitConfigurationAttribute>()?.Options ?? new ElasticXunitRunOptions();
 
-			return new TestFrameworkExecutor(assemblyName, this.SourceInformationProvider, this.DiagnosticMessageSink)
+			return new TestFrameworkExecutor(assemblyName, SourceInformationProvider, DiagnosticMessageSink)
 			{
 				Options = options
 			};

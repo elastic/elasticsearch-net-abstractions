@@ -36,7 +36,7 @@ namespace Elastic.Elasticsearch.Managed.ConsoleWriters
 				colors.Add(nodes[i], AvailableNodeColors[color]);
 			}
 
-			this._nodeColors = colors;
+			_nodeColors = colors;
 		}
 
 		public void Handle(Exception e)

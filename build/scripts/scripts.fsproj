@@ -1,50 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
-    <IsPackable>False</IsPackable>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="FSharp.Core" Version="4.7.0" />
-    
-    <PackageReference Include="Fake.Core.Environment" Version="5.15.0" />
-    <PackageReference Include="Fake.Core.SemVer" Version="5.15.0" />
-    <PackageReference Include="Fake.IO.FileSystem" Version="5.15.0" />
-    <PackageReference Include="Fake.IO.Zip" Version="5.15.0" />
-    <PackageReference Include="Fake.Tools.Git" Version="5.15.0" />
-
+    <PackageReference Include="Argu" Version="6.0.0" />
     <PackageReference Include="Bullseye" Version="3.3.0" />
-    <PackageReference Include="FSharp.Data" Version="3.3.2" />
-    <PackageReference Include="Proc" Version="0.6.1" />
-    <PackageReference Include="ILRepack" Version="2.1.0-beta1" />
-    <PackageReference Include="Elastic.Managed" Version="0.1.0-ci20190925T065816" />
+    <PackageReference Include="Proc" Version="0.6.2" />
+    <PackageReference Include="Fake.Tools.Git" Version="5.15.0" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Projects.fs" />
     <Compile Include="Paths.fs" />
-    <Compile Include="Versioning.fs" />
-    <Compile Include="Commandline.fs" />
-    <Compile Include="Tooling.fs" />
-    <Compile Include="Building.fs" />
+    <Compile Include="CommandLine.fs" />
     <Compile Include="Targets.fs" />
-    <Content Include="versions.example.json" CopyToOutputDirectory="true" CopyToPublishDirectory="true" />
-    <Content Include="..\..\appveyor.yml">
-      <Link>appveyor.yml</Link>
-    </Content>
-    <Content Include="..\..\build.bat">
-      <Link>build.bat</Link>
-    </Content>
-    <Content Include="..\..\build.sh">
-      <Link>build.sh</Link>
-    </Content>
-    <Content Include="..\..\global.json">
-      <Link>global.json</Link>
-    </Content>
-    <Content Include="..\..\versions.json">
-      <Link>versions.json</Link>
-    </Content>
+    <Compile Include="Program.fs" />
   </ItemGroup>
-  <Target Name="CopyToolPackages" AfterTargets="Build">
-    <Copy SourceFiles="$(PkgILRepack)\tools\ILRepack.exe" DestinationFolder="$(OutDir)" />
-  </Target>
+
 </Project>

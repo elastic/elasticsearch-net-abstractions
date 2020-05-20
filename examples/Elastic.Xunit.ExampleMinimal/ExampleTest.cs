@@ -28,8 +28,7 @@ namespace Elastic.Xunit.ExampleMinimal
 
 	public class ExampleTest : IClusterFixture<MyTestCluster>
 	{
-		public ExampleTest(MyTestCluster cluster)
-		{
+		public ExampleTest(MyTestCluster cluster) =>
 			// This registers a single client for the cluster's lifetime to be reused and shared.
 			// A client is not directly exposed on a cluster for two reasons
 			//
@@ -38,7 +37,7 @@ namespace Elastic.Xunit.ExampleMinimal
 			// 2) We do not want Elastic.Elasticsearch.Xunit to depend on NEST. Elastic.Elasticsearch.Xunit can start 2.x, 5.x and 6.x clusters
 			//    and NEST Major.x is only tested and supported against Elasticsearch Major.x.
 			//
-			this.Client = cluster.GetOrAddClient(c =>
+			Client = cluster.GetOrAddClient<ElasticClient>(c =>
 			{
 				var nodes = cluster.NodesUris();
 				var connectionPool = new StaticConnectionPool(nodes);
@@ -46,7 +45,6 @@ namespace Elastic.Xunit.ExampleMinimal
 					.EnableDebugMode();
 				return new ElasticClient(settings);
 			});
-		}
 
 		private ElasticClient Client { get; }
 
@@ -54,7 +52,7 @@ namespace Elastic.Xunit.ExampleMinimal
 		[I]
 		public void SomeTest()
 		{
-			var rootNodeInfo = this.Client.RootNodeInfo();
+			var rootNodeInfo = Client.RootNodeInfo();
 
 			rootNodeInfo.Name.Should().NotBeNullOrEmpty();
 		}

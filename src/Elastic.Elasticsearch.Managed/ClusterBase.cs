@@ -43,24 +43,24 @@ namespace Elastic.Elasticsearch.Managed
 	{
 		protected ClusterBase(TConfiguration clusterConfiguration)
 		{
-			this.ClusterConfiguration = clusterConfiguration;
-			this.ClusterMoniker = this.GetType().Name.Replace("Cluster", "");
+			ClusterConfiguration = clusterConfiguration;
+			ClusterMoniker = GetType().Name.Replace("Cluster", "");
 
 			NodeConfiguration Modify(NodeConfiguration n, int p)
 			{
-				this.ModifyNodeConfiguration(n, p);
+				ModifyNodeConfiguration(n, p);
 				return n;
 			}
 
 			var nodes =
-				(from port in Enumerable.Range(this.ClusterConfiguration.StartingPortNumber, this.ClusterConfiguration.NumberOfNodes)
-				let config = new NodeConfiguration(clusterConfiguration, port, this.ClusterMoniker)
+				(from port in Enumerable.Range(ClusterConfiguration.StartingPortNumber, ClusterConfiguration.NumberOfNodes)
+				let config = new NodeConfiguration(clusterConfiguration, port, ClusterMoniker)
 				{
 					ShowElasticsearchOutputAfterStarted = clusterConfiguration.ShowElasticsearchOutputAfterStarted,
 				}
 				let node = new ElasticsearchNode(Modify(config, port))
 				{
-					AssumeStartedOnNotEnoughMasterPing = this.ClusterConfiguration.NumberOfNodes > 1,
+					AssumeStartedOnNotEnoughMasterPing = ClusterConfiguration.NumberOfNodes > 1,
 				}
 				select node).ToList();
 
@@ -68,14 +68,14 @@ namespace Elastic.Elasticsearch.Managed
 			foreach (var node in nodes)
 				node.NodeConfiguration.InitialMasterNodes(initialMasterNodes);
 
-			this.Nodes = new ReadOnlyCollection<ElasticsearchNode>(nodes);
+			Nodes = new ReadOnlyCollection<ElasticsearchNode>(nodes);
 		}
 
 		/// <summary> A short name to identify the cluster defaults to the <see cref="ClusterBase"/> subclass name with Cluster removed </summary>
 		public virtual string ClusterMoniker { get; }
 
 		public TConfiguration ClusterConfiguration { get; }
-		public INodeFileSystem FileSystem => this.ClusterConfiguration.FileSystem;
+		public INodeFileSystem FileSystem => ClusterConfiguration.FileSystem;
 
 		public ReadOnlyCollection<ElasticsearchNode> Nodes { get; }
 		public bool Started { get; private set; }
@@ -86,42 +86,42 @@ namespace Elastic.Elasticsearch.Managed
 
 		protected virtual void SeedCluster() { }
 
-		public IDisposable Start() => this.Start(TimeSpan.FromMinutes(2));
+		public IDisposable Start() => Start(TimeSpan.FromMinutes(2));
 
 		public IDisposable Start(TimeSpan waitForStarted) =>
-			this.Start(new LineHighlightWriter(this.Nodes.Select(n => n.NodeConfiguration.DesiredNodeName).ToArray()), waitForStarted);
+			Start(new LineHighlightWriter(Nodes.Select(n => n.NodeConfiguration.DesiredNodeName).ToArray()), waitForStarted);
 
 		public IDisposable Start(IConsoleLineHandler writer, TimeSpan waitForStarted)
 		{
-			this.Writer = writer ?? NoopConsoleLineWriter.Instance;
+			Writer = writer ?? NoopConsoleLineWriter.Instance;
 
-			this.OnBeforeStart();
+			OnBeforeStart();
 
 			var subscriptions = new Subscriptions();
-			foreach (var node in this.Nodes) subscriptions.Add(node.SubscribeLines(writer));
+			foreach (var node in Nodes) subscriptions.Add(node.SubscribeLines(writer));
 
-			var waitHandles = this.Nodes.Select(w => w.StartedHandle).ToArray();
+			var waitHandles = Nodes.Select(w => w.StartedHandle).ToArray();
 			if (!WaitHandle.WaitAll(waitHandles, waitForStarted))
 			{
-				var nodeExceptions = this.Nodes.Select(n => n.LastSeenException).Where(e => e != null).ToList();
-				writer?.WriteError($"{{{this.GetType().Name}.{nameof(Start)}}} cluster did not start after {waitForStarted}");
+				var nodeExceptions = Nodes.Select(n => n.LastSeenException).Where(e => e != null).ToList();
+				writer?.WriteError($"{{{GetType().Name}.{nameof(Start)}}} cluster did not start after {waitForStarted}");
 				throw new AggregateException($"Not all nodes started after waiting {waitForStarted}", nodeExceptions);
 			}
 
-			this.Started = this.Nodes.All(n => n.NodeStarted);
-			if (!this.Started)
+			Started = Nodes.All(n => n.NodeStarted);
+			if (!Started)
 			{
-				var nodeExceptions = this.Nodes.Select(n => n.LastSeenException).Where(e => e != null).ToList();
-				var message = $"{{{this.GetType().Name}.{nameof(Start)}}} cluster did not start succesfully";
-				var seeLogsMessage = this.SeeLogsMessage(message);
+				var nodeExceptions = Nodes.Select(n => n.LastSeenException).Where(e => e != null).ToList();
+				var message = $"{{{GetType().Name}.{nameof(Start)}}} cluster did not start succesfully";
+				var seeLogsMessage = SeeLogsMessage(message);
 				writer?.WriteError(seeLogsMessage);
 				throw new AggregateException(seeLogsMessage, nodeExceptions);
 			}
 
 			try
 			{
-                this.OnAfterStarted();
-                this.SeedCluster();
+                OnAfterStarted();
+                SeedCluster();
 			}
 			catch (Exception e)
 			{
@@ -136,7 +136,7 @@ namespace Elastic.Elasticsearch.Managed
 		{
 			private List<IDisposable> Disposables { get; } = new List<IDisposable>();
 
-			internal void Add(IDisposable disposable) => this.Disposables.Add(disposable);
+			internal void Add(IDisposable disposable) => Disposables.Add(disposable);
 
 			public void Dispose()
 			{
@@ -147,13 +147,13 @@ namespace Elastic.Elasticsearch.Managed
 
 		protected virtual string SeeLogsMessage(string message)
 		{
-			var log = Path.Combine(this.FileSystem.LogsPath, $"{this.ClusterConfiguration.ClusterName}.log");
+			var log = Path.Combine(FileSystem.LogsPath, $"{ClusterConfiguration.ClusterName}.log");
 			return $"{message} see {log} to diagnose the issue";
 		}
 
 		public void WaitForExit(TimeSpan waitForCompletion)
 		{
-			foreach (var node in this.Nodes)
+			foreach (var node in Nodes)
 				node.WaitForCompletion(waitForCompletion);
 		}
 
@@ -165,11 +165,11 @@ namespace Elastic.Elasticsearch.Managed
 
 		public void Dispose()
 		{
-			this.Started = false;
-			foreach (var node in this.Nodes)
+			Started = false;
+			foreach (var node in Nodes)
 				node?.Dispose();
 
-			this.OnDispose();
+			OnDispose();
 		}
 	}
 }

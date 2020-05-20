@@ -14,16 +14,14 @@ namespace Elastic.Xunit.ExampleComplex
 	{
 		private static readonly ConcurrentDictionary<IEphemeralCluster, IElasticClient> Clients = new ConcurrentDictionary<IEphemeralCluster, IElasticClient>();
 
-		public static IElasticClient GetOrAddClient(this IEphemeralCluster cluster)
-		{
-			return Clients.GetOrAdd(cluster, (c) =>
+		public static IElasticClient GetOrAddClient(this IEphemeralCluster cluster) =>
+			Clients.GetOrAdd(cluster, (c) =>
 			{
 				var connectionPool = new StaticConnectionPool(c.NodesUris());
 				var settings = new ConnectionSettings(connectionPool);
 				var client = new ElasticClient(settings);
 				return client;
 			});
-		}
 	}
 
 	public interface IMyCluster
@@ -48,7 +46,7 @@ namespace Elastic.Xunit.ExampleComplex
 	{
 		protected override void SeedCluster()
 		{
-			var pluginsResponse = this.Client.CatPlugins();
+			var pluginsResponse = Client.CatPlugins();
 		}
 	}
 
@@ -60,7 +58,7 @@ namespace Elastic.Xunit.ExampleComplex
 
 		protected override void SeedCluster()
 		{
-			var aliasesResponse = this.Client.CatAliases();
+			var aliasesResponse = Client.CatAliases();
 		}
 	}
 }

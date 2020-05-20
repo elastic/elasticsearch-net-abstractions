@@ -19,7 +19,7 @@ namespace Elastic.Elasticsearch.Xunit.XunitPlumbing
 		protected readonly IMessageSink DiagnosticMessageSink;
 
 		protected ElasticTestCaseDiscoverer(IMessageSink diagnosticMessageSink) =>
-			this.DiagnosticMessageSink = diagnosticMessageSink;
+			DiagnosticMessageSink = diagnosticMessageSink;
 
 		/// <summary>
 		///	Detemines whether a test method should be skipped, and the reason why
@@ -35,14 +35,12 @@ namespace Elastic.Elasticsearch.Xunit.XunitPlumbing
 		}
 
 		/// <inheritdoc />
-		public IEnumerable<IXunitTestCase> Discover(ITestFrameworkDiscoveryOptions discoveryOptions, ITestMethod testMethod, IAttributeInfo factAttribute)
-		{
-			return SkipMethod(discoveryOptions, testMethod, out var skipReason)
+		public IEnumerable<IXunitTestCase> Discover(ITestFrameworkDiscoveryOptions discoveryOptions, ITestMethod testMethod, IAttributeInfo factAttribute) =>
+			SkipMethod(discoveryOptions, testMethod, out var skipReason)
 				? string.IsNullOrEmpty(skipReason)
 					? new IXunitTestCase[] {}
 					: new IXunitTestCase[] { new SkippingTestCase(skipReason, testMethod, null)  }
 				: new[] { new XunitTestCase(DiagnosticMessageSink, discoveryOptions.MethodDisplayOrDefault(), testMethod) };
-		}
 
 		protected static TValue GetAttribute<TAttribute, TValue>(ITestMethod testMethod, string propertyName)
 			where TAttribute : Attribute

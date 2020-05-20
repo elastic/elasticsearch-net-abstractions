@@ -106,7 +106,7 @@ namespace Elastic.Stack.ArtifactsApi
 
 		public bool InRange(string range)
 		{
-			var versionRange = new SemVer.Range(range);
+			var versionRange = new Range(range);
 			return InRange(versionRange);
 		}
 
@@ -117,7 +117,7 @@ namespace Elastic.Stack.ArtifactsApi
 
 			//Semver can only match snapshot version with ranges on the same major and minor
 			//anything else fails but we want to know e.g 2.4.5-SNAPSHOT satisfied by <5.0.0;
-			var wholeVersion = $"{this.Major}.{this.Minor}.{this.Patch}";
+			var wholeVersion = $"{Major}.{Minor}.{Patch}";
 			return versionRange.IsSatisfied(wholeVersion);
 		}
 
@@ -149,7 +149,7 @@ namespace Elastic.Stack.ArtifactsApi
 		public int CompareTo(string other)
 		{
 			var v = (ElasticVersion) other;
-			return this.CompareTo(v);
+			return CompareTo(v);
 		}
 		public override bool Equals(object obj) => base.Equals(obj);
 

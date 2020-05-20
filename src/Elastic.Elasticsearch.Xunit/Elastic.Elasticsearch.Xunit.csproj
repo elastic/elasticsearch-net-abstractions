@@ -1,14 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\build\Common.targets" />
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
     <IsPackable>True</IsPackable>
-    <Version>$(XunitVersion)</Version>
-    <InformationalVersion>$(XunitVersion)</InformationalVersion>
-    <AssemblyVersion>$(XunitAssemblyVersion)</AssemblyVersion>
-    <FileVersion>$(XunitAssemblyFileVersion)</FileVersion>
-    <PackageId>Elastic.Elasticsearch.Xunit</PackageId>
-    <Authors>Elastic and contributors</Authors>
     <Description>Provides an Xunit test framework allowing you to run integration tests against local ephemeral Elasticsearch clusters</Description>
     <PackageTags>elastic,elasticsearch,xunit,cluster,integration,test,ephemeral</PackageTags>
   </PropertyGroup>

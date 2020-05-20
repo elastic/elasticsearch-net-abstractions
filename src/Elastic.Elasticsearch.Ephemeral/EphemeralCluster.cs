@@ -25,30 +25,27 @@ namespace Elastic.Elasticsearch.Ephemeral
 	public abstract class EphemeralCluster<TConfiguration> : ClusterBase<TConfiguration>, IEphemeralCluster<TConfiguration>
 		where TConfiguration : EphemeralClusterConfiguration
 	{
-		protected EphemeralCluster(TConfiguration clusterConfiguration) : base(clusterConfiguration)
-		{
-			this.Composer = new EphemeralClusterComposer<TConfiguration>(this);
-		}
+		protected EphemeralCluster(TConfiguration clusterConfiguration) : base(clusterConfiguration) => Composer = new EphemeralClusterComposer<TConfiguration>(this);
 
 		protected EphemeralClusterComposer<TConfiguration> Composer { get; }
 
 		protected override void OnBeforeStart()
 		{
-			this.Composer.Install();
-			this.Composer.OnBeforeStart();
+			Composer.Install();
+			Composer.OnBeforeStart();
 		}
 
-		protected override void OnDispose() => this.Composer.OnStop();
+		protected override void OnDispose() => Composer.OnStop();
 
-		protected override void OnAfterStarted() => this.Composer.OnAfterStart();
+		protected override void OnAfterStarted() => Composer.OnAfterStart();
 
 		public virtual ICollection<Uri> NodesUris(string hostName = null)
 		{
-			hostName = hostName ?? (this.ClusterConfiguration.HttpFiddlerAware && Process.GetProcessesByName("fiddler").Any()
+			hostName = hostName ?? (ClusterConfiguration.HttpFiddlerAware && Process.GetProcessesByName("fiddler").Any()
 				? "ipv4.fiddler"
 				: "localhost");
-			var ssl = this.ClusterConfiguration.EnableSsl ? "s" : "";
-			return this.Nodes
+			var ssl = ClusterConfiguration.EnableSsl ? "s" : "";
+			return Nodes
 				.Select(n=>$"http{ssl}://{hostName}:{n.Port ?? 9200}")
 				.Distinct()
 				.Select(n => new Uri(n))
@@ -57,9 +54,9 @@ namespace Elastic.Elasticsearch.Ephemeral
 
 		protected override string SeeLogsMessage(string message)
 		{
-			var log = Path.Combine(this.FileSystem.LogsPath, $"{this.ClusterConfiguration.ClusterName}.log");
-			if (!File.Exists(log) || this.ClusterConfiguration.ShowElasticsearchOutputAfterStarted) return message;
-			if (!this.Started) return message;
+			var log = Path.Combine(FileSystem.LogsPath, $"{ClusterConfiguration.ClusterName}.log");
+			if (!File.Exists(log) || ClusterConfiguration.ShowElasticsearchOutputAfterStarted) return message;
+			if (!Started) return message;
 			using (var fileStream = new FileStream(log, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 			using (var textReader = new StreamReader(fileStream))
 			{
@@ -70,14 +67,14 @@ namespace Elastic.Elasticsearch.Ephemeral
 
 		public bool CachingAndCachedHomeExists()
 		{
-			if (!this.ClusterConfiguration.CacheEsHomeInstallation) return false;
-			var cachedEsHomeFolder = Path.Combine(this.FileSystem.LocalFolder, this.GetCacheFolderName());
+			if (!ClusterConfiguration.CacheEsHomeInstallation) return false;
+			var cachedEsHomeFolder = Path.Combine(FileSystem.LocalFolder, GetCacheFolderName());
 			return Directory.Exists(cachedEsHomeFolder);
 		}
 
 		public virtual string GetCacheFolderName()
 		{
-			var config = this.ClusterConfiguration;
+			var config = ClusterConfiguration;
 
 			var sb = new StringBuilder();
 			sb.Append(EphemeralClusterComposerBase.InstallationTasks.Count());
