@@ -34,6 +34,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{F75ACC18
 ProjectSection(SolutionItems) = preProject
 	dotnet-tools.json = dotnet-tools.json
 	Directory.Build.props = Directory.Build.props
+	build.bat = build.bat
+	build.sh = build.sh
+	global.json = global.json
+	License.txt = License.txt
+	nuget-icon.png = nuget-icon.png
+	README.md = README.md
+	.github\workflows\ci.yml = .github\workflows\ci.yml
 EndProjectSection
 EndProject
 Global
