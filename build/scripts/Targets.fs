@@ -17,9 +17,15 @@ let private restoreTools = lazy(exec "dotnet" ["tool"; "restore"])
 let private currentVersion =
     lazy(
         restoreTools.Value |> ignore
-        let r = Proc.Start("dotnet", "minver", "-d", "canary")
+        let r = Proc.Start("dotnet", "minver", "-d", "canary", "-m", "0.1")
         let o = r.ConsoleOut |> Seq.find (fun l -> not(l.Line.StartsWith("MinVer:")))
         o.Line
+    )
+let private currentVersionInformational =
+    lazy(
+        match Paths.IncludeGitHashInInformational with
+        | false -> currentVersion.Value
+        | true -> sprintf "%s+%s" currentVersion.Value (Information.getCurrentSHA1( "."))
     )
 
 let private clean (arguments:ParseResults<Arguments>) =
@@ -38,23 +44,34 @@ let private generatePackages (arguments:ParseResults<Arguments>) =
     exec "dotnet" ["pack"; "-c"; "Release"; "-o"; output] |> ignore
     
 let private validatePackages (arguments:ParseResults<Arguments>) =
-    let nugetPackage =
-        let p = Paths.Output.GetFiles("*.nupkg") |> Seq.sortByDescending(fun f -> f.CreationTimeUtc) |> Seq.head
-        Paths.RootRelative p.FullName
-    exec "dotnet" ["nupkg-validator"; nugetPackage; "-v"; currentVersion.Value; "-a"; Paths.ToolName; "-k"; "96c599bbe3e70f5d"] |> ignore
+    let nugetPackages =
+        Paths.Output.GetFiles("*.nupkg") |> Seq.sortByDescending(fun f -> f.CreationTimeUtc)
+        |> Seq.map (fun p -> Paths.RootRelative p.FullName)
+    
+    nugetPackages |> Seq.iter (fun p -> exec "dotnet" ["nupkg-validator"; p; "-v"; currentVersionInformational.Value; "-k"; "96c599bbe3e70f5d"] |> ignore)
+    
 
 let private generateApiChanges (arguments:ParseResults<Arguments>) =
     let output = Paths.RootRelative <| Paths.Output.FullName
     let currentVersion = currentVersion.Value
-    let args =
-        [
-            "assembly-differ"
-            (sprintf "previous-nuget|%s|%s|netcoreapp3.1" Paths.ToolName currentVersion);
-            (sprintf "directory|src/%s/bin/Release/netcoreapp3.1" Paths.ToolName);
-            "--target"; Paths.ToolName; "-f"; "github-comment"; "--output"; output
-        ]
+    let nugetPackages =
+        Paths.Output.GetFiles("*.nupkg") |> Seq.sortByDescending(fun f -> f.CreationTimeUtc)
+        |> Seq.map (fun p -> Path.GetFileNameWithoutExtension(Paths.RootRelative p.FullName).Replace("." + currentVersion, ""))
+    nugetPackages
+    |> Seq.iter(fun p ->
+        let outputFile =
+            let f = sprintf "breaking-changes-%s.md" p
+            Path.Combine(output, f)
+        let args =
+            [
+                "assembly-differ"
+                (sprintf "previous-nuget|%s|%s|%s" p currentVersion Paths.MainTFM);
+                (sprintf "directory|src/%s/bin/Release/%s" p Paths.MainTFM);
+                "-a"; "--target"; p; "-f"; "github-comment"; "--output"; outputFile
+            ]
         
-    exec "dotnet" args |> ignore
+        exec "dotnet" args |> ignore
+    )
     
 let private generateReleaseNotes (arguments:ParseResults<Arguments>) =
     let currentVersion = currentVersion.Value

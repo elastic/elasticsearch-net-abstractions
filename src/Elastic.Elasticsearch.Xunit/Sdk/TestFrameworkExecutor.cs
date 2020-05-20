@@ -62,7 +62,7 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 				using (var runner = new TestAssemblyRunner(TestAssembly, testCases, DiagnosticMessageSink, sink, options))
 				{
 					Options.OnBeforeTestsRun();
-					await runner.RunAsync();
+					await runner.RunAsync().ConfigureAwait(false);
 					Options.OnTestsFinished(runner.ClusterTotals, runner.FailedCollections);
 				}
 			}

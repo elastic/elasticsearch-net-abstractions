@@ -19,7 +19,7 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 				{
 					using (partition)
 						while (partition.MoveNext())
-							await body(partition.Current);
+							await body(partition.Current).ConfigureAwait(false);
 				}));
 	}
 }

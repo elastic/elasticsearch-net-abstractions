@@ -3,8 +3,13 @@ module Paths
 open System
 open System.IO
 
-let ToolName = "assembly-rewriter"
-let Repository = sprintf "nullean/%s" ToolName
+let ToolName = "elasticsearch-net-abstractions"
+let Repository = sprintf "elastic/%s" ToolName
+let MainTFM = "netstandard2.0"
+
+let ValidateAssemblyName = false
+let IncludeGitHashInInformational = true
+let GenerateApiChanges = false
 
 let Root =
     let mutable dir = DirectoryInfo(".")

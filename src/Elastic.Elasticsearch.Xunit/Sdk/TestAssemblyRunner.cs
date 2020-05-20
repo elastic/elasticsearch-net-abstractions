@@ -81,9 +81,9 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 			var defaultMaxConcurrency = Environment.ProcessorCount * 4;
 
 			if (RunUnitTests && !RunIntegrationTests)
-				return await UnitTestPipeline(defaultMaxConcurrency, messageBus, cancellationTokenSource);
+				return await UnitTestPipeline(defaultMaxConcurrency, messageBus, cancellationTokenSource).ConfigureAwait(false);
 
-			return await IntegrationPipeline(defaultMaxConcurrency, messageBus, cancellationTokenSource);
+			return await IntegrationPipeline(defaultMaxConcurrency, messageBus, cancellationTokenSource).ConfigureAwait(false);
 		}
 
 
@@ -94,7 +94,7 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 
 			var testFilters = CreateTestFilters(TestFilter);
 			await _grouped.SelectMany(g => g)
-				.ForEachAsync(defaultMaxConcurrency, async g => { await RunTestCollections(messageBus, ctx, g, testFilters); });
+				.ForEachAsync(defaultMaxConcurrency, async g => { await RunTestCollections(messageBus, ctx, g, testFilters).ConfigureAwait(false); }).ConfigureAwait(false);
 			//foreach (var g in this._grouped) g.Key?.Dispose();
 
 			return new RunSummary
@@ -157,7 +157,7 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 					if (!IntegrationTestsMayUseAlreadyRunningNode || !ValidateRunningVersion())
 						@group.Key?.Start(timeout);
 
-					await @group.ForEachAsync(dop, async g => { await RunTestCollections(messageBus, ctx, g, testFilters); });
+					await @group.ForEachAsync(dop, async g => { await RunTestCollections(messageBus, ctx, g, testFilters).ConfigureAwait(false); }).ConfigureAwait(false);
 				}
 				ClusterTotals[clusterName].Stop();
 			}
@@ -178,7 +178,7 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 
 			try
 			{
-				var summary = await RunTestCollectionAsync(messageBus, g.Collection, g.TestCases, ctx);
+				var summary = await RunTestCollectionAsync(messageBus, g.Collection, g.TestCases, ctx).ConfigureAwait(false);
 				var type = g.Cluster?.GetType();
 				var clusterName = type?.Name.Replace("Cluster", "") ?? "UNKNOWN";
 				if (summary.Failed > 0)
