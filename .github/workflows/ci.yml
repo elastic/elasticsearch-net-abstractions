@@ -44,13 +44,8 @@ jobs:
     - name: publish to github package repository
       if: github.event_name == 'push' && startswith(github.ref, 'refs/heads')
       shell: bash
-      # https://github.com/dotnet/docs/issues/7146 needs ** pattern to pick up multiple, sadly does not work
       run:  |
           until dotnet nuget push 'build/output/*.nupkg' -k ${{secrets.GITHUB_TOKEN}} --skip-duplicate --no-symbols true; do echo "Retrying"; sleep 1; done;
-#         until dotnet nuget push build/output/Elastic.Elasticsearch.Managed.*.nupkg -k ${{secrets.GITHUB_TOKEN}} --skip-duplicate --no-symbols true; do echo "Retrying"; sleep 1; done;
-#         until dotnet nuget push build/output/Elastic.Elasticsearch.Ephemeral.*.nupkg -k ${{secrets.GITHUB_TOKEN}} --skip-duplicate --no-symbols true; do echo "Retrying"; sleep 1; done;
-#         until dotnet nuget push build/output/Elastic.Elasticsearch.Xunit.*.nupkg -k ${{secrets.GITHUB_TOKEN}} --skip-duplicate --no-symbols true; do echo "Retrying"; sleep 1; done;
-#         until dotnet nuget push build/output/Elastic.Stack.ArtifactsApi.*.nupkg -k ${{secrets.GITHUB_TOKEN}} --skip-duplicate --no-symbols true; do echo "Retrying"; sleep 1; done;
 
     - run: ./build.sh generatereleasenotes -s true
       name: Generate release notes for tag
@@ -59,6 +54,6 @@ jobs:
       if: github.event_name == 'push' && startswith(github.ref, 'refs/tags')
       name: Create or update release for tag on github
       
-    # - run: dotnet nuget push build/output/*.nupkg -k ${{secrets.NUGET_ORG_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate --no-symbols true
+    # - run: dotnet nuget push 'build/output/*.nupkg' -k ${{secrets.NUGET_ORG_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate --no-symbols true
     #  name: release to nuget.org
     #  if: github.event_name == 'push' && startswith(github.ref, 'refs/tags')
