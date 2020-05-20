@@ -9,7 +9,6 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using TypeLite;
@@ -73,10 +72,7 @@ namespace Nest.TypescriptGenerator
 		};
 
 
-		private bool PropertyTypesToIgnore(Type propertyType)
-		{
-			return _propertyTypesToIgnore.Contains(propertyType) || (propertyType.BaseType != null && propertyType.BaseType == typeof (MulticastDelegate));
-		}
+		private bool PropertyTypesToIgnore(Type propertyType) => _propertyTypesToIgnore.Contains(propertyType) || (propertyType.BaseType != null && propertyType.BaseType == typeof (MulticastDelegate));
 
 		protected override void AppendClassDefinition(TsClass classModel, ScriptBuilder sb, TsGeneratorOutput generatorOutput)
 		{
@@ -95,14 +91,14 @@ namespace Nest.TypescriptGenerator
 		{
 			AddNamespaceHeaderEnum(classModel.Name,classModel.Type.Assembly.FullName, sb);
 
-			var typeName = this.GetTypeName(classModel);
-			var visibility = this.GetTypeVisibility(classModel, typeName) ? "export " : "";
+			var typeName = GetTypeName(classModel);
+			var visibility = GetTypeVisibility(classModel, typeName) ? "export " : "";
 
 			_docAppender.AppendClassDoc(sb, classModel, typeName);
 
 			sb.AppendFormatIndented("{0}interface {1}", visibility, typeName);
 			if (classModel.BaseType != null)
-				sb.AppendFormat(" extends {0}", this.GetFullyQualifiedTypeName(classModel.BaseType));
+				sb.AppendFormat(" extends {0}", GetFullyQualifiedTypeName(classModel.BaseType));
 
 			var interfaces = classModel.Interfaces.Where(m => CsharpTypeInfoProvider.ExposedInterfaces.Contains(m.Type)).ToList();
 			if (interfaces.Count > 0)
@@ -125,8 +121,8 @@ namespace Nest.TypescriptGenerator
 		{
 			AddNamespaceHeader(classModel.Name, sb);
 
-			var typeName = this.GetTypeName(classModel);
-			var visibility = this.GetTypeVisibility(classModel, typeName) ? "export " : "";
+			var typeName = GetTypeName(classModel);
+			var visibility = GetTypeVisibility(classModel, typeName) ? "export " : "";
 
 			AddRequestRenameInformation(sb, classModel);
 			AddDocCommentForCustomJsonConverter(sb, classModel);
@@ -155,7 +151,7 @@ namespace Nest.TypescriptGenerator
 
 			if (classModel.BaseType != null)
 			{
-				sb.AppendFormat(" extends {0}", this.GetFullyQualifiedTypeName(classModel.BaseType));
+				sb.AppendFormat(" extends {0}", GetFullyQualifiedTypeName(classModel.BaseType));
 			}
 
 			var interfaces = classModel.Interfaces.Where(m => CsharpTypeInfoProvider.ExposedInterfaces.Contains(m.Type)).ToList();
@@ -202,8 +198,8 @@ namespace Nest.TypescriptGenerator
 						continue;
 
 					AddDocCommentForCustomJsonConverter(sb, property);
-					_docAppender.AppendPropertyDoc(sb, property, this.GetPropertyName(property), this.GetPropertyType(property));
-					sb.AppendLineIndented($"{this.GetPropertyName(property)}: {this.GetPropertyType(property)};");
+					_docAppender.AppendPropertyDoc(sb, property, GetPropertyName(property), GetPropertyType(property));
+					sb.AppendLineIndented($"{GetPropertyName(property)}: {GetPropertyType(property)};");
 				}
 
 				if (classModel.Type == typeof(PropertyBase)) sb.AppendLineIndented($"type: string;");
@@ -215,7 +211,7 @@ namespace Nest.TypescriptGenerator
 			if (!ns.StartsWith("Nest") && !ns.StartsWith("Elasticsearch.Net")) return false;
 
 			var n = "common";
-			if (this._sourceDirectory.TypeNameToNamespaceMapping.TryGetValue(name, out var fullNs))
+			if (_sourceDirectory.TypeNameToNamespaceMapping.TryGetValue(name, out var fullNs))
 				n = string.Join('.', fullNs.Split(".").Select(StringExtensions.SnakeCase));
 
 			sb.AppendLineIndented($"/** namespace:{n} **/");
@@ -228,7 +224,7 @@ namespace Nest.TypescriptGenerator
 			if (name == "SearchRequest")
 			{
 			}
-			if (this._sourceDirectory.TypeNameToNamespaceMapping.TryGetValue(name, out var ns))
+			if (_sourceDirectory.TypeNameToNamespaceMapping.TryGetValue(name, out var ns))
 				n = string.Join('.', ns.Split(".").Select(StringExtensions.SnakeCase));
 
 			sb.AppendLineIndented($"@namespace(\"{n}\")");
@@ -250,9 +246,9 @@ namespace Nest.TypescriptGenerator
 			var nonGenericTypeName = ClientTypesExporter.RemoveGeneric.Replace(declaringType.Name, "$1");
 			if (ClientTypesExporter.InterfaceRegex.IsMatch(nonGenericTypeName)) nonGenericTypeName = nonGenericTypeName.Substring(1);
 
-			if (isRequest && this._typeInfoProvider.RequestParameters.ContainsKey(nonGenericTypeName))
+			if (isRequest && _typeInfoProvider.RequestParameters.ContainsKey(nonGenericTypeName))
 			{
-				var rp = this._typeInfoProvider.RequestParameters[nonGenericTypeName];
+				var rp = _typeInfoProvider.RequestParameters[nonGenericTypeName];
 				var prop = rp.GetProperty(propertyName);
 				if (prop != null)
 					sb.AppendLineIndented("@request_parameter()");
@@ -268,13 +264,13 @@ namespace Nest.TypescriptGenerator
 
 		private void AddRequestRenameInformation(ScriptBuilder sb, TsClass classModel)
 		{
-			if (this._restSpec.SkipRequestImplementation(classModel.Name)) return;
+			if (_restSpec.SkipRequestImplementation(classModel.Name)) return;
 
 			var i = classModel.Name;
 			if (!ClientTypesExporter.InterfaceRegex.IsMatch(i)) i = $"I{i}";
 
-			if (this._restSpec.SkipRequestImplementation(i)) return;
-			if (!this._restSpec.Requests.TryGetValue(i, out var mapping))
+			if (_restSpec.SkipRequestImplementation(i)) return;
+			if (!_restSpec.Requests.TryGetValue(i, out var mapping))
 			{
 				throw new Exception($"Could not get {i} original rest spec file name");
 			}
@@ -328,12 +324,12 @@ namespace Nest.TypescriptGenerator
 			if (!AddNamespaceHeaderEnum(enumModel.Name, enumModel.Type.Assembly.FullName, sb)) return;
 			if (_typesToIgnore.Contains(enumModel.Type)) return;
 
-			var typeName = this.GetTypeName(enumModel);
+			var typeName = GetTypeName(enumModel);
 			var visibility = string.Empty;
 
 			_docAppender.AppendEnumDoc(sb, enumModel, typeName);
 
-			var constSpecifier = this.GenerateConstEnums ? "const " : string.Empty;
+			var constSpecifier = GenerateConstEnums ? "const " : string.Empty;
 			sb.AppendLineIndented(string.Format("{0}{2}enum {1} {{", visibility, typeName, constSpecifier));
 
 			using (sb.IncreaseIndentation())
@@ -371,7 +367,7 @@ namespace Nest.TypescriptGenerator
 				foreach (var enumModel in enums)
 				{
 					if (Ignore(enumModel)) continue;
-					this.AppendEnumDefinition(enumModel, sb, generatorOutput);
+					AppendEnumDefinition(enumModel, sb, generatorOutput);
 				}
 			}
 
@@ -390,10 +386,10 @@ namespace Nest.TypescriptGenerator
 						continue;
 					var c = ReMapClass(classModel);
 					if (Ignore(c)) continue;
-					if (this._appended.Contains(c.Name)) continue;
-					if (this._appended.Contains("I" + c.Name)) continue;
-					this.AppendClassDefinition(c, sb, generatorOutput);
-					this._appended.Add(c.Name);
+					if (_appended.Contains(c.Name)) continue;
+					if (_appended.Contains("I" + c.Name)) continue;
+					AppendClassDefinition(c, sb, generatorOutput);
+					_appended.Add(c.Name);
 				}
 			}
 
@@ -403,7 +399,7 @@ namespace Nest.TypescriptGenerator
 				{
 					if (classModel.IsIgnored) continue;
 
-					this.AppendConstantModule(classModel, sb);
+					AppendConstantModule(classModel, sb);
 				}
 			}
 		}

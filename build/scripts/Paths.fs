@@ -1,37 +1,24 @@
-﻿// Licensed to Elasticsearch B.V under one or more agreements.
-// Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
-// See the LICENSE file in the project root for more information
+module Paths
 
-namespace Scripts
-
-open Fake.Core
+open System
 open System.IO
 
-module Paths =
+let ToolName = "elasticsearch-net-abstractions"
+let Repository = sprintf "elastic/%s" ToolName
+let MainTFM = "netstandard2.0"
 
-    let Repository = "https://github.com/mpdreamz/elasticsearch-net-abstraction"
+let ValidateAssemblyName = false
+let IncludeGitHashInInformational = true
+let GenerateApiChanges = false
 
-    let BuildFolder = "build"
-    let BuildOutput = sprintf "%s/output" BuildFolder
-    let VersionsJson = Path.GetFullPath "versions.json"
-
-    let Tool tool = sprintf "packages/build/%s" tool
-    let CheckedInToolsFolder = "build/Tools"
-    let KeysFolder = sprintf "%s/keys" BuildFolder
-    let NugetOutput = sprintf "%s/_packages" BuildOutput
-    let SourceFolder = "src"
+let Root =
+    let mutable dir = DirectoryInfo(".")
+    while dir.GetFiles("*.sln").Length = 0 do dir <- dir.Parent
+    Environment.CurrentDirectory <- dir.FullName
+    dir
     
-    let CheckedInTool(tool) = sprintf "%s/%s" CheckedInToolsFolder tool
-    let PaketDotNetGlobalTool tool subPath = sprintf "%s/%s" (Tool tool) subPath
-    let Keys(keyFile) = sprintf "%s/%s" KeysFolder keyFile
-    let Output(folder) = sprintf "%s/%s" BuildOutput folder
-    let Source(folder) = sprintf "%s/%s" SourceFolder folder
-    let Build(folder) = sprintf "%s/%s" BuildFolder folder
-
-    let BinFolder(folder) = 
-        let f = String.replace @"\" "/" folder
-        sprintf "%s/%s/bin/Release" SourceFolder f
-
-    let SolutionFile = sprintf "%s/Elastic.Abstractions.sln" SourceFolder
+let RootRelative path = Path.GetRelativePath(Root.FullName, path) 
     
-    let PackageOutFolder = Output("_packages")
+let Output = DirectoryInfo(Path.Combine(Root.FullName, "build", "output"))
+
+let ToolProject = DirectoryInfo(Path.Combine(Root.FullName, "src", ToolName))

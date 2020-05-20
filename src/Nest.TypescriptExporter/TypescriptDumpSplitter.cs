@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection.Metadata;
 using System.Text.RegularExpressions;
 using ShellProgressBar;
 
@@ -19,24 +18,24 @@ namespace Nest.TypescriptGenerator
 
 		public TypescriptDumpSplitter(string definitionFile, RestSpec restSpec, string outFolder)
 		{
-			this._definitionFile = definitionFile;
-			this._restSpec = restSpec;
-			this._outFolder = Path.GetFullPath(outFolder);
+			_definitionFile = definitionFile;
+			_restSpec = restSpec;
+			_outFolder = Path.GetFullPath(outFolder);
 		}
 
 		public int Split()
 		{
 			using (var pbar = new ProgressBar(6, "splitting local typedefinitions.ts to elastic-client-generator", new ProgressBarOptions {ForegroundColor = ConsoleColor.Blue}))
 			{
-				if (Directory.Exists(this._outFolder))
+				if (Directory.Exists(_outFolder))
 				{
-					Directory.Delete(this._outFolder, true);
-					pbar.Tick($"Deleted {this._outFolder}");
+					Directory.Delete(_outFolder, true);
+					pbar.Tick($"Deleted {_outFolder}");
 				}
-				else pbar.Tick($"{this._outFolder} does not exist yet");
+				else pbar.Tick($"{_outFolder} does not exist yet");
 
-				Directory.CreateDirectory(this._outFolder);
-				pbar.Tick($"{this._outFolder} created");
+				Directory.CreateDirectory(_outFolder);
+				pbar.Tick($"{_outFolder} created");
 				var additionalLines = SplitDeclarationDumpFile();
 				pbar.Tick($"split typedefinitions.ts");
 				DumpRemainder(additionalLines);
@@ -44,14 +43,14 @@ namespace Nest.TypescriptGenerator
 				CopyTsConfig();
 				pbar.Tick($"copied tsconfig.json");
 				WriteTsLintFile();
-				pbar.Tick($"wrote empty tslint.json in {this._outFolder}");
+				pbar.Tick($"wrote empty tslint.json in {_outFolder}");
 				return 0;
 			}
 		}
 
 		private List<string> SplitDeclarationDumpFile()
 		{
-			var lines = File.ReadAllLines(this._definitionFile);
+			var lines = File.ReadAllLines(_definitionFile);
 			var additionalLines = new List<string>();
 			var symbolContents = new Queue<string>();
 			var readingType = false;
@@ -99,14 +98,14 @@ namespace Nest.TypescriptGenerator
 
 		private void WriteTsLintFile()
 		{
-			var target = Path.Combine(this._outFolder, "tslint.json");
+			var target = Path.Combine(_outFolder, "tslint.json");
 			File.WriteAllText(target, "{}");
 		}
 		private void CopyTsConfig()
 		{
 			var tsconfigJson = "tsconfig.json";
-			var config = Path.Combine(new FileInfo(this._definitionFile).Directory.FullName, tsconfigJson);
-			var target = Path.Combine(this._outFolder, tsconfigJson);
+			var config = Path.Combine(new FileInfo(_definitionFile).Directory.FullName, tsconfigJson);
+			var target = Path.Combine(_outFolder, tsconfigJson);
 			File.Copy(config, target);
 		}
 
@@ -126,7 +125,7 @@ namespace Nest.TypescriptGenerator
 			if (!string.IsNullOrWhiteSpace(currentSpecName))
 			{
 				var name = currentSpecName + ".json";
-				var source = this._restSpec.SpecificationFiles[currentSpecName].FullName;
+				var source = _restSpec.SpecificationFiles[currentSpecName].FullName;
 				var target = Path.Combine(folder, name);
 				File.Copy(source, target);
 			}

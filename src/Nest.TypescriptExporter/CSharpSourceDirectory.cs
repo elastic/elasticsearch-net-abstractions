@@ -26,10 +26,10 @@ namespace Nest.TypescriptGenerator
 			var csharpSourceFiles = InputFiles(directory).SelectMany(r => r.Declarations, (r, s) => new { r, s });
 			foreach(var f in csharpSourceFiles)
 			{
-				if (this.TypeNameToNamespaceMapping.ContainsKey(f.s) && (f.s.EndsWith("Request") || f.s.EndsWith("Descriptor")) )
+				if (TypeNameToNamespaceMapping.ContainsKey(f.s) && (f.s.EndsWith("Request") || f.s.EndsWith("Descriptor")) )
 					continue;
-				if (this.TypeNameToNamespaceMapping.ContainsKey(f.s)) continue;
-				this.TypeNameToNamespaceMapping.Add(f.s, f.r.Namespace);
+				if (TypeNameToNamespaceMapping.ContainsKey(f.s)) continue;
+				TypeNameToNamespaceMapping.Add(f.s, f.r.Namespace);
 			}
 		}
 

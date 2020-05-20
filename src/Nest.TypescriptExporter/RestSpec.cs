@@ -27,17 +27,17 @@ namespace Nest.TypescriptGenerator
 			using (var pbar = new ProgressBar(2, "reading NEST's REST API spec folder"))
 			{
 
-				this.RestSpecificationFolder = Path.GetFullPath(Path.Combine(nestSourceFolder, "..", "ApiGenerator", "RestSpecification"));
+				RestSpecificationFolder = Path.GetFullPath(Path.Combine(nestSourceFolder, "..", "ApiGenerator", "RestSpecification"));
 
-				var jsonFiles = Directory.GetFiles(this.RestSpecificationFolder, $"*.json", SearchOption.AllDirectories)
+				var jsonFiles = Directory.GetFiles(RestSpecificationFolder, $"*.json", SearchOption.AllDirectories)
 					.Where(f => !f.EndsWith(".patch.json") && !f.EndsWith("_common.json"))
 					.Select(f => new FileInfo(f))
 					.ToList();
 
-				this.SpecificationFiles = jsonFiles.ToDictionary(f => Path.GetFileNameWithoutExtension(f.Name), f => f);
+				SpecificationFiles = jsonFiles.ToDictionary(f => Path.GetFileNameWithoutExtension(f.Name), f => f);
 				pbar.Tick("read all json files");
 
-				this.Requests = Directory.GetFiles(nestSourceFolder, $"*Request.cs", SearchOption.AllDirectories)
+				Requests = Directory.GetFiles(nestSourceFolder, $"*Request.cs", SearchOption.AllDirectories)
 					.Select(f => new FileInfo(f))
 					.Select(CreateMapping)
 					.Where(m => m != null)
@@ -45,8 +45,8 @@ namespace Nest.TypescriptGenerator
 
 				pbar.Tick("mapped all json files to their *Request.cs counterparts in NEST's codebase");
 
-				var requestFileNames = this.Requests.Values.Select(v => v.Json.Name).ToList();
-				var notFound = this.SpecificationFiles.Values
+				var requestFileNames = Requests.Values.Select(v => v.Json.Name).ToList();
+				var notFound = SpecificationFiles.Values
 					.Select(v => v.Name)
 					.ToList()
 					.Except(requestFileNames)
@@ -92,12 +92,12 @@ namespace Nest.TypescriptGenerator
 			specFileName = specFileName.SnakeCase().Replace("_", ".");
 			do
 			{
-				if (this.SpecificationFiles.TryGetValue(specFileName, out var f))
+				if (SpecificationFiles.TryGetValue(specFileName, out var f))
 					return new RestSpecMapping {TypeName = $"I{typeName}", Json = f};
 			}
 			while (TryGetSpecTarget(specFileName, out specFileName));
 
-			throw new Exception($"{typeName} is not a known request in {this.RestSpecificationFolder}");
+			throw new Exception($"{typeName} is not a known request in {RestSpecificationFolder}");
 		}
 
 		public bool SkipRequestImplementation(string typeName)
