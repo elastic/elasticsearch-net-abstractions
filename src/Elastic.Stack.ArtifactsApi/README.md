@@ -1,4 +1,4 @@
-# Elastic.Stack.Artifacts
+# Elastic.Stack.ArtifactsApi
 
 Library to fetch the url and metadata for released artifacts.
 

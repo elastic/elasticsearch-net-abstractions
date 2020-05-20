@@ -1,6 +1,6 @@
-# Elastic.Xunit
+# Elastic.Elasticsearch.Xunit
 
-Write integration tests against Elasticsearch `2.x`, `5.x` and `6.x`.
+Write integration tests against Elasticsearch `2.x`, `5.x`, `6.x` and `7.x`.
 Works with `.NET Core` and `.NET 4.6` and up.
 
 Supports `dotnet xunit`, `dotnet test`, `xunit.console.runner` and tests will be runnable in your IDE through VSTest and jetBrains Rider.
@@ -19,10 +19,7 @@ from core but you can also use a full framework project.
     <TargetFrameworks>netcoreapp3.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
-    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-beta1-build3642" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Elastic.Xunit" Version="<latest>" />
+    <PackageReference Include="Elastic.Elasticsearch.Xunit" Version="<latest>" />
     <!-- Add the following if you want to run tests in your IDE (Rider/VS/Code) -->
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
@@ -33,22 +30,19 @@ from core but you can also use a full framework project.
 </Project>
 ```
 
-When using `.NET core` `dotnet xunit` is preferred over `dotnet test` the first will output a lot of useful 
-information about the clusters that get started.
-
-### Use Elastic.Xunit's test framework
+### Use Elastic.Elasticsearch.Xunit's test framework
 
 Add the following Assembly attribute anywhere in your project. This informs Xunit to use our 
 test framework to orchestrate and discover the tests.
 
 ```csharp
-[assembly: Xunit.TestFrameworkAttribute("Elastic.Xunit.Sdk.ElasticTestFramework", "Elastic.Xunit")]
+[assembly: Xunit.TestFrameworkAttribute("Elastic.Elasticsearch.Xunit.Sdk.ElasticTestFramework", "Elastic.Elasticsearch.Xunit")]
 ```
 
 ### Create a cluster
 
 This is the cluster that we'll write our integration test against. You can have multiple cluster. 
-`Elastic.Xunit` will only ever start one cluster at a time and then run all tests belonging to that cluster. 
+`Elastic.Elasticsearch.Xunit` will only ever start one cluster at a time and then run all tests belonging to that cluster. 
 
 ```csharp
 /// <summary> Declare our cluster that we want to inject into our test classes </summary>
@@ -104,8 +98,7 @@ public class ExampleTest : IClusterFixture<MyTestCluster>
 
 ![jetBrains rider integration](ide-integration.png)
 
-When using `.NET core` `dotnet xunit` is preferred over `dotnet test` the first will output a lot of useful 
-information about the clusters that get started.
+Or on the command line using `dotnet test`
 
 ![sample output](output.gif)
 
