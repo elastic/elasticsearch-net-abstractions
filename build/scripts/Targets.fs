@@ -44,11 +44,13 @@ let private generatePackages (arguments:ParseResults<Arguments>) =
     exec "dotnet" ["pack"; "-c"; "Release"; "-o"; output] |> ignore
     
 let private validatePackages (arguments:ParseResults<Arguments>) =
+    let output = Paths.RootRelative <| Paths.Output.FullName
     let nugetPackages =
         Paths.Output.GetFiles("*.nupkg") |> Seq.sortByDescending(fun f -> f.CreationTimeUtc)
         |> Seq.map (fun p -> Paths.RootRelative p.FullName)
     
-    nugetPackages |> Seq.iter (fun p -> exec "dotnet" ["nupkg-validator"; p; "-v"; currentVersionInformational.Value; "-k"; "96c599bbe3e70f5d"] |> ignore)
+    let args = ["-v"; currentVersionInformational.Value; "-k"; "96c599bbe3e70f5d"; "-t"; output]
+    nugetPackages |> Seq.iter (fun p -> exec "dotnet" (["nupkg-validator"; p] @ args) |> ignore)
     
 
 let private generateApiChanges (arguments:ParseResults<Arguments>) =
