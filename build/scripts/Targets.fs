@@ -104,14 +104,18 @@ let private createReleaseOnGithub (arguments:ParseResults<Arguments>) =
         | None -> []
         | Some token -> ["--token"; token;]
     let releaseNotes = Paths.RootRelative <| Path.Combine(Paths.Output.FullName, sprintf "release-notes-%s.md" currentVersion)
-    let breakingChanges = Paths.RootRelative <| Path.Combine(Paths.Output.FullName, "github-breaking-changes-comments.md")
+    let breakingChanges =
+        let file = Path.Combine(Paths.Output.FullName, "github-breaking-changes-comments.md")
+        let relativeFile = Paths.RootRelative <| file
+        match File.Exists file with
+        | true -> ["--body"; relativeFile]
+            | false -> []
     let releaseArgs =
         (Paths.Repository.Split("/") |> Seq.toList)
         @ ["create-release"
            "--version"; currentVersion
            "--body"; releaseNotes; 
-           "--body"; breakingChanges; 
-        ] @ tokenArgs
+        ] @ breakingChanges @ tokenArgs
         
     exec "dotnet" (["release-notes"] @ releaseArgs) |> ignore
     
