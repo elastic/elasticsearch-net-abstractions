@@ -105,11 +105,11 @@ let private createReleaseOnGithub (arguments:ParseResults<Arguments>) =
         | Some token -> ["--token"; token;]
     let releaseNotes = Paths.RootRelative <| Path.Combine(Paths.Output.FullName, sprintf "release-notes-%s.md" currentVersion)
     let breakingChanges =
-        let file = Path.Combine(Paths.Output.FullName, "github-breaking-changes-comments.md")
-        let relativeFile = Paths.RootRelative <| file
-        match File.Exists file with
-        | true -> ["--body"; relativeFile]
-            | false -> []
+        let breakingChangesDocs = Paths.Output.GetFiles("breaking-changes-*.md")
+        breakingChangesDocs 
+        |> Seq.map(fun f -> ["--body"; Paths.RootRelative f.FullName])
+        |> Seq.collect id
+        |> Seq.toList
     let releaseArgs =
         (Paths.Repository.Split("/") |> Seq.toList)
         @ ["create-release"
