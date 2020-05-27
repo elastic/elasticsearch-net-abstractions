@@ -72,7 +72,7 @@ let private generateApiChanges (arguments:ParseResults<Arguments>) =
                 "assembly-differ"
                 (sprintf "previous-nuget|%s|%s|%s" p currentVersion Paths.MainTFM);
                 (sprintf "directory|src/%s/bin/Release/%s" p Paths.MainTFM);
-                "-a"; "--target"; p; "-f"; "github-comment"; "--output"; outputFile
+                "-a"; "true"; "--target"; p; "-f"; "github-comment"; "--output"; outputFile
             ]
         
         exec "dotnet" args |> ignore
