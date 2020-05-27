@@ -9,7 +9,7 @@
       ]
     },
     "assembly-differ": {
-      "version": "0.12.0",
+      "version": "0.12.1",
       "commands": [
         "assembly-differ"
       ]
