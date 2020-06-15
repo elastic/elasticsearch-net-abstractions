@@ -64,6 +64,8 @@ namespace Nest.TypescriptGenerator
 				typeof (AllField),
 #pragma warning restore 618
 				typeof (Indices.ManyIndices),
+				typeof (PostType),
+				typeof (IDescriptor),
 			});
 
 		private readonly Dictionary<Type, string[]> _typesPropertiesToIgnore = new Dictionary<Type, string[]>
@@ -135,9 +137,9 @@ namespace Nest.TypescriptGenerator
 				return;
 			}
 
-			void EnforceBaseClass<TInterface, TBase>()
+			void EnforceBaseClass<TInterface, TBase>(bool force = false)
 			{
-				if (classModel.BaseType != null) return;
+				if (!force && classModel.BaseType != null) return;
 				if (classModel.Type == typeof(TBase)) return;
 				if (typeof(TInterface).IsAssignableFrom(classModel.Type)) classModel.BaseType = new TsClass(typeof(TBase));
 			}
@@ -148,6 +150,7 @@ namespace Nest.TypescriptGenerator
 			EnforceBaseClass<ICharFilter, CharFilterBase>();
 			EnforceBaseClass<IProperty, PropertyBase>();
 			EnforceBaseClass<IResponse, ResponseBase>();
+			EnforceBaseClass<WriteResponseBase, WriteResponseBase>(true);
 
 			if (classModel.BaseType != null)
 			{
@@ -192,6 +195,7 @@ namespace Nest.TypescriptGenerator
 			{
 				foreach (var property in members)
 				{
+					if (property.Name == "IsValid") continue;
 					if (property.IsIgnored ||
 					    PropertyTypesToIgnore(property.PropertyType.Type) ||
 					    (_typesPropertiesToIgnore.ContainsKey(classModel.Type) && _typesPropertiesToIgnore[classModel.Type].Contains(property.Name)))
@@ -254,7 +258,7 @@ namespace Nest.TypescriptGenerator
 					sb.AppendLineIndented("@request_parameter()");
 			}
 
-			var converter = attributes.FirstOrDefault(a => a.TypeId.ToString() == "Nest.Json.JsonConverterAttribute");
+			var converter = attributes.FirstOrDefault(a => a.TypeId.ToString() == "Elasticsearch.Net.Utf8Json.JsonFormatterAttribute");
 			if (converter != null)
 			{
 				if (GetConverter(converter, out var type)) return;
@@ -294,7 +298,7 @@ namespace Nest.TypescriptGenerator
 			if (iface != null) attributes.AddRange(iface.GetCustomAttributes());
 			attributes.AddRange(classModel.Type.GetCustomAttributes());
 
-			var converter = attributes.FirstOrDefault(a => a.TypeId.ToString() == "Nest.Json.JsonConverterAttribute");
+			var converter = attributes.FirstOrDefault(a => a.TypeId.ToString() == "Elasticsearch.Net.Utf8Json.JsonFormatterAttribute");
 			if (converter != null)
 			{
 				if (GetConverter(converter, out var type)) return;
@@ -310,8 +314,8 @@ namespace Nest.TypescriptGenerator
 
 		private static bool GetConverter(Attribute converter, out Type type)
 		{
-			type = (Type) converter.GetType().GetProperty("ConverterType").GetGetMethod().Invoke(converter, new object[] { });
-			if (type.Name.StartsWith("ReadAsTypeJsonConverter")) return true;
+			type = (Type) converter.GetType().GetProperty("FormatterType").GetGetMethod().Invoke(converter, new object[] { });
+			if (type.Name.StartsWith("ReadAsType")) return true;
 			if (type.Name.StartsWith("VerbatimDictionary")) return true;
 			if (type.Name.Contains("DictionaryResponse")) return true;
 			if (type.Name.StartsWith("StringEnum")) return true;
@@ -445,6 +449,11 @@ namespace Nest.TypescriptGenerator
 		{
 			if (TypeRenames.ContainsKey(classModel.Name)) return false;
 			if (typeof(IRequestParameters).IsAssignableFrom(classModel.Type)) return true;
+			if (typeof(IConnectionPool).IsAssignableFrom(classModel.Type)) return true;
+			if (typeof(IConnection).IsAssignableFrom(classModel.Type)) return true;
+			if (typeof(IElasticsearchSerializer).IsAssignableFrom(classModel.Type)) return true;
+			if (typeof(IMemoryStreamFactory).IsAssignableFrom(classModel.Type)) return true;
+			if (typeof(IPostData<>).IsAssignableFrom(classModel.Type)) return true;
 			if (IsClrType(classModel.Type)) return true;
 			if (_typesToIgnore.Contains(classModel.Type)) return true;
 			return false;

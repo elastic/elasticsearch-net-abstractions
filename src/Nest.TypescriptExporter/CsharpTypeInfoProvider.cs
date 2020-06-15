@@ -68,7 +68,7 @@ namespace Nest.TypescriptGenerator
 		private static bool TypeFilter(Type t) => TypeFilter(t, ExposedInterfacesImplementations);
 
 		private static bool TypeFilter(Type t, IEnumerable<Type> interfaces) =>
-			(t.IsEnum && !t.Namespace.StartsWith("Nest.Json") && (t.Namespace.StartsWith("Nest") || t.Namespace.StartsWith("Elasticsearch.Net")))
+			(t.IsEnum && !t.Namespace.StartsWith("Elasticsearch.Net.Utf8Json") && (t.Namespace.StartsWith("Nest") || t.Namespace.StartsWith("Elasticsearch.Net")))
 			|| (interfaces.Any(i=> i.IsAssignableFrom(t)) && t.IsClass && !BadClassRegex.IsMatch(t.Name));
 	}
 }

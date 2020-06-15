@@ -9,7 +9,7 @@ interface Uri {}
 interface Date {}
 interface TimeSpan {}
 interface SourceDocument {}
-@namespace("common")
+@class_serializer("ErrorCauseFormatter")
 class ErrorCause {
 	additional_properties: Dictionary<string, any>;
 	bytes_limit: long;
@@ -33,7 +33,7 @@ class ErrorCause {
 	stack_trace: string;
 	type: string;
 }
-@namespace("common")
+@class_serializer("ErrorFormatter")
 class MainError extends ErrorCause {
 	headers: Dictionary<string, string>;
 	root_cause: ErrorCause[];
@@ -1320,6 +1320,7 @@ enum WatcherState {
 	stopping = 3
 }
 @namespace("document.multiple.bulk.bulk_response_item")
+@class_serializer("BulkResponseItemFormatter")
 class BulkResponseItemBase {
 	error: MainError;
 	_id: string;
@@ -1332,9 +1333,9 @@ class BulkResponseItemBase {
 	status: integer;
 	_type: string;
 	_version: long;
-	is_valid: boolean;
 }
 @namespace("x_pack.security.role_mapping.rules.role")
+@class_serializer("RoleMappingRuleBaseFormatter")
 class RoleMappingRuleBase {
 }
 @namespace("analysis.analyzers")
@@ -1366,7 +1367,6 @@ class RequestBase {
 @namespace("common_abstractions.response")
 class ResponseBase implements IResponse {
 	debug_information: string;
-	is_valid: boolean;
 	server_error: ServerError;
 }
 @namespace("analysis.token_filters.compound_word")
@@ -1394,7 +1394,6 @@ class NodesResponseBase extends ResponseBase implements IResponse {
 @namespace("common_abstractions.response")
 class AcknowledgedResponseBase extends ResponseBase implements IResponse {
 	acknowledged: boolean;
-	is_valid: boolean;
 }
 @namespace("common_abstractions.response")
 class ShardsOperationResponseBase extends ResponseBase implements IResponse {
@@ -1465,6 +1464,7 @@ interface ITokenizer {
 	version: string;
 }
 @namespace("common_options.scripting")
+@class_serializer("ScriptFormatter")
 class Script {
 	lang: string;
 	params: Dictionary<string, any>;
@@ -1473,6 +1473,7 @@ class Script {
 interface ICatRecord {
 }
 @namespace("cluster.cluster_reroute.commands")
+@class_serializer("ClusterRerouteCommandFormatter")
 class ClusterRerouteCommand {
 	name: string;
 }
@@ -1487,6 +1488,7 @@ class BulkOperation {
 	version_type: VersionType;
 }
 @namespace("query_dsl.abstractions.container")
+@class_serializer("QueryContainerInterfaceFormatter")
 class QueryContainer {
 	bool: BoolQuery;
 	boosting: BoostingQuery;
@@ -1554,6 +1556,7 @@ class Query {
 	_name: string;
 }
 @namespace("query_dsl.compound.function_score.functions")
+@class_serializer("ScoreFunctionJsonFormatter")
 class ScoreFunction {
 	filter: QueryContainer;
 	weight: double;
@@ -1572,6 +1575,7 @@ class FieldLookup {
 	routing: Routing;
 }
 @namespace("query_dsl.geo.shape")
+@class_serializer("GeoShapeFormatter")
 class GeoShape {
 	type: string;
 }
@@ -1645,6 +1649,7 @@ class ScriptField {
 	script: Script;
 }
 @namespace("search.search.sort")
+@class_serializer("SortFormatter")
 class Sort {
 	missing: any;
 	mode: SortMode;
@@ -1660,6 +1665,7 @@ class NestedSort {
 	path: Field;
 }
 @namespace("search.search.source_filtering")
+@class_serializer("SourceFilterFormatter")
 class SourceFilter {
 	excludes: Field[];
 	includes: Field[];
@@ -1671,9 +1677,6 @@ class IntervalsContainer {
 	match: IntervalsMatch;
 	prefix: IntervalsPrefix;
 	wildcard: IntervalsWildcard;
-}
-@namespace("common_abstractions.fluent")
-class Descriptor {
 }
 @namespace("query_dsl.full_text.intervals")
 class Intervals {
@@ -1695,6 +1698,7 @@ class IntervalsFilter {
 class IntervalsNoFilter {
 }
 @namespace("common_options.fuzziness")
+@class_serializer("FuzzinessInterfaceFormatter")
 class Fuzziness {
 	auto: boolean;
 	low: integer;
@@ -1704,6 +1708,7 @@ class Fuzziness {
 }
 @namespace("query_dsl.specialized.more_like_this.like")
 class LikeDocument {
+	@prop_serializer("SourceFormatter`1")
 	doc: any;
 	fields: Field[];
 	_id: Id;
@@ -1748,6 +1753,7 @@ class MultiGetHit<TDocument> {
 }
 @namespace("document.multiple.multi_term_vectors")
 class MultiTermVectorOperation {
+	@prop_serializer("SourceFormatter`1")
 	doc: any;
 	field_statistics: boolean;
 	filter: TermVectorFilter;
@@ -1805,15 +1811,18 @@ class RemoteSource {
 	username: string;
 }
 @namespace("common_abstractions.lazy_document")
+@class_serializer("LazyDocumentInterfaceFormatter")
 class LazyDocument {
 }
 @namespace("search.explain")
 class InlineGet<TDocument> {
 	fields: Dictionary<string, LazyDocument>;
 	found: boolean;
+	@prop_serializer("SourceFormatter`1")
 	_source: TDocument;
 }
 @namespace("indices.alias_management.alias.actions")
+@class_serializer("AliasActionFormatter")
 class AliasAction {
 }
 @namespace("indices.alias_management")
@@ -1828,6 +1837,7 @@ class Alias {
 class TypeMapping {
 	all_field: AllField;
 	date_detection: boolean;
+	@prop_serializer("DynamicMappingFormatter")
 	dynamic: Union<boolean, DynamicMapping>;
 	dynamic_date_formats: string[];
 	dynamic_templates: Dictionary<string, DynamicTemplate>;
@@ -1881,6 +1891,7 @@ class Pipeline {
 	processors: Processor[];
 }
 @namespace("ingest")
+@class_serializer("ProcessorFormatter")
 class Processor {
 	name: string;
 	on_failure: Processor[];
@@ -1892,6 +1903,7 @@ class Processor {
 class SimulatePipelineDocument {
 	_id: Id;
 	_index: IndexName;
+	@prop_serializer("SourceFormatter`1")
 	_source: any;
 }
 @namespace("mapping.types")
@@ -1923,6 +1935,7 @@ class TextIndexPrefixes {
 	min_chars: integer;
 }
 @namespace("mapping.types.specialized.completion")
+@class_serializer("SuggestContextFormatter")
 class SuggestContext {
 	name: string;
 	path: Field;
@@ -2104,9 +2117,11 @@ class Aggregation {
 	name: string;
 }
 @namespace("aggregations.pipeline")
+@class_serializer("BucketsPathFormatter")
 class BucketsPath {
 }
 @namespace("aggregations.bucket.composite")
+@class_serializer("CompositeAggregationSourceFormatter")
 class CompositeAggregationSource {
 	field: Field;
 	missing_bucket: boolean;
@@ -2183,6 +2198,7 @@ class AnalysisConfig {
 	summary_count_field_name: Field;
 }
 @namespace("x_pack.machine_learning.job.detectors")
+@class_serializer("DetectorFormatter")
 class Detector {
 	custom_rules: DetectionRule[];
 	detector_description: string;
@@ -2370,6 +2386,7 @@ class ApplicationPrivileges {
 @namespace("x_pack.security.role.put_role")
 class IndicesPrivileges {
 	field_security: FieldSecurity;
+	@prop_serializer("IndicesFormatter")
 	names: Indices;
 	privileges: string[];
 	query: QueryContainer;
@@ -2383,6 +2400,7 @@ class FieldSecurity {
 class SnapshotLifecycleConfig {
 	ignore_unavailable: boolean;
 	include_global_state: boolean;
+	@prop_serializer("IndicesMultiSyntaxFormatter")
 	indices: Indices;
 }
 @namespace("x_pack.watcher.schedule")
@@ -2454,6 +2472,7 @@ class ConditionContainer {
 class Condition {
 }
 @namespace("x_pack.watcher.condition")
+@class_serializer("ArrayCompareConditionFormatter")
 class ArrayCompareCondition {
 	array_path: string;
 	comparison: string;
@@ -2502,6 +2521,7 @@ class HttpInputProxy {
 	port: integer;
 }
 @namespace("x_pack.watcher.trigger")
+@class_serializer("TriggerContainerInterfaceFormatter")
 class TriggerContainer {
 	schedule: ScheduleContainer;
 }
@@ -2522,21 +2542,29 @@ class TimeOfDay {
 }
 @namespace("x_pack.watcher.schedule")
 class TimeOfMonth {
+	@prop_serializer("SingleOrEnumerableFormatter`1")
 	at: string[];
+	@prop_serializer("SingleOrEnumerableFormatter`1")
 	on: integer[];
 }
 @namespace("x_pack.watcher.schedule")
 class TimeOfWeek {
+	@prop_serializer("SingleOrEnumerableFormatter`1")
 	at: string[];
+	@prop_serializer("SingleOrEnumerableFormatter`1")
 	on: Day[];
 }
 @namespace("x_pack.watcher.schedule")
 class TimeOfYear {
+	@prop_serializer("SingleOrEnumerableFormatter`1")
 	at: string[];
+	@prop_serializer("SingleOrEnumerableFormatter`1")
 	int: Month[];
+	@prop_serializer("SingleOrEnumerableFormatter`1")
 	on: integer[];
 }
 @namespace("aggregations")
+@class_serializer("AggregateFormatter")
 class Aggregate {
 	meta: Dictionary<string, any>;
 }
@@ -2547,6 +2575,7 @@ class HitMetadata<TDocument> {
 	_primary_term: long;
 	_routing: string;
 	_seq_no: long;
+	@prop_serializer("SourceFormatter`1")
 	_source: TDocument;
 	_type: string;
 	_version: long;
@@ -2558,6 +2587,7 @@ class HitsMetadata<T> {
 	total: TotalHits;
 }
 @namespace("search.suggesters")
+@class_serializer("SuggestDictionaryFormatter`1")
 class SuggestDictionary<T> {
 	item: Suggest<T>[];
 	keys: string[];
@@ -2581,6 +2611,7 @@ class SuggestOption<TDocument> {
 	_id: string;
 	_index: IndexName;
 	score: double;
+	@prop_serializer("SourceFormatter`1")
 	_source: TDocument;
 	score: double;
 	text: string;
@@ -2639,6 +2670,7 @@ class SlackAttachment {
 	thumb_url: string;
 	title: string;
 	title_link: string;
+	@prop_serializer("NullableDateTimeOffsetEpochSecondsFormatter")
 	ts: Date;
 }
 @namespace("x_pack.watcher.action.slack")
@@ -2818,7 +2850,9 @@ class ParentIdQuery {
 }
 @namespace("query_dsl.specialized.percolate")
 class PercolateQuery {
+	@prop_serializer("SourceFormatter`1")
 	document: any;
+	@prop_serializer("SourceFormatter`1")
 	documents: any[];
 	field: Field;
 	id: Id;
@@ -3058,10 +3092,12 @@ class ScheduleTriggerEvent {
 	triggered_time: Union<Date, string>;
 }
 @namespace("x_pack.watcher.transform")
+@class_serializer("ChainTransformFormatter")
 class ChainTransform {
 	transforms: TransformContainer[];
 }
 @namespace("x_pack.watcher.transform")
+@class_serializer("ScriptTransformFormatter")
 class ScriptTransform {
 	lang: string;
 	params: Dictionary<string, any>;
@@ -3075,6 +3111,7 @@ class SearchTransform {
 class AlwaysCondition {
 }
 @namespace("x_pack.watcher.condition")
+@class_serializer("CompareConditionFormatter")
 class CompareCondition {
 	comparison: string;
 	path: string;
@@ -3084,11 +3121,13 @@ class CompareCondition {
 class NeverCondition {
 }
 @namespace("x_pack.watcher.condition")
+@class_serializer("ScriptConditionFormatter")
 class ScriptCondition {
 	lang: string;
 	params: Dictionary<string, any>;
 }
 @namespace("x_pack.watcher.input")
+@class_serializer("ChainInputFormatter")
 class ChainInput {
 	inputs: Dictionary<string, InputContainer>;
 }
@@ -3105,6 +3144,7 @@ class SearchInput {
 	timeout: Time;
 }
 @namespace("x_pack.watcher.input")
+@class_serializer("SimpleInputFormatter")
 class SimpleInput {
 	payload: Dictionary<string, any>;
 }
@@ -3121,6 +3161,7 @@ class Hit<TDocument> {
 	_explanation: Explanation;
 	fields: Dictionary<string, LazyDocument>;
 	highlight: Dictionary<string, string[]>;
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	inner_hits: Dictionary<string, InnerHitsResult>;
 	matched_queries: string[];
 	_nested: NestedIdentity;
@@ -3128,6 +3169,7 @@ class Hit<TDocument> {
 	sort: any[];
 }
 @namespace("query_dsl.full_text.common_terms")
+@class_serializer("FieldNameQueryFormatter`2")
 class CommonTermsQuery {
 	analyzer: string;
 	cutoff_frequency: double;
@@ -3137,6 +3179,7 @@ class CommonTermsQuery {
 	query: string;
 }
 @namespace("query_dsl.term_level.fuzzy")
+@class_serializer("FuzzyQueryFormatter")
 class FuzzyQuery {
 	max_expansions: integer;
 	prefix_length: integer;
@@ -3144,12 +3187,14 @@ class FuzzyQuery {
 	transpositions: boolean;
 }
 @namespace("query_dsl.geo.bounding_box")
+@class_serializer("GeoBoundingBoxQueryFormatter")
 class GeoBoundingBoxQuery {
 	bounding_box: BoundingBox;
 	type: GeoExecution;
 	validation_method: GeoValidationMethod;
 }
 @namespace("query_dsl.geo.distance")
+@class_serializer("GeoDistanceQueryFormatter")
 class GeoDistanceQuery {
 	distance: Distance;
 	distance_type: GeoDistanceType;
@@ -3157,11 +3202,13 @@ class GeoDistanceQuery {
 	validation_method: GeoValidationMethod;
 }
 @namespace("query_dsl.geo.polygon")
+@class_serializer("GeoPolygonQueryFormatter")
 class GeoPolygonQuery {
 	points: GeoLocation[];
 	validation_method: GeoValidationMethod;
 }
 @namespace("query_dsl.geo.shape")
+@class_serializer("CompositeFormatter`3")
 class GeoShapeQuery {
 	ignore_unmapped: boolean;
 	indexed_shape: FieldLookup;
@@ -3169,6 +3216,7 @@ class GeoShapeQuery {
 	shape: GeoShape;
 }
 @namespace("query_dsl.specialized.shape")
+@class_serializer("CompositeFormatter`3")
 class ShapeQuery {
 	ignore_unmapped: boolean;
 	indexed_shape: FieldLookup;
@@ -3176,6 +3224,7 @@ class ShapeQuery {
 	shape: GeoShape;
 }
 @namespace("query_dsl.full_text.match")
+@class_serializer("FieldNameQueryFormatter`2")
 class MatchQuery {
 	analyzer: string;
 	auto_generate_synonyms_phrase_query: boolean;
@@ -3192,12 +3241,14 @@ class MatchQuery {
 	zero_terms_query: ZeroTermsQuery;
 }
 @namespace("query_dsl.full_text.match_phrase")
+@class_serializer("FieldNameQueryFormatter`2")
 class MatchPhraseQuery {
 	analyzer: string;
 	query: string;
 	slop: integer;
 }
 @namespace("query_dsl.full_text.match_phrase_prefix")
+@class_serializer("FieldNameQueryFormatter`2")
 class MatchPhrasePrefixQuery {
 	analyzer: string;
 	max_expansions: integer;
@@ -3206,13 +3257,17 @@ class MatchPhrasePrefixQuery {
 	zero_terms_query: ZeroTermsQuery;
 }
 @namespace("query_dsl.term_level.term")
+@class_serializer("FieldNameQueryFormatter`2")
 class TermQuery {
+	@prop_serializer("SourceWriteFormatter`1")
 	value: any;
 }
 @namespace("query_dsl.term_level.range")
+@class_serializer("RangeQueryFormatter")
 class RangeQuery {
 }
 @namespace("query_dsl.term_level.regexp")
+@class_serializer("FieldNameQueryFormatter`2")
 class RegexpQuery {
 	flags: string;
 	max_determinized_states: integer;
@@ -3234,6 +3289,7 @@ class SpanFirstQuery {
 	match: SpanQuery;
 }
 @namespace("query_dsl.span.gap")
+@class_serializer("SpanGapQueryFormatter")
 class SpanGapQuery {
 	field: Field;
 	width: integer;
@@ -3266,21 +3322,26 @@ class SpanWithinQuery {
 	little: SpanQuery;
 }
 @namespace("query_dsl.term_level.terms")
+@class_serializer("TermsQueryFormatter")
 class TermsQuery {
 	terms: any[];
 	terms_lookup: FieldLookup;
 }
 @namespace("query_dsl.term_level.terms_set")
+@class_serializer("FieldNameQueryFormatter`2")
 class TermsSetQuery {
 	minimum_should_match_field: Field;
 	minimum_should_match_script: Script;
+	@prop_serializer("SourceWriteFormatter`1")
 	terms: any[];
 }
 @namespace("query_dsl.specialized.rank_feature")
+@class_serializer("RankFeatureQueryFormatter")
 class RankFeatureQuery {
 	function: RankFeatureFunction;
 }
 @namespace("query_dsl.specialized.distance_feature")
+@class_serializer("DistanceFeatureQueryFormatter")
 class DistanceFeatureQuery {
 	origin: Union<GeoCoordinate, DateMath>;
 	pivot: Union<Distance, Time>;
@@ -3372,6 +3433,7 @@ class ExtendedStatsBucketAggregation {
 	sigma: double;
 }
 @namespace("aggregations.bucket.filter")
+@class_serializer("FilterAggregationFormatter")
 class FilterAggregation {
 	filter: QueryContainer;
 }
@@ -3450,6 +3512,7 @@ class MissingAggregation {
 	field: Field;
 }
 @namespace("aggregations.pipeline.moving_average")
+@class_serializer("MovingAverageAggregationFormatter")
 class MovingAverageAggregation {
 	minimize: boolean;
 	model: MovingAverageModel;
@@ -3471,12 +3534,14 @@ class ParentAggregation {
 	type: RelationName;
 }
 @namespace("aggregations.metric.percentile_ranks")
+@class_serializer("PercentileRanksAggregationFormatter")
 class PercentileRanksAggregation {
 	method: PercentilesMethod;
 	values: double[];
 	keyed: boolean;
 }
 @namespace("aggregations.metric.percentiles")
+@class_serializer("PercentilesAggregationFormatter")
 class PercentilesAggregation {
 	method: PercentilesMethod;
 	percents: double[];
@@ -3609,20 +3674,25 @@ class MedianAbsoluteDeviationAggregation {
 	compression: double;
 }
 @namespace("query_dsl.full_text.intervals")
+@class_serializer("FieldNameQueryFormatter`2")
 class IntervalsQuery {
 }
 @namespace("query_dsl.term_level.prefix")
+@class_serializer("FieldNameQueryFormatter`2")
 class PrefixQuery {
 	rewrite: MultiTermQueryRewrite;
 }
 @namespace("query_dsl.term_level.wildcard")
+@class_serializer("FieldNameQueryFormatter`2")
 class WildcardQuery {
 	rewrite: MultiTermQueryRewrite;
 }
 @namespace("query_dsl.span.term")
+@class_serializer("FieldNameQueryFormatter`2")
 class SpanTermQuery {
 }
 @namespace("common_abstractions.union")
+@class_serializer("UnionFormatter`2")
 class Union<TFirst, TSecond> {
 }
 @namespace("cluster.cluster_allocation_explain")
@@ -3673,6 +3743,7 @@ class IndexHealthStats {
 	number_of_replicas: integer;
 	number_of_shards: integer;
 	relocating_shards: integer;
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	shards: Dictionary<string, ShardHealthStats>;
 	status: Health;
 	unassigned_shards: integer;
@@ -3937,6 +4008,7 @@ class NodeInfo {
 	process: NodeProcessInfo;
 	roles: NodeRole[];
 	settings: string[];
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	thread_pool: Dictionary<string, NodeThreadPoolInfo>;
 	transport: NodeInfoTransport;
 	transport_address: string;
@@ -4035,13 +4107,16 @@ class NodeInfoTransport {
 }
 @namespace("cluster.nodes_stats")
 class NodeStats {
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	adaptive_selection: Dictionary<string, AdaptiveSelectionStats>;
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	breakers: Dictionary<string, BreakerStats>;
 	fs: FileSystemStats;
 	host: string;
 	http: HttpStats;
 	indices: IndexStats;
 	ingest: NodeIngestStats;
+	@prop_serializer("SingleOrEnumerableFormatter`1")
 	ip: string[];
 	jvm: NodeJvmStats;
 	name: string;
@@ -4049,6 +4124,7 @@ class NodeStats {
 	process: ProcessStats;
 	roles: NodeRole[];
 	script: ScriptStats;
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	thread_pool: Dictionary<string, ThreadCountStats>;
 	timestamp: long;
 	transport: TransportStats;
@@ -4137,6 +4213,7 @@ class IndexingStats {
 	index_time: string;
 	index_time_in_millis: long;
 	index_total: long;
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	types: Dictionary<string, IndexingStats>;
 }
 @namespace("common_options.stats")
@@ -4216,6 +4293,7 @@ class WarmerStats {
 }
 @namespace("cluster.nodes_stats.statistics")
 class NodeIngestStats {
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	pipelines: Dictionary<string, IngestStats>;
 	total: IngestStats;
 }
@@ -4228,6 +4306,7 @@ class IngestStats {
 	processors: KeyedProcessorStats[];
 }
 @namespace("cluster.nodes_stats.statistics")
+@class_serializer("KeyedProcessorStatsFormatter")
 class KeyedProcessorStats {
 	type: string;
 	statistics: ProcessStats;
@@ -4241,6 +4320,7 @@ class ProcessStats {
 }
 @namespace("cluster.nodes_stats")
 class NodeJvmStats {
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	buffer_pools: Dictionary<string, NodeBufferPool>;
 	classes: JvmClassesStats;
 	gc: GarbageCollectionStats;
@@ -4284,7 +4364,9 @@ class TransportStats {
 @namespace("cluster.nodes_usage")
 class NodeUsageInformation {
 	rest_actions: Dictionary<string, integer>;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	since: Date;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	timestamp: Date;
 }
 @namespace("cluster.remote_info")
@@ -4310,6 +4392,7 @@ class ElasticsearchVersionInfo {
 }
 @namespace("cluster.task_management.list_tasks")
 class TaskExecutingNode {
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	attributes: Dictionary<string, string>;
 	host: string;
 	ip: string;
@@ -4373,6 +4456,7 @@ class ShardStatistics {
 	total: integer;
 }
 @namespace("common_options.geo")
+@class_serializer("DistanceFormatter")
 class Distance {
 	precision: double;
 	unit: DistanceUnit;
@@ -4417,15 +4501,18 @@ class Token {
 	start_offset: integer;
 }
 @namespace("document.multiple.reindex_on_server")
+@class_serializer("ReindexRoutingFormatter")
 class ReindexRouting {
 }
 @namespace("document.multiple.reindex_rethrottle")
 class ReindexNode {
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	attributes: Dictionary<string, string>;
 	host: string;
 	ip: string;
 	name: string;
 	roles: string[];
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	tasks: Dictionary<TaskId, ReindexTask>;
 	transport_address: string;
 }
@@ -4516,6 +4603,7 @@ class CloseShardResult {
 }
 @namespace("indices.mapping_management.get_field_mapping")
 class TypeFieldMappings {
+	@prop_serializer("ResolvableReadOnlyDictionaryFormatter`2")
 	mappings: Dictionary<Field, FieldMapping>;
 }
 @namespace("indices.mapping_management.get_mapping")
@@ -4535,7 +4623,9 @@ class ShardRecovery {
 	source: RecoveryOrigin;
 	stage: string;
 	start: RecoveryStartStatus;
+	@prop_serializer("NullableDateTimeEpochMillisecondsFormatter")
 	start_time_in_millis: Date;
+	@prop_serializer("NullableDateTimeEpochMillisecondsFormatter")
 	stop_time_in_millis: Date;
 	target: RecoveryOrigin;
 	total_time_in_millis: long;
@@ -4601,13 +4691,16 @@ class RecoveryVerifyIndex {
 }
 @namespace("indices.monitoring.indices_segments")
 class IndexSegment {
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	shards: Dictionary<string, ShardsSegment>;
 }
 @namespace("indices.monitoring.indices_segments")
+@class_serializer("Json")
 class ShardsSegment {
 	num_committed_segments: integer;
 	routing: ShardSegmentRouting;
 	num_search_segments: integer;
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	segments: Dictionary<string, Segment>;
 }
 @namespace("indices.monitoring.indices_segments")
@@ -4631,6 +4724,7 @@ class Segment {
 }
 @namespace("indices.monitoring.indices_shard_stores")
 class IndicesShardStores {
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	shards: Dictionary<string, ShardStoreWrapper>;
 }
 @namespace("indices.monitoring.indices_shard_stores")
@@ -4638,9 +4732,11 @@ class ShardStoreWrapper {
 	stores: ShardStore[];
 }
 @namespace("indices.monitoring.indices_shard_stores")
+@class_serializer("ShardStoreFormatter")
 class ShardStore {
 	allocation: ShardStoreAllocation;
 	allocation_id: string;
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	attributes: Dictionary<string, any>;
 	id: string;
 	legacy_version: long;
@@ -4656,6 +4752,7 @@ class ShardStoreException {
 @namespace("indices.monitoring.indices_stats")
 class IndicesStats {
 	primaries: IndexStats;
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	shards: Dictionary<string, ShardStats[]>;
 	total: IndexStats;
 	uuid: string;
@@ -4967,7 +5064,9 @@ class License {
 class ScheduledEvent {
 	calendar_id: Id;
 	description: string;
+	@prop_serializer("NullableDateTimeOffsetEpochMillisecondsFormatter")
 	start_time: Date;
+	@prop_serializer("NullableDateTimeOffsetEpochMillisecondsFormatter")
 	end_time: Date;
 	event_id: Id;
 }
@@ -4977,11 +5076,13 @@ class ExtendedBounds<T> {
 	min: T;
 }
 @namespace("aggregations.bucket.terms")
+@class_serializer("TermsExcludeFormatter")
 class TermsExclude {
 	pattern: string;
 	values: string[];
 }
 @namespace("aggregations.bucket.terms")
+@class_serializer("TermsIncludeFormatter")
 class TermsInclude {
 	num_partitions: long;
 	partition: long;
@@ -4989,6 +5090,7 @@ class TermsInclude {
 	values: string[];
 }
 @namespace("aggregations.bucket.significant_terms")
+@class_serializer("IncludeExcludeFormatter")
 class IncludeExclude {
 	pattern: string;
 	values: string[];
@@ -4999,6 +5101,7 @@ class FilterRef {
 	filter_type: RuleFilterType;
 }
 @namespace("x_pack.watcher.execution")
+@class_serializer("SimulatedActionsFormatter")
 class SimulatedActions {
 	actions: string[];
 	all: SimulatedActions;
@@ -5048,8 +5151,11 @@ class ExplanationDetail {
 @namespace("search.field_capabilities")
 class FieldCapabilities {
 	aggregatable: boolean;
+	@prop_serializer("IndicesFormatter")
 	indices: Indices;
+	@prop_serializer("IndicesFormatter")
 	non_aggregatable_indices: Indices;
+	@prop_serializer("IndicesFormatter")
 	non_searchable_indices: Indices;
 	searchable: boolean;
 }
@@ -5096,6 +5202,7 @@ class NestedIdentity {
 	offset: integer;
 }
 @namespace("search.search.hits")
+@class_serializer("TotalHitsFormatter")
 class TotalHits {
 	relation: TotalHitsRelation;
 	value: long;
@@ -5240,6 +5347,7 @@ class CcrAutoFollowStats {
 @namespace("x_pack.cross_cluster_replication.stats")
 class AutoFollowedCluster {
 	cluster_name: string;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	time_since_last_check_millis: Date;
 	last_seen_metadata_version: long;
 }
@@ -5264,21 +5372,26 @@ class GraphVertex {
 @namespace("x_pack.ilm.explain_lifecycle")
 class LifecycleExplain {
 	action: string;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	action_time_millis: Date;
 	failed_step: string;
 	index: IndexName;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	lifecycle_date_millis: Date;
 	managed: boolean;
 	phase: string;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	phase_time_millis: Date;
 	policy: string;
 	step: string;
 	step_info: Dictionary<string, any>;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	step_time_millis: Date;
 	age: Time;
 }
 @namespace("x_pack.ilm.get_lifecycle")
 class LifecyclePolicy {
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	modified_date: Date;
 	policy: Policy;
 	version: integer;
@@ -5382,6 +5495,7 @@ class AnomalyRecord {
 	probability: double;
 	record_score: double;
 	result_type: string;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	timestamp: Date;
 	typical: double[];
 }
@@ -5419,6 +5533,7 @@ class Bucket {
 	partition_scores: PartitionScore[];
 	processing_time_ms: double;
 	result_type: string;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	timestamp: Date;
 }
 @namespace("x_pack.machine_learning.job.results")
@@ -5432,6 +5547,7 @@ class BucketInfluencer {
 	job_id: string;
 	probability: double;
 	result_type: string;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	timestamp: Date;
 }
 @namespace("x_pack.machine_learning.job.results")
@@ -5467,6 +5583,7 @@ class DatafeedStats {
 }
 @namespace("x_pack.machine_learning.datafeed")
 class DiscoveryNode {
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	attributes: Dictionary<string, string>;
 	ephemeral_id: string;
 	id: string;
@@ -5487,6 +5604,7 @@ class DatafeedConfig {
 	chunking_config: ChunkingConfig;
 	datafeed_id: string;
 	frequency: Time;
+	@prop_serializer("IndicesFormatter")
 	indices: Indices;
 	job_id: string;
 	query: QueryContainer;
@@ -5515,6 +5633,7 @@ class JobStats {
 @namespace("x_pack.machine_learning.job.process")
 class DataCounts {
 	bucket_count: long;
+	@prop_serializer("NullableDateTimeOffsetEpochMillisecondsFormatter")
 	earliest_record_timestamp: Date;
 	empty_bucket_count: long;
 	input_bytes: long;
@@ -5522,9 +5641,13 @@ class DataCounts {
 	input_record_count: long;
 	invalid_date_count: long;
 	job_id: string;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	last_data_time: Date;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	latest_empty_bucket_timestamp: Date;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	latest_record_timestamp: Date;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	latest_sparse_bucket_timestamp: Date;
 	missing_field_count: long;
 	out_of_order_timestamp_count: long;
@@ -5544,10 +5667,12 @@ class JobForecastStatistics {
 class ModelSizeStats {
 	bucket_allocation_failures_count: long;
 	job_id: string;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	log_time: Date;
 	memory_status: MemoryStatus;
 	model_bytes: long;
 	result_type: string;
+	@prop_serializer("NullableDateTimeOffsetEpochMillisecondsFormatter")
 	timestamp: Date;
 	total_by_field_count: long;
 	total_over_field_count: long;
@@ -5568,9 +5693,11 @@ class Job {
 	analysis_config: AnalysisConfig;
 	analysis_limits: AnalysisLimits;
 	background_persist_interval: Time;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	create_time: Date;
 	data_description: DataDescription;
 	description: string;
+	@prop_serializer("NullableDateTimeOffsetEpochMillisecondsFormatter")
 	finished_time: Date;
 	job_id: string;
 	job_type: string;
@@ -5585,12 +5712,15 @@ class Job {
 class ModelSnapshot {
 	description: string;
 	job_id: string;
+	@prop_serializer("NullableDateTimeOffsetEpochMillisecondsFormatter")
 	latest_record_time_stamp: Date;
+	@prop_serializer("NullableDateTimeOffsetEpochMillisecondsFormatter")
 	latest_result_time_stamp: Date;
 	model_size_stats: ModelSizeStats;
 	retain: boolean;
 	snapshot_doc_count: long;
 	snapshot_id: string;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	timestamp: Date;
 }
 @namespace("x_pack.machine_learning.job.results")
@@ -5600,6 +5730,7 @@ class OverallBucket {
 	jobs: OverallBucketJobInfo[];
 	overall_score: double;
 	result_type: string;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	timestamp: Date;
 }
 @namespace("x_pack.machine_learning.job.results")
@@ -5693,7 +5824,9 @@ class RollupJobStatus {
 }
 @namespace("x_pack.security.api_key.get_api_key")
 class ApiKeys {
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	creation: Date;
+	@prop_serializer("NullableDateTimeOffsetEpochMillisecondsFormatter")
 	expiration: Date;
 	id: string;
 	invalidated: boolean;
@@ -5793,7 +5926,9 @@ class XPackUser {
 }
 @namespace("x_pack.slm")
 class SnapshotLifecyclePolicyMetadata {
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	modified_date_millis: Date;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	next_execution_millis: Date;
 	policy: SnapshotLifecyclePolicy;
 	version: integer;
@@ -5806,11 +5941,13 @@ class SnapshotLifecycleInProgress {
 	name: string;
 	uuid: string;
 	state: string;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	start_time_millis: Date;
 }
 @namespace("x_pack.slm")
 class SnapshotLifecycleInvocationRecord {
 	snapshot_name: string;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	time: Date;
 }
 @namespace("x_pack.sql.query_sql")
@@ -5978,6 +6115,7 @@ class ExecutionThreadPool {
 	queue_size: long;
 }
 @namespace("analysis")
+@class_serializer("StopWordsFormatter")
 class StopWords extends Union<string, string[]> {
 }
 @namespace("cat.cat_aliases")
@@ -6016,6 +6154,7 @@ class CatCountResponse extends ResponseBase {
 	records: CatCountRecord[];
 }
 @namespace("cat.cat_fielddata")
+@class_serializer("CatFielddataRecordFormatter")
 class CatFielddataRecord implements ICatRecord {
 	field: string;
 	host: string;
@@ -6178,6 +6317,7 @@ class CatNodesResponse extends ResponseBase {
 }
 @namespace("cat.cat_pending_tasks")
 class CatPendingTasksRecord implements ICatRecord {
+	@prop_serializer("NullableStringIntFormatter")
 	insertOrder: integer;
 	priority: string;
 	source: string;
@@ -6222,8 +6362,10 @@ class CatRecoveryRecord implements ICatRecord {
 	target_host: string;
 	target_node: string;
 	time: string;
+	@prop_serializer("NullableStringLongFormatter")
 	translog_ops: long;
 	translog_ops_percent: string;
+	@prop_serializer("NullableStringLongFormatter")
 	translog_ops_recovered: long;
 	type: string;
 }
@@ -6330,15 +6472,21 @@ class CatShardsResponse extends ResponseBase {
 @namespace("cat.cat_snapshots")
 class CatSnapshotsRecord implements ICatRecord {
 	duration: Time;
+	@prop_serializer("StringLongFormatter")
 	end_epoch: long;
 	end_time: string;
+	@prop_serializer("StringLongFormatter")
 	failed_shards: long;
 	id: string;
+	@prop_serializer("StringLongFormatter")
 	indices: long;
+	@prop_serializer("StringLongFormatter")
 	start_epoch: long;
 	start_time: string;
 	status: string;
+	@prop_serializer("StringLongFormatter")
 	successful_shards: long;
+	@prop_serializer("StringLongFormatter")
 	total_shards: long;
 }
 @namespace("cat.cat_snapshots")
@@ -6365,7 +6513,9 @@ class CatTasksResponse extends ResponseBase {
 class CatTemplatesRecord implements ICatRecord {
 	index_patterns: string;
 	name: string;
+	@prop_serializer("StringLongFormatter")
 	order: long;
+	@prop_serializer("NullableStringLongFormatter")
 	version: long;
 }
 @namespace("cat.cat_templates")
@@ -6374,24 +6524,36 @@ class CatTemplatesResponse extends ResponseBase {
 }
 @namespace("cat.cat_thread_pool")
 class CatThreadPoolRecord implements ICatRecord {
+	@prop_serializer("StringIntFormatter")
 	active: integer;
+	@prop_serializer("NullableStringLongFormatter")
 	completed: long;
+	@prop_serializer("NullableStringIntFormatter")
 	core: integer;
 	ephemeral_node_id: string;
 	host: string;
 	ip: string;
 	keep_alive: Time;
+	@prop_serializer("NullableStringIntFormatter")
 	largest: integer;
+	@prop_serializer("NullableStringIntFormatter")
 	max: integer;
 	name: string;
 	node_id: string;
 	node_name: string;
+	@prop_serializer("NullableStringIntFormatter")
 	pool_size: integer;
+	@prop_serializer("NullableStringIntFormatter")
 	port: integer;
+	@prop_serializer("NullableStringIntFormatter")
 	pid: integer;
+	@prop_serializer("StringIntFormatter")
 	queue: integer;
+	@prop_serializer("NullableStringIntFormatter")
 	queue_size: integer;
+	@prop_serializer("StringLongFormatter")
 	rejected: long;
+	@prop_serializer("NullableStringIntFormatter")
 	size: integer;
 	type: string;
 }
@@ -6400,9 +6562,11 @@ class CatThreadPoolResponse extends ResponseBase {
 	records: CatThreadPoolRecord[];
 }
 @namespace("common_options.minimum_should_match")
+@class_serializer("MinimumShouldMatchFormatter")
 class MinimumShouldMatch extends Union<integer, string> {
 }
 @namespace("query_dsl.multi_term_query_rewrite")
+@class_serializer("MultiTermQueryRewriteFormatter")
 class MultiTermQueryRewrite {
 	constant_score: MultiTermQueryRewrite;
 	constant_score_boolean: MultiTermQueryRewrite;
@@ -6411,9 +6575,11 @@ class MultiTermQueryRewrite {
 	size: integer;
 }
 @namespace("query_dsl.specialized.more_like_this.like")
+@class_serializer("LikeFormatter")
 class Like extends Union<string, LikeDocument> {
 }
 @namespace("aggregations.bucket.histogram")
+@class_serializer("SortOrderFormatter`1")
 class HistogramOrder {
 	count_ascending: HistogramOrder;
 	count_descending: HistogramOrder;
@@ -6423,6 +6589,7 @@ class HistogramOrder {
 	order: SortOrder;
 }
 @namespace("aggregations.bucket.terms")
+@class_serializer("SortOrderFormatter`1")
 class TermsOrder {
 	count_ascending: TermsOrder;
 	count_descending: TermsOrder;
@@ -6432,6 +6599,7 @@ class TermsOrder {
 	order: SortOrder;
 }
 @namespace("search.suggesters.context_suggester")
+@class_serializer("ContextFormatter")
 class Context extends Union<string, GeoLocation> {
 	category: string;
 	geo: GeoLocation;
@@ -6489,10 +6657,13 @@ class Names extends String {}
 @namespace("common_abstractions.infer.node_id")
 class NodeIds extends String {}
 @namespace("common_abstractions.infer.indices")
+@class_serializer("IndicesMultiSyntaxFormatter")
 class Indices extends String {}
 @namespace("common_abstractions.infer.index_name")
+@class_serializer("IndexNameFormatter")
 class IndexName extends String {}
 @namespace("common_abstractions.infer.field")
+@class_serializer("FieldFormatter")
 class Field extends String {}
 @namespace("common_abstractions.infer.name")
 class Name extends String {}
@@ -6501,19 +6672,25 @@ class Metrics extends String {}
 @namespace("common_abstractions.infer.metrics")
 class IndexMetrics extends String {}
 @namespace("common_abstractions.infer.task_id")
+@class_serializer("TaskIdFormatter")
 class TaskId extends String {}
 @namespace("common_abstractions.infer.id")
+@class_serializer("IdFormatter")
 class Id extends String {}
 @namespace("common_abstractions.infer.join_field_routing")
+@class_serializer("RoutingFormatter")
 class Routing extends String {}
 @namespace("query_dsl.geo")
+@class_serializer("GeoLocationFormatter")
 class GeoLocation {
 	lat: double;
 	lon: double;
 }
 @namespace("common_abstractions.infer.relation_name")
+@class_serializer("RelationNameFormatter")
 class RelationName extends String {}
 @namespace("common_options.date_math")
+@class_serializer("DateMathExpressionFormatter")
 class DateMathExpression extends String {}
 @namespace("common_options.date_math")
 class DateMathTime {
@@ -6521,6 +6698,7 @@ class DateMathTime {
 	interval: DateMathTimeUnit;
 }
 @namespace("common_abstractions.infer.property_name")
+@class_serializer("PropertyNameFormatter")
 class PropertyName extends String {}
 @namespace("common_abstractions.infer.id")
 class Ids {
@@ -6532,6 +6710,7 @@ class Timestamp {
 class LongId {
 }
 @namespace("x_pack.sql.query_sql")
+@class_serializer("SqlValueFormatter")
 class SqlValue extends LazyDocument {
 }
 @namespace("x_pack.watcher.execution")
@@ -6539,14 +6718,19 @@ class HttpInputRequestResult extends HttpInputRequest {
 }
 @namespace("analysis.analyzers")
 class CustomAnalyzer extends AnalyzerBase {
+	@prop_serializer("SingleOrEnumerableFormatter`1")
 	char_filter: string[];
+	@prop_serializer("SingleOrEnumerableFormatter`1")
 	filter: string[];
+	@prop_serializer("NullableStringIntFormatter")
 	position_offset_gap: integer;
 	tokenizer: string;
 }
 @namespace("analysis.analyzers")
 class FingerprintAnalyzer extends AnalyzerBase {
+	@prop_serializer("NullableStringIntFormatter")
 	max_output_size: integer;
+	@prop_serializer("NullableStringBooleanFormatter")
 	preserve_original: boolean;
 	separator: string;
 	stopwords: StopWords;
@@ -6572,6 +6756,7 @@ class NoriAnalyzer extends AnalyzerBase {
 @namespace("analysis.analyzers")
 class PatternAnalyzer extends AnalyzerBase {
 	flags: string;
+	@prop_serializer("NullableStringBooleanFormatter")
 	lowercase: boolean;
 	pattern: string;
 	stopwords: StopWords;
@@ -6586,6 +6771,7 @@ class SnowballAnalyzer extends AnalyzerBase {
 }
 @namespace("analysis.analyzers")
 class StandardAnalyzer extends AnalyzerBase {
+	@prop_serializer("NullableStringIntFormatter")
 	max_token_length: integer;
 	stopwords: StopWords;
 }
@@ -6620,11 +6806,14 @@ class IcuAnalyzer extends AnalyzerBase {
 class IcuCollationTokenFilter extends TokenFilterBase {
 	alternate: IcuCollationAlternate;
 	caseFirst: IcuCollationCaseFirst;
+	@prop_serializer("NullableStringBooleanFormatter")
 	caseLevel: boolean;
 	country: string;
 	decomposition: IcuCollationDecomposition;
+	@prop_serializer("NullableStringBooleanFormatter")
 	hiraganaQuaternaryMode: boolean;
 	language: string;
+	@prop_serializer("NullableStringBooleanFormatter")
 	numeric: boolean;
 	strength: IcuCollationStrength;
 	variableTop: string;
@@ -6659,7 +6848,9 @@ class KuromojiAnalyzer extends AnalyzerBase {
 }
 @namespace("analysis.plugins.kuromoji")
 class KuromojiIterationMarkCharFilter extends CharFilterBase {
+	@prop_serializer("NullableStringBooleanFormatter")
 	normalize_kana: boolean;
+	@prop_serializer("NullableStringBooleanFormatter")
 	normalize_kanji: boolean;
 }
 @namespace("analysis.plugins.kuromoji")
@@ -6668,16 +6859,20 @@ class KuromojiPartOfSpeechTokenFilter extends TokenFilterBase {
 }
 @namespace("analysis.plugins.kuromoji")
 class KuromojiReadingFormTokenFilter extends TokenFilterBase {
+	@prop_serializer("NullableStringBooleanFormatter")
 	use_romaji: boolean;
 }
 @namespace("analysis.plugins.kuromoji")
 class KuromojiStemmerTokenFilter extends TokenFilterBase {
+	@prop_serializer("NullableStringIntFormatter")
 	minimum_length: integer;
 }
 @namespace("analysis.plugins.kuromoji")
 class KuromojiTokenizer extends TokenizerBase {
+	@prop_serializer("NullableStringBooleanFormatter")
 	discard_punctuation: boolean;
 	mode: KuromojiTokenizationMode;
+	@prop_serializer("NullableStringIntFormatter")
 	nbest_cost: integer;
 	nbest_examples: string;
 	user_dictionary: string;
@@ -6687,20 +6882,26 @@ class KuromojiTokenizer extends TokenizerBase {
 class PhoneticTokenFilter extends TokenFilterBase {
 	encoder: PhoneticEncoder;
 	languageset: PhoneticLanguage[];
+	@prop_serializer("NullableStringIntFormatter")
 	max_code_len: integer;
 	name_type: PhoneticNameType;
+	@prop_serializer("NullableStringBooleanFormatter")
 	replace: boolean;
 	rule_type: PhoneticRuleType;
 }
 @namespace("analysis.token_filters")
 class AsciiFoldingTokenFilter extends TokenFilterBase {
+	@prop_serializer("NullableStringBooleanFormatter")
 	preserve_original: boolean;
 }
 @namespace("analysis.token_filters")
 class CommonGramsTokenFilter extends TokenFilterBase {
+	@prop_serializer("SingleOrEnumerableFormatter`1")
 	common_words: string[];
 	common_words_path: string;
+	@prop_serializer("NullableStringBooleanFormatter")
 	ignore_case: boolean;
+	@prop_serializer("NullableStringBooleanFormatter")
 	query_mode: boolean;
 }
 @namespace("analysis.token_filters")
@@ -6715,25 +6916,31 @@ class DelimitedPayloadTokenFilter extends TokenFilterBase {
 }
 @namespace("analysis.token_filters.edge_n_gram")
 class EdgeNGramTokenFilter extends TokenFilterBase {
+	@prop_serializer("NullableStringIntFormatter")
 	max_gram: integer;
+	@prop_serializer("NullableStringIntFormatter")
 	min_gram: integer;
 	side: EdgeNGramSide;
 }
 @namespace("analysis.token_filters")
 class ElisionTokenFilter extends TokenFilterBase {
 	articles: string[];
+	@prop_serializer("NullableStringBooleanFormatter")
 	articles_case: boolean;
 }
 @namespace("analysis.token_filters")
 class FingerprintTokenFilter extends TokenFilterBase {
+	@prop_serializer("NullableStringIntFormatter")
 	max_output_size: integer;
 	separator: string;
 }
 @namespace("analysis.token_filters")
 class HunspellTokenFilter extends TokenFilterBase {
+	@prop_serializer("NullableStringBooleanFormatter")
 	dedup: boolean;
 	dictionary: string;
 	locale: string;
+	@prop_serializer("NullableStringBooleanFormatter")
 	longest_only: boolean;
 }
 @namespace("analysis.token_filters")
@@ -6744,11 +6951,13 @@ class KeepTypesTokenFilter extends TokenFilterBase {
 @namespace("analysis.token_filters")
 class KeepWordsTokenFilter extends TokenFilterBase {
 	keep_words: string[];
+	@prop_serializer("NullableStringBooleanFormatter")
 	keep_words_case: boolean;
 	keep_words_path: string;
 }
 @namespace("analysis.token_filters")
 class KeywordMarkerTokenFilter extends TokenFilterBase {
+	@prop_serializer("NullableStringBooleanFormatter")
 	ignore_case: boolean;
 	keywords: string[];
 	keywords_path: string;
@@ -6759,12 +6968,16 @@ class KStemTokenFilter extends TokenFilterBase {
 }
 @namespace("analysis.token_filters")
 class LengthTokenFilter extends TokenFilterBase {
+	@prop_serializer("NullableStringIntFormatter")
 	max: integer;
+	@prop_serializer("NullableStringIntFormatter")
 	min: integer;
 }
 @namespace("analysis.token_filters")
 class LimitTokenCountTokenFilter extends TokenFilterBase {
+	@prop_serializer("NullableStringBooleanFormatter")
 	consume_all_tokens: boolean;
+	@prop_serializer("NullableStringIntFormatter")
 	max_token_count: integer;
 }
 @namespace("analysis.token_filters")
@@ -6774,11 +6987,14 @@ class LowercaseTokenFilter extends TokenFilterBase {
 @namespace("analysis.token_filters")
 class MultiplexerTokenFilter extends TokenFilterBase {
 	filters: string[];
+	@prop_serializer("NullableStringBooleanFormatter")
 	preserve_original: boolean;
 }
 @namespace("analysis.token_filters")
 class NGramTokenFilter extends TokenFilterBase {
+	@prop_serializer("NullableStringIntFormatter")
 	max_gram: integer;
+	@prop_serializer("NullableStringIntFormatter")
 	min_gram: integer;
 }
 @namespace("analysis.token_filters")
@@ -6788,6 +7004,7 @@ class NoriPartOfSpeechTokenFilter extends TokenFilterBase {
 @namespace("analysis.token_filters")
 class PatternCaptureTokenFilter extends TokenFilterBase {
 	patterns: string[];
+	@prop_serializer("NullableStringBooleanFormatter")
 	preserve_original: boolean;
 }
 @namespace("analysis.token_filters")
@@ -6812,9 +7029,13 @@ class ReverseTokenFilter extends TokenFilterBase {
 @namespace("analysis.token_filters.shingle")
 class ShingleTokenFilter extends TokenFilterBase {
 	filler_token: string;
+	@prop_serializer("NullableStringIntFormatter")
 	max_shingle_size: integer;
+	@prop_serializer("NullableStringIntFormatter")
 	min_shingle_size: integer;
+	@prop_serializer("NullableStringBooleanFormatter")
 	output_unigrams: boolean;
+	@prop_serializer("NullableStringBooleanFormatter")
 	output_unigrams_if_no_shingles: boolean;
 	token_separator: string;
 }
@@ -6833,15 +7054,19 @@ class StemmerTokenFilter extends TokenFilterBase {
 }
 @namespace("analysis.token_filters.stop")
 class StopTokenFilter extends TokenFilterBase {
+	@prop_serializer("NullableStringBooleanFormatter")
 	ignore_case: boolean;
+	@prop_serializer("NullableStringBooleanFormatter")
 	remove_trailing: boolean;
 	stopwords: StopWords;
 	stopwords_path: string;
 }
 @namespace("analysis.token_filters.synonym")
 class SynonymGraphTokenFilter extends TokenFilterBase {
+	@prop_serializer("NullableStringBooleanFormatter")
 	expand: boolean;
 	format: SynonymFormat;
+	@prop_serializer("NullableStringBooleanFormatter")
 	lenient: boolean;
 	synonyms: string[];
 	synonyms_path: string;
@@ -6849,8 +7074,10 @@ class SynonymGraphTokenFilter extends TokenFilterBase {
 }
 @namespace("analysis.token_filters.synonym")
 class SynonymTokenFilter extends TokenFilterBase {
+	@prop_serializer("NullableStringBooleanFormatter")
 	expand: boolean;
 	format: SynonymFormat;
+	@prop_serializer("NullableStringBooleanFormatter")
 	lenient: boolean;
 	synonyms: string[];
 	synonyms_path: string;
@@ -6861,10 +7088,12 @@ class TrimTokenFilter extends TokenFilterBase {
 }
 @namespace("analysis.token_filters")
 class TruncateTokenFilter extends TokenFilterBase {
+	@prop_serializer("NullableStringIntFormatter")
 	length: integer;
 }
 @namespace("analysis.token_filters")
 class UniqueTokenFilter extends TokenFilterBase {
+	@prop_serializer("NullableStringBooleanFormatter")
 	only_on_same_position: boolean;
 }
 @namespace("analysis.token_filters")
@@ -6872,33 +7101,52 @@ class UppercaseTokenFilter extends TokenFilterBase {
 }
 @namespace("analysis.token_filters.word_delimiter_graph")
 class WordDelimiterGraphTokenFilter extends TokenFilterBase {
+	@prop_serializer("NullableStringBooleanFormatter")
 	adjust_offsets: boolean;
+	@prop_serializer("NullableStringBooleanFormatter")
 	catenate_all: boolean;
+	@prop_serializer("NullableStringBooleanFormatter")
 	catenate_numbers: boolean;
+	@prop_serializer("NullableStringBooleanFormatter")
 	catenate_words: boolean;
+	@prop_serializer("NullableStringBooleanFormatter")
 	generate_number_parts: boolean;
+	@prop_serializer("NullableStringBooleanFormatter")
 	generate_word_parts: boolean;
+	@prop_serializer("NullableStringBooleanFormatter")
 	preserve_original: boolean;
 	protected_words: string[];
 	protected_words_path : string;
+	@prop_serializer("NullableStringBooleanFormatter")
 	split_on_case_change: boolean;
+	@prop_serializer("NullableStringBooleanFormatter")
 	split_on_numerics: boolean;
+	@prop_serializer("NullableStringBooleanFormatter")
 	stem_english_possessive: boolean;
 	type_table: string[];
 	type_table_path: string;
 }
 @namespace("analysis.token_filters.word_delimiter")
 class WordDelimiterTokenFilter extends TokenFilterBase {
+	@prop_serializer("NullableStringBooleanFormatter")
 	catenate_all: boolean;
+	@prop_serializer("NullableStringBooleanFormatter")
 	catenate_numbers: boolean;
+	@prop_serializer("NullableStringBooleanFormatter")
 	catenate_words: boolean;
+	@prop_serializer("NullableStringBooleanFormatter")
 	generate_number_parts: boolean;
+	@prop_serializer("NullableStringBooleanFormatter")
 	generate_word_parts: boolean;
+	@prop_serializer("NullableStringBooleanFormatter")
 	preserve_original: boolean;
 	protected_words: string[];
 	protected_words_path : string;
+	@prop_serializer("NullableStringBooleanFormatter")
 	split_on_case_change: boolean;
+	@prop_serializer("NullableStringBooleanFormatter")
 	split_on_numerics: boolean;
+	@prop_serializer("NullableStringBooleanFormatter")
 	stem_english_possessive: boolean;
 	type_table: string[];
 	type_table_path: string;
@@ -6909,6 +7157,7 @@ class CharGroupTokenizer extends TokenizerBase {
 }
 @namespace("analysis.tokenizers")
 class KeywordTokenizer extends TokenizerBase {
+	@prop_serializer("NullableStringIntFormatter")
 	buffer_size: integer;
 }
 @namespace("analysis.tokenizers")
@@ -6919,13 +7168,17 @@ class LowercaseTokenizer extends TokenizerBase {
 }
 @namespace("analysis.tokenizers.n_gram")
 class EdgeNGramTokenizer extends TokenizerBase {
+	@prop_serializer("NullableStringIntFormatter")
 	max_gram: integer;
+	@prop_serializer("NullableStringIntFormatter")
 	min_gram: integer;
 	token_chars: TokenChar[];
 }
 @namespace("analysis.tokenizers.n_gram")
 class NGramTokenizer extends TokenizerBase {
+	@prop_serializer("NullableStringIntFormatter")
 	max_gram: integer;
+	@prop_serializer("NullableStringIntFormatter")
 	min_gram: integer;
 	token_chars: TokenChar[];
 }
@@ -6937,31 +7190,39 @@ class NoriTokenizer extends TokenizerBase {
 }
 @namespace("analysis.tokenizers")
 class PathHierarchyTokenizer extends TokenizerBase {
+	@prop_serializer("NullableStringIntFormatter")
 	buffer_size: integer;
 	delimiter: string;
 	replacement: string;
+	@prop_serializer("NullableStringBooleanFormatter")
 	reverse: boolean;
+	@prop_serializer("NullableStringIntFormatter")
 	skip: integer;
 }
 @namespace("analysis.tokenizers")
 class PatternTokenizer extends TokenizerBase {
 	flags: string;
+	@prop_serializer("NullableStringIntFormatter")
 	group: integer;
 	pattern: string;
 }
 @namespace("analysis.tokenizers")
 class StandardTokenizer extends TokenizerBase {
+	@prop_serializer("NullableStringIntFormatter")
 	max_token_length: integer;
 }
 @namespace("analysis.tokenizers")
 class UaxEmailUrlTokenizer extends TokenizerBase {
+	@prop_serializer("NullableStringIntFormatter")
 	max_token_length: integer;
 }
 @namespace("analysis.tokenizers")
 class WhitespaceTokenizer extends TokenizerBase {
+	@prop_serializer("NullableStringIntFormatter")
 	max_token_length: integer;
 }
 @namespace("common_options.time_unit")
+@class_serializer("TimeFormatter")
 class Time {
 	factor: double;
 	interval: TimeUnit;
@@ -7006,6 +7267,7 @@ class ClusterHealthResponse extends ResponseBase implements IResponse {
 	active_shards_percent_as_number: double;
 	cluster_name: string;
 	delayed_unassigned_shards: integer;
+	@prop_serializer("ResolvableReadOnlyDictionaryFormatter`2")
 	indices: Dictionary<IndexName, IndexHealthStats>;
 	initializing_shards: integer;
 	number_of_data_nodes: integer;
@@ -7055,7 +7317,6 @@ class RootNodeInfoResponse extends ResponseBase implements IResponse {
 }
 @namespace("cluster.task_management.cancel_tasks")
 class CancelTasksResponse extends ResponseBase implements IResponse {
-	is_valid: boolean;
 	node_failures: ErrorCause[];
 	nodes: Dictionary<string, TaskExecutingNode>;
 }
@@ -7066,25 +7327,23 @@ class GetTaskResponse extends ResponseBase implements IResponse {
 }
 @namespace("cluster.task_management.list_tasks")
 class ListTasksResponse extends ResponseBase implements IResponse {
-	is_valid: boolean;
 	node_failures: ErrorCause[];
 	nodes: Dictionary<string, TaskExecutingNode>;
 }
 @namespace("document.multiple.bulk")
 class BulkResponse extends ResponseBase implements IResponse {
 	errors: boolean;
-	is_valid: boolean;
 	items: BulkResponseItemBase[];
 	items_with_errors: BulkResponseItemBase[];
 	took: long;
 }
 @namespace("query_dsl.geo")
+@class_serializer("GeoCoordinateFormatter")
 class GeoCoordinate extends GeoLocation {
 	z: double;
 }
 @namespace("document.multiple.delete_by_query")
 class DeleteByQueryResponse extends ResponseBase implements IResponse {
-	is_valid: boolean;
 	batches: long;
 	deleted: long;
 	failures: BulkIndexByScrollFailure[];
@@ -7101,9 +7360,9 @@ class DeleteByQueryResponse extends ResponseBase implements IResponse {
 	version_conflicts: long;
 }
 @namespace("document.multiple.multi_get.response")
+@class_serializer("MultiGetResponseFormatter")
 class MultiGetResponse extends ResponseBase implements IResponse {
 	hits: MultiGetHit<any>[];
-	is_valid: boolean;
 }
 @namespace("document.multiple.multi_term_vectors")
 class MultiTermVectorsResponse extends ResponseBase implements IResponse {
@@ -7111,7 +7370,6 @@ class MultiTermVectorsResponse extends ResponseBase implements IResponse {
 }
 @namespace("document.multiple.reindex_on_server")
 class ReindexOnServerResponse extends ResponseBase implements IResponse {
-	is_valid: boolean;
 	batches: long;
 	created: long;
 	failures: BulkIndexByScrollFailure[];
@@ -7127,11 +7385,11 @@ class ReindexOnServerResponse extends ResponseBase implements IResponse {
 }
 @namespace("document.multiple.reindex_rethrottle")
 class ReindexRethrottleResponse extends ResponseBase implements IResponse {
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	nodes: Dictionary<string, ReindexNode>;
 }
 @namespace("document.multiple.update_by_query")
 class UpdateByQueryResponse extends ResponseBase implements IResponse {
-	is_valid: boolean;
 	batches: long;
 	failures: BulkIndexByScrollFailure[];
 	noops: long;
@@ -7146,10 +7404,10 @@ class UpdateByQueryResponse extends ResponseBase implements IResponse {
 }
 @namespace("document.single.term_vectors")
 class TermVectorsResponse extends ResponseBase implements IResponse {
-	is_valid: boolean;
 	found: boolean;
 	_id: string;
 	_index: string;
+	@prop_serializer("ResolvableReadOnlyDictionaryFormatter`2")
 	term_vectors: Dictionary<Field, TermVector>;
 	took: long;
 	_type: string;
@@ -7172,15 +7430,18 @@ class ExistsResponse extends ResponseBase implements IResponse {
 }
 @namespace("indices.monitoring.indices_segments")
 class SegmentsResponse extends ResponseBase implements IResponse {
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	indices: Dictionary<string, IndexSegment>;
 	_shards: ShardStatistics;
 }
 @namespace("indices.monitoring.indices_shard_stores")
 class IndicesShardStoresResponse extends ResponseBase implements IResponse {
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	indices: Dictionary<string, IndicesShardStores>;
 }
 @namespace("indices.monitoring.indices_stats")
 class IndicesStatsResponse extends ResponseBase implements IResponse {
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	indices: Dictionary<string, IndicesStats>;
 	_shards: ShardStatistics;
 	_all: IndicesStats;
@@ -7202,6 +7463,7 @@ class CleanupRepositoryResponse extends ResponseBase implements IResponse {
 	results: CleanupRepositoryResults;
 }
 @namespace("modules.snapshot_and_restore.repositories.get_repository")
+@class_serializer("GetRepositoryResponseFormatter")
 class GetRepositoryResponse extends ResponseBase implements IResponse {
 	repositories: Dictionary<string, SnapshotRepository>;
 }
@@ -7227,6 +7489,7 @@ class SnapshotResponse extends ResponseBase implements IResponse {
 	snapshot: Snapshot;
 }
 @namespace("x_pack.watcher.schedule")
+@class_serializer("CronExpressionFormatter")
 class CronExpression extends ScheduleBase {
 }
 @namespace("search.count")
@@ -7239,10 +7502,10 @@ class FieldCapabilitiesResponse extends ResponseBase implements IResponse {
 	fields: Dictionary<Field, Dictionary<string, FieldCapabilities>>;
 }
 @namespace("search.multi_search")
+@class_serializer("MultiSearchResponseFormatter")
 class MultiSearchResponse extends ResponseBase implements IResponse {
 	took: long;
 	all_responses: IResponse[];
-	is_valid: boolean;
 	total_responses: integer;
 }
 @namespace("search.scroll.clear_scroll")
@@ -7265,6 +7528,7 @@ class ValidateQueryResponse extends ResponseBase implements IResponse {
 }
 @namespace("x_pack.cross_cluster_replication.auto_follow.get_auto_follow_pattern")
 class GetAutoFollowPatternResponse extends ResponseBase implements IResponse {
+	@prop_serializer("AutoFollowPatternFormatter")
 	patterns: Dictionary<string, AutoFollowPattern>;
 }
 @namespace("x_pack.cross_cluster_replication.follow.create_follow_index")
@@ -7345,7 +7609,6 @@ class GetBasicLicenseStatusResponse extends ResponseBase implements IResponse {
 }
 @namespace("x_pack.license.get_license")
 class GetLicenseResponse extends ResponseBase implements IResponse {
-	is_valid: boolean;
 	license: LicenseInformation;
 }
 @namespace("x_pack.license.get_trial_license_status")
@@ -7458,6 +7721,7 @@ class PostCalendarEventsResponse extends ResponseBase implements IResponse {
 @namespace("x_pack.machine_learning.post_job_data")
 class PostJobDataResponse extends ResponseBase implements IResponse {
 	bucket_count: long;
+	@prop_serializer("NullableDateTimeOffsetEpochMillisecondsFormatter")
 	earliest_record_timestamp: Date;
 	empty_bucket_count: long;
 	input_bytes: long;
@@ -7465,7 +7729,9 @@ class PostJobDataResponse extends ResponseBase implements IResponse {
 	input_record_count: long;
 	invalid_date_count: long;
 	job_id: string;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	last_data_time: Date;
+	@prop_serializer("NullableDateTimeOffsetEpochMillisecondsFormatter")
 	latest_record_timestamp: Date;
 	missing_field_count: long;
 	out_of_order_timestamp_count: long;
@@ -7491,6 +7757,7 @@ class PutDatafeedResponse extends ResponseBase implements IResponse {
 	chunking_config: ChunkingConfig;
 	datafeed_id: string;
 	frequency: Time;
+	@prop_serializer("IndicesFormatter")
 	indices: Indices;
 	job_id: string;
 	query: QueryContainer;
@@ -7509,6 +7776,7 @@ class PutJobResponse extends ResponseBase implements IResponse {
 	analysis_config: AnalysisConfig;
 	analysis_limits: AnalysisLimits;
 	background_persist_interval: Time;
+	@prop_serializer("DateTimeOffsetEpochMillisecondsFormatter")
 	create_time: Date;
 	data_description: DataDescription;
 	description: string;
@@ -7539,6 +7807,7 @@ class UpdateDatafeedResponse extends ResponseBase implements IResponse {
 	chunking_config: ChunkingConfig;
 	datafeed_id: string;
 	frequency: Time;
+	@prop_serializer("IndicesFormatter")
 	indices: Indices;
 	job_id: string;
 	query: QueryContainer;
@@ -7577,6 +7846,7 @@ class StopRollupJobResponse extends ResponseBase implements IResponse {
 class CreateApiKeyResponse extends ResponseBase implements IResponse {
 	id: string;
 	name: string;
+	@prop_serializer("NullableDateTimeOffsetEpochMillisecondsFormatter")
 	expiration: Date;
 	api_key: string;
 }
@@ -7616,9 +7886,11 @@ class GetUserPrivilegesResponse extends ResponseBase implements IResponse {
 }
 @namespace("x_pack.security.privileges.has_privileges")
 class HasPrivilegesResponse extends ResponseBase implements IResponse {
+	@prop_serializer("ApplicationsPrivilegesFormatter")
 	application: Dictionary<string, ResourcePrivileges[]>;
 	cluster: Dictionary<string, boolean>;
 	has_all_requested: boolean;
+	@prop_serializer("IndicesPrivilegesFormatter")
 	index: ResourcePrivileges[];
 	username: string;
 }
@@ -7695,6 +7967,7 @@ class TranslateSqlResponse extends ResponseBase implements IResponse {
 	result: SearchRequest;
 }
 @namespace("x_pack.ssl.get_certificates")
+@class_serializer("GetCertificatesResponseFormatter")
 class GetCertificatesResponse extends ResponseBase implements IResponse {
 	certificates: ClusterCertificateInformation[];
 }
@@ -7754,11 +8027,13 @@ class ClusterStatsResponse extends NodesResponseBase implements IResponse {
 @namespace("cluster.nodes_info")
 class NodesInfoResponse extends NodesResponseBase implements IResponse {
 	cluster_name: string;
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	nodes: Dictionary<string, NodeInfo>;
 }
 @namespace("cluster.nodes_stats")
 class NodesStatsResponse extends NodesResponseBase implements IResponse {
 	cluster_name: string;
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	nodes: Dictionary<string, NodeStats>;
 }
 @namespace("cluster.nodes_usage")
@@ -7769,15 +8044,14 @@ class NodesUsageResponse extends NodesResponseBase implements IResponse {
 @namespace("cluster.reload_secure_settings")
 class ReloadSecureSettingsResponse extends NodesResponseBase implements IResponse {
 	cluster_name: string;
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	nodes: Dictionary<string, NodeStats>;
 }
 @namespace("document.single.create")
-class CreateResponse extends ResponseBase implements IResponse {
-	is_valid: boolean;
+class CreateResponse extends WriteResponseBase implements IResponse {
 }
 @namespace("document.single.delete")
-class DeleteResponse extends ResponseBase implements IResponse {
-	is_valid: boolean;
+class DeleteResponse extends WriteResponseBase implements IResponse {
 }
 @namespace("document.single.get")
 class GetResponse<TDocument> extends ResponseBase {
@@ -7788,13 +8062,13 @@ class GetResponse<TDocument> extends ResponseBase {
 	_primary_term: long;
 	_routing: string;
 	_seq_no: long;
+	@prop_serializer("SourceFormatter`1")
 	_source: TDocument;
 	_type: string;
 	_version: long;
 }
 @namespace("document.single.index")
-class IndexResponse extends ResponseBase implements IResponse {
-	is_valid: boolean;
+class IndexResponse extends WriteResponseBase implements IResponse {
 }
 @namespace("document.single.source")
 class SourceResponse<TDocument> extends ResponseBase {
@@ -7896,6 +8170,7 @@ class DeleteRepositoryResponse extends AcknowledgedResponseBase implements IResp
 class DeleteSnapshotResponse extends AcknowledgedResponseBase implements IResponse {
 }
 @namespace("x_pack.watcher.schedule")
+@class_serializer("IntervalFormatter")
 class Interval extends ScheduleBase {
 	factor: long;
 	unit: IntervalUnit;
@@ -8514,6 +8789,7 @@ class ClusterStateRequest extends RequestBase {
 	wait_for_timeout: Time;
 }
 @namespace("cluster.cluster_state")
+@class_serializer("DynamicResponseFormatter`1")
 class ClusterStateResponse extends ResponseBase {
 	state: string[];
 	cluster_name: string;
@@ -8640,6 +8916,7 @@ class ListTasksRequest extends RequestBase {
 }
 @namespace("document.multiple.bulk")
 @rest_spec_name("bulk")
+@class_serializer("BulkRequestFormatter")
 class BulkRequest extends RequestBase {
 	operations: BulkOperation[];
 	@request_parameter()
@@ -8740,6 +9017,7 @@ class DeleteByQueryRequest extends RequestBase {
 }
 @namespace("document.multiple.multi_get.request")
 @rest_spec_name("mget")
+@class_serializer("MultiGetRequestFormatter")
 class MultiGetRequest extends RequestBase {
 	@request_parameter()
 	stored_fields: Field[];
@@ -9014,6 +9292,7 @@ class SourceRequest extends RequestBase {
 @namespace("document.single.term_vectors")
 @rest_spec_name("termvectors")
 class TermVectorsRequest<TDocument> extends RequestBase {
+	@prop_serializer("SourceFormatter`1")
 	doc: TDocument;
 	filter: TermVectorFilter;
 	per_field_analyzer: Dictionary<Field, string>;
@@ -9044,11 +9323,13 @@ class TermVectorsRequest<TDocument> extends RequestBase {
 @rest_spec_name("update")
 class UpdateRequest<TDocument, TPartialDocument> extends RequestBase {
 	detect_noop: boolean;
+	@prop_serializer("SourceFormatter`1")
 	doc: TPartialDocument;
 	doc_as_upsert: boolean;
 	script: Script;
 	scripted_upsert: boolean;
 	_source: Union<boolean, SourceFilter>;
+	@prop_serializer("SourceFormatter`1")
 	upsert: TDocument;
 	@request_parameter()
 	if_primary_term: long;
@@ -9070,8 +9351,7 @@ class UpdateRequest<TDocument, TPartialDocument> extends RequestBase {
 	wait_for_active_shards: string;
 }
 @namespace("document.single.update")
-class UpdateResponse<TDocument> extends ResponseBase {
-	is_valid: boolean;
+class UpdateResponse<TDocument> extends WriteResponseBase {
 	get: InlineGet<TDocument>;
 }
 @namespace("indices.alias_management.alias_exists")
@@ -9118,7 +9398,6 @@ class GetAliasRequest extends RequestBase {
 @namespace("indices.alias_management.get_alias")
 class GetAliasResponse extends DictionaryResponseBase<IndexName, IndexAliases> {
 	indices: Dictionary<IndexName, IndexAliases>;
-	is_valid: boolean;
 }
 @namespace("indices.alias_management.put_alias")
 @rest_spec_name("indices.put_alias")
@@ -9373,6 +9652,7 @@ class IndexTemplateExistsRequest extends RequestBase {
 }
 @namespace("indices.index_settings.update_index_settings")
 @rest_spec_name("indices.put_settings")
+@class_serializer("UpdateIndexSettingsRequestFormatter")
 class UpdateIndexSettingsRequest extends RequestBase {
 	index_settings: Dictionary<string, any>;
 	@request_parameter()
@@ -9409,7 +9689,6 @@ class GetFieldMappingRequest extends RequestBase {
 @namespace("indices.mapping_management.get_field_mapping")
 class GetFieldMappingResponse extends DictionaryResponseBase<IndexName, TypeFieldMappings> {
 	indices: Dictionary<IndexName, TypeFieldMappings>;
-	is_valid: boolean;
 }
 @namespace("indices.mapping_management.get_mapping")
 @rest_spec_name("indices.get_mapping")
@@ -9661,6 +9940,7 @@ class CleanupRepositoryRequest extends RequestBase {
 }
 @namespace("modules.snapshot_and_restore.repositories.create_repository")
 @rest_spec_name("snapshot.create_repository")
+@class_serializer("CreateRepositoryFormatter")
 class CreateRepositoryRequest extends RequestBase {
 	repository: SnapshotRepository;
 	@request_parameter()
@@ -9740,6 +10020,7 @@ class SnapshotStatusRequest extends RequestBase {
 class SnapshotRequest extends RequestBase {
 	ignore_unavailable: boolean;
 	include_global_state: boolean;
+	@prop_serializer("IndicesMultiSyntaxFormatter")
 	indices: Indices;
 	partial: boolean;
 	metadata: Dictionary<string, any>;
@@ -10061,11 +10342,13 @@ class GetFiltersRequest extends RequestBase {
 @rest_spec_name("ml.get_influencers")
 class GetInfluencersRequest extends RequestBase {
 	descending: boolean;
+	@prop_serializer("NullableDateTimeOffsetEpochMillisecondsFormatter")
 	end: Date;
 	exclude_interim: boolean;
 	influencer_score: double;
 	page: Page;
 	sort: Field;
+	@prop_serializer("NullableDateTimeOffsetEpochMillisecondsFormatter")
 	start: Date;
 }
 @namespace("x_pack.machine_learning.get_job_stats")
@@ -10084,9 +10367,11 @@ class GetJobsRequest extends RequestBase {
 @rest_spec_name("ml.get_model_snapshots")
 class GetModelSnapshotsRequest extends RequestBase {
 	desc: boolean;
+	@prop_serializer("NullableDateTimeOffsetEpochMillisecondsFormatter")
 	end: Date;
 	page: Page;
 	sort: Field;
+	@prop_serializer("NullableDateTimeOffsetEpochMillisecondsFormatter")
 	start: Date;
 }
 @namespace("x_pack.machine_learning.get_overall_buckets")
@@ -10104,11 +10389,13 @@ class GetOverallBucketsRequest extends RequestBase {
 @rest_spec_name("ml.get_records")
 class GetAnomalyRecordsRequest extends RequestBase {
 	desc: boolean;
+	@prop_serializer("NullableDateTimeOffsetEpochMillisecondsFormatter")
 	end: Date;
 	exclude_interim: boolean;
 	page: Page;
 	record_score: double;
 	sort: Field;
+	@prop_serializer("NullableDateTimeOffsetEpochMillisecondsFormatter")
 	start: Date;
 }
 @namespace("x_pack.machine_learning.machine_learning_info")
@@ -10127,6 +10414,7 @@ class PostCalendarEventsRequest extends RequestBase {
 }
 @namespace("x_pack.machine_learning.post_job_data")
 @rest_spec_name("ml.post_data")
+@class_serializer("PostJobDataFormatter")
 class PostJobDataRequest extends RequestBase {
 	@request_parameter()
 	reset_end: Date;
@@ -10153,6 +10441,7 @@ class PutDatafeedRequest extends RequestBase {
 	aggregations: Dictionary<string, AggregationContainer>;
 	chunking_config: ChunkingConfig;
 	frequency: Time;
+	@prop_serializer("IndicesFormatter")
 	indices: Indices;
 	job_id: Id;
 	query: QueryContainer;
@@ -10185,7 +10474,9 @@ class RevertModelSnapshotRequest extends RequestBase {
 @namespace("x_pack.machine_learning.start_datafeed")
 @rest_spec_name("ml.start_datafeed")
 class StartDatafeedRequest extends RequestBase {
+	@prop_serializer("NullableDateTimeOffsetEpochMillisecondsFormatter")
 	end: Date;
+	@prop_serializer("NullableDateTimeOffsetEpochMillisecondsFormatter")
 	start: Date;
 	timeout: Time;
 }
@@ -10203,6 +10494,7 @@ class UpdateDatafeedRequest extends RequestBase {
 	aggregations: Dictionary<string, AggregationContainer>;
 	chunking_config: ChunkingConfig;
 	frequency: Time;
+	@prop_serializer("IndicesFormatter")
 	indices: Indices;
 	job_id: Id;
 	query: QueryContainer;
@@ -10248,6 +10540,7 @@ class ValidateJobRequest extends RequestBase {
 }
 @namespace("x_pack.machine_learning.validate_detector")
 @rest_spec_name("ml.validate_detector")
+@class_serializer("ValidateDetectorRequestFormatter")
 class ValidateDetectorRequest extends RequestBase {
 	detector: Detector;
 }
@@ -10338,6 +10631,7 @@ class FieldCapabilitiesRequest extends RequestBase {
 }
 @namespace("search.multi_search")
 @rest_spec_name("msearch")
+@class_serializer("MultiSearchFormatter")
 class MultiSearchRequest extends RequestBase {
 	@request_parameter()
 	ccs_minimize_roundtrips: boolean;
@@ -10357,6 +10651,7 @@ class MultiSearchRequest extends RequestBase {
 }
 @namespace("search.multi_search_template")
 @rest_spec_name("msearch_template")
+@class_serializer("MultiSearchTemplateFormatter")
 class MultiSearchTemplateRequest extends RequestBase {
 	@request_parameter()
 	ccs_minimize_roundtrips: boolean;
@@ -10944,6 +11239,7 @@ class SearchRequest extends RequestBase {
 	explain: boolean;
 	from: integer;
 	highlight: Highlight;
+	@prop_serializer("IndicesBoostFormatter")
 	indices_boost: Dictionary<IndexName, double>;
 	min_score: double;
 	post_filter: QueryContainer;
@@ -11001,6 +11297,7 @@ class SearchTemplateRequest extends RequestBase {
 }
 @namespace("x_pack.security.privileges.put_privileges")
 @rest_spec_name("security.put_privileges")
+@class_serializer("PutPrivilegesFormatter")
 class PutPrivilegesRequest extends RequestBase {
 	@request_parameter()
 	refresh: Refresh;
@@ -11028,6 +11325,7 @@ class TranslateSqlRequest extends RequestBase {
 }
 @namespace("document.single.create")
 @rest_spec_name("create")
+@class_serializer("CreateRequestFormatter`1")
 class CreateRequest<TDocument> extends RequestBase {
 	document: TDocument;
 	@request_parameter()
@@ -11047,6 +11345,7 @@ class CreateRequest<TDocument> extends RequestBase {
 }
 @namespace("document.single.index")
 @rest_spec_name("index")
+@class_serializer("IndexRequestFormatter`1")
 class IndexRequest<TDocument> extends RequestBase {
 	document: TDocument;
 	@request_parameter()
@@ -11072,6 +11371,7 @@ class IndexRequest<TDocument> extends RequestBase {
 }
 @namespace("mapping.types.complex.object")
 class ObjectProperty extends CorePropertyBase {
+	@prop_serializer("DynamicMappingFormatter")
 	dynamic: Union<boolean, DynamicMapping>;
 	enabled: boolean;
 	properties: Dictionary<PropertyName, IProperty>;
@@ -11284,13 +11584,6 @@ enum Size {
 }
 /** namespace:common **/
 /** namespace:common **/
-enum PostType {
-	ByteArray = 0,
-	LiteralString = 1,
-	EnumerableOfString = 2,
-	EnumerableOfObject = 3,
-	Serializable = 4
-}
 /** namespace:common **/
 enum PipelineFailure {
 	BadAuthentication = 0,
@@ -11390,26 +11683,7 @@ class CustomResponseBuilderBase {
 class UrlParameter {
 }
 @namespace("common")
-class MemoryStreamFactory {
-}
-@namespace("common")
-class ElasticsearchSerializer {
-}
-@namespace("common")
 class ElasticsearchResponse {
-}
-@namespace("common")
-class Connection {
-}
-@namespace("common")
-class ConnectionPool {
-	last_update: Date;
-	max_retries: integer;
-	nodes: Node[];
-	sniffed_on_startup: boolean;
-	supports_pinging: boolean;
-	supports_reseeding: boolean;
-	using_ssl: boolean;
 }
 @namespace("common")
 class PostData {
@@ -11423,6 +11697,7 @@ class ServerError {
 	status: integer;
 }
 @namespace("common")
+@namespace("common")
 class ShardFailure {
 	index: string;
 	node: string;
@@ -11430,6 +11705,7 @@ class ShardFailure {
 	shard: integer;
 	status: string;
 }
+@namespace("common")
 @namespace("common")
 class ElasticsearchUrlFormatter {
 }
@@ -11496,6 +11772,7 @@ class JvmClassesStats {
 }
 @namespace("cluster.nodes_stats")
 class GarbageCollectionStats {
+	@prop_serializer("VerbatimInterfaceReadOnlyDictionaryKeysFormatter`2")
 	collectors: Dictionary<string, GarbageCollectionGenerationStats>;
 }
 @namespace("cluster.nodes_stats")

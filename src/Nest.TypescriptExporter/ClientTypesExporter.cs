@@ -63,11 +63,11 @@ namespace Nest.TypescriptGenerator
 			var attributes = new List<Attribute>();
 			if (ifaceProperty != null) attributes.AddRange(ifaceProperty.GetCustomAttributes());
 			attributes.AddRange(property.MemberInfo.GetCustomAttributes());
-			if (attributes.Any(a => a.TypeId.ToString() == "Nest.Json.JsonIgnoreAttribute"))
+			if (attributes.Any(a => a.TypeId.ToString() == "System.Runtime.Serialization.IgnoreDataMemberAttribute"))
 				property.IsIgnored = true;
 
-			if (attributes.Any(a => a.TypeId.ToString() == "System.Runtime.Serialization.DataMemberAttribute"))
-				property.IsIgnored = true;
+			//if (attributes.Any(a => a.TypeId.ToString() == "System.Runtime.Serialization.DataMemberAttribute"))
+			//	property.IsIgnored = true;
 
 			var jsonPropertyAttribute = attributes.FirstOrDefault(a => a.TypeId.ToString() == "Nest.Json.JsonPropertyAttribute");
 			if (jsonPropertyAttribute != null)
