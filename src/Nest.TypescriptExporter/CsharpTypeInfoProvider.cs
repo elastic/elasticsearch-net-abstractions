@@ -44,6 +44,7 @@ namespace Nest.TypescriptGenerator
 				.GetTypes()
 				.Where(TypeFilter)
 				.Concat(ExposedInterfacesImplementations.Where(t=>!t.IsGenericType))
+				.OrderBy(t=>t.Name)
 				.ToArray();
 
 			var requestParams = lowLevelAssembly
@@ -59,7 +60,15 @@ namespace Nest.TypescriptGenerator
 
 
 			RequestParameters = requestParams
-				.ToDictionary(t => t.Name.Replace("Parameters", ""));
+				.ToDictionary(t =>
+					{
+						var tt = t.Name.Replace("Parameters", "");
+						if (t.FullName.Contains("Eql")) tt = "Eql" + tt;
+						if (t.FullName.Contains("Async")) tt = "Async" + tt;
+						if (t.FullName.Contains("SearchableSnapshots")) tt = "SearchableSnapshots" + tt;
+						return tt;
+					}
+					);
 		}
 
 		public Dictionary<string, Type> RequestParameters { get; }

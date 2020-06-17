@@ -89,7 +89,7 @@ namespace Nest.TypescriptGenerator
 			if (!_badDescriptorFors.Contains(typeName))
 				specFileName = FindDescriptorForRemapping(file, specFileName);
 
-			specFileName = specFileName.SnakeCase().Replace("_", ".");
+			specFileName = specFileName.SnakeCase().Replace("_", ".").Replace("async.search", "async_search");
 			do
 			{
 				if (SpecificationFiles.TryGetValue(specFileName, out var f))
@@ -97,7 +97,7 @@ namespace Nest.TypescriptGenerator
 			}
 			while (TryGetSpecTarget(specFileName, out specFileName));
 
-			throw new Exception($"{typeName} is not a known request in {RestSpecificationFolder}");
+			throw new Exception($"{specFileName}: {typeName} is not a known request in {RestSpecificationFolder}");
 		}
 
 		public bool SkipRequestImplementation(string typeName)
