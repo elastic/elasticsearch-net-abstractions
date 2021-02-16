@@ -47,12 +47,17 @@ namespace Elastic.Elasticsearch.Managed
 
 		private static Dictionary<string, string> EnvVars(NodeConfiguration config)
 		{
-			if (string.IsNullOrWhiteSpace(config.FileSystem.ConfigPath)) return null;
-			return new Dictionary<string, string>
+			var environmentVariables = new Dictionary<string, string>
 			{
-				{ config.FileSystem.ConfigEnvironmentVariableName, config.FileSystem.ConfigPath },
-				{"ES_HOME", config.FileSystem.ElasticsearchHome}
+				{"ES_JAVA_OPTS", "-Xms1g -Xmx1g"}
 			};
+			if (!string.IsNullOrWhiteSpace(config.FileSystem.ConfigPath))
+				environmentVariables.Add(config.FileSystem.ConfigEnvironmentVariableName, config.FileSystem.ConfigPath);
+
+			if (!string.IsNullOrWhiteSpace(config.FileSystem.ElasticsearchHome))
+				environmentVariables.Add("ES_HOME", config.FileSystem.ElasticsearchHome);
+
+			return environmentVariables;
 		}
 
 		/// <summary>
