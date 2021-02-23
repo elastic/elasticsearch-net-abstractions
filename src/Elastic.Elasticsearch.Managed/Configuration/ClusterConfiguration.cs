@@ -82,6 +82,7 @@ namespace Elastic.Elasticsearch.Managed.Configuration
 		public int StartingPortNumber { get; set; } = 9200;
 		public bool NoCleanupAfterNodeStopped { get; set; }
 
+		public string JavaHomeEnvironmentVariable => Version.InRange("<7.12.0") ? "JAVA_HOME" : "ES_JAVA_HOME";
 
 		/// <summary> Will print the contents of all the yaml files when starting the cluster up, great for debugging purposes</summary>
 		public bool PrintYamlFilesInConfigFolder { get; set; }
