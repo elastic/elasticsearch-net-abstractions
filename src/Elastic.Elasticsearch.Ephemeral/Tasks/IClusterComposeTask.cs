@@ -178,7 +178,7 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 
 			if (result.ExitCode != 0)
 				throw new Exception(
-					$"Expected exit code 0 but recieved ({result.ExitCode}) while executing {description}: {command}");
+					$"Expected exit code 0 but received ({result.ExitCode}) while executing {description}: {command}");
 
 			var errorOut = result.ConsoleOut.Where(c => c.Error).ToList();
 			// this manifested when calling certgen on versions smaller then 5.2.0
