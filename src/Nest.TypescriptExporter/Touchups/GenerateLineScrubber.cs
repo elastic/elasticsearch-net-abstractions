@@ -15,7 +15,6 @@ namespace Nest.TypescriptGenerator.Touchups
 		public static void LineBasedHacks(string file)
 		{
 			var lines = File.ReadAllLines(file);
-			var lines = File.ReadAllLines(file);
 			var newLines = new List<string>();
 			List<string> errorCause = new List<string>(), error = new List<string>(), ignore = new List<string>();
 
