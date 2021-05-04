@@ -14,8 +14,8 @@ namespace Elastic.Stack.ArtifactsApi
 {
 	public class ElasticVersion : Version, IComparable<string>
 	{
-		public ArtifactBuildState ArtifactBuildState { get; }
-		private string BuildHash { get; }
+		private readonly ConcurrentDictionary<string, Artifact>
+			_resolved = new ConcurrentDictionary<string, Artifact>();
 
 		protected ElasticVersion(string version, ArtifactBuildState state, string buildHash = null) : base(version)
 		{
@@ -23,7 +23,15 @@ namespace Elastic.Stack.ArtifactsApi
 			BuildHash = buildHash;
 		}
 
-		private readonly ConcurrentDictionary<string, Artifact> _resolved = new ConcurrentDictionary<string, Artifact>();
+		public ArtifactBuildState ArtifactBuildState { get; }
+		private string BuildHash { get; }
+
+		public int CompareTo(string other)
+		{
+			var v = (ElasticVersion) other;
+			return CompareTo(v);
+		}
+
 		public Artifact Artifact(Product product)
 		{
 			var cacheKey = product.ToString();
@@ -38,10 +46,11 @@ namespace Elastic.Stack.ArtifactsApi
 					SnapshotApiResolver.TryResolve(product, this, OsMonikers.CurrentPlatform(), null, out artifact);
 					break;
 				case ArtifactBuildState.BuildCandidate:
-					StagingVersionResolver.TryResolve(product, this, BuildHash,  out artifact);
+					StagingVersionResolver.TryResolve(product, this, BuildHash, out artifact);
 					break;
 				default:
-					throw new ArgumentOutOfRangeException(nameof(ArtifactBuildState), $"{ArtifactBuildState} not expected here");
+					throw new ArgumentOutOfRangeException(nameof(ArtifactBuildState),
+						$"{ArtifactBuildState} not expected here");
 			}
 
 			_resolved.TryAdd(cacheKey, artifact);
@@ -51,16 +60,18 @@ namespace Elastic.Stack.ArtifactsApi
 
 
 		/// <summary>
-		/// Resolves an Elasticsearch version using either (version | version-snapshot | 'latest' | 'latest-MAJORVERSION')
+		///     Resolves an Elasticsearch version using either (version | version-snapshot | 'latest' | 'latest-MAJORVERSION')
 		/// </summary>
 		public static ElasticVersion From(string managedVersionString)
 		{
-			ArtifactBuildState GetReleaseState(string s) =>
-				s.EndsWith("-SNAPSHOT")
+			ArtifactBuildState GetReleaseState(string s)
+			{
+				return s.EndsWith("-SNAPSHOT")
 					? ArtifactBuildState.Snapshot
 					: ApiResolver.IsReleasedVersion(s)
 						? ArtifactBuildState.Released
 						: ArtifactBuildState.BuildCandidate;
+			}
 
 			if (string.IsNullOrWhiteSpace(managedVersionString)) return null;
 
@@ -127,30 +138,24 @@ namespace Elastic.Stack.ArtifactsApi
 		public static bool operator <(ElasticVersion first, string second) => first < (ElasticVersion) second;
 		public static bool operator >(ElasticVersion first, string second) => first > (ElasticVersion) second;
 
-		public static bool operator <(string first, ElasticVersion second) => (ElasticVersion)first < second;
-		public static bool operator >(string first, ElasticVersion second) => (ElasticVersion)first > second;
+		public static bool operator <(string first, ElasticVersion second) => (ElasticVersion) first < second;
+		public static bool operator >(string first, ElasticVersion second) => (ElasticVersion) first > second;
 
 		public static bool operator <=(ElasticVersion first, string second) => first <= (ElasticVersion) second;
 		public static bool operator >=(ElasticVersion first, string second) => first >= (ElasticVersion) second;
 
-		public static bool operator <=(string first, ElasticVersion second) => (ElasticVersion)first <= second;
-		public static bool operator >=(string first, ElasticVersion second) => (ElasticVersion)first >= second;
+		public static bool operator <=(string first, ElasticVersion second) => (ElasticVersion) first <= second;
+		public static bool operator >=(string first, ElasticVersion second) => (ElasticVersion) first >= second;
 
 		public static bool operator ==(ElasticVersion first, string second) => first == (ElasticVersion) second;
 		public static bool operator !=(ElasticVersion first, string second) => first != (ElasticVersion) second;
 
 
-		public static bool operator ==(string first, ElasticVersion second) => (ElasticVersion)first == second;
-		public static bool operator !=(string first, ElasticVersion second) => (ElasticVersion)first != second;
+		public static bool operator ==(string first, ElasticVersion second) => (ElasticVersion) first == second;
+		public static bool operator !=(string first, ElasticVersion second) => (ElasticVersion) first != second;
 
 		// ReSharper disable once UnusedMember.Local
 		private bool Equals(ElasticVersion other) => base.Equals(other);
-
-		public int CompareTo(string other)
-		{
-			var v = (ElasticVersion) other;
-			return CompareTo(v);
-		}
 		public override bool Equals(object obj) => base.Equals(obj);
 
 		public override int GetHashCode() => base.GetHashCode();

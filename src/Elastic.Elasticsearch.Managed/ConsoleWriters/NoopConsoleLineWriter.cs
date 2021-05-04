@@ -10,8 +10,13 @@ namespace Elastic.Elasticsearch.Managed.ConsoleWriters
 	internal class NoopConsoleLineWriter : IConsoleLineHandler
 	{
 		public static NoopConsoleLineWriter Instance { get; } = new NoopConsoleLineWriter();
-		public void Handle(LineOut lineOut) { }
 
-		public void Handle(Exception e) { }
+		public void Handle(LineOut lineOut)
+		{
+		}
+
+		public void Handle(Exception e)
+		{
+		}
 	}
 }

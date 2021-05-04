@@ -12,11 +12,6 @@ namespace Nest.TypescriptGenerator
 {
 	public class CSharpSourceFile : CSharpSyntaxWalker
 	{
-		public string Namespace { get; }
-		public List<string> Declarations { get; } = new List<string>();
-
-		private string[] Skip { get; } = { "IElasticClient", "ElasticClient" };
-
 		public CSharpSourceFile(FileInfo fileInfo)
 		{
 			var code = File.ReadAllText(fileInfo.FullName);
@@ -27,6 +22,7 @@ namespace Nest.TypescriptGenerator
 				namespaces.Add(dirInfo.Name);
 				dirInfo = dirInfo.Parent;
 			} while (dirInfo != null && dirInfo.Name != "src");
+
 			namespaces.Reverse();
 			namespaces.Remove("Nest");
 			Namespace = string.Join(".", namespaces);
@@ -34,6 +30,11 @@ namespace Nest.TypescriptGenerator
 			var ast = CSharpSyntaxTree.ParseText(code);
 			Visit(ast.GetRoot());
 		}
+
+		public string Namespace { get; }
+		public List<string> Declarations { get; } = new List<string>();
+
+		private string[] Skip { get; } = {"IElasticClient", "ElasticClient"};
 
 		public override void VisitClassDeclaration(ClassDeclarationSyntax node)
 		{

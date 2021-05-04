@@ -1,4 +1,4 @@
-﻿// Licensed to Elasticsearch B.V under one or more agreements.
+// Licensed to Elasticsearch B.V under one or more agreements.
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
@@ -18,7 +18,8 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.InstallationTasks
 			var a = cluster.ClusterConfiguration.Artifact;
 			if (Directory.Exists(fs.ElasticsearchHome))
 			{
-                cluster.Writer?.WriteDiagnostic($"{{{nameof(UnzipElasticsearch)}}} skipping [{fs.ElasticsearchHome}] already exists");
+				cluster.Writer?.WriteDiagnostic(
+					$"{{{nameof(UnzipElasticsearch)}}} skipping [{fs.ElasticsearchHome}] already exists");
 				return;
 			}
 
@@ -26,15 +27,17 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.InstallationTasks
 			var extractedFolder = Path.Combine(fs.LocalFolder, a.FolderInZip);
 			if (!Directory.Exists(extractedFolder))
 			{
-                cluster.Writer?.WriteDiagnostic($"{{{nameof(UnzipElasticsearch)}}} unzipping version [{v}] {{{from}}}");
-                Extract(from, fs.LocalFolder);
-                
-                cluster.Writer?.WriteDiagnostic($"{{{nameof(UnzipElasticsearch)}}} extracted version [{v}] to {{{fs.LocalFolder}}}");
+				cluster.Writer?.WriteDiagnostic($"{{{nameof(UnzipElasticsearch)}}} unzipping version [{v}] {{{from}}}");
+				Extract(from, fs.LocalFolder);
+
+				cluster.Writer?.WriteDiagnostic(
+					$"{{{nameof(UnzipElasticsearch)}}} extracted version [{v}] to {{{fs.LocalFolder}}}");
 			}
-			
+
 			if (extractedFolder == fs.ElasticsearchHome) return;
 
-			cluster.Writer?.WriteDiagnostic($"{{{nameof(UnzipElasticsearch)}}} Copying extracted folder {{{extractedFolder}}} => {fs.ElasticsearchHome}");
+			cluster.Writer?.WriteDiagnostic(
+				$"{{{nameof(UnzipElasticsearch)}}} Copying extracted folder {{{extractedFolder}}} => {fs.ElasticsearchHome}");
 			CopyFolder(extractedFolder, fs.ElasticsearchHome);
 		}
 	}

@@ -1,4 +1,4 @@
-﻿// Licensed to Elasticsearch B.V under one or more agreements.
+// Licensed to Elasticsearch B.V under one or more agreements.
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
@@ -15,6 +15,17 @@ namespace Elastic.Elasticsearch.Managed.FileSystem
 	{
 		protected const string SubFolder = "ElasticManaged";
 
+		public NodeFileSystem(ElasticVersion version, string elasticsearchHome = null)
+		{
+			Version = version;
+			Artifact = version.Artifact(Product.Elasticsearch);
+			LocalFolder = AppDataFolder(version);
+			ElasticsearchHome = elasticsearchHome ??
+			                    GetEsHomeVariable() ?? throw new ArgumentNullException(nameof(elasticsearchHome));
+
+			ConfigEnvironmentVariableName = version.Major >= 6 ? "ES_PATH_CONF" : "CONF_DIR";
+		}
+
 		protected ElasticVersion Version { get; }
 		protected Artifact Artifact { get; }
 
@@ -26,32 +37,29 @@ namespace Elastic.Elasticsearch.Managed.FileSystem
 		public string Binary => Path.Combine(ElasticsearchHome, "bin", "elasticsearch") + BinarySuffix;
 
 		/// <inheritdoc />
-		public string PluginBinary => Path.Combine(ElasticsearchHome, "bin", (Version.Major >= 5 ? "elasticsearch-" : "" ) +"plugin") + BinarySuffix;
+		public string PluginBinary =>
+			Path.Combine(ElasticsearchHome, "bin", (Version.Major >= 5 ? "elasticsearch-" : "") + "plugin") +
+			BinarySuffix;
 
 		/// <inheritdoc />
 		public string ElasticsearchHome { get; }
+
 		/// <inheritdoc />
 		public string LocalFolder { get; }
+
 		/// <inheritdoc />
 		public virtual string ConfigPath => null;
+
 		/// <inheritdoc />
 		public virtual string DataPath => null;
+
 		/// <inheritdoc />
 		public virtual string LogsPath => null;
+
 		/// <inheritdoc />
 		public virtual string RepositoryPath => null;
 
 		public string ConfigEnvironmentVariableName { get; }
-
-		public NodeFileSystem(ElasticVersion version, string elasticsearchHome = null)
-		{
-			Version = version;
-			Artifact = version.Artifact(Product.Elasticsearch);
-			LocalFolder = AppDataFolder(version);
-			ElasticsearchHome = elasticsearchHome ?? GetEsHomeVariable() ?? throw new ArgumentNullException(nameof(elasticsearchHome));
-
-			ConfigEnvironmentVariableName = version.Major >= 6 ? "ES_PATH_CONF" : "CONF_DIR";
-		}
 
 		protected static string AppDataFolder(ElasticVersion version)
 		{
@@ -64,6 +72,7 @@ namespace Elastic.Elasticsearch.Managed.FileSystem
 		protected static string GetApplicationDataDirectory() =>
 			RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
 				? Environment.GetEnvironmentVariable("LocalAppData")
-				: Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create);
+				: Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData,
+					Environment.SpecialFolderOption.Create);
 	}
 }

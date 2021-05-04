@@ -10,7 +10,7 @@ namespace Elastic.Elasticsearch.Managed.Configuration
 		public string Value { get; }
 
 		/// <summary>
-		/// Stores for which elasticsearch version range this setting is applicable
+		///     Stores for which elasticsearch version range this setting is applicable
 		/// </summary>
 		public string VersionRange { get; }
 

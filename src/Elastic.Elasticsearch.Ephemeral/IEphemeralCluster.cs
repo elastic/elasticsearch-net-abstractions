@@ -16,6 +16,7 @@ namespace Elastic.Elasticsearch.Ephemeral
 	}
 
 	public interface IEphemeralCluster<out TConfiguration> : IEphemeralCluster, ICluster<TConfiguration>
-		where TConfiguration : EphemeralClusterConfiguration { }
-
+		where TConfiguration : EphemeralClusterConfiguration
+	{
+	}
 }

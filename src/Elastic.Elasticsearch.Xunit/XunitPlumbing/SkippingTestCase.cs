@@ -12,10 +12,12 @@ namespace Elastic.Elasticsearch.Xunit.XunitPlumbing
 	public class SkippingTestCase : TestMethodTestCase, IXunitTestCase
 	{
 		/// <summary>Used for de-serialization.</summary>
-		public SkippingTestCase() { }
+		public SkippingTestCase()
+		{
+		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="SkippingTestCase"/> class.
+		///     Initializes a new instance of the <see cref="SkippingTestCase" /> class.
 		/// </summary>
 		/// <param name="testMethod">The test method this test case belongs to.</param>
 		/// <param name="testMethodArguments">The arguments for the test method.</param>

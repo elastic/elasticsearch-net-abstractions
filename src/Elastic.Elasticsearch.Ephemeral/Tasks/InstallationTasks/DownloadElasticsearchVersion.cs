@@ -21,13 +21,16 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.InstallationTasks
 			var to = Path.Combine(fs.LocalFolder, a.Archive);
 			if (File.Exists(to))
 			{
-				cluster.Writer?.WriteDiagnostic($"{{{nameof(DownloadElasticsearchVersion)}}} {v} was already downloaded");
+				cluster.Writer?.WriteDiagnostic(
+					$"{{{nameof(DownloadElasticsearchVersion)}}} {v} was already downloaded");
 				return;
 			}
 
-			cluster.Writer?.WriteDiagnostic($"{{{nameof(DownloadElasticsearchVersion)}}} downloading Elasticsearch [{v}] from {{{from}}} {{{to}}}");
+			cluster.Writer?.WriteDiagnostic(
+				$"{{{nameof(DownloadElasticsearchVersion)}}} downloading Elasticsearch [{v}] from {{{from}}} {{{to}}}");
 			DownloadFile(from, to);
-			cluster.Writer?.WriteDiagnostic($"{{{nameof(DownloadElasticsearchVersion)}}} downloaded Elasticsearch [{v}] from {{{from}}} {{{to}}}");
+			cluster.Writer?.WriteDiagnostic(
+				$"{{{nameof(DownloadElasticsearchVersion)}}} downloaded Elasticsearch [{v}] from {{{from}}} {{{to}}}");
 		}
 	}
 }

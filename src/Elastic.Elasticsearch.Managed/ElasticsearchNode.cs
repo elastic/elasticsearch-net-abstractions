@@ -1,9 +1,10 @@
-﻿// Licensed to Elasticsearch B.V under one or more agreements.
+// Licensed to Elasticsearch B.V under one or more agreements.
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using Elastic.Elasticsearch.Managed.Configuration;
 using Elastic.Elasticsearch.Managed.ConsoleWriters;
@@ -16,6 +17,15 @@ namespace Elastic.Elasticsearch.Managed
 {
 	public class ElasticsearchNode : ObservableProcess
 	{
+		private readonly ManualResetEvent _startedHandle = new ManualResetEvent(false);
+
+		public ElasticsearchNode(ElasticVersion version, string elasticsearchHome = null)
+			: this(new NodeConfiguration(new ClusterConfiguration(version,
+				(v, s) => new NodeFileSystem(v, elasticsearchHome))))
+		{
+		}
+
+		public ElasticsearchNode(NodeConfiguration config) : base(StartArgs(config)) => NodeConfiguration = config;
 		public string Version { get; private set; }
 		public int? Port { get; private set; }
 		public bool NodeStarted { get; private set; }
@@ -25,10 +35,17 @@ namespace Elastic.Elasticsearch.Managed
 		public override int? ProcessId => JavaProcessId ?? base.ProcessId;
 		public int? HostProcessId => base.ProcessId;
 
-		public ElasticsearchNode(ElasticVersion version, string elasticsearchHome = null)
-			: this(new NodeConfiguration(new ClusterConfiguration(version, fileSystem: (v, s) => new NodeFileSystem(v, elasticsearchHome)))) { }
+		/// <summary>
+		///     Set this true if you want the node to go into assumed started state as soon as its waiting for more nodes to start
+		///     doing the election.
+		///     <para>Useful to speed up starting multi node clusters</para>
+		/// </summary>
+		public bool AssumeStartedOnNotEnoughMasterPing { get; set; }
 
-		public ElasticsearchNode(NodeConfiguration config) : base(StartArgs(config)) => NodeConfiguration = config;
+		internal IConsoleLineHandler Writer { get; private set; }
+
+		public Exception LastSeenException { get; set; }
+		public WaitHandle StartedHandle => _startedHandle;
 
 		private static StartArguments StartArgs(NodeConfiguration config)
 		{
@@ -47,10 +64,7 @@ namespace Elastic.Elasticsearch.Managed
 
 		private static Dictionary<string, string> EnvVars(NodeConfiguration config)
 		{
-			var environmentVariables = new Dictionary<string, string>
-			{
-				{"ES_JAVA_OPTS", "-Xms1g -Xmx1g"}
-			};
+			var environmentVariables = new Dictionary<string, string> {{"ES_JAVA_OPTS", "-Xms1g -Xmx1g"}};
 			if (!string.IsNullOrWhiteSpace(config.FileSystem.ConfigPath))
 				environmentVariables.Add(config.FileSystem.ConfigEnvironmentVariableName, config.FileSystem.ConfigPath);
 
@@ -59,12 +73,6 @@ namespace Elastic.Elasticsearch.Managed
 
 			return environmentVariables;
 		}
-
-		/// <summary>
-		/// Set this true if you want the node to go into assumed started state as soon as its waiting for more nodes to start doing the election.
-		/// <para>Useful to speed up starting multi node clusters</para>
-		/// </summary>
-		public bool AssumeStartedOnNotEnoughMasterPing { get; set; }
 
 		private bool AssumedStartedStateChecker(string section, string message)
 		{
@@ -85,22 +93,24 @@ namespace Elastic.Elasticsearch.Managed
 			var subscription = SubscribeLines(writer);
 			if (WaitForStarted(waitForStarted)) return subscription;
 			subscription.Dispose();
-			throw new ElasticsearchCleanExitException($"Failed to start node: {node} before the configured timeout of: {waitForStarted}");
+			throw new ElasticsearchCleanExitException(
+				$"Failed to start node: {node} before the configured timeout of: {waitForStarted}");
 		}
 
-		internal IConsoleLineHandler Writer { get; private set; }
-
 		public IDisposable SubscribeLines() => SubscribeLines(new LineHighlightWriter());
+
 		public IDisposable SubscribeLines(IConsoleLineHandler writer) =>
 			SubscribeLines(writer, delegate { }, delegate { }, delegate { });
 
 		public IDisposable SubscribeLines(IConsoleLineHandler writer, Action<LineOut> onNext) =>
 			SubscribeLines(writer, onNext, delegate { }, delegate { });
 
-		public IDisposable SubscribeLines(IConsoleLineHandler writer, Action<LineOut> onNext, Action<Exception> onError) =>
+		public IDisposable SubscribeLines(IConsoleLineHandler writer, Action<LineOut> onNext,
+			Action<Exception> onError) =>
 			SubscribeLines(writer, onNext, onError, delegate { });
 
-		public IDisposable SubscribeLines(IConsoleLineHandler writer, Action<LineOut> onNext, Action<Exception> onError, Action onCompleted)
+		public IDisposable SubscribeLines(IConsoleLineHandler writer, Action<LineOut> onNext, Action<Exception> onError,
+			Action onCompleted)
 		{
 			Writer = writer;
 			var node = NodeConfiguration.DesiredNodeName;
@@ -113,7 +123,8 @@ namespace Elastic.Elasticsearch.Managed
 			Process.StartInfo.Environment[envVarName] = javaHome;
 
 			return SubscribeLines(
-				l => {
+				l =>
+				{
 					writer?.Handle(l);
 					onNext?.Invoke(l);
 				},
@@ -131,10 +142,6 @@ namespace Elastic.Elasticsearch.Managed
 				});
 		}
 
-		public Exception LastSeenException { get; set; }
-
-		private readonly ManualResetEvent _startedHandle = new ManualResetEvent(false);
-		public WaitHandle StartedHandle => _startedHandle;
 		public bool WaitForStarted(TimeSpan timeout) => _startedHandle.WaitOne(timeout);
 
 		protected override void OnBeforeSetCompletedHandle()
@@ -159,10 +166,12 @@ namespace Elastic.Elasticsearch.Managed
 			if (!processId.HasValue) return;
 			try
 			{
-				var p = System.Diagnostics.Process.GetProcessById(processId.Value);
+				var p = Process.GetProcessById(processId.Value);
 				p.Kill();
 			}
-			catch (Exception) { }
+			catch (Exception)
+			{
+			}
 		}
 
 		protected override bool ContinueReadingFromProcessReaders()
@@ -186,7 +195,8 @@ namespace Elastic.Elasticsearch.Managed
 				return keepBuffering;
 			}
 
-			var parsed = LineOutParser.TryParse(c?.Line, out _, out _, out var section, out _, out var message, out var started);
+			var parsed = LineOutParser.TryParse(c?.Line, out _, out _, out var section, out _, out var message,
+				out var started);
 
 			if (!parsed) return Writer != null;
 
@@ -200,13 +210,16 @@ namespace Elastic.Elasticsearch.Managed
 				Port = port;
 				var dp = NodeConfiguration.DesiredPort;
 				if (dp.HasValue && Port != dp.Value)
-					throw new ElasticsearchCleanExitException($"Node started on port {port} but {dp.Value} was requested");
+					throw new ElasticsearchCleanExitException(
+						$"Node started on port {port} but {dp.Value} was requested");
 			}
 
 			if (!started) started = AssumedStartedStateChecker(section, message);
 			if (started)
 			{
-				if (!Port.HasValue) throw new ElasticsearchCleanExitException($"Node started but ElasticsearchNode did not grab its port number");
+				if (!Port.HasValue)
+					throw new ElasticsearchCleanExitException(
+						$"Node started but ElasticsearchNode did not grab its port number");
 				NodeStarted = true;
 				_startedHandle.Set();
 			}
@@ -216,6 +229,5 @@ namespace Elastic.Elasticsearch.Managed
 			//otherwise only keep buffering if we are not started
 			return !started;
 		}
-
 	}
 }

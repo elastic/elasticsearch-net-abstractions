@@ -1,4 +1,4 @@
-﻿// Licensed to Elasticsearch B.V under one or more agreements.
+// Licensed to Elasticsearch B.V under one or more agreements.
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
@@ -24,13 +24,15 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 			ITestCaseOrderer testCaseOrderer,
 			ExceptionAggregator aggregator,
 			CancellationTokenSource cancellationTokenSource)
-			: base(testCollection, testCases, diagnosticMessageSink, messageBus, testCaseOrderer, aggregator, cancellationTokenSource)
+			: base(testCollection, testCases, diagnosticMessageSink, messageBus, testCaseOrderer, aggregator,
+				cancellationTokenSource)
 		{
 			_assemblyFixtureMappings = assemblyFixtureMappings;
 			_diagnosticMessageSink = diagnosticMessageSink;
 		}
 
-		protected override Task<RunSummary> RunTestClassAsync(ITestClass testClass, IReflectionTypeInfo @class, IEnumerable<IXunitTestCase> testCases)
+		protected override Task<RunSummary> RunTestClassAsync(ITestClass testClass, IReflectionTypeInfo @class,
+			IEnumerable<IXunitTestCase> testCases)
 		{
 			// whats this doing exactly??
 			var combinedFixtures = new Dictionary<Type, object>(_assemblyFixtureMappings);
@@ -38,7 +40,9 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 				combinedFixtures[kvp.Key] = kvp.Value;
 
 			// We've done everything we need, so hand back off to default Xunit implementation for class runner
-			return new XunitTestClassRunner(testClass, @class, testCases, _diagnosticMessageSink, MessageBus, TestCaseOrderer, new ExceptionAggregator(Aggregator), CancellationTokenSource, combinedFixtures).RunAsync();
+			return new XunitTestClassRunner(testClass, @class, testCases, _diagnosticMessageSink, MessageBus,
+					TestCaseOrderer, new ExceptionAggregator(Aggregator), CancellationTokenSource, combinedFixtures)
+				.RunAsync();
 		}
 	}
 }

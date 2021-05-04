@@ -12,11 +12,15 @@ namespace Elastic.Elasticsearch.Managed.Configuration
 {
 	public class NodeConfiguration
 	{
-		public NodeConfiguration(ElasticVersion version, int? port = null) : this(new ClusterConfiguration(version), port)
+		private Action<StartArguments> _defaultStartArgs = s => { };
+
+		public NodeConfiguration(ElasticVersion version, int? port = null) : this(new ClusterConfiguration(version),
+			port)
 		{
 		}
 
-		public NodeConfiguration(IClusterConfiguration<NodeFileSystem> clusterConfiguration, int? port = null, string nodePrefix = null)
+		public NodeConfiguration(IClusterConfiguration<NodeFileSystem> clusterConfiguration, int? port = null,
+			string nodePrefix = null)
 		{
 			ClusterConfiguration = clusterConfiguration;
 			DesiredPort = port;
@@ -24,14 +28,14 @@ namespace Elastic.Elasticsearch.Managed.Configuration
 			Settings = new NodeSettings(clusterConfiguration.DefaultNodeSettings);
 
 			if (!string.IsNullOrWhiteSpace(DesiredNodeName)) Settings.Add("node.name", DesiredNodeName);
-			if (DesiredPort.HasValue) Settings.Add("http.port", DesiredPort.Value.ToString(CultureInfo.InvariantCulture));
+			if (DesiredPort.HasValue)
+				Settings.Add("http.port", DesiredPort.Value.ToString(CultureInfo.InvariantCulture));
 		}
 
 		private IClusterConfiguration<NodeFileSystem> ClusterConfiguration { get; }
 
 		public int? DesiredPort { get; }
 		public string DesiredNodeName { get; }
-		private Action<StartArguments> _defaultStartArgs = s => { };
 
 		public Action<StartArguments> ModifyStartArguments
 		{
@@ -40,18 +44,18 @@ namespace Elastic.Elasticsearch.Managed.Configuration
 		}
 
 		/// <summary>
-		/// Wheter <see cref="ElasticsearchNode" /> should continue to write output to console after it has started.
-		/// <para>Defaults to true but useful to turn of if it proofs to be too noisy </para>
+		///     Wheter <see cref="ElasticsearchNode" /> should continue to write output to console after it has started.
+		///     <para>Defaults to true but useful to turn of if it proofs to be too noisy </para>
 		/// </summary>
 		public bool ShowElasticsearchOutputAfterStarted { get; set; } = true;
 
 		/// <summary>
-		/// The expected duration of the shut down sequence for Elasticsearch. After this wait duration a hard kill will occur.
+		///     The expected duration of the shut down sequence for Elasticsearch. After this wait duration a hard kill will occur.
 		/// </summary>
 		public TimeSpan WaitForShutdown { get; set; } = TimeSpan.FromSeconds(10);
 
 		/// <summary>
-		/// Copy of <see cref="IClusterConfiguration{TFileSystem}.DefaultNodeSettings" />. Add individual node settings here.
+		///     Copy of <see cref="IClusterConfiguration{TFileSystem}.DefaultNodeSettings" />. Add individual node settings here.
 		/// </summary>
 		public NodeSettings Settings { get; }
 
@@ -59,7 +63,8 @@ namespace Elastic.Elasticsearch.Managed.Configuration
 		public ElasticVersion Version => ClusterConfiguration.Version;
 		public string[] CommandLineArguments => Settings.ToCommandLineArguments(Version);
 
-		public void InitialMasterNodes(string initialMasterNodes) => Settings.Add("cluster.initial_master_nodes", initialMasterNodes, ">=7.0.0.beta1");
+		public void InitialMasterNodes(string initialMasterNodes) =>
+			Settings.Add("cluster.initial_master_nodes", initialMasterNodes, ">=7.0.0.beta1");
 
 		public string AttributeKey(string attribute)
 		{
@@ -67,7 +72,7 @@ namespace Elastic.Elasticsearch.Managed.Configuration
 			return $"node.{attr}{attribute}";
 		}
 
-		public void Add(string key, string value) => Settings.Add(key,value);
+		public void Add(string key, string value) => Settings.Add(key, value);
 
 		private string CreateNodeName(int? node, string prefix = null)
 		{

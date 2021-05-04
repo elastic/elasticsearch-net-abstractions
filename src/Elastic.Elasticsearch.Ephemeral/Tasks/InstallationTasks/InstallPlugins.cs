@@ -25,12 +25,15 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.InstallationTasks
 			//on 2.x we do not support tests requiring plugins for 2.x since we can not reliably install them
 			if (v.Major == 2)
 			{
-				cluster.Writer?.WriteDiagnostic($"{{{nameof(InstallPlugins)}}} skipping install plugins on {{2.x}} version: [{v}]");
+				cluster.Writer?.WriteDiagnostic(
+					$"{{{nameof(InstallPlugins)}}} skipping install plugins on {{2.x}} version: [{v}]");
 				return;
 			}
+
 			if (v.Major < 7 && v.ArtifactBuildState == ArtifactBuildState.Snapshot)
 			{
-				cluster.Writer?.WriteDiagnostic($"{{{nameof(InstallPlugins)}}} skipping install SNAPSHOT plugins on < {{7.x}} version: [{v}]");
+				cluster.Writer?.WriteDiagnostic(
+					$"{{{nameof(InstallPlugins)}}} skipping install SNAPSHOT plugins on < {{7.x}} version: [{v}]");
 				return;
 			}
 
@@ -52,23 +55,29 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.InstallationTasks
 				var includedByDefault = plugin.IsIncludedOutOfTheBox(v);
 				if (includedByDefault)
 				{
-					cluster.Writer?.WriteDiagnostic($"{{{nameof(Run)}}} SKIP plugin [{plugin.SubProductName}] shipped OOTB as of: {{{plugin.ShippedByDefaultAsOf}}}");
-					continue;
-				}
-				var validForCurrentVersion = plugin.IsValid(v);
-				if (!validForCurrentVersion)
-				{
-					cluster.Writer?.WriteDiagnostic($"{{{nameof(Run)}}} SKIP plugin [{plugin.SubProductName}] not valid for version: {{{v}}}");
-					continue;
-				}
-				var alreadyInstalled = AlreadyInstalled(fs, plugin.SubProductName);
-				if (alreadyInstalled)
-				{
-					cluster.Writer?.WriteDiagnostic($"{{{nameof(Run)}}} SKIP plugin [{plugin.SubProductName}] already installed");
+					cluster.Writer?.WriteDiagnostic(
+						$"{{{nameof(Run)}}} SKIP plugin [{plugin.SubProductName}] shipped OOTB as of: {{{plugin.ShippedByDefaultAsOf}}}");
 					continue;
 				}
 
-				cluster.Writer?.WriteDiagnostic($"{{{nameof(Run)}}} attempting install [{plugin.SubProductName}] as it's not OOTB: {{{plugin.ShippedByDefaultAsOf}}} and valid for {v}: {{{plugin.IsValid(v)}}}");
+				var validForCurrentVersion = plugin.IsValid(v);
+				if (!validForCurrentVersion)
+				{
+					cluster.Writer?.WriteDiagnostic(
+						$"{{{nameof(Run)}}} SKIP plugin [{plugin.SubProductName}] not valid for version: {{{v}}}");
+					continue;
+				}
+
+				var alreadyInstalled = AlreadyInstalled(fs, plugin.SubProductName);
+				if (alreadyInstalled)
+				{
+					cluster.Writer?.WriteDiagnostic(
+						$"{{{nameof(Run)}}} SKIP plugin [{plugin.SubProductName}] already installed");
+					continue;
+				}
+
+				cluster.Writer?.WriteDiagnostic(
+					$"{{{nameof(Run)}}} attempting install [{plugin.SubProductName}] as it's not OOTB: {{{plugin.ShippedByDefaultAsOf}}} and valid for {v}: {{{plugin.IsValid(v)}}}");
 				//var installParameter = v.ReleaseState == ReleaseState.Released ? plugin.Moniker : UseHttpPluginLocation(cluster.Writer, fs, plugin, v);
 				var installParameter = UseHttpPluginLocation(cluster.Writer, fs, plugin, v);
 				if (!Directory.Exists(fs.ConfigPath)) Directory.CreateDirectory(fs.ConfigPath);
@@ -81,11 +90,10 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.InstallationTasks
 
 				CopyConfigDirectoryToHomeCacheConfigDirectory(cluster, plugin);
 			}
-
-
 		}
 
-		private static void CopyConfigDirectoryToHomeCacheConfigDirectory(IEphemeralCluster<EphemeralClusterConfiguration> cluster, ElasticsearchPlugin plugin)
+		private static void CopyConfigDirectoryToHomeCacheConfigDirectory(
+			IEphemeralCluster<EphemeralClusterConfiguration> cluster, ElasticsearchPlugin plugin)
 		{
 			if (plugin.SubProductName == "x-pack") return;
 			if (!cluster.ClusterConfiguration.CacheEsHomeInstallation) return;
@@ -107,7 +115,8 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.InstallationTasks
 			return Directory.Exists(pluginFolder);
 		}
 
-		private static string UseHttpPluginLocation(IConsoleLineHandler writer, INodeFileSystem fileSystem, ElasticsearchPlugin plugin, ElasticVersion v)
+		private static string UseHttpPluginLocation(IConsoleLineHandler writer, INodeFileSystem fileSystem,
+			ElasticsearchPlugin plugin, ElasticVersion v)
 		{
 			var downloadLocation = Path.Combine(fileSystem.LocalFolder, $"{plugin.SubProductName}-{v}.zip");
 			DownloadPluginSnapshot(writer, downloadLocation, plugin, v);
@@ -115,20 +124,24 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.InstallationTasks
 			return new Uri(new Uri("file://"), downloadLocation).AbsoluteUri;
 		}
 
-		private static void DownloadPluginSnapshot(IConsoleLineHandler writer, string downloadLocation, ElasticsearchPlugin plugin, ElasticVersion v)
+		private static void DownloadPluginSnapshot(IConsoleLineHandler writer, string downloadLocation,
+			ElasticsearchPlugin plugin, ElasticVersion v)
 		{
 			if (File.Exists(downloadLocation)) return;
 			var artifact = v.Artifact(Product.ElasticsearchPlugin(plugin));
 			var downloadUrl = artifact.DownloadUrl;
-			writer?.WriteDiagnostic($"{{{nameof(DownloadPluginSnapshot)}}} downloading [{plugin.SubProductName}] from {{{downloadUrl}}}");
+			writer?.WriteDiagnostic(
+				$"{{{nameof(DownloadPluginSnapshot)}}} downloading [{plugin.SubProductName}] from {{{downloadUrl}}}");
 			try
 			{
 				DownloadFile(downloadUrl, downloadLocation);
-				writer?.WriteDiagnostic($"{{{nameof(DownloadPluginSnapshot)}}} downloaded [{plugin.SubProductName}] to {{{downloadLocation}}}");
+				writer?.WriteDiagnostic(
+					$"{{{nameof(DownloadPluginSnapshot)}}} downloaded [{plugin.SubProductName}] to {{{downloadLocation}}}");
 			}
 			catch (Exception)
 			{
-				writer?.WriteDiagnostic($"{{{nameof(DownloadPluginSnapshot)}}} download failed! [{plugin.SubProductName}] from {{{downloadUrl}}}");
+				writer?.WriteDiagnostic(
+					$"{{{nameof(DownloadPluginSnapshot)}}} download failed! [{plugin.SubProductName}] from {{{downloadUrl}}}");
 				throw;
 			}
 		}

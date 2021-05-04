@@ -1,4 +1,4 @@
-﻿// Licensed to Elasticsearch B.V under one or more agreements.
+// Licensed to Elasticsearch B.V under one or more agreements.
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
@@ -8,6 +8,8 @@ namespace Nest.TypescriptGenerator
 {
 	public static class StringExtensions
 	{
+		private static readonly Regex SnakeCaseRe = new Regex("(?<=.)([A-Z])");
+
 		public static string QuoteMaybe(this string s)
 		{
 			if (s == null) return null;
@@ -19,7 +21,7 @@ namespace Nest.TypescriptGenerator
 			return s;
 		}
 
-		private static readonly Regex SnakeCaseRe = new Regex("(?<=.)([A-Z])");
-		public static string SnakeCase(this string token) => token == null ? null : SnakeCaseRe.Replace(token, "_$0").ToLowerInvariant();
+		public static string SnakeCase(this string token) =>
+			token == null ? null : SnakeCaseRe.Replace(token, "_$0").ToLowerInvariant();
 	}
 }

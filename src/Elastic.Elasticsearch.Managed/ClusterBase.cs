@@ -35,12 +35,16 @@ namespace Elastic.Elasticsearch.Managed
 
 	public abstract class ClusterBase : ClusterBase<ClusterConfiguration>
 	{
-		protected ClusterBase(ClusterConfiguration clusterConfiguration) : base(clusterConfiguration) { }
+		protected ClusterBase(ClusterConfiguration clusterConfiguration) : base(clusterConfiguration)
+		{
+		}
 	}
 
 	public abstract class ClusterBase<TConfiguration> : ICluster<TConfiguration>
 		where TConfiguration : IClusterConfiguration<NodeFileSystem>
 	{
+		private Action<NodeConfiguration, int> _defaultConfigSelector = (n, i) => { };
+
 		protected ClusterBase(TConfiguration clusterConfiguration)
 		{
 			ClusterConfiguration = clusterConfiguration;
@@ -53,25 +57,30 @@ namespace Elastic.Elasticsearch.Managed
 			}
 
 			var nodes =
-				(from port in Enumerable.Range(ClusterConfiguration.StartingPortNumber, ClusterConfiguration.NumberOfNodes)
-				let config = new NodeConfiguration(clusterConfiguration, port, ClusterMoniker)
-				{
-					ShowElasticsearchOutputAfterStarted = clusterConfiguration.ShowElasticsearchOutputAfterStarted,
-				}
-				let node = new ElasticsearchNode(Modify(config, port))
-				{
-					AssumeStartedOnNotEnoughMasterPing = ClusterConfiguration.NumberOfNodes > 1,
-				}
-				select node).ToList();
+				(from port in Enumerable.Range(ClusterConfiguration.StartingPortNumber,
+						ClusterConfiguration.NumberOfNodes)
+					let config = new NodeConfiguration(clusterConfiguration, port, ClusterMoniker)
+					{
+						ShowElasticsearchOutputAfterStarted =
+							clusterConfiguration.ShowElasticsearchOutputAfterStarted,
+					}
+					let node = new ElasticsearchNode(Modify(config, port))
+					{
+						AssumeStartedOnNotEnoughMasterPing = ClusterConfiguration.NumberOfNodes > 1,
+					}
+					select node).ToList();
 
-			var initialMasterNodes = string.Join(",", nodes.Select(n=>n.NodeConfiguration.DesiredNodeName));
+			var initialMasterNodes = string.Join(",", nodes.Select(n => n.NodeConfiguration.DesiredNodeName));
 			foreach (var node in nodes)
 				node.NodeConfiguration.InitialMasterNodes(initialMasterNodes);
 
 			Nodes = new ReadOnlyCollection<ElasticsearchNode>(nodes);
 		}
 
-		/// <summary> A short name to identify the cluster defaults to the <see cref="ClusterBase"/> subclass name with Cluster removed </summary>
+		/// <summary>
+		///     A short name to identify the cluster defaults to the <see cref="ClusterBase" /> subclass name with Cluster
+		///     removed
+		/// </summary>
 		public virtual string ClusterMoniker { get; }
 
 		public TConfiguration ClusterConfiguration { get; }
@@ -81,15 +90,11 @@ namespace Elastic.Elasticsearch.Managed
 		public bool Started { get; private set; }
 		public IConsoleLineHandler Writer { get; private set; } = NoopConsoleLineWriter.Instance;
 
-		private Action<NodeConfiguration, int> _defaultConfigSelector = (n, i) => { };
-		protected virtual void ModifyNodeConfiguration(NodeConfiguration nodeConfiguration, int port) { }
-
-		protected virtual void SeedCluster() { }
-
 		public IDisposable Start() => Start(TimeSpan.FromMinutes(2));
 
 		public IDisposable Start(TimeSpan waitForStarted) =>
-			Start(new LineHighlightWriter(Nodes.Select(n => n.NodeConfiguration.DesiredNodeName).ToArray()), waitForStarted);
+			Start(new LineHighlightWriter(Nodes.Select(n => n.NodeConfiguration.DesiredNodeName).ToArray()),
+				waitForStarted);
 
 		public IDisposable Start(IConsoleLineHandler writer, TimeSpan waitForStarted)
 		{
@@ -104,7 +109,8 @@ namespace Elastic.Elasticsearch.Managed
 			if (!WaitHandle.WaitAll(waitHandles, waitForStarted))
 			{
 				var nodeExceptions = Nodes.Select(n => n.LastSeenException).Where(e => e != null).ToList();
-				writer?.WriteError($"{{{GetType().Name}.{nameof(Start)}}} cluster did not start after {waitForStarted}");
+				writer?.WriteError(
+					$"{{{GetType().Name}.{nameof(Start)}}} cluster did not start after {waitForStarted}");
 				throw new AggregateException($"Not all nodes started after waiting {waitForStarted}", nodeExceptions);
 			}
 
@@ -120,8 +126,8 @@ namespace Elastic.Elasticsearch.Managed
 
 			try
 			{
-                OnAfterStarted();
-                SeedCluster();
+				OnAfterStarted();
+				SeedCluster();
 			}
 			catch (Exception e)
 			{
@@ -132,16 +138,21 @@ namespace Elastic.Elasticsearch.Managed
 			return subscriptions;
 		}
 
-		private class Subscriptions : IDisposable
+		public void Dispose()
 		{
-			private List<IDisposable> Disposables { get; } = new List<IDisposable>();
+			Started = false;
+			foreach (var node in Nodes)
+				node?.Dispose();
 
-			internal void Add(IDisposable disposable) => Disposables.Add(disposable);
+			OnDispose();
+		}
 
-			public void Dispose()
-			{
-				foreach(var d in Disposables) d.Dispose();
-			}
+		protected virtual void ModifyNodeConfiguration(NodeConfiguration nodeConfiguration, int port)
+		{
+		}
+
+		protected virtual void SeedCluster()
+		{
 		}
 
 
@@ -157,19 +168,28 @@ namespace Elastic.Elasticsearch.Managed
 				node.WaitForCompletion(waitForCompletion);
 		}
 
-		protected virtual void OnAfterStarted() { }
-
-		protected virtual void OnBeforeStart() { }
-
-		protected virtual void OnDispose() { }
-
-		public void Dispose()
+		protected virtual void OnAfterStarted()
 		{
-			Started = false;
-			foreach (var node in Nodes)
-				node?.Dispose();
+		}
 
-			OnDispose();
+		protected virtual void OnBeforeStart()
+		{
+		}
+
+		protected virtual void OnDispose()
+		{
+		}
+
+		private class Subscriptions : IDisposable
+		{
+			private List<IDisposable> Disposables { get; } = new List<IDisposable>();
+
+			public void Dispose()
+			{
+				foreach (var d in Disposables) d.Dispose();
+			}
+
+			internal void Add(IDisposable disposable) => Disposables.Add(disposable);
 		}
 	}
 }

@@ -16,17 +16,20 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 			if (!cluster.ClusterConfiguration.EnableSecurity) return;
 
 			var configFile = Path.Combine(cluster.FileSystem.ConfigPath, "elasticsearch.yml");
-			cluster.Writer.WriteDiagnostic($"{{{nameof(EnsureSecurityRealms)}}} attempting to add xpack realms to [{configFile}]");
+			cluster.Writer.WriteDiagnostic(
+				$"{{{nameof(EnsureSecurityRealms)}}} attempting to add xpack realms to [{configFile}]");
 			var lines = File.ReadAllLines(configFile).ToList();
 			var saveFile = false;
 
 			var major = cluster.ClusterConfiguration.Version.Major;
-			saveFile =  major >= 6
-				? (major >= 7 ? Write7XAndUpRealms(lines, cluster.ClusterConfiguration.EnableSsl) : Write6XAndUpRealms(lines))
+			saveFile = major >= 6
+				? major >= 7 ? Write7XAndUpRealms(lines, cluster.ClusterConfiguration.EnableSsl) :
+				Write6XAndUpRealms(lines)
 				: Write5XAndUpRealms(lines);
 
 			if (saveFile) File.WriteAllLines(configFile, lines);
-			cluster.Writer.WriteDiagnostic($"{{{nameof(EnsureSecurityRealms)}}} {(saveFile ? "saved" : "skipped saving")} xpack realms to [{configFile}]");
+			cluster.Writer.WriteDiagnostic(
+				$"{{{nameof(EnsureSecurityRealms)}}} {(saveFile ? "saved" : "skipped saving")} xpack realms to [{configFile}]");
 		}
 
 		private static bool Write7XAndUpRealms(List<string> lines, bool sslEnabled)
@@ -34,27 +37,14 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 			if (lines.Any(line => line.Contains("file1"))) return false;
 			lines.AddRange(new[]
 			{
-				string.Empty,
-				"xpack:",
-				"  security:",
-				"    authc:",
-				"      realms:",
-				"        file:",
-				$"         {SecurityRealms.FileRealm}:",
-				"            order: 0",
-				string.Empty
+				string.Empty, "xpack:", "  security:", "    authc:", "      realms:", "        file:",
+				$"         {SecurityRealms.FileRealm}:", "            order: 0", string.Empty
 			});
 			if (sslEnabled)
-			{
 				lines.AddRange(new[]
 				{
-
-					"        pki:",
-					$"         {SecurityRealms.PkiRealm}:",
-					"            order: 1",
-					string.Empty
+					"        pki:", $"         {SecurityRealms.PkiRealm}:", "            order: 1", string.Empty
 				});
-			}
 			return true;
 		}
 
@@ -63,18 +53,9 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 			if (lines.Any(line => line.Contains("file1"))) return false;
 			lines.AddRange(new[]
 			{
-				string.Empty,
-				"xpack:",
-				"  security:",
-				"    authc:",
-				"      realms:",
-				$"        {SecurityRealms.FileRealm}:",
-				"          type: file",
-				"          order: 0",
-				$"        {SecurityRealms.PkiRealm}:",
-				"          type: pki",
-				"          order: 1",
-				string.Empty
+				string.Empty, "xpack:", "  security:", "    authc:", "      realms:",
+				$"        {SecurityRealms.FileRealm}:", "          type: file", "          order: 0",
+				$"        {SecurityRealms.PkiRealm}:", "          type: pki", "          order: 1", string.Empty
 			});
 
 			return true;
@@ -87,14 +68,8 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 			{
 				lines.AddRange(new[]
 				{
-					string.Empty,
-					"xpack:",
-					"  security:",
-					"    authc:",
-					"      realms:",
-					$"        {SecurityRealms.FileRealm}:",
-					"          type: file",
-					"          order: 0",
+					string.Empty, "xpack:", "  security:", "    authc:", "      realms:",
+					$"        {SecurityRealms.FileRealm}:", "          type: file", "          order: 0",
 					string.Empty
 				});
 				saveFile = true;
@@ -104,15 +79,8 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 			{
 				lines.AddRange(new[]
 				{
-					string.Empty,
-					"xpack:",
-					"  security:",
-					"    authc:",
-					"      realms:",
-					$"        {SecurityRealms.PkiRealm}:",
-					"          type: pki",
-					"          order: 1",
-					string.Empty
+					string.Empty, "xpack:", "  security:", "    authc:", "      realms:",
+					$"        {SecurityRealms.PkiRealm}:", "          type: pki", "          order: 1", string.Empty
 				});
 				saveFile = true;
 			}

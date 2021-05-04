@@ -1,4 +1,4 @@
-﻿// Licensed to Elasticsearch B.V under one or more agreements.
+// Licensed to Elasticsearch B.V under one or more agreements.
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
@@ -7,9 +7,10 @@ using Elastic.Elasticsearch.Xunit.XunitPlumbing;
 using Elasticsearch.Net;
 using FluentAssertions;
 using Nest;
+using Xunit;
 
 // we need to put this assembly attribute in place for xunit to use our custom test execution pipeline
-[assembly: Xunit.TestFrameworkAttribute("Elastic.Elasticsearch.Xunit.Sdk.ElasticTestFramework", "Elastic.Elasticsearch.Xunit")]
+[assembly: TestFramework("Elastic.Elasticsearch.Xunit.Sdk.ElasticTestFramework", "Elastic.Elasticsearch.Xunit")]
 
 namespace Elastic.Xunit.ExampleMinimal
 {
@@ -17,13 +18,12 @@ namespace Elastic.Xunit.ExampleMinimal
 	public class MyTestCluster : XunitClusterBase
 	{
 		/// <summary>
-		/// We pass our configuration instance to the base class.
-		/// We only configure it to run version 6.2.3 here but lots of additional options are available.
+		///     We pass our configuration instance to the base class.
+		///     We only configure it to run version 6.2.3 here but lots of additional options are available.
 		/// </summary>
 		public MyTestCluster() : base(new XunitClusterConfiguration("8.0.0-SNAPSHOT") { })
 		{
 		}
-
 	}
 
 	public class ExampleTest : IClusterFixture<MyTestCluster>

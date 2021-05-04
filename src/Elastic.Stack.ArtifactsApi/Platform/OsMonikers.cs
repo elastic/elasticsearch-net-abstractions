@@ -26,7 +26,8 @@ namespace Elastic.Stack.ArtifactsApi.Platform
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return OSPlatform.Windows;
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return OSPlatform.OSX;
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) return OSPlatform.Linux;
-			throw new Exception($"{RuntimeInformation.OSDescription} is currently not supported please open an issue @elastic/elasticsearch-net-abstractions");
+			throw new Exception(
+				$"{RuntimeInformation.OSDescription} is currently not supported please open an issue @elastic/elasticsearch-net-abstractions");
 		}
 
 
@@ -36,7 +37,8 @@ namespace Elastic.Stack.ArtifactsApi.Platform
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return "tar.gz";
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) return "tar.gz";
 
-			throw new Exception($"{RuntimeInformation.OSDescription} is currently not supported please open an issue @elastic/elasticsearch-net-abstractions");
+			throw new Exception(
+				$"{RuntimeInformation.OSDescription} is currently not supported please open an issue @elastic/elasticsearch-net-abstractions");
 		}
 
 		public static string CurrentPlatformPackageSuffix()
@@ -46,7 +48,8 @@ namespace Elastic.Stack.ArtifactsApi.Platform
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return $"{OSX}-{intelX86Suffix}";
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) return $"{Linux}-{intelX86Suffix}";
 
-			throw new Exception($"{RuntimeInformation.OSDescription} is currently not supported please open an issue @elastic/elasticsearch-net-abstractions");
+			throw new Exception(
+				$"{RuntimeInformation.OSDescription} is currently not supported please open an issue @elastic/elasticsearch-net-abstractions");
 		}
 
 		internal static string CurrentPlatformSearchFilter()
@@ -55,8 +58,8 @@ namespace Elastic.Stack.ArtifactsApi.Platform
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return "tar";
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) return "tar";
 
-			throw new Exception($"{RuntimeInformation.OSDescription} is currently not supported please open an issue @elastic/elasticsearch-net-abstractions");
+			throw new Exception(
+				$"{RuntimeInformation.OSDescription} is currently not supported please open an issue @elastic/elasticsearch-net-abstractions");
 		}
-
 	}
 }

@@ -17,27 +17,23 @@ namespace Elastic.Elasticsearch.Ephemeral
 	public class EphemeralCluster : EphemeralCluster<EphemeralClusterConfiguration>
 	{
 		public EphemeralCluster(ElasticVersion version, int numberOfNodes = 1)
-			: base(new EphemeralClusterConfiguration(version, ClusterFeatures.None, numberOfNodes: numberOfNodes)) { }
-
-		public EphemeralCluster(EphemeralClusterConfiguration clusterConfiguration) : base(clusterConfiguration) { }
-	}
-
-	public abstract class EphemeralCluster<TConfiguration> : ClusterBase<TConfiguration>, IEphemeralCluster<TConfiguration>
-		where TConfiguration : EphemeralClusterConfiguration
-	{
-		protected EphemeralCluster(TConfiguration clusterConfiguration) : base(clusterConfiguration) => Composer = new EphemeralClusterComposer<TConfiguration>(this);
-
-		protected EphemeralClusterComposer<TConfiguration> Composer { get; }
-
-		protected override void OnBeforeStart()
+			: base(new EphemeralClusterConfiguration(version, ClusterFeatures.None, numberOfNodes: numberOfNodes))
 		{
-			Composer.Install();
-			Composer.OnBeforeStart();
 		}
 
-		protected override void OnDispose() => Composer.OnStop();
+		public EphemeralCluster(EphemeralClusterConfiguration clusterConfiguration) : base(clusterConfiguration)
+		{
+		}
+	}
 
-		protected override void OnAfterStarted() => Composer.OnAfterStart();
+	public abstract class EphemeralCluster<TConfiguration> : ClusterBase<TConfiguration>,
+		IEphemeralCluster<TConfiguration>
+		where TConfiguration : EphemeralClusterConfiguration
+	{
+		protected EphemeralCluster(TConfiguration clusterConfiguration) : base(clusterConfiguration) =>
+			Composer = new EphemeralClusterComposer<TConfiguration>(this);
+
+		protected EphemeralClusterComposer<TConfiguration> Composer { get; }
 
 		public virtual ICollection<Uri> NodesUris(string hostName = null)
 		{
@@ -46,23 +42,10 @@ namespace Elastic.Elasticsearch.Ephemeral
 				: "localhost");
 			var ssl = ClusterConfiguration.EnableSsl ? "s" : "";
 			return Nodes
-				.Select(n=>$"http{ssl}://{hostName}:{n.Port ?? 9200}")
+				.Select(n => $"http{ssl}://{hostName}:{n.Port ?? 9200}")
 				.Distinct()
 				.Select(n => new Uri(n))
 				.ToList();
-		}
-
-		protected override string SeeLogsMessage(string message)
-		{
-			var log = Path.Combine(FileSystem.LogsPath, $"{ClusterConfiguration.ClusterName}.log");
-			if (!File.Exists(log) || ClusterConfiguration.ShowElasticsearchOutputAfterStarted) return message;
-			if (!Started) return message;
-			using (var fileStream = new FileStream(log, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-			using (var textReader = new StreamReader(fileStream))
-			{
-				var logContents = textReader.ReadToEnd();
-				return message + $" contents of {log}:{Environment.NewLine}" + logContents;
-			}
 		}
 
 		public bool CachingAndCachedHomeExists()
@@ -85,20 +68,44 @@ namespace Elastic.Elasticsearch.Ephemeral
 			if (config.Plugins != null && config.Plugins.Count > 0)
 			{
 				sb.Append("-");
-				foreach (var p in config.Plugins.OrderBy(p=>p.SubProductName))
+				foreach (var p in config.Plugins.OrderBy(p => p.SubProductName))
 					sb.Append(p.SubProductName.ToLowerInvariant());
 			}
+
 			var name = sb.ToString();
 
 			return CalculateSha1(name, Encoding.UTF8);
 		}
+
+		protected override void OnBeforeStart()
+		{
+			Composer.Install();
+			Composer.OnBeforeStart();
+		}
+
+		protected override void OnDispose() => Composer.OnStop();
+
+		protected override void OnAfterStarted() => Composer.OnAfterStart();
+
+		protected override string SeeLogsMessage(string message)
+		{
+			var log = Path.Combine(FileSystem.LogsPath, $"{ClusterConfiguration.ClusterName}.log");
+			if (!File.Exists(log) || ClusterConfiguration.ShowElasticsearchOutputAfterStarted) return message;
+			if (!Started) return message;
+			using (var fileStream = new FileStream(log, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+			using (var textReader = new StreamReader(fileStream))
+			{
+				var logContents = textReader.ReadToEnd();
+				return message + $" contents of {log}:{Environment.NewLine}" + logContents;
+			}
+		}
+
 		public static string CalculateSha1(string text, Encoding enc)
 		{
 			var buffer = enc.GetBytes(text);
 			var cryptoTransformSha1 = new SHA1CryptoServiceProvider();
 			return BitConverter.ToString(cryptoTransformSha1.ComputeHash(buffer))
-				.Replace("-", "").ToLowerInvariant().Substring(0,12);
+				.Replace("-", "").ToLowerInvariant().Substring(0, 12);
 		}
-
 	}
 }

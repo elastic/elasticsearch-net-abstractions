@@ -1,4 +1,4 @@
-﻿// Licensed to Elasticsearch B.V under one or more agreements.
+// Licensed to Elasticsearch B.V under one or more agreements.
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
@@ -12,25 +12,26 @@ namespace Nest.TypescriptGenerator
 {
 	public class CsharpTypeInfoProvider
 	{
-		private static readonly Regex BadClassRegex = new Regex(@"(SynchronizedCollection|Descriptor|Attribute)(?:Base)?(?:\`.+$|$)");
+		private static readonly Regex BadClassRegex =
+			new Regex(@"(SynchronizedCollection|Descriptor|Attribute)(?:Base)?(?:\`.+$|$)");
 
 		// can not add typeof(IAggregate), because quite a few of these behave as an ICollection which trips TSLite.
 		//need to manually port these.
 
 		public static readonly Type[] ExposedInterfaces =
 		{
-			typeof(IRequest), typeof(IResponse), typeof(ICharFilter), typeof(ITokenFilter), typeof(IAnalyzer), typeof(ITokenizer),
-			typeof(ICatRecord), typeof(IProperty)
+			typeof(IRequest), typeof(IResponse), typeof(ICharFilter), typeof(ITokenFilter), typeof(IAnalyzer),
+			typeof(ITokenizer), typeof(ICatRecord), typeof(IProperty)
 		};
 
 		public static readonly Type[] StringAbstractions = new[]
 		{
-			typeof(DateMath), typeof(Indices), typeof(IndexName), typeof(RelationName), typeof(Id), typeof(Names), typeof(Name), typeof(NodeIds),
-			typeof(Metrics), typeof(IndexMetrics), typeof(Field), typeof(Fields), typeof(PropertyName), typeof(Routing), typeof(TaskId),
-			typeof(DateMathExpression), typeof(IDateMath)
+			typeof(DateMath), typeof(Indices), typeof(IndexName), typeof(RelationName), typeof(Id), typeof(Names),
+			typeof(Name), typeof(NodeIds), typeof(Metrics), typeof(IndexMetrics), typeof(Field), typeof(Fields),
+			typeof(PropertyName), typeof(Routing), typeof(TaskId), typeof(DateMathExpression), typeof(IDateMath)
 		};
 
-		private static readonly Type[] ExposedInterfacesImplementations = ExposedInterfaces.Concat(new []
+		private static readonly Type[] ExposedInterfacesImplementations = ExposedInterfaces.Concat(new[]
 		{
 			typeof(IDictionaryResponse<,>), typeof(IIndicesModuleSettings)
 		}).ToArray();
@@ -43,8 +44,8 @@ namespace Nest.TypescriptGenerator
 			ExposedTypes = nestAssembly
 				.GetTypes()
 				.Where(TypeFilter)
-				.Concat(ExposedInterfacesImplementations.Where(t=>!t.IsGenericType))
-				.OrderBy(t=>t.Name)
+				.Concat(ExposedInterfacesImplementations.Where(t => !t.IsGenericType))
+				.OrderBy(t => t.Name)
 				.ToArray();
 
 			var requestParams = lowLevelAssembly
@@ -68,7 +69,7 @@ namespace Nest.TypescriptGenerator
 						if (t.FullName.Contains("SearchableSnapshots")) tt = "SearchableSnapshots" + tt;
 						return tt;
 					}
-					);
+				);
 		}
 
 		public Dictionary<string, Type> RequestParameters { get; }
@@ -77,7 +78,8 @@ namespace Nest.TypescriptGenerator
 		private static bool TypeFilter(Type t) => TypeFilter(t, ExposedInterfacesImplementations);
 
 		private static bool TypeFilter(Type t, IEnumerable<Type> interfaces) =>
-			(t.IsEnum && !t.Namespace.StartsWith("Elasticsearch.Net.Utf8Json") && (t.Namespace.StartsWith("Nest") || t.Namespace.StartsWith("Elasticsearch.Net")))
-			|| (interfaces.Any(i=> i.IsAssignableFrom(t)) && t.IsClass && !BadClassRegex.IsMatch(t.Name));
+			t.IsEnum && !t.Namespace.StartsWith("Elasticsearch.Net.Utf8Json") &&
+			(t.Namespace.StartsWith("Nest") || t.Namespace.StartsWith("Elasticsearch.Net"))
+			|| interfaces.Any(i => i.IsAssignableFrom(t)) && t.IsClass && !BadClassRegex.IsMatch(t.Name);
 	}
 }

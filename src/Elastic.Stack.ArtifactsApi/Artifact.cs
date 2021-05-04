@@ -12,7 +12,10 @@ namespace Elastic.Stack.ArtifactsApi
 {
 	public class Artifact
 	{
-		internal Artifact(Product product, Version version, string downloadUrl, ArtifactBuildState state, string buildHash)
+		private static readonly Uri BaseUri = new Uri("http://localhost");
+
+		internal Artifact(Product product, Version version, string downloadUrl, ArtifactBuildState state,
+			string buildHash)
 		{
 			ProductName = product.ProductName;
 			Version = version;
@@ -20,6 +23,7 @@ namespace Elastic.Stack.ArtifactsApi
 			State = state;
 			BuildHash = buildHash;
 		}
+
 		internal Artifact(Product product, Version version, SearchPackage package, string buildHash = null)
 		{
 			ProductName = product.ProductName;
@@ -30,17 +34,6 @@ namespace Elastic.Stack.ArtifactsApi
 			AscUrl = package.AscUrl;
 			BuildHash = buildHash;
 		}
-
-		// ReSharper disable UnusedAutoPropertyAccessor.Global
-		public string ProductName { get; }
-		public Version Version { get; }
-		public string DownloadUrl { get; }
-
-		public ArtifactBuildState State { get; }
-		public string BuildHash { get; }
-		public string ShaUrl { get; }
-		public string AscUrl { get; }
-		// ReSharper restore UnusedAutoPropertyAccessor.Global
 
 		public string LocalFolderName
 		{
@@ -63,17 +56,27 @@ namespace Elastic.Stack.ArtifactsApi
 
 		public string FolderInZip => $"{ProductName}-{Version}";
 
-		private static readonly Uri BaseUri = new Uri("http://localhost");
 		public string Archive
 		{
 			get
 			{
 				if (!Uri.TryCreate(DownloadUrl, UriKind.Absolute, out var uri))
-						uri = new Uri(BaseUri, DownloadUrl);
+					uri = new Uri(BaseUri, DownloadUrl);
 
 				return Path.GetFileName(uri.LocalPath);
 			}
 		}
 
+		// ReSharper disable UnusedAutoPropertyAccessor.Global
+		public string ProductName { get; }
+		public Version Version { get; }
+		public string DownloadUrl { get; }
+
+		public ArtifactBuildState State { get; }
+		public string BuildHash { get; }
+		public string ShaUrl { get; }
+
+		public string AscUrl { get; }
+		// ReSharper restore UnusedAutoPropertyAccessor.Global
 	}
 }

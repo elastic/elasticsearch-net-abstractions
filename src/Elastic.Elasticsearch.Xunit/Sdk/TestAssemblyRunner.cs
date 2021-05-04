@@ -1,4 +1,4 @@
-﻿// Licensed to Elasticsearch B.V under one or more agreements.
+// Licensed to Elasticsearch B.V under one or more agreements.
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
@@ -25,17 +25,6 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 
 		private readonly List<IGrouping<IEphemeralCluster<XunitClusterConfiguration>, GroupedByCluster>> _grouped;
 
-		public ConcurrentBag<RunSummary> Summaries { get; } = new ConcurrentBag<RunSummary>();
-		public ConcurrentBag<Tuple<string, string>> FailedCollections { get; } = new ConcurrentBag<Tuple<string, string>>();
-		public Dictionary<string, Stopwatch> ClusterTotals { get; } = new Dictionary<string, Stopwatch>();
-
-		private class GroupedByCluster
-		{
-			public IEphemeralCluster<XunitClusterConfiguration> Cluster { get; set; }
-			public ITestCollection Collection { get; set; }
-			public List<IXunitTestCase> TestCases { get; set; }
-		}
-
 		public TestAssemblyRunner(ITestAssembly testAssembly,
 			IEnumerable<IXunitTestCase> testCases,
 			IMessageSink diagnosticMessageSink,
@@ -45,20 +34,29 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 		{
 			var tests = OrderTestCollections();
 			RunIntegrationTests = executionOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.RunIntegrationTests));
-			IntegrationTestsMayUseAlreadyRunningNode = executionOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.IntegrationTestsMayUseAlreadyRunningNode));
+			IntegrationTestsMayUseAlreadyRunningNode =
+				executionOptions.GetValue<bool>(nameof(ElasticXunitRunOptions
+					.IntegrationTestsMayUseAlreadyRunningNode));
 			RunUnitTests = executionOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.RunUnitTests));
 			TestFilter = executionOptions.GetValue<string>(nameof(ElasticXunitRunOptions.TestFilter));
 			ClusterFilter = executionOptions.GetValue<string>(nameof(ElasticXunitRunOptions.ClusterFilter));
 
 			//bit side effecty, sets up _assemblyFixtureMappings before possibly letting xunit do its regular concurrency thing
 			_grouped = (from c in tests
-							 let cluster = ClusterFixture(c.Item2.First().TestMethod.TestClass)
-							 let testcase = new GroupedByCluster { Collection = c.Item1, TestCases = c.Item2, Cluster = cluster }
-							 group testcase by testcase.Cluster
-							 into g
-							 orderby g.Count() descending
-							 select g).ToList();
+				let cluster = ClusterFixture(c.Item2.First().TestMethod.TestClass)
+				let testcase = new GroupedByCluster {Collection = c.Item1, TestCases = c.Item2, Cluster = cluster}
+				group testcase by testcase.Cluster
+				into g
+				orderby g.Count() descending
+				select g).ToList();
 		}
+
+		public ConcurrentBag<RunSummary> Summaries { get; } = new ConcurrentBag<RunSummary>();
+
+		public ConcurrentBag<Tuple<string, string>> FailedCollections { get; } =
+			new ConcurrentBag<Tuple<string, string>>();
+
+		public Dictionary<string, Stopwatch> ClusterTotals { get; } = new Dictionary<string, Stopwatch>();
 
 		private bool RunIntegrationTests { get; }
 		private bool IntegrationTestsMayUseAlreadyRunningNode { get; }
@@ -66,35 +64,43 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 		private string TestFilter { get; }
 		private string ClusterFilter { get; }
 
-		protected override Task<RunSummary> RunTestCollectionAsync(IMessageBus b, ITestCollection c, IEnumerable<IXunitTestCase> t, CancellationTokenSource s)
+		protected override Task<RunSummary> RunTestCollectionAsync(IMessageBus b, ITestCollection c,
+			IEnumerable<IXunitTestCase> t, CancellationTokenSource s)
 		{
 			var aggregator = new ExceptionAggregator(Aggregator);
 			var fixtureObjects = new Dictionary<Type, object>();
 			foreach (var kv in _assemblyFixtureMappings) fixtureObjects.Add(kv.Key, kv.Value);
-			return new TestCollectionRunner(fixtureObjects,c, t, DiagnosticMessageSink, b, TestCaseOrderer, aggregator, s)
+			return new TestCollectionRunner(fixtureObjects, c, t, DiagnosticMessageSink, b, TestCaseOrderer, aggregator,
+					s)
 				.RunAsync();
 		}
 
-		protected override async Task<RunSummary> RunTestCollectionsAsync(IMessageBus messageBus, CancellationTokenSource cancellationTokenSource)
+		protected override async Task<RunSummary> RunTestCollectionsAsync(IMessageBus messageBus,
+			CancellationTokenSource cancellationTokenSource)
 		{
 			//threading guess
 			var defaultMaxConcurrency = Environment.ProcessorCount * 4;
 
 			if (RunUnitTests && !RunIntegrationTests)
-				return await UnitTestPipeline(defaultMaxConcurrency, messageBus, cancellationTokenSource).ConfigureAwait(false);
+				return await UnitTestPipeline(defaultMaxConcurrency, messageBus, cancellationTokenSource)
+					.ConfigureAwait(false);
 
-			return await IntegrationPipeline(defaultMaxConcurrency, messageBus, cancellationTokenSource).ConfigureAwait(false);
+			return await IntegrationPipeline(defaultMaxConcurrency, messageBus, cancellationTokenSource)
+				.ConfigureAwait(false);
 		}
 
 
-		private async Task<RunSummary> UnitTestPipeline(int defaultMaxConcurrency, IMessageBus messageBus, CancellationTokenSource ctx)
+		private async Task<RunSummary> UnitTestPipeline(int defaultMaxConcurrency, IMessageBus messageBus,
+			CancellationTokenSource ctx)
 		{
 			//make sure all clusters go in started state (won't actually start clusters in unit test mode)
 			//foreach (var g in this._grouped) g.Key?.Start();
 
 			var testFilters = CreateTestFilters(TestFilter);
 			await _grouped.SelectMany(g => g)
-				.ForEachAsync(defaultMaxConcurrency, async g => { await RunTestCollections(messageBus, ctx, g, testFilters).ConfigureAwait(false); }).ConfigureAwait(false);
+				.ForEachAsync(defaultMaxConcurrency,
+					async g => { await RunTestCollections(messageBus, ctx, g, testFilters).ConfigureAwait(false); })
+				.ConfigureAwait(false);
 			//foreach (var g in this._grouped) g.Key?.Dispose();
 
 			return new RunSummary
@@ -105,7 +111,8 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 			};
 		}
 
-		private async Task<RunSummary> IntegrationPipeline(int defaultMaxConcurrency, IMessageBus messageBus, CancellationTokenSource ctx)
+		private async Task<RunSummary> IntegrationPipeline(int defaultMaxConcurrency, IMessageBus messageBus,
+			CancellationTokenSource ctx)
 		{
 			var testFilters = CreateTestFilters(TestFilter);
 			foreach (var group in _grouped)
@@ -115,7 +122,7 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 				{
 					var testCount = @group.SelectMany(q => q.TestCases).Count();
 					Console.WriteLine($" -> Several tests skipped because they have no cluster associated");
-					Summaries.Add(new RunSummary { Total = testCount, Skipped = testCount});
+					Summaries.Add(new RunSummary {Total = testCount, Skipped = testCount});
 					continue;
 				}
 
@@ -123,21 +130,22 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 				var clusterName = type.Name.Replace("Cluster", string.Empty) ?? "UNKNOWN";
 				if (!MatchesClusterFilter(clusterName)) continue;
 
-				var dop= @group.Key.ClusterConfiguration?.MaxConcurrency ?? defaultMaxConcurrency;
+				var dop = @group.Key.ClusterConfiguration?.MaxConcurrency ?? defaultMaxConcurrency;
 				dop = dop <= 0 ? defaultMaxConcurrency : dop;
 
 				var timeout = @group.Key.ClusterConfiguration?.Timeout ?? TimeSpan.FromMinutes(2);
 
 				var skipReasons = @group.SelectMany(g => g.TestCases.Select(t => t.SkipReason)).ToList();
-				var allSkipped = skipReasons.All(r=>!string.IsNullOrWhiteSpace(r));
+				var allSkipped = skipReasons.All(r => !string.IsNullOrWhiteSpace(r));
 				if (allSkipped)
 				{
 					Console.WriteLine($" -> All tests from {clusterName} are skipped under the current configuration");
-					Summaries.Add(new RunSummary { Total = skipReasons.Count, Skipped = skipReasons.Count});
+					Summaries.Add(new RunSummary {Total = skipReasons.Count, Skipped = skipReasons.Count});
 					continue;
 				}
 
 				ClusterTotals.Add(clusterName, Stopwatch.StartNew());
+
 				bool ValidateRunningVersion()
 				{
 					try
@@ -157,8 +165,14 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 					if (!IntegrationTestsMayUseAlreadyRunningNode || !ValidateRunningVersion())
 						@group.Key?.Start(timeout);
 
-					await @group.ForEachAsync(dop, async g => { await RunTestCollections(messageBus, ctx, g, testFilters).ConfigureAwait(false); }).ConfigureAwait(false);
+					await @group.ForEachAsync(dop,
+							async g =>
+							{
+								await RunTestCollections(messageBus, ctx, g, testFilters).ConfigureAwait(false);
+							})
+						.ConfigureAwait(false);
 				}
+
 				ClusterTotals[clusterName].Stop();
 			}
 
@@ -170,7 +184,8 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 			};
 		}
 
-		private async Task RunTestCollections(IMessageBus messageBus, CancellationTokenSource ctx, GroupedByCluster g, string[] testFilters)
+		private async Task RunTestCollections(IMessageBus messageBus, CancellationTokenSource ctx, GroupedByCluster g,
+			string[] testFilters)
 		{
 			var test = g.Collection.DisplayName.Replace("Test collection for", string.Empty).Trim();
 			if (!MatchesATestFilter(test, testFilters)) return;
@@ -178,7 +193,8 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 
 			try
 			{
-				var summary = await RunTestCollectionAsync(messageBus, g.Collection, g.TestCases, ctx).ConfigureAwait(false);
+				var summary = await RunTestCollectionAsync(messageBus, g.Collection, g.TestCases, ctx)
+					.ConfigureAwait(false);
 				var type = g.Cluster?.GetType();
 				var clusterName = type?.Name.Replace("Cluster", "") ?? "UNKNOWN";
 				if (summary.Failed > 0)
@@ -192,7 +208,7 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 		}
 
 		private static string[] CreateTestFilters(string testFilters) =>
-			testFilters?.Split(',').Select(s => s.Trim()).Where(s=>!string.IsNullOrWhiteSpace(s)).ToArray()
+			testFilters?.Split(',').Select(s => s.Trim()).Where(s => !string.IsNullOrWhiteSpace(s)).ToArray()
 			?? new string[] { };
 
 		private static bool MatchesATestFilter(string test, IReadOnlyCollection<string> testFilters)
@@ -249,15 +265,19 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 			while (toCheck != null && toCheck != typeof(object))
 			{
 				var cur = toCheck.GetTypeInfo().IsGenericType ? toCheck.GetGenericTypeDefinition() : toCheck;
-				if (generic == cur)
-				{
-					return true;
-				}
+				if (generic == cur) return true;
 
 				toCheck = toCheck.GetTypeInfo().BaseType;
 			}
 
 			return false;
+		}
+
+		private class GroupedByCluster
+		{
+			public IEphemeralCluster<XunitClusterConfiguration> Cluster { get; set; }
+			public ITestCollection Collection { get; set; }
+			public List<IXunitTestCase> TestCases { get; set; }
 		}
 	}
 }

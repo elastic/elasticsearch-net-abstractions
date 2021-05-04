@@ -15,23 +15,30 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.ValidationTasks
 		{
 			if (!cluster.ClusterConfiguration.XPackInstalled) return;
 
-			cluster.Writer.WriteDiagnostic($"{{{nameof(ValidateLicenseTask)}}} validating the x-pack license is active");
+			cluster.Writer.WriteDiagnostic(
+				$"{{{nameof(ValidateLicenseTask)}}} validating the x-pack license is active");
 			var licenseType = GetLicenseType(cluster);
 
 			var licenseStatus = GetLicenseStatus(cluster);
 			if (licenseStatus == "active") return;
-			throw new Exception($"x-pack is installed but the {licenseType} license was expected to be active but is {licenseStatus}");
+			throw new Exception(
+				$"x-pack is installed but the {licenseType} license was expected to be active but is {licenseStatus}");
 		}
 
-		private string GetLicenseStatus(IEphemeralCluster<EphemeralClusterConfiguration> cluster) => LicenseInfo(cluster, "license.status");
-		private string GetLicenseType(IEphemeralCluster<EphemeralClusterConfiguration> cluster) => LicenseInfo(cluster, "license.type");
+		private string GetLicenseStatus(IEphemeralCluster<EphemeralClusterConfiguration> cluster) =>
+			LicenseInfo(cluster, "license.status");
 
-		private string LicenseInfo(IEphemeralCluster<EphemeralClusterConfiguration> cluster, string filter, int retries = 0)
+		private string GetLicenseType(IEphemeralCluster<EphemeralClusterConfiguration> cluster) =>
+			LicenseInfo(cluster, "license.type");
+
+		private string LicenseInfo(IEphemeralCluster<EphemeralClusterConfiguration> cluster, string filter,
+			int retries = 0)
 		{
 			var licenseUrl = cluster.ClusterConfiguration.Version.Major < 8 ? "_xpack/license" : "_license";
 			var getLicense = Get(cluster, licenseUrl, "filter_path=" + filter);
 			if ((getLicense == null || !getLicense.IsSuccessStatusCode) && retries >= 5)
-				throw new Exception($"Calling GET _xpack/license did not result in an OK response after trying {retries} {GetResponseException(getLicense)}");
+				throw new Exception(
+					$"Calling GET _xpack/license did not result in an OK response after trying {retries} {GetResponseException(getLicense)}");
 
 			if (getLicense == null || !getLicense.IsSuccessStatusCode)
 			{

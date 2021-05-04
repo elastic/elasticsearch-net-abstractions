@@ -18,13 +18,18 @@ namespace Elastic.Stack.ArtifactsApi.Resolvers
 {
 	public static class SnapshotApiResolver
 	{
-		public static readonly Lazy<IReadOnlyCollection<Version>> AvailableVersions = new Lazy<IReadOnlyCollection<Version>>(LoadVersions, LazyThreadSafetyMode.ExecutionAndPublication);
+		public static readonly System.Lazy<IReadOnlyCollection<Version>> AvailableVersions =
+			new System.Lazy<IReadOnlyCollection<Version>>(LoadVersions, LazyThreadSafetyMode.ExecutionAndPublication);
 
-		private static Regex PackageProductRegex { get; } = new Regex(@"(.*?)-(\d+\.\d+\.\d+(?:-(?:SNAPSHOT|alpha\d+|beta\d+|rc\d+))?)");
+		private static Regex PackageProductRegex { get; } =
+			new Regex(@"(.*?)-(\d+\.\d+\.\d+(?:-(?:SNAPSHOT|alpha\d+|beta\d+|rc\d+))?)");
 
 		private static Version IncludeOsMoniker { get; } = new Version("7.0.0");
 
-		public static bool TryResolve(Product product, Version version, OSPlatform os, string filters, out Artifact artifact)
+		public static Version LatestReleaseOrSnapshot => AvailableVersions.Value.OrderByDescending(v => v).First();
+
+		public static bool TryResolve(Product product, Version version, OSPlatform os, string filters,
+			out Artifact artifact)
 		{
 			artifact = null;
 			var p = product.SubProduct?.SubProductName ?? product.ProductName;
@@ -43,7 +48,9 @@ namespace Elastic.Stack.ArtifactsApi.Resolvers
 				// if packages is empty it turns into an array[] otherwise its a dictionary :/
 				packages = JsonSerializer.Deserialize<ArtifactsSearchResponse>(json).Packages;
 			}
-			catch { }
+			catch
+			{
+			}
 
 			if (packages == null || packages.Count == 0) return false;
 			var list = packages
@@ -59,7 +66,7 @@ namespace Elastic.Stack.ArtifactsApi.Resolvers
 				if (product.PlatformDependent && !kv.Key.EndsWith(shouldEndWith)) continue;
 
 
-				var tokens = PackageProductRegex.Split(kv.Key).Where(s=>!string.IsNullOrWhiteSpace(s)).ToArray();
+				var tokens = PackageProductRegex.Split(kv.Key).Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
 				if (tokens.Length < 2) continue;
 
 				if (!tokens[0].Equals(p, StringComparison.CurrentCultureIgnoreCase)) continue;
@@ -68,6 +75,7 @@ namespace Elastic.Stack.ArtifactsApi.Resolvers
 				var buildHash = ApiResolver.GetBuildHash(kv.Value.DownloadUrl);
 				artifact = new Artifact(product, version, kv.Value, buildHash);
 			}
+
 			return false;
 		}
 
@@ -80,14 +88,13 @@ namespace Elastic.Stack.ArtifactsApi.Resolvers
 			return new List<Version>(versions.Select(v => new Version(v)));
 		}
 
-		public static Version LatestReleaseOrSnapshot => AvailableVersions.Value.OrderByDescending(v => v).First();
-
 		public static Version LatestSnapshotForMajor(int major)
 		{
 			var range = new Range($"~{major}");
 			return AvailableVersions.Value
 				.Reverse()
-				.FirstOrDefault(v => v.PreRelease == "SNAPSHOT" && range.IsSatisfied(v.ToString().Replace("-SNAPSHOT", "")));
+				.FirstOrDefault(v =>
+					v.PreRelease == "SNAPSHOT" && range.IsSatisfied(v.ToString().Replace("-SNAPSHOT", "")));
 		}
 
 		public static Version LatestReleaseOrSnapshotForMajor(int major)
@@ -97,6 +104,5 @@ namespace Elastic.Stack.ArtifactsApi.Resolvers
 				.Reverse()
 				.FirstOrDefault(v => range.IsSatisfied(v.ToString().Replace("-SNAPSHOT", "")));
 		}
-
 	}
 }

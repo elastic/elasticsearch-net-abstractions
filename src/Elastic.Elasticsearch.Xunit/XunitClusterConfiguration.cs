@@ -1,4 +1,4 @@
-﻿// Licensed to Elasticsearch B.V under one or more agreements.
+// Licensed to Elasticsearch B.V under one or more agreements.
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
@@ -23,12 +23,12 @@ namespace Elastic.Elasticsearch.Xunit
 		protected override string NodePrefix => "xunit";
 
 		/// <summary>
-		/// The maximum number of tests that can run concurrently against a cluster using this configuration.
+		///     The maximum number of tests that can run concurrently against a cluster using this configuration.
 		/// </summary>
 		public int MaxConcurrency { get; set; }
 
 		/// <summary>
-		/// The maximum amount of time a cluster can run using this configuration.
+		///     The maximum amount of time a cluster can run using this configuration.
 		/// </summary>
 		public TimeSpan? Timeout { get; set; }
 	}

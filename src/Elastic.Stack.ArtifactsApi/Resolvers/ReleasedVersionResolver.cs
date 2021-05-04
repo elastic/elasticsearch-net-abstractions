@@ -13,6 +13,7 @@ namespace Elastic.Stack.ArtifactsApi.Resolvers
 	{
 		//https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.1.0-linux-x86_64.tar.gz
 		private const string ArtifactsUrl = "https://artifacts.elastic.co";
+
 		public static bool TryResolve(Product product, Version version, OSPlatform os, out Artifact artifact)
 		{
 			var p = product.Moniker;

@@ -9,6 +9,5 @@ namespace Elastic.Elasticsearch.Ephemeral
 		public const string FileRealm = "file1";
 
 		public const string PkiRealm = "pki1";
-
 	}
 }

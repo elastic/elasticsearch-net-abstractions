@@ -20,9 +20,7 @@ namespace Elastic.Stack.ArtifactsApi.Products
 				var correct = $"downloads/elasticsearch-plugins/{plugin}";
 				return !s.Contains(correct) ? s.Replace("downloads/elasticsearch", correct) : s;
 			};
-		}
-
-		// ReSharper disable InconsistentNaming
+		} // ReSharper disable InconsistentNaming
 		public static ElasticsearchPlugin AnalysisIcu { get; } = new ElasticsearchPlugin("analysis-icu");
 		public static ElasticsearchPlugin AnalysisKuromoji { get; } = new ElasticsearchPlugin("analysis-kuromoji");
 		public static ElasticsearchPlugin AnalysisPhonetic { get; } = new ElasticsearchPlugin("analysis-phonetic");
@@ -68,9 +66,6 @@ namespace Elastic.Stack.ArtifactsApi.Products
 
 		public static ElasticsearchPlugin XPack { get; } =
 			new ElasticsearchPlugin("x-pack", listName: v => v >= "6.2.0" && v < "6.3.0" ? "x-pack-core" : "x-pack",
-				isValid: v => v < "6.3.0")
-			{
-				ShippedByDefaultAsOf = "6.3.0"
-			};
+				isValid: v => v < "6.3.0") {ShippedByDefaultAsOf = "6.3.0"};
 	}
 }

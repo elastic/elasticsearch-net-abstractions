@@ -1,10 +1,11 @@
-﻿// Licensed to Elasticsearch B.V under one or more agreements.
+// Licensed to Elasticsearch B.V under one or more agreements.
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -31,7 +32,7 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 	public interface IClusterTeardownTask
 	{
 		/// <summary>
-		/// Called when the cluster disposes, used to clean up after itself.
+		///     Called when the cluster disposes, used to clean up after itself.
 		/// </summary>
 		/// <param name="cluster">The cluster configuration of the node that was started</param>
 		/// <param name="nodeStarted">Whether the cluster composer was successful in starting the node</param>
@@ -40,10 +41,9 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 
 	public abstract class ClusterComposeTask : IClusterComposeTask
 	{
-		public abstract void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster);
-
 		protected static bool IsWindows { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 		protected static string BinarySuffix => IsWindows ? ".bat" : string.Empty;
+		public abstract void Run(IEphemeralCluster<EphemeralClusterConfiguration> cluster);
 
 		protected static void DownloadFile(string from, string to)
 		{
@@ -78,7 +78,7 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 			string query,
 			Func<HttpClient, Uri, CancellationToken, Task<HttpResponseMessage>> verb)
 		{
-			var q = string.IsNullOrEmpty(query) ? "pretty=true" : (query + "&pretty=true");
+			var q = string.IsNullOrEmpty(query) ? "pretty=true" : query + "&pretty=true";
 			var statusUrl = new UriBuilder(cluster.NodesUris().First()) {Path = path, Query = q}.Uri;
 
 			var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(20));
@@ -87,7 +87,8 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 				AutomaticDecompression =
 					DecompressionMethods.Deflate | DecompressionMethods.GZip | DecompressionMethods.None,
 			};
-			cluster.Writer.WriteDiagnostic($"{{{nameof(Call)}}} [{statusUrl}] SSL: {cluster.ClusterConfiguration.EnableSsl} Security: {cluster.ClusterConfiguration.EnableSecurity}");
+			cluster.Writer.WriteDiagnostic(
+				$"{{{nameof(Call)}}} [{statusUrl}] SSL: {cluster.ClusterConfiguration.EnableSsl} Security: {cluster.ClusterConfiguration.EnableSecurity}");
 			if (cluster.ClusterConfiguration.EnableSsl)
 			{
 #if !NETSTANDARD
@@ -95,12 +96,10 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 #else
 				handler.ServerCertificateCustomValidationCallback += (m, c, cn, p) => true;
 #endif
-
 			}
 
 			using (var client = new HttpClient(handler) {Timeout = TimeSpan.FromSeconds(20)})
 			{
-
 				if (cluster.ClusterConfiguration.EnableSecurity)
 				{
 					var byteArray =
@@ -128,7 +127,6 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 				}
 				finally
 				{
-
 #if !NETSTANDARD
 				ServicePointManager.ServerCertificateValidationCallback -= ServerCertificateValidationCallback;
 #endif
@@ -138,7 +136,8 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 			return null;
 		}
 
-		private static bool ServerCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslpolicyerrors) => true;
+		private static bool ServerCertificateValidationCallback(object sender, X509Certificate certificate,
+			X509Chain chain, SslPolicyErrors sslpolicyerrors) => true;
 
 		protected static void WriteFileIfNotExist(string fileLocation, string contents)
 		{
@@ -185,7 +184,9 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 			if (errorOut.Any() && config.Version < "5.2.0")
 				errorOut = errorOut.Where(e => !e.Line.Contains("No log4j2 configuration file found")).ToList();
 
-			if (errorOut.Any(e => !string.IsNullOrWhiteSpace(e.Line) && !e.Line.Contains("usage of JAVA_HOME is deprecated")) && !binary.Contains("plugin") && !binary.Contains("cert"))
+			if (errorOut.Any(e =>
+				    !string.IsNullOrWhiteSpace(e.Line) && !e.Line.Contains("usage of JAVA_HOME is deprecated")) &&
+			    !binary.Contains("plugin") && !binary.Contains("cert"))
 				throw new Exception(
 					$"Received error out with exitCode ({result.ExitCode}) while executing {description}: {command}");
 
@@ -219,7 +220,7 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 
 		private static void ExtractTar(string file, string toFolder)
 		{
-			using(var inStream = File.OpenRead(file))
+			using (var inStream = File.OpenRead(file))
 			using (var tarArchive = TarArchive.CreateInputTarArchive(inStream))
 				tarArchive.ExtractContents(toFolder);
 		}
@@ -227,20 +228,16 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 		private static void ExtractTarGz(string file, string toFolder)
 		{
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-			{
 				using (var inStream = File.OpenRead(file))
 				using (var gzipStream = new GZipInputStream(inStream))
 				using (var tarArchive = TarArchive.CreateInputTarArchive(gzipStream))
 					tarArchive.ExtractContents(toFolder);
-			}
 			else
-			{
 				//SharpZipLib loses permissions when untarring
 				Proc.Exec("tar", "-xvf", file, "-C", toFolder);
-			}
 		}
 
 		private static void ExtractZip(string file, string toFolder) =>
-			System.IO.Compression.ZipFile.ExtractToDirectory(file, toFolder);
+			ZipFile.ExtractToDirectory(file, toFolder);
 	}
 }

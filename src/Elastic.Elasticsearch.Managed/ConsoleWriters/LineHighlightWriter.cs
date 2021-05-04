@@ -14,18 +14,19 @@ namespace Elastic.Elasticsearch.Managed.ConsoleWriters
 	{
 		private static readonly ConsoleColor[] AvailableNodeColors =
 		{
-			ConsoleColor.DarkGreen,
-			ConsoleColor.DarkBlue,
-			ConsoleColor.DarkRed,
-			ConsoleColor.DarkCyan,
-			ConsoleColor.DarkYellow,
-			ConsoleColor.Blue,
+			ConsoleColor.DarkGreen, ConsoleColor.DarkBlue, ConsoleColor.DarkRed, ConsoleColor.DarkCyan,
+			ConsoleColor.DarkYellow, ConsoleColor.Blue,
 		};
 
-		private readonly Dictionary<string, ConsoleColor> _nodeColors;
-		private ConsoleColor NodeColor(string node) => (_nodeColors != null && _nodeColors.TryGetValue(node, out var color)) ? color : AvailableNodeColors[0];
+		private static readonly object Lock = new object();
 
-		public LineHighlightWriter() { }
+		private static readonly char[] Anchors = {'[', ']', '{', '}'};
+
+		private readonly Dictionary<string, ConsoleColor> _nodeColors;
+
+		public LineHighlightWriter()
+		{
+		}
 
 		public LineHighlightWriter(IList<string> nodes)
 		{
@@ -43,29 +44,33 @@ namespace Elastic.Elasticsearch.Managed.ConsoleWriters
 		{
 			lock (Lock)
 			{
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Error.WriteLine(e);
-                Console.ResetColor();
+				Console.BackgroundColor = ConsoleColor.Red;
+				Console.ForegroundColor = ConsoleColor.White;
+				Console.Error.WriteLine(e);
+				Console.ResetColor();
 			}
 		}
 
 		public void Handle(LineOut lineOut)
 		{
-			var parsed = LineOutParser.TryParse(lineOut.Line, out var date, out var level, out var section, out var node, out var message, out _);
+			var parsed = LineOutParser.TryParse(lineOut.Line, out var date, out var level, out var section,
+				out var node, out var message, out _);
 			if (parsed) Write(lineOut.Error, date, level, section, node, message, NodeColor);
 			else if (ExceptionLineParser.TryParseCause(lineOut.Line, out var cause, out var causeMessage))
 				WriteCausedBy(lineOut.Error, cause, causeMessage);
 
-			else if (ExceptionLineParser.TryParseStackTrace(lineOut.Line, out var at, out var method, out var file, out var jar))
+			else if (ExceptionLineParser.TryParseStackTrace(lineOut.Line, out var at, out var method, out var file,
+				out var jar))
 				WriteStackTraceLine(lineOut.Error, at, method, file, jar);
 
 			else Write(lineOut.Error, lineOut.Line);
 		}
 
-		private static readonly object Lock = new object();
+		private ConsoleColor NodeColor(string node) =>
+			_nodeColors != null && _nodeColors.TryGetValue(node, out var color) ? color : AvailableNodeColors[0];
 
-		private static void Write(bool error, string date, string level, string section, string node, string message, Func<string, ConsoleColor> getNodeColor = null)
+		private static void Write(bool error, string date, string level, string section, string node, string message,
+			Func<string, ConsoleColor> getNodeColor = null)
 		{
 			lock (Lock)
 			{
@@ -101,7 +106,6 @@ namespace Elastic.Elasticsearch.Managed.ConsoleWriters
 				w.WriteLine();
 				Console.ResetColor();
 				w.Flush();
-
 			}
 		}
 
@@ -121,7 +125,6 @@ namespace Elastic.Elasticsearch.Managed.ConsoleWriters
 
 				Console.ResetColor();
 				w.Flush();
-
 			}
 		}
 
@@ -153,18 +156,18 @@ namespace Elastic.Elasticsearch.Managed.ConsoleWriters
 			}
 		}
 
-		private static readonly char[] Anchors = {'[', ']', '{', '}'};
 		private static IEnumerable<string> Parts(string s)
 		{
 			int start = 0, index;
 			while ((index = s.IndexOfAny(Anchors, start)) != -1)
 			{
-				if(index-start > 0)
+				if (index - start > 0)
 					yield return s.Substring(start, index - start);
 
 				yield return s.Substring(index, 1);
 				start = index + 1;
 			}
+
 			if (start < s.Length)
 				yield return s.Substring(start);
 		}
@@ -188,9 +191,9 @@ namespace Elastic.Elasticsearch.Managed.ConsoleWriters
 
 				w.Write(p);
 			}
+
 			Console.ResetColor();
 			w.WriteLine();
-
 		}
 
 		private static void WriteSpace(TextWriter w) => w.Write(" ");
@@ -215,7 +218,5 @@ namespace Elastic.Elasticsearch.Managed.ConsoleWriters
 			w.Write(b);
 			Console.ForegroundColor = original;
 		}
-
-
 	}
 }

@@ -17,7 +17,9 @@ namespace Elastic.Elasticsearch.Ephemeral
 {
 	public class EphemeralClusterComposerBase
 	{
-		protected EphemeralClusterComposerBase() { }
+		protected EphemeralClusterComposerBase()
+		{
+		}
 
 		internal static IEnumerable<IClusterComposeTask> InstallationTasks { get; } = new List<IClusterComposeTask>
 		{
@@ -29,7 +31,6 @@ namespace Elastic.Elasticsearch.Ephemeral
 			new UnzipElasticsearch(),
 			new SetElasticsearchBundledJdkJavaHome(),
 			new InstallPlugins(),
-
 			new EnsureElasticsearchBatWorksAcrossDrives(),
 			new EnsureXPackEnvBinaryExists(),
 			new PathXPackInBatFile()
@@ -40,7 +41,6 @@ namespace Elastic.Elasticsearch.Ephemeral
 			new CreateEphemeralDirectory(),
 			new EnsureSecurityRealms(),
 			new EnsureSecurityRolesFileExists(),
-
 			new EnsureSecurityUsersInDefaultRealmAreAdded(),
 			new GenerateCertificatesTask(),
 			new AddClientCertificateRoleMappingTask(),
@@ -52,7 +52,7 @@ namespace Elastic.Elasticsearch.Ephemeral
 			new CleanUpDirectoriesAfterNodeStopped()
 		};
 
-		protected static IEnumerable<IClusterComposeTask> AfterStartedTasks  { get; } = new List<IClusterComposeTask>
+		protected static IEnumerable<IClusterComposeTask> AfterStartedTasks { get; } = new List<IClusterComposeTask>
 		{
 			new ValidateRunningVersion(),
 			new ValidateClusterStateTask(),
@@ -66,13 +66,14 @@ namespace Elastic.Elasticsearch.Ephemeral
 	public class EphemeralClusterComposer<TConfiguration> : EphemeralClusterComposerBase
 		where TConfiguration : EphemeralClusterConfiguration
 	{
+		private readonly object _lock = new object();
 		public EphemeralClusterComposer(IEphemeralCluster<TConfiguration> cluster) => Cluster = cluster;
 
 		private IEphemeralCluster<TConfiguration> Cluster { get; }
 
 		private bool NodeStarted { get; set; }
 
-		public void OnStop() => Itterate(NodeStoppedTasks, (t, c, fs) => t.Run(c, NodeStarted), callOnStop: false);
+		public void OnStop() => Itterate(NodeStoppedTasks, (t, c, fs) => t.Run(c, NodeStarted), false);
 
 		public void Install() => Itterate(InstallationTasks, (t, c, fs) => t.Run(c));
 
@@ -99,14 +100,13 @@ namespace Elastic.Elasticsearch.Ephemeral
 			Itterate(tasks, (t, c, fs) => t.Run(c), false);
 		}
 
-		private readonly object _lock = new object();
-		private void Itterate<T>(IEnumerable<T> collection, Action<T, IEphemeralCluster<TConfiguration>, INodeFileSystem> act, bool callOnStop = true)
+		private void Itterate<T>(IEnumerable<T> collection,
+			Action<T, IEphemeralCluster<TConfiguration>, INodeFileSystem> act, bool callOnStop = true)
 		{
 			lock (_lock)
 			{
 				var cluster = Cluster;
 				foreach (var task in collection)
-				{
 					try
 					{
 						act(task, cluster, cluster.FileSystem);
@@ -116,7 +116,6 @@ namespace Elastic.Elasticsearch.Ephemeral
 						if (callOnStop) OnStop();
 						throw;
 					}
-				}
 			}
 		}
 	}

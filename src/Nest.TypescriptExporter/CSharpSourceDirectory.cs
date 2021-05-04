@@ -1,4 +1,4 @@
-﻿// Licensed to Elasticsearch B.V under one or more agreements.
+// Licensed to Elasticsearch B.V under one or more agreements.
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
@@ -11,7 +11,22 @@ namespace Nest.TypescriptGenerator
 {
 	public class CSharpSourceDirectory
 	{
-		private static readonly string[] SkipFolders = { "_Generated", "Debug", "Release" };
+		private static readonly string[] SkipFolders = {"_Generated", "Debug", "Release"};
+
+		public CSharpSourceDirectory(string directory)
+		{
+			var csharpSourceFiles = InputFiles(directory).SelectMany(r => r.Declarations, (r, s) => new {r, s});
+			foreach (var f in csharpSourceFiles)
+			{
+				if (TypeNameToNamespaceMapping.ContainsKey(f.s) &&
+				    (f.s.EndsWith("Request") || f.s.EndsWith("Descriptor")))
+					continue;
+				if (TypeNameToNamespaceMapping.ContainsKey(f.s)) continue;
+				TypeNameToNamespaceMapping.Add(f.s, f.r.Namespace);
+			}
+		}
+
+		public Dictionary<string, string> TypeNameToNamespaceMapping { get; } = new Dictionary<string, string>();
 
 		private static IEnumerable<CSharpSourceFile> InputFiles(string directory) =>
 			from f in Directory.GetFiles(directory, $"*.cs", SearchOption.AllDirectories)
@@ -20,19 +35,5 @@ namespace Nest.TypescriptGenerator
 			let fi = new FileInfo(f)
 			where !Regex.IsMatch(fi.Name, $@"(Requests|Descriptors)\..*?\.cs")
 			select new CSharpSourceFile(fi);
-
-		public CSharpSourceDirectory(string directory)
-		{
-			var csharpSourceFiles = InputFiles(directory).SelectMany(r => r.Declarations, (r, s) => new { r, s });
-			foreach(var f in csharpSourceFiles)
-			{
-				if (TypeNameToNamespaceMapping.ContainsKey(f.s) && (f.s.EndsWith("Request") || f.s.EndsWith("Descriptor")) )
-					continue;
-				if (TypeNameToNamespaceMapping.ContainsKey(f.s)) continue;
-				TypeNameToNamespaceMapping.Add(f.s, f.r.Namespace);
-			}
-		}
-
-		public Dictionary<string, string> TypeNameToNamespaceMapping { get; } = new Dictionary<string, string>();
 	}
 }

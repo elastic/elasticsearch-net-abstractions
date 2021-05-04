@@ -19,10 +19,16 @@ namespace Elastic.Stack.ArtifactsApi.Resolvers
 	{
 		private const string ArtifactsApiUrl = "https://artifacts-api.elastic.co/v1/";
 
-		private static HttpClient HttpClient { get; } = new HttpClient(new HttpClientHandler
-		{
-			SslProtocols = SslProtocols.Tls12
-		}) {BaseAddress = new Uri(ArtifactsApiUrl)};
+		private static readonly ConcurrentDictionary<string, bool> Releases = new ConcurrentDictionary<string, bool>();
+
+		private static HttpClient HttpClient { get; } =
+			new HttpClient(new HttpClientHandler {SslProtocols = SslProtocols.Tls12})
+			{
+				BaseAddress = new Uri(ArtifactsApiUrl)
+			};
+
+		private static Regex BuildHashRegex { get; } =
+			new Regex(@"https://(?:snapshots|staging).elastic.co/(\d+\.\d+\.\d+-([^/]+)?)");
 
 		public static string FetchJson(string path)
 		{
@@ -31,16 +37,11 @@ namespace Elastic.Stack.ArtifactsApi.Resolvers
 				return fileStream.ReadToEnd();
 		}
 
-		private static ConcurrentDictionary<string, bool> Releases = new ConcurrentDictionary<string, bool>();
 		public static bool IsReleasedVersion(string version)
 		{
 			if (Releases.TryGetValue(version, out var released)) return released;
 			var versionPath = "https://github.com/elastic/elasticsearch/releases/tag/v" + version;
-			var message = new HttpRequestMessage
-			{
-				Method = HttpMethod.Head,
-				RequestUri = new Uri(versionPath)
-			};
+			var message = new HttpRequestMessage {Method = HttpMethod.Head, RequestUri = new Uri(versionPath)};
 
 			using (var response = HttpClient.SendAsync(message).GetAwaiter().GetResult())
 			{
@@ -49,6 +50,7 @@ namespace Elastic.Stack.ArtifactsApi.Resolvers
 				return released;
 			}
 		}
+
 		public static string LatestBuildHash(string version)
 		{
 			var json = FetchJson($"search/{version}/msi");
@@ -64,9 +66,8 @@ namespace Elastic.Stack.ArtifactsApi.Resolvers
 			{
 				throw new Exception("Can not get build hash for: " + version);
 			}
-
 		}
-		private static Regex BuildHashRegex { get; } = new Regex(@"https://(?:snapshots|staging).elastic.co/(\d+\.\d+\.\d+-([^/]+)?)");
+
 		public static string GetBuildHash(string url)
 		{
 			var tokens = BuildHashRegex.Split(url).Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
