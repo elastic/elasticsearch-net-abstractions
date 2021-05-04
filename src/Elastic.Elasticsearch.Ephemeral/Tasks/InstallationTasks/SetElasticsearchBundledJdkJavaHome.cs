@@ -17,11 +17,13 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.InstallationTasks
 			if (Directory.Exists(jdkFolder))
 			{
 				var envVarName = cluster.ClusterConfiguration.JavaHomeEnvironmentVariable;
-				cluster.Writer?.WriteDiagnostic($"{{{nameof(SetElasticsearchBundledJdkJavaHome)}}} [{envVarName}] is set to bundled jdk: {{{jdkFolder}}} ");
+				cluster.Writer?.WriteDiagnostic(
+					$"{{{nameof(SetElasticsearchBundledJdkJavaHome)}}} [{envVarName}] is set to bundled jdk: {{{jdkFolder}}} ");
 				Environment.SetEnvironmentVariable(envVarName, jdkFolder);
 			}
-			else 
-				cluster.Writer?.WriteDiagnostic($"{{{nameof(SetElasticsearchBundledJdkJavaHome)}}} [No bundled jdk found] looked in: {{{jdkFolder}}} ");
+			else
+				cluster.Writer?.WriteDiagnostic(
+					$"{{{nameof(SetElasticsearchBundledJdkJavaHome)}}} [No bundled jdk found] looked in: {{{jdkFolder}}} ");
 		}
 	}
 }

@@ -14,11 +14,13 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.InstallationTasks
 			var fs = cluster.FileSystem;
 			if (Directory.Exists(fs.LocalFolder))
 			{
-				cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateLocalApplicationDirectory)}}} already exists: {{{fs.LocalFolder}}}");
+				cluster.Writer?.WriteDiagnostic(
+					$"{{{nameof(CreateLocalApplicationDirectory)}}} already exists: {{{fs.LocalFolder}}}");
 				return;
 			}
 
-			cluster.Writer?.WriteDiagnostic($"{{{nameof(CreateLocalApplicationDirectory)}}} creating {{{fs.LocalFolder}}}");
+			cluster.Writer?.WriteDiagnostic(
+				$"{{{nameof(CreateLocalApplicationDirectory)}}} creating {{{fs.LocalFolder}}}");
 
 			Directory.CreateDirectory(fs.LocalFolder);
 		}

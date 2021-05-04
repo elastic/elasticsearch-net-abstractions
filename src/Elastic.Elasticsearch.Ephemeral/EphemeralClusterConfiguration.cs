@@ -16,13 +16,16 @@ namespace Elastic.Elasticsearch.Ephemeral
 {
 	public class EphemeralClusterConfiguration : ClusterConfiguration<EphemeralFileSystem>
 	{
-		private static string UniqueishSuffix => Guid.NewGuid().ToString("N").Substring(0, 6);
-		private static string EphemeralClusterName => $"ephemeral-cluster-{UniqueishSuffix}";
+		private static readonly ElasticVersion LastVersionThatAcceptedShieldSettings = "5.0.0-alpha1";
 
-		public EphemeralClusterConfiguration(ElasticVersion version, ElasticsearchPlugins plugins = null, int numberOfNodes = 1)
-			: this(version, ClusterFeatures.None, plugins, numberOfNodes) { }
+		public EphemeralClusterConfiguration(ElasticVersion version, ElasticsearchPlugins plugins = null,
+			int numberOfNodes = 1)
+			: this(version, ClusterFeatures.None, plugins, numberOfNodes)
+		{
+		}
 
-		public EphemeralClusterConfiguration(ElasticVersion version, ClusterFeatures features, ElasticsearchPlugins plugins = null, int numberOfNodes = 1)
+		public EphemeralClusterConfiguration(ElasticVersion version, ClusterFeatures features,
+			ElasticsearchPlugins plugins = null, int numberOfNodes = 1)
 			: base(version, (v, s) => new EphemeralFileSystem(v, s), numberOfNodes, EphemeralClusterName)
 		{
 			TrialMode = XPackTrialMode.None;
@@ -37,20 +40,23 @@ namespace Elastic.Elasticsearch.Ephemeral
 			AddDefaultXPackSettings();
 		}
 
+		private static string UniqueishSuffix => Guid.NewGuid().ToString("N").Substring(0, 6);
+		private static string EphemeralClusterName => $"ephemeral-cluster-{UniqueishSuffix}";
+
 		/// <summary>
-		/// The features supported by the cluster
+		///     The features supported by the cluster
 		/// </summary>
 		public ClusterFeatures Features { get; }
 
 		/// <summary>
-		/// The collection of plugins to install
+		///     The collection of plugins to install
 		/// </summary>
 		public ElasticsearchPlugins Plugins { get; }
 
 		/// <summary>
-		/// Validates that the plugins to install can be installed on the target Elasticsearch version.
-		/// This can be useful to fail early when subsequent operations are relying on installation
-		/// succeeding.
+		///     Validates that the plugins to install can be installed on the target Elasticsearch version.
+		///     This can be useful to fail early when subsequent operations are relying on installation
+		///     succeeding.
 		/// </summary>
 		public bool ValidatePluginsToInstall { get; } = true;
 
@@ -68,7 +74,8 @@ namespace Elastic.Elasticsearch.Ephemeral
 		public IList<IClusterComposeTask> AdditionalAfterStartedTasks { get; } = new List<IClusterComposeTask>();
 
 		/// <summary>
-		/// Expert level setting, skips all built-in validation tasks for cases where you need to guarantee your call is the first call into the cluster
+		///     Expert level setting, skips all built-in validation tasks for cases where you need to guarantee your call is the
+		///     first call into the cluster
 		/// </summary>
 		public bool SkipBuiltInAfterStartTasks { get; set; }
 
@@ -76,23 +83,22 @@ namespace Elastic.Elasticsearch.Ephemeral
 		public string XPackLicenseJson { get; set; }
 
 		/// <summary>
-		/// From 6.3.0 and up this property allows you to control what type of license is applied (trial/basic) in the absense of
-		/// <see cref="XPackLicenseJson"/>
+		///     From 6.3.0 and up this property allows you to control what type of license is applied (trial/basic) in the absense
+		///     of
+		///     <see cref="XPackLicenseJson" />
 		/// </summary>
 		public XPackTrialMode TrialMode { get; set; }
 
 		/// <summary> Bootstrapping HTTP calls should attempt to auto route traffic through fiddler if its running </summary>
 		public bool HttpFiddlerAware { get; set; }
 
+		protected virtual string NodePrefix => "ephemeral";
+
 		public override string CreateNodeName(int? node)
 		{
 			var suffix = Guid.NewGuid().ToString("N").Substring(0, 6);
 			return $"{NodePrefix}-node-{suffix}{node}";
 		}
-
-		protected virtual string NodePrefix => "ephemeral";
-
-		private static readonly ElasticVersion LastVersionThatAcceptedShieldSettings = "5.0.0-alpha1";
 
 		public void AddSecuritySetting(string key, string value) => AddSecuritySetting(key, value, null);
 
@@ -109,15 +115,15 @@ namespace Elastic.Elasticsearch.Ephemeral
 			if (!XPackInstalled) return;
 
 			var securityEnabled = EnableSecurity.ToString().ToLowerInvariant();
-            var sslEnabled = EnableSsl.ToString().ToLowerInvariant();
+			var sslEnabled = EnableSsl.ToString().ToLowerInvariant();
 			AddSecuritySetting("enabled", securityEnabled);
 
-            AddSecuritySetting("http.ssl.enabled", sslEnabled);
-            AddSecuritySetting("transport.ssl.enabled", sslEnabled);
+			AddSecuritySetting("http.ssl.enabled", sslEnabled);
+			AddSecuritySetting("transport.ssl.enabled", sslEnabled);
 			if (EnableSecurity && EnableSsl)
 			{
-	           	AddSecuritySetting("authc.realms.pki1.enabled", sslEnabled, "<7.0.0-beta1");
-	           	AddSecuritySetting("authc.realms.pki.pki1.enabled", sslEnabled, ">=7.0.0-beta1");
+				AddSecuritySetting("authc.realms.pki1.enabled", sslEnabled, "<7.0.0-beta1");
+				AddSecuritySetting("authc.realms.pki.pki1.enabled", sslEnabled, ">=7.0.0-beta1");
 			}
 
 			if (EnableSsl)
@@ -128,7 +134,6 @@ namespace Elastic.Elasticsearch.Ephemeral
 					Add("xpack.ssl.key", FileSystem.NodePrivateKey);
 					Add("xpack.ssl.certificate", FileSystem.NodeCertificate);
 					Add("xpack.ssl.certificate_authorities", FileSystem.CaCertificate);
-
 				}
 				else
 				{
@@ -139,9 +144,7 @@ namespace Elastic.Elasticsearch.Ephemeral
 					Add("xpack.security.http.ssl.key", FileSystem.NodePrivateKey);
 					Add("xpack.security.http.ssl.certificate", FileSystem.NodeCertificate);
 					Add("xpack.security.http.ssl.certificate_authorities", FileSystem.CaCertificate);
-
 				}
-
 			}
 		}
 	}

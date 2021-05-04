@@ -18,15 +18,16 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.BeforeStartNodeTasks
 			var cachedelasticsearchYaml = Path.Combine(cachedEsHomeFolder, "config", "elasticsearch.yml");
 			if (File.Exists(cachedelasticsearchYaml))
 			{
-				cluster.Writer?.WriteDiagnostic($"{{{nameof(CacheElasticsearchInstallation)}}} cached home already exists [{cachedEsHomeFolder}]");
+				cluster.Writer?.WriteDiagnostic(
+					$"{{{nameof(CacheElasticsearchInstallation)}}} cached home already exists [{cachedEsHomeFolder}]");
 				return;
 			}
 
 			var source = fs.ElasticsearchHome;
 			var target = cachedEsHomeFolder;
-			cluster.Writer?.WriteDiagnostic($"{{{nameof(CacheElasticsearchInstallation)}}} caching {{{source}}} to [{target}]");
+			cluster.Writer?.WriteDiagnostic(
+				$"{{{nameof(CacheElasticsearchInstallation)}}} caching {{{source}}} to [{target}]");
 			CopyFolder(source, target, false);
 		}
-
 	}
 }

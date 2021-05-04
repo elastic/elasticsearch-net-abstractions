@@ -1,4 +1,4 @@
-﻿// Licensed to Elasticsearch B.V under one or more agreements.
+// Licensed to Elasticsearch B.V under one or more agreements.
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
@@ -15,10 +15,9 @@ namespace Nest.TypescriptGenerator
 {
 	public class ClientTypesExporter
 	{
-		private readonly ClientTypescriptGenerator _scriptGenerator;
-		private readonly TypeScriptFluent _definitions;
 		public static readonly Regex InterfaceRegex = new Regex("(?-i)^I[A-Z].*$");
-		public static Regex RemoveGeneric { get; } = new Regex(@"^(.+)(?:\`.+)$");
+		private readonly TypeScriptFluent _definitions;
+		private readonly ClientTypescriptGenerator _scriptGenerator;
 
 		public ClientTypesExporter(CsharpTypeInfoProvider typeInfoProvider, ClientTypescriptGenerator scriptGenerator)
 		{
@@ -35,6 +34,8 @@ namespace Nest.TypescriptGenerator
 
 			_definitions = typeInfoProvider.ExposedTypes.Aggregate(d, (def, t) => def.For(t));
 		}
+
+		public static Regex RemoveGeneric { get; } = new Regex(@"^(.+)(?:\`.+)$");
 
 		public string Generate() => _definitions.Generate();
 
@@ -69,18 +70,24 @@ namespace Nest.TypescriptGenerator
 			//if (attributes.Any(a => a.TypeId.ToString() == "System.Runtime.Serialization.DataMemberAttribute"))
 			//	property.IsIgnored = true;
 
-			var jsonPropertyAttribute = attributes.FirstOrDefault(a => a.TypeId.ToString() == "Nest.Json.JsonPropertyAttribute");
+			var jsonPropertyAttribute =
+				attributes.FirstOrDefault(a => a.TypeId.ToString() == "Nest.Json.JsonPropertyAttribute");
 			if (jsonPropertyAttribute != null)
 			{
-				var v = jsonPropertyAttribute.GetType().GetProperty("PropertyName").GetGetMethod().Invoke(jsonPropertyAttribute, new object[] {});
+				var v = jsonPropertyAttribute.GetType().GetProperty("PropertyName").GetGetMethod()
+					.Invoke(jsonPropertyAttribute, new object[] { });
 				return ((string) v ?? propertyName.SnakeCase()).QuoteMaybe();
 			}
-			var dataMemberAtt = attributes.FirstOrDefault(a => a.TypeId.ToString() == "System.Runtime.Serialization.DataMemberAttribute");
+
+			var dataMemberAtt = attributes.FirstOrDefault(a =>
+				a.TypeId.ToString() == "System.Runtime.Serialization.DataMemberAttribute");
 			if (dataMemberAtt != null)
 			{
-				var v = dataMemberAtt.GetType().GetProperty("Name").GetGetMethod().Invoke(dataMemberAtt, new object[] {});
+				var v = dataMemberAtt.GetType().GetProperty("Name").GetGetMethod()
+					.Invoke(dataMemberAtt, new object[] { });
 				return ((string) v ?? propertyName.SnakeCase()).QuoteMaybe();
 			}
+
 			return propertyName.SnakeCase().QuoteMaybe();
 		}
 
@@ -88,7 +95,7 @@ namespace Nest.TypescriptGenerator
 
 		private string GenerateTypeName(TsType type)
 		{
-			var tsClass = (TsClass)type;
+			var tsClass = (TsClass) type;
 
 			var name = ClientTypescriptGenerator.TypeRenames.ContainsKey(tsClass.Name)
 				? ClientTypescriptGenerator.TypeRenames[tsClass.Name]
@@ -96,7 +103,8 @@ namespace Nest.TypescriptGenerator
 
 			if (type.Type == typeof(HistogramOrder)) return "HistogramOrder";
 
-			if (InterfaceRegex.IsMatch(name) && !CsharpTypeInfoProvider.ExposedInterfaces.Contains(type.Type)) name = name.Substring(1);
+			if (InterfaceRegex.IsMatch(name) && !CsharpTypeInfoProvider.ExposedInterfaces.Contains(type.Type))
+				name = name.Substring(1);
 
 			if (!tsClass.GenericArguments.Any()) return name;
 
@@ -109,7 +117,6 @@ namespace Nest.TypescriptGenerator
 			if (typeof(IIsADictionary).IsAssignableFrom(a.Type)) return fullyQualifiedTypeName;
 			if (a is TsCollection)
 			{
-
 			}
 
 			return a is TsCollection && !fullyQualifiedTypeName.StartsWith("Dictionary<")

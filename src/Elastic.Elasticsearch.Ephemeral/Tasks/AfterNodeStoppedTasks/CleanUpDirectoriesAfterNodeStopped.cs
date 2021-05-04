@@ -18,7 +18,8 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.AfterNodeStoppedTasks
 			var a = cluster.ClusterConfiguration.Artifact;
 			if (cluster.ClusterConfiguration.NoCleanupAfterNodeStopped)
 			{
-				w.WriteDiagnostic($"{{{nameof(CleanUpDirectoriesAfterNodeStopped)}}} skipping cleanup as requested on cluster configuration");
+				w.WriteDiagnostic(
+					$"{{{nameof(CleanUpDirectoriesAfterNodeStopped)}}} skipping cleanup as requested on cluster configuration");
 				return;
 			}
 
@@ -44,16 +45,17 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.AfterNodeStoppedTasks
 			var cachedEsHomeFolder = Path.Combine(fs.LocalFolder, cluster.GetCacheFolderName());
 			if (cluster.ClusterConfiguration.CacheEsHomeInstallation && !nodeStarted)
 				DeleteDirectory(w, "cached installation - node failed to start", cachedEsHomeFolder);
-			else 
-				w.WriteDiagnostic($"{{{nameof(CleanUpDirectoriesAfterNodeStopped)}}} Leaving [cached folder] on disk: {{{cachedEsHomeFolder}}}");
+			else
+				w.WriteDiagnostic(
+					$"{{{nameof(CleanUpDirectoriesAfterNodeStopped)}}} Leaving [cached folder] on disk: {{{cachedEsHomeFolder}}}");
 		}
 
 		private static void DeleteDirectory(IConsoleLineHandler w, string description, string path)
 		{
 			if (!Directory.Exists(path)) return;
-			w.WriteDiagnostic($"{{{nameof(CleanUpDirectoriesAfterNodeStopped)}}} attempting to delete [{description}]: {{{path}}}");
+			w.WriteDiagnostic(
+				$"{{{nameof(CleanUpDirectoriesAfterNodeStopped)}}} attempting to delete [{description}]: {{{path}}}");
 			Directory.Delete(path, true);
 		}
-
 	}
 }

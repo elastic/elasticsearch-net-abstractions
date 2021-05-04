@@ -19,7 +19,8 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.InstallationTasks
 
 			var source = cachedEsHomeFolder;
 			var target = fs.ElasticsearchHome;
-			cluster.Writer?.WriteDiagnostic($"{{{nameof(CopyCachedEsInstallation)}}} using cached ES_HOME {{{source}}} and copying it to [{target}]");
+			cluster.Writer?.WriteDiagnostic(
+				$"{{{nameof(CopyCachedEsInstallation)}}} using cached ES_HOME {{{source}}} and copying it to [{target}]");
 			CopyFolder(source, target);
 		}
 	}

@@ -1,4 +1,4 @@
-﻿// Licensed to Elasticsearch B.V under one or more agreements.
+// Licensed to Elasticsearch B.V under one or more agreements.
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
@@ -19,7 +19,8 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.InstallationTasks
 				return;
 
 			var batFile = cluster.FileSystem.Binary;
-			cluster.Writer.WriteDiagnostic($"{{{nameof(EnsureElasticsearchBatWorksAcrossDrives)}}} patching {batFile} according to elastic/elasticsearch#29057");
+			cluster.Writer.WriteDiagnostic(
+				$"{{{nameof(EnsureElasticsearchBatWorksAcrossDrives)}}} patching {batFile} according to elastic/elasticsearch#29057");
 			var contents = File.ReadAllLines(batFile);
 			for (var i = 0; i < contents.Length; i++)
 			{

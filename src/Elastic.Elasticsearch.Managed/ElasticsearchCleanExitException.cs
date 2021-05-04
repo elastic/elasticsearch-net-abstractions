@@ -8,8 +8,12 @@ namespace Elastic.Elasticsearch.Managed
 {
 	public class ElasticsearchCleanExitException : Exception
 	{
-		public ElasticsearchCleanExitException(string message) : base(message) { }
-		public ElasticsearchCleanExitException(string message, Exception innerException) : base(message, innerException) { }
+		public ElasticsearchCleanExitException(string message) : base(message)
+		{
+		}
 
+		public ElasticsearchCleanExitException(string message, Exception innerException) : base(message, innerException)
+		{
+		}
 	}
 }

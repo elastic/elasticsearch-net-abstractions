@@ -26,7 +26,7 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.ValidationTasks
 				.ToList();
 			var allOnRequestedVersion = false;
 
-			// fully qualified name not returned anymore, so beta1 rc1 etcetera is no longer returned in the version number
+			// fully qualified name not returned anymore, so beta1 rc1 etc. is no longer returned in the version number
 			if (requestedVersion.Major >= 7)
 			{
 				var anchorVersion = $"{requestedVersion.Major}.{requestedVersion.Minor}.{requestedVersion.Patch}";
@@ -39,7 +39,8 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.ValidationTasks
 			{
 				var requestedVersionNoSnapShot =
 					cluster.ClusterConfiguration.Version.ToString().Replace("-SNAPSHOT", "");
-				allOnRequestedVersion = nodeVersions.All(v => v.Trim() == requestedVersion || v.Trim() == requestedVersionNoSnapShot);
+				allOnRequestedVersion = nodeVersions.All(v =>
+					v.Trim() == requestedVersion || v.Trim() == requestedVersionNoSnapShot);
 
 				if (!allOnRequestedVersion)
 					throw new Exception(

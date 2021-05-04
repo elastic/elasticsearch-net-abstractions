@@ -1,4 +1,4 @@
-﻿// Licensed to Elasticsearch B.V under one or more agreements.
+// Licensed to Elasticsearch B.V under one or more agreements.
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
@@ -12,9 +12,9 @@ namespace Nest.TypescriptGenerator
 	public static class Program
 	{
 		/// <summary>
-		/// generate [definitionfile] [nest_source_folder]
-		/// split [definitionfile] [nest_source_folder] [out_folder]
-		/// both [definitionfile] [nest_source_folder] [out_folder]
+		///     generate [definitionfile] [nest_source_folder]
+		///     split [definitionfile] [nest_source_folder] [out_folder]
+		///     both [definitionfile] [nest_source_folder] [out_folder]
 		/// </summary>
 		public static int Main(string[] args)
 		{
@@ -29,7 +29,9 @@ namespace Nest.TypescriptGenerator
 				case "generate": return Generate(definitionFile, nestSourceFolder, restSpec);
 				case "both":
 				case "split":
-					var outFolder = args.Length > 3 ? args[3] : @"../../../elastic-client-generator/specification/specs";
+					var outFolder = args.Length > 3
+						? args[3]
+						: @"../../../elastic-client-generator/specification/specs";
 					var r = 0;
 					if (command == "both") r += Generate(definitionFile, nestSourceFolder, restSpec);
 					r += Split(definitionFile, restSpec, outFolder);
@@ -52,7 +54,8 @@ namespace Nest.TypescriptGenerator
 			var typeInfoProvider = new CsharpTypeInfoProvider();
 			var scriptGenerator = new ClientTypescriptGenerator(typeInfoProvider, sourceDirectory, restSpec);
 
-			using (var pbar = new ProgressBar(3, "Generating typescript information from NEST sources/code", new ProgressBarOptions {ForegroundColor = ConsoleColor.Yellow}))
+			using (var pbar = new ProgressBar(3, "Generating typescript information from NEST sources/code",
+				new ProgressBarOptions {ForegroundColor = ConsoleColor.Yellow}))
 			{
 				var generator = new ClientTypesExporter(typeInfoProvider, scriptGenerator);
 				File.WriteAllText(definitionFile, generator.Generate());

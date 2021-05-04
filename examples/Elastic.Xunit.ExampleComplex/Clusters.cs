@@ -1,4 +1,4 @@
-﻿// Licensed to Elasticsearch B.V under one or more agreements.
+// Licensed to Elasticsearch B.V under one or more agreements.
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
@@ -12,7 +12,8 @@ namespace Elastic.Xunit.ExampleComplex
 {
 	internal static class EphemeralClusterExtensions
 	{
-		private static readonly ConcurrentDictionary<IEphemeralCluster, IElasticClient> Clients = new ConcurrentDictionary<IEphemeralCluster, IElasticClient>();
+		private static readonly ConcurrentDictionary<IEphemeralCluster, IElasticClient> Clients =
+			new ConcurrentDictionary<IEphemeralCluster, IElasticClient>();
 
 		public static IElasticClient GetOrAddClient(this IEphemeralCluster cluster) =>
 			Clients.GetOrAdd(cluster, (c) =>
@@ -36,7 +37,6 @@ namespace Elastic.Xunit.ExampleComplex
 			ShowElasticsearchOutputAfterStarted = false,
 		})
 		{
-
 		}
 
 		public IElasticClient Client => this.GetOrAddClient();
@@ -52,7 +52,9 @@ namespace Elastic.Xunit.ExampleComplex
 
 	public class TestGenericCluster : XunitClusterBase<XunitClusterConfiguration>, IMyCluster
 	{
-		public TestGenericCluster() : base(new XunitClusterConfiguration(MyRunOptions.TestVersion)) { }
+		public TestGenericCluster() : base(new XunitClusterConfiguration(MyRunOptions.TestVersion))
+		{
+		}
 
 		public IElasticClient Client => this.GetOrAddClient();
 

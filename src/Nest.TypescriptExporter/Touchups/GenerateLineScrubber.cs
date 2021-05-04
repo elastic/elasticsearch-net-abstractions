@@ -1,4 +1,4 @@
-﻿// Licensed to Elasticsearch B.V under one or more agreements.
+// Licensed to Elasticsearch B.V under one or more agreements.
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
@@ -11,6 +11,7 @@ namespace Nest.TypescriptGenerator.Touchups
 	public static class GenerateLineScrubber
 	{
 		private static readonly Regex ReadSingleOrEnumerableToUnion = new Regex(@"^(.+?): (.+?)\[\];");
+
 		public static void LineBasedHacks(string file)
 		{
 			var lines = File.ReadAllLines(file);
@@ -31,12 +32,14 @@ namespace Nest.TypescriptGenerator.Touchups
 
 				newLines.Add(l);
 			}
+
 			File.WriteAllLines(file, errorCause);
 			File.AppendAllLines(file, error);
 			File.AppendAllLines(file, newLines);
 		}
 
-		private static bool TryMove(string l, string classDef, ICollection<string> movedLines, IList<string> newLines, ref bool skipTillNextBracket)
+		private static bool TryMove(string l, string classDef, ICollection<string> movedLines, IList<string> newLines,
+			ref bool skipTillNextBracket)
 		{
 			if (l == "}" && skipTillNextBracket)
 			{
@@ -56,12 +59,12 @@ namespace Nest.TypescriptGenerator.Touchups
 			if (!skipTillNextBracket) return false;
 			movedLines.Add(l);
 			return true;
-
 		}
 
 		//in NEST we always choose the array and use a json converter to accept the value
 		//define it as a union of value | value[] instead
-		private static bool TryHandleReadSingleOrEnumerable(string l, ICollection<string> newLines, ref bool singleOrArray)
+		private static bool TryHandleReadSingleOrEnumerable(string l, ICollection<string> newLines,
+			ref bool singleOrArray)
 		{
 			if (l.Contains("ReadSingleOrEnumerable"))
 			{
@@ -75,7 +78,6 @@ namespace Nest.TypescriptGenerator.Touchups
 			newLines.Add(ll);
 			singleOrArray = false;
 			return true;
-
 		}
 	}
 }

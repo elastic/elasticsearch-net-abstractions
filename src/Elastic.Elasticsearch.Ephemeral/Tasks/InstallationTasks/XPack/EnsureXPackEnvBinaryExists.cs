@@ -1,4 +1,4 @@
-﻿// Licensed to Elasticsearch B.V under one or more agreements.
+// Licensed to Elasticsearch B.V under one or more agreements.
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
@@ -18,12 +18,14 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.InstallationTasks.XPack
 			var config = cluster.ClusterConfiguration;
 			var v = config.Version;
 
-			var envBinary = Path.Combine(config.FileSystem.ElasticsearchHome, "bin", "x-pack", "x-pack-env") + BinarySuffix;
+			var envBinary = Path.Combine(config.FileSystem.ElasticsearchHome, "bin", "x-pack", "x-pack-env") +
+			                BinarySuffix;
 
 			if (v.Major != 6 || File.Exists(envBinary)) return;
 			if (v >= "6.3.0") return;
 
-			cluster.Writer.WriteDiagnostic($"{{{nameof(EnsureSecurityUsersInDefaultRealmAreAdded)}}} {envBinary} does not exist, patching now.");
+			cluster.Writer.WriteDiagnostic(
+				$"{{{nameof(EnsureSecurityUsersInDefaultRealmAreAdded)}}} {envBinary} does not exist, patching now.");
 			File.WriteAllText(envBinary, "set ES_CLASSPATH=!ES_CLASSPATH!;!ES_HOME!/plugins/x-pack/*");
 		}
 	}

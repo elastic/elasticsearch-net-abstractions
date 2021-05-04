@@ -1,4 +1,4 @@
-﻿// Licensed to Elasticsearch B.V under one or more agreements.
+// Licensed to Elasticsearch B.V under one or more agreements.
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
@@ -9,6 +9,9 @@ namespace Elastic.Elasticsearch.Managed.ConsoleWriters
 	public static class ExceptionLineParser
 	{
 		private static readonly Regex CauseRegex = new Regex(@"^(?<cause>.*?Exception:)(?<message>.*?)$");
+
+		private static readonly Regex
+			LocRegex = new Regex(@"^(?<at>\s*?at )(?<method>.*?)\((?<file>.*?)\)(?<jar>.*?)$");
 
 		public static bool TryParseCause(string line, out string cause, out string message)
 		{
@@ -21,8 +24,8 @@ namespace Elastic.Elasticsearch.Managed.ConsoleWriters
 			return true;
 		}
 
-		private static readonly Regex LocRegex = new Regex(@"^(?<at>\s*?at )(?<method>.*?)\((?<file>.*?)\)(?<jar>.*?)$");
-		public static bool TryParseStackTrace(string line, out string at, out string method, out string file, out string jar)
+		public static bool TryParseStackTrace(string line, out string at, out string method, out string file,
+			out string jar)
 		{
 			at = method = file = jar = null;
 			if (string.IsNullOrEmpty(line)) return false;
@@ -34,6 +37,5 @@ namespace Elastic.Elasticsearch.Managed.ConsoleWriters
 			jar = match.Groups["jar"].Value.Trim();
 			return true;
 		}
-
 	}
 }

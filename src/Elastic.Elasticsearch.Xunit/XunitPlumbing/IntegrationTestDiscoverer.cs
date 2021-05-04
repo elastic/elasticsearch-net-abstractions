@@ -11,66 +11,78 @@ using SemVer;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
+using Enumerable = System.Linq.Enumerable;
 
 namespace Elastic.Elasticsearch.Xunit.XunitPlumbing
 {
 	/// <summary>
-	/// An Xunit test that should be skipped, and a reason why.
+	///     An Xunit test that should be skipped, and a reason why.
 	/// </summary>
 	public abstract class SkipTestAttributeBase : Attribute
 	{
 		/// <summary>
-		/// Whether the test should be skipped
+		///     Whether the test should be skipped
 		/// </summary>
 		public abstract bool Skip { get; }
 
 		/// <summary>
-		/// The reason why the test should be skipped
+		///     The reason why the test should be skipped
 		/// </summary>
 		public abstract string Reason { get; }
 	}
 
 	/// <summary>
-	/// An Xunit integration test
+	///     An Xunit integration test
 	/// </summary>
-	[XunitTestCaseDiscoverer("Elastic.Elasticsearch.Xunit.XunitPlumbing.IntegrationTestDiscoverer", "Elastic.Elasticsearch.Xunit")]
-	public class I : FactAttribute { }
+	[XunitTestCaseDiscoverer("Elastic.Elasticsearch.Xunit.XunitPlumbing.IntegrationTestDiscoverer",
+		"Elastic.Elasticsearch.Xunit")]
+	public class I : FactAttribute
+	{
+	}
 
 	/// <summary>
-	/// A test discoverer used to discover integration tests cases attached
-	/// to test methods that are attributed with <see cref="I" /> attribute
+	///     A test discoverer used to discover integration tests cases attached
+	///     to test methods that are attributed with <see cref="I" /> attribute
 	/// </summary>
 	public class IntegrationTestDiscoverer : ElasticTestCaseDiscoverer
 	{
-		public IntegrationTestDiscoverer(IMessageSink diagnosticMessageSink) : base(diagnosticMessageSink) { }
+		public IntegrationTestDiscoverer(IMessageSink diagnosticMessageSink) : base(diagnosticMessageSink)
+		{
+		}
 
 		/// <inheritdoc />
-		protected override bool SkipMethod(ITestFrameworkDiscoveryOptions discoveryOptions, ITestMethod testMethod, out string skipReason)
+		protected override bool SkipMethod(ITestFrameworkDiscoveryOptions discoveryOptions, ITestMethod testMethod,
+			out string skipReason)
 		{
 			skipReason = null;
-			var runIntegrationTests = discoveryOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.RunIntegrationTests));
+			var runIntegrationTests =
+				discoveryOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.RunIntegrationTests));
 			if (!runIntegrationTests) return true;
 
 			var cluster = TestAssemblyRunner.GetClusterForClass(testMethod.TestClass.Class);
 			if (cluster == null)
 			{
-				skipReason += $"{testMethod.TestClass.Class.Name} does not define a cluster through IClusterFixture or {nameof(IntegrationTestClusterAttribute)}";
+				skipReason +=
+					$"{testMethod.TestClass.Class.Name} does not define a cluster through IClusterFixture or {nameof(IntegrationTestClusterAttribute)}";
 				return true;
 			}
 
-			var elasticsearchVersion = discoveryOptions.GetValue<ElasticVersion>(nameof(ElasticXunitRunOptions.Version));
+			var elasticsearchVersion =
+				discoveryOptions.GetValue<ElasticVersion>(nameof(ElasticXunitRunOptions.Version));
 
 			// Skip if the version we are testing against is attributed to be skipped do not run the test nameof(SkipVersionAttribute.Ranges)
-			var skipVersionAttribute = GetAttributes<SkipVersionAttribute>(testMethod).FirstOrDefault();
+			var skipVersionAttribute = Enumerable.FirstOrDefault(GetAttributes<SkipVersionAttribute>(testMethod));
 			if (skipVersionAttribute != null)
 			{
-				var skipVersionRanges = skipVersionAttribute.GetNamedArgument<IList<Range>>(nameof(SkipVersionAttribute.Ranges)) ?? new List<Range>();
+				var skipVersionRanges =
+					skipVersionAttribute.GetNamedArgument<IList<Range>>(nameof(SkipVersionAttribute.Ranges)) ??
+					new List<Range>();
 				if (elasticsearchVersion == null && skipVersionRanges.Count > 0)
-                {
-                    skipReason = $"{nameof(SkipVersionAttribute)} has ranges defined for this test but " +
-                                 $"no {nameof(ElasticXunitRunOptions.Version)} has been provided to {nameof(ElasticXunitRunOptions)}";
-                    return true;
-                }
+				{
+					skipReason = $"{nameof(SkipVersionAttribute)} has ranges defined for this test but " +
+					             $"no {nameof(ElasticXunitRunOptions.Version)} has been provided to {nameof(ElasticXunitRunOptions)}";
+					return true;
+				}
 
 				if (elasticsearchVersion != null)
 				{
@@ -80,7 +92,8 @@ namespace Elastic.Elasticsearch.Xunit.XunitPlumbing
 						var range = skipVersionRanges[index];
 						// inrange takes prereleases into account
 						if (!elasticsearchVersion.InRange(range)) continue;
-						skipReason = $"{nameof(SkipVersionAttribute)} has range {range} that {elasticsearchVersion} satisfies";
+						skipReason =
+							$"{nameof(SkipVersionAttribute)} has range {range} that {elasticsearchVersion} satisfies";
 						if (!string.IsNullOrWhiteSpace(reason)) skipReason += $": {reason}";
 						return true;
 					}
@@ -88,7 +101,7 @@ namespace Elastic.Elasticsearch.Xunit.XunitPlumbing
 			}
 
 			var skipTests = GetAttributes<SkipTestAttributeBase>(testMethod)
-				.FirstOrDefault(a=>a.GetNamedArgument<bool>(nameof(SkipTestAttributeBase.Skip)));
+				.FirstOrDefault(a => a.GetNamedArgument<bool>(nameof(SkipTestAttributeBase.Skip)));
 
 			if (skipTests == null) return false;
 

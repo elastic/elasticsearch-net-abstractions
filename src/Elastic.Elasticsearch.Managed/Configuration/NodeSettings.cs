@@ -11,8 +11,16 @@ namespace Elastic.Elasticsearch.Managed.Configuration
 {
 	public class NodeSettings : List<NodeSetting>
 	{
-		public NodeSettings() { }
-		public NodeSettings(NodeSettings settings) : base(settings) { }
+		private static readonly ElasticVersion
+			LastVersionWithoutPrefixForSettings = ElasticVersion.From("5.0.0-alpha2");
+
+		public NodeSettings()
+		{
+		}
+
+		public NodeSettings(NodeSettings settings) : base(settings)
+		{
+		}
 
 		public void Add(string setting)
 		{
@@ -20,13 +28,12 @@ namespace Elastic.Elasticsearch.Managed.Configuration
 			if (s.Length != 2)
 				throw new ArgumentException($"Can only add node settings in key=value from but received: {setting}");
 			Add(new NodeSetting(s[0], s[1], null));
-
 		}
+
 		public void Add(string key, string value) => Add(new NodeSetting(key, value, null));
 
-		public void Add(string key, string value, string versionRange) => Add(new NodeSetting(key, value, versionRange));
-
-		private static readonly ElasticVersion LastVersionWithoutPrefixForSettings = ElasticVersion.From("5.0.0-alpha2");
+		public void Add(string key, string value, string versionRange) =>
+			Add(new NodeSetting(key, value, versionRange));
 
 		public string[] ToCommandLineArguments(ElasticVersion version)
 		{

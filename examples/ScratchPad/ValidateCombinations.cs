@@ -15,8 +15,12 @@ namespace ScratchPad
 	{
 		public static void Run()
 		{
-			var plugins = new ElasticsearchPlugins(ElasticsearchPlugin.IngestGeoIp, ElasticsearchPlugin.AnalysisKuromoji);
-			var versions = new string[] {"7.0.0-beta1", "latest", "latest-7", "latest-6", "957e3089:7.2.0", "6.6.1", "5.6.15" };
+			var plugins =
+				new ElasticsearchPlugins(ElasticsearchPlugin.IngestGeoIp, ElasticsearchPlugin.AnalysisKuromoji);
+			var versions = new string[]
+			{
+				"7.0.0-beta1", "latest", "latest-7", "latest-6", "957e3089:7.2.0", "6.6.1", "5.6.15"
+			};
 			var features = new[]
 			{
 				ClusterFeatures.None,
@@ -26,52 +30,47 @@ namespace ScratchPad
 			};
 
 			foreach (var v in versions)
+			foreach (var f in features)
 			{
-				foreach (var f in features)
-				{
-					Console.Clear();
-					var reset = Console.ForegroundColor;
-					Console.ForegroundColor = ConsoleColor.Cyan;
-					Console.WriteLine($"{v} {f}");
+				Console.Clear();
+				var reset = Console.ForegroundColor;
+				Console.ForegroundColor = ConsoleColor.Cyan;
+				Console.WriteLine($"{v} {f}");
 
-					Console.ForegroundColor = reset;
-					var config = new EphemeralClusterConfiguration(v, f, plugins, numberOfNodes: 1)
+				Console.ForegroundColor = reset;
+				var config = new EphemeralClusterConfiguration(v, f, plugins, 1) {HttpFiddlerAware = true,};
+
+				using (var cluster = new EphemeralCluster(config))
+					try
 					{
-						HttpFiddlerAware = true,
-					};
+						cluster.Start();
 
-					using (var cluster = new EphemeralCluster(config))
-					{
-						try
-						{
-                              cluster.Start();
+						var nodes = cluster.NodesUris();
+						var connectionPool = new StaticConnectionPool(nodes);
+						var settings = new ConnectionSettings(connectionPool).EnableDebugMode();
+						if (config.EnableSecurity)
+							settings = settings.BasicAuthentication(ClusterAuthentication.Admin.Username,
+								ClusterAuthentication.Admin.Password);
+						if (config.EnableSsl)
+							settings = settings.ServerCertificateValidationCallback(CertificateValidations.AllowAll);
 
-                              var nodes = cluster.NodesUris();
-                              var connectionPool = new StaticConnectionPool(nodes);
-                              var settings = new ConnectionSettings(connectionPool).EnableDebugMode();
-                              if (config.EnableSecurity)
-                                   settings = settings.BasicAuthentication(ClusterAuthentication.Admin.Username, ClusterAuthentication.Admin.Password);
-                              if (config.EnableSsl)
-                                   settings = settings.ServerCertificateValidationCallback(CertificateValidations.AllowAll);
-
-                              var client = new ElasticClient(settings);
-                              Console.WriteLine(client.RootNodeInfo().Version.Number);
-                              cluster.Dispose();
-                              cluster.WaitForExit(TimeSpan.FromMinutes(1));
-						}
-						catch (Exception e)
-						{
-							Console.WriteLine(e);
-							Console.ForegroundColor = ConsoleColor.Cyan;
-							Console.WriteLine($"{v} {f}");
-
-							Console.ForegroundColor = reset;
-
-							throw;
-						}
+						var client = new ElasticClient(settings);
+						Console.WriteLine(client.RootNodeInfo().Version.Number);
+						cluster.Dispose();
+						cluster.WaitForExit(TimeSpan.FromMinutes(1));
 					}
-				}
+					catch (Exception e)
+					{
+						Console.WriteLine(e);
+						Console.ForegroundColor = ConsoleColor.Cyan;
+						Console.WriteLine($"{v} {f}");
+
+						Console.ForegroundColor = reset;
+
+						throw;
+					}
 			}
+
 			Console.WriteLine("Done!");
 		}
 	}

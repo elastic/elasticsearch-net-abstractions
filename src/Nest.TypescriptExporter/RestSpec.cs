@@ -1,4 +1,4 @@
-﻿// Licensed to Elasticsearch B.V under one or more agreements.
+// Licensed to Elasticsearch B.V under one or more agreements.
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
@@ -13,21 +13,32 @@ namespace Nest.TypescriptGenerator
 {
 	public class RestSpec
 	{
-		public Dictionary<string, FileInfo> SpecificationFiles { get; }
-		private string RestSpecificationFolder { get; }
-
-		public class RestSpecMapping
+		private readonly string[] _badDescriptorFors =
 		{
-			public FileInfo Json { get; set; }
-			public string TypeName { get; set; }
-		}
+			"DeleteScriptRequest", "GetScriptRequest", "PutScriptRequest", "SnapshotStatusRequest"
+		};
+
+		private readonly string[] _helperRequests = {"BulkAllRequest", "ScrollAllRequest",};
+
+		private readonly string[] _ignoredApis =
+		{
+			//not mapped un purpose in NEST
+			"xpack.ml.delete_filter.json", "xpack.ml.get_filters.json", "xpack.ml.put_filter.json",
+			"xpack.monitoring.bulk.json", "xpack.ml.get_buckets.replace.json",
+			// not mapped yet
+			"rank_eval.json"
+		};
+
+		private readonly Regex _mapsApiRe = new Regex(@"MapsApi\(""(?<descriptor>.+?)(?:\.json)?""");
+
+		private readonly string[] _notARequest = {"HttpInputRequest", "SearchInputRequest"};
 
 		public RestSpec(string nestSourceFolder)
 		{
 			using (var pbar = new ProgressBar(2, "reading NEST's REST API spec folder"))
 			{
-
-				RestSpecificationFolder = Path.GetFullPath(Path.Combine(nestSourceFolder, "..", "ApiGenerator", "RestSpecification"));
+				RestSpecificationFolder =
+					Path.GetFullPath(Path.Combine(nestSourceFolder, "..", "ApiGenerator", "RestSpecification"));
 
 				var jsonFiles = Directory.GetFiles(RestSpecificationFolder, $"*.json", SearchOption.AllDirectories)
 					.Where(f => !f.EndsWith(".patch.json") && !f.EndsWith("_common.json"))
@@ -53,33 +64,13 @@ namespace Nest.TypescriptGenerator
 					.Except(_ignoredApis)
 					.ToList();
 			}
-
 		}
+
+		public Dictionary<string, FileInfo> SpecificationFiles { get; }
+		private string RestSpecificationFolder { get; }
 
 		public Dictionary<string, RestSpecMapping> Requests { get; }
 
-		private readonly Regex _mapsApiRe = new Regex(@"MapsApi\(""(?<descriptor>.+?)(?:\.json)?""");
-		private readonly string[] _ignoredApis =
-		{
-			//not mapped un purpose in NEST
-			"xpack.ml.delete_filter.json",
-			"xpack.ml.get_filters.json",
-			"xpack.ml.put_filter.json",
-			"xpack.monitoring.bulk.json",
-			"xpack.ml.get_buckets.replace.json",
-			// not mapped yet
-			"rank_eval.json"
-		};
-		private readonly string[] _helperRequests =
-		{
-			"BulkAllRequest", "ScrollAllRequest",
-		};
-
-		private readonly string[] _notARequest = {"HttpInputRequest", "SearchInputRequest"};
-		private readonly string[] _badDescriptorFors =
-		{
-			"DeleteScriptRequest", "GetScriptRequest", "PutScriptRequest", "SnapshotStatusRequest"
-		};
 		private RestSpecMapping CreateMapping(FileInfo file)
 		{
 			var typeName = Path.GetFileNameWithoutExtension(file.Name);
@@ -91,10 +82,8 @@ namespace Nest.TypescriptGenerator
 
 			specFileName = specFileName.SnakeCase().Replace("_", ".").Replace("async.search", "async_search");
 			do
-			{
 				if (SpecificationFiles.TryGetValue(specFileName, out var f))
 					return new RestSpecMapping {TypeName = $"I{typeName}", Json = f};
-			}
 			while (TryGetSpecTarget(specFileName, out specFileName));
 
 			throw new Exception($"{specFileName}: {typeName} is not a known request in {RestSpecificationFolder}");
@@ -135,7 +124,12 @@ namespace Nest.TypescriptGenerator
 			if (i < 0) return false;
 			newSpecFileName = specFileName.Remove(i, 1).Insert(i, "_");
 			return true;
+		}
 
+		public class RestSpecMapping
+		{
+			public FileInfo Json { get; set; }
+			public string TypeName { get; set; }
 		}
 	}
 }
