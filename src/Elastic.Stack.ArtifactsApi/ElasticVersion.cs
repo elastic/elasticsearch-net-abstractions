@@ -14,8 +14,7 @@ namespace Elastic.Stack.ArtifactsApi
 {
 	public class ElasticVersion : Version, IComparable<string>
 	{
-		private readonly ConcurrentDictionary<string, Artifact>
-			_resolved = new ConcurrentDictionary<string, Artifact>();
+		private readonly ConcurrentDictionary<string, Artifact> _resolved = new();
 
 		protected ElasticVersion(string version, ArtifactBuildState state, string buildHash = null) : base(version)
 		{
@@ -73,7 +72,8 @@ namespace Elastic.Stack.ArtifactsApi
 						: ArtifactBuildState.BuildCandidate;
 			}
 
-			if (string.IsNullOrWhiteSpace(managedVersionString)) return null;
+			if (string.IsNullOrWhiteSpace(managedVersionString))
+				return null;
 
 			var version = managedVersionString;
 			var state = GetReleaseState(version);
@@ -88,8 +88,10 @@ namespace Elastic.Stack.ArtifactsApi
 					if (state == ArtifactBuildState.BuildCandidate)
 						buildHash = ApiResolver.LatestBuildHash(version);
 					break;
+				// When the version is not yet released but contains the alpha label, we treat it in the same way as snapshots so it is resolved correctly
 				case { } _ when managedVersionString.EndsWith("-snapshot", StringComparison.OrdinalIgnoreCase)
-				                || managedVersionString.IndexOf("-alpha", StringComparison.OrdinalIgnoreCase) >= 0:
+				                || state != ArtifactBuildState.Released &&
+				                managedVersionString.IndexOf("-alpha", StringComparison.OrdinalIgnoreCase) >= 0:
 					state = ArtifactBuildState.Snapshot;
 					break;
 				case { } _ when TryParseBuildCandidate(managedVersionString, out var v, out buildHash):
@@ -110,7 +112,8 @@ namespace Elastic.Stack.ArtifactsApi
 			version = null;
 			gitHash = null;
 			var tokens = passedVersion.Split(':');
-			if (tokens.Length < 2) return false;
+			if (tokens.Length < 2)
+				return false;
 			version = tokens[1].Trim();
 			gitHash = tokens[0].Trim();
 			return true;
@@ -125,7 +128,8 @@ namespace Elastic.Stack.ArtifactsApi
 		public bool InRange(Range versionRange)
 		{
 			var satisfied = versionRange.IsSatisfied(this);
-			if (satisfied) return true;
+			if (satisfied)
+				return true;
 
 			//Semver can only match snapshot version with ranges on the same major and minor
 			//anything else fails but we want to know e.g 2.4.5-SNAPSHOT satisfied by <5.0.0;
