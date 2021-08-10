@@ -28,7 +28,7 @@ namespace Elastic.Stack.ArtifactsApi
 
 		public int CompareTo(string other)
 		{
-			var v = (ElasticVersion) other;
+			var v = (ElasticVersion)other;
 			return CompareTo(v);
 		}
 
@@ -81,17 +81,18 @@ namespace Elastic.Stack.ArtifactsApi
 
 			switch (managedVersionString)
 			{
-				case string _ when managedVersionString.StartsWith("latest-", StringComparison.OrdinalIgnoreCase):
+				case { } when managedVersionString.StartsWith("latest-", StringComparison.OrdinalIgnoreCase):
 					var major = int.Parse(managedVersionString.Replace("latest-", ""));
 					version = SnapshotApiResolver.LatestReleaseOrSnapshotForMajor(major).ToString();
 					state = GetReleaseState(version);
 					if (state == ArtifactBuildState.BuildCandidate)
 						buildHash = ApiResolver.LatestBuildHash(version);
 					break;
-				case string _ when managedVersionString.EndsWith("-snapshot", StringComparison.OrdinalIgnoreCase):
+				case { } _ when managedVersionString.EndsWith("-snapshot", StringComparison.OrdinalIgnoreCase)
+				                || managedVersionString.IndexOf("-alpha", StringComparison.OrdinalIgnoreCase) >= 0:
 					state = ArtifactBuildState.Snapshot;
 					break;
-				case string _ when TryParseBuildCandidate(managedVersionString, out var v, out buildHash):
+				case { } _ when TryParseBuildCandidate(managedVersionString, out var v, out buildHash):
 					state = ArtifactBuildState.BuildCandidate;
 					version = v;
 					break;
@@ -135,24 +136,24 @@ namespace Elastic.Stack.ArtifactsApi
 
 		public static implicit operator ElasticVersion(string version) => From(version);
 
-		public static bool operator <(ElasticVersion first, string second) => first < (ElasticVersion) second;
-		public static bool operator >(ElasticVersion first, string second) => first > (ElasticVersion) second;
+		public static bool operator <(ElasticVersion first, string second) => first < (ElasticVersion)second;
+		public static bool operator >(ElasticVersion first, string second) => first > (ElasticVersion)second;
 
-		public static bool operator <(string first, ElasticVersion second) => (ElasticVersion) first < second;
-		public static bool operator >(string first, ElasticVersion second) => (ElasticVersion) first > second;
+		public static bool operator <(string first, ElasticVersion second) => (ElasticVersion)first < second;
+		public static bool operator >(string first, ElasticVersion second) => (ElasticVersion)first > second;
 
-		public static bool operator <=(ElasticVersion first, string second) => first <= (ElasticVersion) second;
-		public static bool operator >=(ElasticVersion first, string second) => first >= (ElasticVersion) second;
+		public static bool operator <=(ElasticVersion first, string second) => first <= (ElasticVersion)second;
+		public static bool operator >=(ElasticVersion first, string second) => first >= (ElasticVersion)second;
 
-		public static bool operator <=(string first, ElasticVersion second) => (ElasticVersion) first <= second;
-		public static bool operator >=(string first, ElasticVersion second) => (ElasticVersion) first >= second;
+		public static bool operator <=(string first, ElasticVersion second) => (ElasticVersion)first <= second;
+		public static bool operator >=(string first, ElasticVersion second) => (ElasticVersion)first >= second;
 
-		public static bool operator ==(ElasticVersion first, string second) => first == (ElasticVersion) second;
-		public static bool operator !=(ElasticVersion first, string second) => first != (ElasticVersion) second;
+		public static bool operator ==(ElasticVersion first, string second) => first == (ElasticVersion)second;
+		public static bool operator !=(ElasticVersion first, string second) => first != (ElasticVersion)second;
 
 
-		public static bool operator ==(string first, ElasticVersion second) => (ElasticVersion) first == second;
-		public static bool operator !=(string first, ElasticVersion second) => (ElasticVersion) first != second;
+		public static bool operator ==(string first, ElasticVersion second) => (ElasticVersion)first == second;
+		public static bool operator !=(string first, ElasticVersion second) => (ElasticVersion)first != second;
 
 		// ReSharper disable once UnusedMember.Local
 		private bool Equals(ElasticVersion other) => base.Equals(other);
