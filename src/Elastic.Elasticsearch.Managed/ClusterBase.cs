@@ -118,7 +118,7 @@ namespace Elastic.Elasticsearch.Managed
 			if (!Started)
 			{
 				var nodeExceptions = Nodes.Select(n => n.LastSeenException).Where(e => e != null).ToList();
-				var message = $"{{{GetType().Name}.{nameof(Start)}}} cluster did not start succesfully";
+				var message = $"{{{GetType().Name}.{nameof(Start)}}} cluster did not start successfully";
 				var seeLogsMessage = SeeLogsMessage(message);
 				writer?.WriteError(seeLogsMessage);
 				throw new AggregateException(seeLogsMessage, nodeExceptions);
