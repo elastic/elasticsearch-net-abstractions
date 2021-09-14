@@ -63,14 +63,14 @@ namespace Elastic.Stack.ArtifactsApi
 		/// </summary>
 		public static ElasticVersion From(string managedVersionString)
 		{
-			ArtifactBuildState GetReleaseState(string s)
-			{
-				return s.EndsWith("-SNAPSHOT")
+			ArtifactBuildState GetReleaseState(string s) => s.EndsWith("-SNAPSHOT")
 					? ArtifactBuildState.Snapshot
 					: ApiResolver.IsReleasedVersion(s)
 						? ArtifactBuildState.Released
-						: ArtifactBuildState.BuildCandidate;
-			}
+						// When the version is not yet released but contains the alpha label, we treat it in the same way as snapshots so it is resolved correctly
+						: s.IndexOf("-alpha", StringComparison.OrdinalIgnoreCase) >= 0
+							? ArtifactBuildState.Snapshot
+							: ArtifactBuildState.BuildCandidate;
 
 			if (string.IsNullOrWhiteSpace(managedVersionString))
 				return null;
@@ -88,10 +88,7 @@ namespace Elastic.Stack.ArtifactsApi
 					if (state == ArtifactBuildState.BuildCandidate)
 						buildHash = ApiResolver.LatestBuildHash(version);
 					break;
-				// When the version is not yet released but contains the alpha label, we treat it in the same way as snapshots so it is resolved correctly
-				case { } _ when managedVersionString.EndsWith("-snapshot", StringComparison.OrdinalIgnoreCase)
-				                || state != ArtifactBuildState.Released &&
-				                managedVersionString.IndexOf("-alpha", StringComparison.OrdinalIgnoreCase) >= 0:
+				case { } _ when managedVersionString.EndsWith("-snapshot", StringComparison.OrdinalIgnoreCase):
 					state = ArtifactBuildState.Snapshot;
 					break;
 				case { } _ when TryParseBuildCandidate(managedVersionString, out var v, out buildHash):
