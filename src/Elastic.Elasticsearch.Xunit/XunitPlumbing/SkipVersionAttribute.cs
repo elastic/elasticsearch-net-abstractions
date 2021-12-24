@@ -20,11 +20,11 @@ namespace Elastic.Elasticsearch.Xunit.XunitPlumbing
 		{
 			Reason = reason;
 			Ranges = string.IsNullOrEmpty(skipVersionRangesSeparatedByComma)
-				? new List<Range>()
+				? new List<SemVer.Range>()
 				: skipVersionRangesSeparatedByComma.Split(',')
 					.Select(r => r.Trim())
 					.Where(r => !string.IsNullOrWhiteSpace(r))
-					.Select(r => new Range(r))
+					.Select(r => new SemVer.Range(r))
 					.ToList();
 		}
 
@@ -36,6 +36,6 @@ namespace Elastic.Elasticsearch.Xunit.XunitPlumbing
 		/// <summary>
 		///     The version ranges for which the test should be skipped
 		/// </summary>
-		public IList<Range> Ranges { get; }
+		public IList<SemVer.Range> Ranges { get; }
 	}
 }

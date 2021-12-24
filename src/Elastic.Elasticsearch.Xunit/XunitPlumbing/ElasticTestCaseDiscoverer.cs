@@ -30,7 +30,7 @@ namespace Elastic.Elasticsearch.Xunit.XunitPlumbing
 					: new IXunitTestCase[] {new SkippingTestCase(skipReason, testMethod, null)}
 				: new[]
 				{
-					new XunitTestCase(DiagnosticMessageSink, discoveryOptions.MethodDisplayOrDefault(), testMethod)
+					new XunitTestCase(DiagnosticMessageSink, discoveryOptions.MethodDisplayOrDefault(), TestMethodDisplayOptions.None, testMethod)
 				};
 
 		/// <summary>

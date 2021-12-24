@@ -75,8 +75,8 @@ namespace Elastic.Elasticsearch.Xunit.XunitPlumbing
 			if (skipVersionAttribute != null)
 			{
 				var skipVersionRanges =
-					skipVersionAttribute.GetNamedArgument<IList<Range>>(nameof(SkipVersionAttribute.Ranges)) ??
-					new List<Range>();
+					skipVersionAttribute.GetNamedArgument<IList<SemVer.Range>>(nameof(SkipVersionAttribute.Ranges)) ??
+					new List<SemVer.Range>();
 				if (elasticsearchVersion == null && skipVersionRanges.Count > 0)
 				{
 					skipReason = $"{nameof(SkipVersionAttribute)} has ranges defined for this test but " +
