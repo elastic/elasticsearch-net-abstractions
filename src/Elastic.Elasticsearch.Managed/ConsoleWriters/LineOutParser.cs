@@ -64,7 +64,7 @@ namespace Elastic.Elasticsearch.Managed.ConsoleWriters
 		private static bool TryGetStartedConfirmation(string section, string message)
 		{
 			var inNodeSection = section == "o.e.n.Node" || section == "node";
-			return inNodeSection && message == "started";
+			return inNodeSection && (message == "started" || message.StartsWith("started {", StringComparison.Ordinal));
 		}
 
 		public static bool TryGetPortNumber(string section, string message, out int port)
