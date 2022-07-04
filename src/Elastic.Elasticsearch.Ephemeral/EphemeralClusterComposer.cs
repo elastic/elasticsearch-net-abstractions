@@ -12,6 +12,7 @@ using Elastic.Elasticsearch.Ephemeral.Tasks.InstallationTasks;
 using Elastic.Elasticsearch.Ephemeral.Tasks.InstallationTasks.XPack;
 using Elastic.Elasticsearch.Ephemeral.Tasks.ValidationTasks;
 using Elastic.Elasticsearch.Managed.FileSystem;
+using Elastic.Elasticsearch.Managed.ConsoleWriters;
 
 namespace Elastic.Elasticsearch.Ephemeral
 {
@@ -73,9 +74,9 @@ namespace Elastic.Elasticsearch.Ephemeral
 
 		private bool NodeStarted { get; set; }
 
-		public void OnStop() => Itterate(NodeStoppedTasks, (t, c, fs) => t.Run(c, NodeStarted), false);
+		public void OnStop() => Iterate(NodeStoppedTasks, (t, c, fs) => t.Run(c, NodeStarted), false);
 
-		public void Install() => Itterate(InstallationTasks, (t, c, fs) => t.Run(c));
+		public void Install() => Iterate(InstallationTasks, (t, c, fs) => t.Run(c));
 
 		public void OnBeforeStart()
 		{
@@ -86,7 +87,7 @@ namespace Elastic.Elasticsearch.Ephemeral
 			if (Cluster.ClusterConfiguration.PrintYamlFilesInConfigFolder)
 				tasks.Add(new PrintYamlContents());
 
-			Itterate(tasks, (t, c, fs) => t.Run(c));
+			Iterate(tasks, (t, c, fs) => t.Run(c));
 
 			NodeStarted = true;
 		}
@@ -97,10 +98,10 @@ namespace Elastic.Elasticsearch.Ephemeral
 			var tasks = new List<IClusterComposeTask>(AfterStartedTasks);
 			if (Cluster.ClusterConfiguration.AdditionalAfterStartedTasks != null)
 				tasks.AddRange(Cluster.ClusterConfiguration.AdditionalAfterStartedTasks);
-			Itterate(tasks, (t, c, fs) => t.Run(c), false);
+			Iterate(tasks, (t, c, fs) => t.Run(c), false);
 		}
 
-		private void Itterate<T>(IEnumerable<T> collection,
+		private void Iterate<T>(IEnumerable<T> collection,
 			Action<T, IEphemeralCluster<TConfiguration>, INodeFileSystem> act, bool callOnStop = true)
 		{
 			lock (_lock)
@@ -111,9 +112,10 @@ namespace Elastic.Elasticsearch.Ephemeral
 					{
 						act(task, cluster, cluster.FileSystem);
 					}
-					catch (Exception)
+					catch (Exception ex)
 					{
 						if (callOnStop) OnStop();
+						cluster.Writer.WriteError($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
 						throw;
 					}
 			}
