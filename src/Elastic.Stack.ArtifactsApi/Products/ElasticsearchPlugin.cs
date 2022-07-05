@@ -36,7 +36,10 @@ namespace Elastic.Stack.ArtifactsApi.Products
 		public static ElasticsearchPlugin DiscoveryGCE { get; } = new ElasticsearchPlugin("discovery-gce");
 
 		public static ElasticsearchPlugin IngestAttachment { get; } =
-			new ElasticsearchPlugin("ingest-attachment", version => version >= "5.0.0-alpha3");
+			new ElasticsearchPlugin("ingest-attachment", version => version >= "5.0.0-alpha3")
+			{
+				ShippedByDefaultAsOf = "8.4.0"
+			};
 
 		public static ElasticsearchPlugin IngestGeoIp { get; } =
 			new ElasticsearchPlugin("ingest-geoip", version => version >= "5.0.0-alpha3")
