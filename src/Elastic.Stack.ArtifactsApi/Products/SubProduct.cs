@@ -35,8 +35,19 @@ namespace Elastic.Stack.ArtifactsApi.Products
 		public string GetExistsMoniker(ElasticVersion version) => _getExistsMoniker(version);
 
 		/// <summary>Whether the sub project is included in the distribution out of the box for the given version</summary>
-		public bool IsIncludedOutOfTheBox(ElasticVersion version) =>
-			ShippedByDefaultAsOf != null && version >= ShippedByDefaultAsOf;
+		public bool IsIncludedOutOfTheBox(ElasticVersion version)
+		{
+			if (ShippedByDefaultAsOf is null)
+				return false;
+
+			// When we are using a snapshot version of Elasticsearch compare on base version.
+			// This ensures that when testing with a snapshot, we install plugins correctly.
+			// e.g. When testing with 8.4.0-SNAPSHOT of elasticsearch, we don't expect to ingest-attachment,
+			// added in-box in 8.4.0 to be installed.
+			return version.ArtifactBuildState == ArtifactBuildState.Snapshot
+				? version.BaseVersion() >= ShippedByDefaultAsOf.BaseVersion()
+				: version >= ShippedByDefaultAsOf;
+		}
 
 		/// <summary>Whether the subProject is valid for the given version</summary>
 		public bool IsValid(ElasticVersion version) => IsIncludedOutOfTheBox(version) || _isValid(version);
