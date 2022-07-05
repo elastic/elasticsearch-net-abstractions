@@ -140,11 +140,18 @@ namespace Elastic.Elasticsearch.Managed
 
 		public void Dispose()
 		{
-			Started = false;
-			foreach (var node in Nodes)
-				node?.Dispose();
+			try
+			{
+				Started = false;
+				foreach (var node in Nodes)
+					node?.Dispose();
 
-			OnDispose();
+				OnDispose();
+			}
+			catch(Exception ex)
+			{
+				Writer.WriteError($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+			}
 		}
 
 		protected virtual void ModifyNodeConfiguration(NodeConfiguration nodeConfiguration, int port)
