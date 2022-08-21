@@ -32,6 +32,7 @@ namespace Elastic.Elasticsearch.Ephemeral
 		public string CertificatesPath => Path.Combine(ConfigPath, CertificateFolderName);
 
 		public string CaCertificate => Path.Combine(CertificatesPath, "ca", "ca") + ".crt";
+		public string CaPrivateKey => Path.Combine(CertificatesPath, "ca", "ca") + ".key";
 
 		public string NodePrivateKey =>
 			Path.Combine(CertificatesPath, CertificateNodeName, CertificateNodeName) + ".key";

@@ -185,8 +185,8 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 				errorOut = errorOut.Where(e => !e.Line.Contains("No log4j2 configuration file found")).ToList();
 
 			if (errorOut.Any(e =>
-				    !string.IsNullOrWhiteSpace(e.Line) && !e.Line.Contains("usage of JAVA_HOME is deprecated")) &&
-			    !binary.Contains("plugin") && !binary.Contains("cert"))
+				    !string.IsNullOrWhiteSpace(e.Line) && !e.Line.Contains("usage of JAVA_HOME is deprecated") && !e.Line.Contains("using ES_JAVA_HOME")) &&
+			    !binary.Contains("plugin") && !binary.Contains("cert") )
 				throw new Exception(
 					$"Received error out with exitCode ({result.ExitCode}) while executing {description}: {command}");
 
