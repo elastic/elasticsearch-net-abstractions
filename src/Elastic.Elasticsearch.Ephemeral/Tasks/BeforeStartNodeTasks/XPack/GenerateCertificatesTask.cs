@@ -178,12 +178,10 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 		{
 			if (config.Version < "8.0.0") return;
 
-			var @out = zipLocation;
-			var fs = config.FileSystem;
-			var binary = Path.Combine(fs.ElasticsearchHome, "bin", "elasticsearch-certutil") + BinarySuffix;
+			var binary = Path.Combine(config.FileSystem.ElasticsearchHome, "bin", "elasticsearch-certutil") + BinarySuffix;
 
 			ExecuteBinary(config, writer, binary, "generating CA certificate for this session",
-				"ca", "--pem", "--out", @out);
+				"ca", "--pem", "--out", zipLocation);
 		}
 
 
