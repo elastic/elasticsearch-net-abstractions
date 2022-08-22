@@ -40,6 +40,12 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 			if (!cluster.ClusterConfiguration.EnableSsl) return;
 
 			var config = cluster.ClusterConfiguration;
+			
+			if (Directory.Exists(config.FileSystem.CertificatesPath))
+			{
+				cluster.Writer.WriteDiagnostic($"{{{nameof(GenerateCertificatesTask)}}} Skipping certificate generation as ${{{config.FileSystem.CertificatesPath}}} already exists");
+				return;
+			}
 
 			var fileSystem = cluster.FileSystem;
 			//due to a bug in certgen this file needs to live in two places
@@ -82,8 +88,8 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 			var name = config.FileSystem.CertificateFolderName;
 			var path = config.FileSystem.CertificatesPath;
 			NewOrCachedCertificates(cluster, "ca-certificates", path, writer,
-				zipLocation => GenerateCaCertificate(config, zipLocation, writer)
-			);
+				zipLocation => GenerateCaCertificate(config, zipLocation, writer),
+							"8.0.0");
 			NewOrCachedCertificates(cluster, name, path, writer,
 				zipLocation => GenerateCertificate(config, name, path, zipLocation, silentModeConfigFile, writer)
 			);
@@ -96,19 +102,21 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 			var name = config.FileSystem.UnusedCertificateFolderName;
 			var path = config.FileSystem.UnusedCertificatesPath;
 			NewOrCachedCertificates(cluster, "unused-ca-certificates", path, writer,
-				zipLocation => GenerateCaCertificate(config, zipLocation, writer)
-			);
+				zipLocation => GenerateCaCertificate(config, zipLocation, writer),
+							"8.0.0");
 			NewOrCachedCertificates(cluster, name, path, writer,
 				zipLocation => GenerateCertificate(config, name, path, zipLocation, silentModeConfigFile, writer)
 			);
 		}
 
 		private static void NewOrCachedCertificates(IEphemeralCluster<EphemeralClusterConfiguration> cluster,
-			string name, string path, IConsoleLineHandler writer, Action<string> generateCertificateAction)
+			string name, string path, IConsoleLineHandler writer, Action<string> generateCertificateAction, string minVersion = null)
 		{
 			var config = cluster.ClusterConfiguration;
 			var cachedEsHomeFolder = Path.Combine(config.FileSystem.LocalFolder, cluster.GetCacheFolderName());
 			var zipLocationCache = Path.Combine(cachedEsHomeFolder, name) + ".zip";
+
+			if (minVersion != null && config.Version < minVersion) return;
 
 			if (File.Exists(zipLocationCache))
 			{
@@ -144,10 +152,6 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 					: Path.Combine(fs.ElasticsearchHome, "bin", "elasticsearch-certutil") + BinarySuffix
 				: Path.Combine(fs.ElasticsearchHome, "bin", "x-pack", "certgen") + BinarySuffix;
 
-			// TODO figure out what to do about the original check for the existence of 'path',
-			//      I suspect it was done so that the 'NoCleanupAfterNodeStopped' option can be
-			//      to launch a cluster that was setup in the past. Perhaps I can move this
-			//      check to be higher up in the call chain.
 			if (config.Version < "7.0.0")
 				ExecuteBinary(config, writer, binary, "generating ssl certificates for this session",
 					"-in", silentModeConfigFile, "-out", @out);
@@ -185,11 +189,6 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 
 		private static void UnpackCertificatesZip(string zipLocation, string outFolder, IConsoleLineHandler writer)
 		{
-			// TODO figure out what to do about the original check for the existence of 'path',
-			//      I suspect it was done so that the 'NoCleanupAfterNodeStopped' option can be
-			//      to launch a cluster that was setup in the past. Perhaps I can move this
-			//      check to be higher up in the call chain.
-
 			writer.WriteDiagnostic($"{{{nameof(GenerateCertificatesTask)}}} unzipping certificates to {outFolder}");
 			Directory.CreateDirectory(outFolder);
 
