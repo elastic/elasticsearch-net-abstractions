@@ -43,6 +43,8 @@ ProjectSection(SolutionItems) = preProject
 	.github\workflows\ci.yml = .github\workflows\ci.yml
 EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elastic.Ephemeral.Example", "examples\Elastic.Ephemeral.Example\Elastic.Ephemeral.Example.csproj", "{9666AFDC-B0E8-489C-A25A-17E67303A969}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,6 +64,7 @@ Global
 		{80DE8673-CB3E-4D0B-99F4-A5CECF6BE752} = {77E78EDE-60D5-469A-B431-443A7966A243}
 		{C05F7B36-EEF7-4BCD-86A2-F5F1BB8CFEB9} = {77E78EDE-60D5-469A-B431-443A7966A243}
 		{D6997ADC-E933-418E-831C-DE1A78897493} = {F75ACC18-D314-4F1F-88A3-2002EAC4E207}
+		{9666AFDC-B0E8-489C-A25A-17E67303A969} = {9D154338-4AA8-40A9-A378-B27C05D45791}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AFADDCED-A7DD-43E7-B03C-27F57AC5C358}
@@ -107,5 +110,9 @@ Global
 		{80DE8673-CB3E-4D0B-99F4-A5CECF6BE752}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80DE8673-CB3E-4D0B-99F4-A5CECF6BE752}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80DE8673-CB3E-4D0B-99F4-A5CECF6BE752}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9666AFDC-B0E8-489C-A25A-17E67303A969}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9666AFDC-B0E8-489C-A25A-17E67303A969}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9666AFDC-B0E8-489C-A25A-17E67303A969}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9666AFDC-B0E8-489C-A25A-17E67303A969}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
