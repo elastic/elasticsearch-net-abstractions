@@ -185,7 +185,7 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 				errorOut = errorOut.Where(e => !e.Line.Contains("No log4j2 configuration file found")).ToList();
 
 			errorOut = errorOut
-				.Where(e=> !string.IsNullOrWhiteSpace(e.Line))
+				.Where(e => !string.IsNullOrWhiteSpace(e.Line))
 				.Where(e => !e.Line.Contains("usage of JAVA_HOME is deprecated"))
 				.Where(e => !e.Line.Trim().StartsWith("warning:"))
 				.ToList();
