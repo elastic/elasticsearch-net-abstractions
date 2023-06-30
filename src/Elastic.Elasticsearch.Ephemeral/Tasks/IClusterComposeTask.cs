@@ -187,6 +187,7 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 			errorOut = errorOut
 				.Where(e => !string.IsNullOrWhiteSpace(e.Line))
 				.Where(e => !e.Line.Contains("usage of JAVA_HOME is deprecated"))
+				.Where(e => !e.Line.Contains("using ES_JAVA_HOME"))
 				.Where(e => !e.Line.Trim().StartsWith("warning:"))
 				.ToList();
 

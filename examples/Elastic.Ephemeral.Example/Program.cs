@@ -3,7 +3,17 @@
 // See the LICENSE file in the project root for more information
 
 using Elastic.Elasticsearch.Ephemeral;
+using static Elastic.Elasticsearch.Ephemeral.ClusterFeatures;
 
-var config = new EphemeralClusterConfiguration("8.7.0");
-var cluster = new EphemeralCluster(config);
+
+var config = new EphemeralClusterConfiguration("8.7.0", XPack | Security | SSL);
+using var cluster = new EphemeralCluster(config);
+
+var exitEvent = new ManualResetEvent(false);
+Console.CancelKeyPress += (sender, eventArgs) => {
+	cluster.Dispose();
+	eventArgs.Cancel = true;
+	exitEvent.Set();
+};
 using var started = cluster.Start();
+exitEvent.WaitOne();

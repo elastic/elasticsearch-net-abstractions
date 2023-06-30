@@ -2,6 +2,7 @@
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -39,6 +40,12 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 			if (!cluster.ClusterConfiguration.EnableSsl) return;
 
 			var config = cluster.ClusterConfiguration;
+			
+			if (Directory.Exists(config.FileSystem.CertificatesPath))
+			{
+				cluster.Writer.WriteDiagnostic($"{{{nameof(GenerateCertificatesTask)}}} Skipping certificate generation as ${{{config.FileSystem.CertificatesPath}}} already exists");
+				return;
+			}
 
 			var fileSystem = cluster.FileSystem;
 			//due to a bug in certgen this file needs to live in two places
@@ -80,7 +87,12 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 			var config = cluster.ClusterConfiguration;
 			var name = config.FileSystem.CertificateFolderName;
 			var path = config.FileSystem.CertificatesPath;
-			NewOrCachedCertificates(cluster, name, path, silentModeConfigFile, writer);
+			NewOrCachedCertificates(cluster, "ca-certificates", path, writer,
+				zipLocation => GenerateCaCertificate(config, zipLocation, writer),
+							"8.0.0");
+			NewOrCachedCertificates(cluster, name, path, writer,
+				zipLocation => GenerateCertificate(config, name, path, zipLocation, silentModeConfigFile, writer)
+			);
 		}
 
 		private static void GenerateUnusedCertificates(IEphemeralCluster<EphemeralClusterConfiguration> cluster,
@@ -89,15 +101,22 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 			var config = cluster.ClusterConfiguration;
 			var name = config.FileSystem.UnusedCertificateFolderName;
 			var path = config.FileSystem.UnusedCertificatesPath;
-			NewOrCachedCertificates(cluster, name, path, silentModeConfigFile, writer);
+			NewOrCachedCertificates(cluster, "unused-ca-certificates", path, writer,
+				zipLocation => GenerateCaCertificate(config, zipLocation, writer),
+							"8.0.0");
+			NewOrCachedCertificates(cluster, name, path, writer,
+				zipLocation => GenerateCertificate(config, name, path, zipLocation, silentModeConfigFile, writer)
+			);
 		}
 
 		private static void NewOrCachedCertificates(IEphemeralCluster<EphemeralClusterConfiguration> cluster,
-			string name, string path, string silentModeConfigFile, IConsoleLineHandler writer)
+			string name, string path, IConsoleLineHandler writer, Action<string> generateCertificateAction, string minVersion = null)
 		{
 			var config = cluster.ClusterConfiguration;
 			var cachedEsHomeFolder = Path.Combine(config.FileSystem.LocalFolder, cluster.GetCacheFolderName());
 			var zipLocationCache = Path.Combine(cachedEsHomeFolder, name) + ".zip";
+
+			if (minVersion != null && config.Version < minVersion) return;
 
 			if (File.Exists(zipLocationCache))
 			{
@@ -110,7 +129,7 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 			var zipLocation = config.Version >= "6.3.0"
 				? Path.Combine(config.FileSystem.ConfigPath, name) + ".zip"
 				: Path.Combine(config.FileSystem.ConfigPath, "x-pack", name) + ".zip";
-			GenerateCertificate(config, name, path, zipLocation, silentModeConfigFile, writer);
+			generateCertificateAction(zipLocation);
 
 			if (!File.Exists(zipLocationCache))
 			{
@@ -133,17 +152,17 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 					: Path.Combine(fs.ElasticsearchHome, "bin", "elasticsearch-certutil") + BinarySuffix
 				: Path.Combine(fs.ElasticsearchHome, "bin", "x-pack", "certgen") + BinarySuffix;
 
-
-			if (!Directory.Exists(path))
-			{
-				if (config.Version < "7.0.0")
-					ExecuteBinary(config, writer, binary, "generating ssl certificates for this session",
-						"-in", silentModeConfigFile, "-out", @out);
-				else
-					ExecuteBinary(config, writer, binary, "generating ssl certificates for this session",
-						"cert",
-						"-in", silentModeConfigFile, "-out", @out);
-			}
+			if (config.Version < "7.0.0")
+				ExecuteBinary(config, writer, binary, "generating ssl certificates for this session",
+					"-in", silentModeConfigFile, "-out", @out);
+			else if (config.Version < "8.0.0")
+				ExecuteBinary(config, writer, binary, "generating ssl certificates for this session",
+					"cert",
+					"--in", silentModeConfigFile, "--out", @out);
+			else
+				ExecuteBinary(config, writer, binary, "generating ssl certificates for this session",
+					"cert", "--pem",
+					"--in", silentModeConfigFile, "--out", @out, "--ca-cert", fs.CaCertificate, "--ca-key", fs.CaPrivateKey);
 
 			var badLocation = Path.Combine(config.FileSystem.ElasticsearchHome, "config", "x-pack", @out);
 			//not necessary anymore now that we patch .in.bat i think
@@ -154,14 +173,25 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 			}
 		}
 
+		private static void GenerateCaCertificate(EphemeralClusterConfiguration config,
+			string zipLocation, IConsoleLineHandler writer)
+		{
+			if (config.Version < "8.0.0") return;
+
+			var binary = Path.Combine(config.FileSystem.ElasticsearchHome, "bin", "elasticsearch-certutil") + BinarySuffix;
+
+			ExecuteBinary(config, writer, binary, "generating CA certificate for this session",
+				"ca", "--pem", "--out", zipLocation);
+		}
+
 
 		private static void UnpackCertificatesZip(string zipLocation, string outFolder, IConsoleLineHandler writer)
 		{
-			if (Directory.Exists(outFolder)) return;
-
 			writer.WriteDiagnostic($"{{{nameof(GenerateCertificatesTask)}}} unzipping certificates to {outFolder}");
 			Directory.CreateDirectory(outFolder);
+
 			ZipFile.ExtractToDirectory(zipLocation, outFolder);
+			
 		}
 	}
 }
