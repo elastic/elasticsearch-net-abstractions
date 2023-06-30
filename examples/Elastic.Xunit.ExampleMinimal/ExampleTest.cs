@@ -37,7 +37,7 @@ namespace Elastic.Xunit.ExampleMinimal
 			// 2) We do not want Elastic.Elasticsearch.Xunit to depend on NEST. Elastic.Elasticsearch.Xunit can start 2.x, 5.x and 6.x clusters
 			//    and NEST Major.x is only tested and supported against Elasticsearch Major.x.
 			//
-			Client = cluster.GetOrAddClient<ElasticClient>(c =>
+			Client = cluster.GetOrAddClient(c =>
 			{
 				var nodes = cluster.NodesUris();
 				var connectionPool = new StaticConnectionPool(nodes);
