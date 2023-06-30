@@ -25,10 +25,11 @@ jobs:
         git fetch --prune --unshallow --tags
         echo exit code $?
         git tag --list
-    - uses: actions/setup-dotnet@v1
+          
+    # Install .NET version as mandated by global.json
+    - uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '5.0.408'
-        source-url: https://nuget.pkg.github.com/elastic/index.json
+          global-json-file: global.json
       env:
         NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
         
