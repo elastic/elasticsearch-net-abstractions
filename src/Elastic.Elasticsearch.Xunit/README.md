@@ -78,7 +78,7 @@ public class ExampleTest : IClusterFixture<MyTestCluster>
 			var settings = new ConnectionSettings(connectionPool)
 				.EnableDebugMode();
 			return new ElasticClient(settings);
-		);
+		});
 	}
 
 	private ElasticClient Client { get; }
