@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
         <Description>Provides a set of classes to resolve the location of Elastic stack products in various stages: released, snapshot and build candidates</Description>
         <PackageTags>elastic,elasticsearch,stack,versioning,artifacts</PackageTags>
     </PropertyGroup>

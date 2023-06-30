@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net461</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net462</TargetFrameworks>
     <IsPackable>True</IsPackable>
     <Description>Provides an Xunit test framework allowing you to run integration tests against local ephemeral Elasticsearch clusters</Description>
     <PackageTags>elastic,elasticsearch,xunit,cluster,integration,test,ephemeral</PackageTags>
