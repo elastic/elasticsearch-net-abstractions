@@ -45,8 +45,10 @@ jobs:
     - name: publish canary packages github package repository
       if: github.event_name == 'push' && startswith(github.ref, 'refs/heads')
       shell: bash
-      run:  |
-          until dotnet nuget push 'build/output/*.nupkg' -k ${{secrets.GITHUB_TOKEN}} --skip-duplicate --no-symbols true; do echo "Retrying"; sleep 1; done;
+      timeout-minutes: 10
+      continue-on-error: true
+      run: |
+          until dotnet nuget push 'build/output/*.nupkg' -k ${{secrets.GITHUB_TOKEN}} --skip-duplicate --no-symbols -s https://nuget.pkg.github.com/elastic/index.json; do echo "Retrying"; sleep 1; done;
 
     # Github packages requires authentication, this is likely going away in the future so for now we publish to feedz.io
     - run: dotnet nuget push 'build/output/*.nupkg' -k ${{secrets.FEEDZ_IO_API_KEY}} -s https://f.feedz.io/elastic/all/nuget/index.json --skip-duplicate --no-symbols true
@@ -60,6 +62,6 @@ jobs:
       if: github.event_name == 'push' && startswith(github.ref, 'refs/tags')
       name: Create or update release for tag on github
           
-    - run: dotnet nuget push 'build/output/*.nupkg' -k ${{secrets.NUGET_ORG_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate --no-symbols true
+    - run: dotnet nuget push 'build/output/*.nupkg' -k ${{secrets.NUGET_ORG_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate --no-symbols
       name: release to nuget.org
       if: github.event_name == 'push' && startswith(github.ref, 'refs/tags')
