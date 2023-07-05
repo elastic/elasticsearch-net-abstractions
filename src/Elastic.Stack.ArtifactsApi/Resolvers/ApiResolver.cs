@@ -7,8 +7,19 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
+#if NETFRAMEWORK
+using System.Net;
+#endif
+
 using System.Net.Http;
+
+#if !NETFRAMEWORK
+
 using System.Security.Authentication;
+
+#endif
+
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -22,7 +33,12 @@ namespace Elastic.Stack.ArtifactsApi.Resolvers
 		private static readonly ConcurrentDictionary<string, bool> Releases = new ConcurrentDictionary<string, bool>();
 
 		private static HttpClient HttpClient { get; } =
-			new HttpClient(new HttpClientHandler {SslProtocols = SslProtocols.Tls12})
+#if NETFRAMEWORK
+			new HttpClient
+#else
+			// SslProtocols is only available in .NET Framework 4.7.2 and above
+			new HttpClient(new HttpClientHandler { SslProtocols = SslProtocols.Tls12 })
+#endif
 			{
 				BaseAddress = new Uri(ArtifactsApiUrl)
 			};
@@ -39,9 +55,10 @@ namespace Elastic.Stack.ArtifactsApi.Resolvers
 
 		public static bool IsReleasedVersion(string version)
 		{
-			if (Releases.TryGetValue(version, out var released)) return released;
+			if (Releases.TryGetValue(version, out var released))
+				return released;
 			var versionPath = "https://github.com/elastic/elasticsearch/releases/tag/v" + version;
-			var message = new HttpRequestMessage {Method = HttpMethod.Head, RequestUri = new Uri(versionPath)};
+			var message = new HttpRequestMessage { Method = HttpMethod.Head, RequestUri = new Uri(versionPath) };
 
 			using (var response = HttpClient.SendAsync(message).GetAwaiter().GetResult())
 			{
@@ -76,6 +93,14 @@ namespace Elastic.Stack.ArtifactsApi.Resolvers
 
 			return tokens[1];
 		}
+
+#if NETFRAMEWORK
+		static ApiResolver() =>
+			ServicePointManager.SecurityProtocol = ServicePointManager.SecurityProtocol
+												   & ~SecurityProtocolType.Ssl3
+												   & ~SecurityProtocolType.Tls
+												   & ~SecurityProtocolType.Tls11;
+#endif
 	}
 
 	internal class ArtifactsVersionsResponse
