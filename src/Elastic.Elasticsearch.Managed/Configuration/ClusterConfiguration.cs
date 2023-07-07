@@ -80,6 +80,7 @@ namespace Elastic.Elasticsearch.Managed.Configuration
 			if (logsPathDefault != fs.LogsPath) Add("path.logs", fs.LogsPath);
 
 			if (version.Major < 6) Add("path.conf", fs.ConfigPath);
+
 		}
 
 		public Artifact Artifact { get; }

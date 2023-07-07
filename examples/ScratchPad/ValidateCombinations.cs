@@ -38,7 +38,7 @@ namespace ScratchPad
 				Console.WriteLine($"{v} {f}");
 
 				Console.ForegroundColor = reset;
-				var config = new EphemeralClusterConfiguration(v, f, plugins, 1) {HttpFiddlerAware = true,};
+				var config = new EphemeralClusterConfiguration(v, f, plugins, 1) {AutoWireKnownProxies = true,};
 
 				using (var cluster = new EphemeralCluster(config))
 					try

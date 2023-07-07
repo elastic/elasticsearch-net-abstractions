@@ -89,8 +89,14 @@ namespace Elastic.Elasticsearch.Ephemeral
 		/// </summary>
 		public XPackTrialMode TrialMode { get; set; }
 
-		/// <summary> Bootstrapping HTTP calls should attempt to auto route traffic through fiddler if its running </summary>
-		public bool HttpFiddlerAware { get; set; }
+		/// <summary>
+		/// Bootstrapping HTTP calls should attempt to auto route traffic through known proxy software if they are running
+		/// <list type="buller">
+		/// <item> <description>Fiddler, typically on Windows</description></item>
+		/// <item> <description>mitmproxy, typically on non Windows OS's</description></item>
+		/// </list>
+		/// </summary>
+		public bool AutoWireKnownProxies { get; set; }
 
 		protected virtual string NodePrefix => "ephemeral";
 

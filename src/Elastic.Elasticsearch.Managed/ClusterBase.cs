@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -12,6 +13,7 @@ using Elastic.Elasticsearch.Managed.Configuration;
 using Elastic.Elasticsearch.Managed.ConsoleWriters;
 using Elastic.Elasticsearch.Managed.FileSystem;
 using ProcNet.Std;
+using static Elastic.Elasticsearch.Managed.DetectedProxySoftware;
 
 namespace Elastic.Elasticsearch.Managed
 {
@@ -30,6 +32,11 @@ namespace Elastic.Elasticsearch.Managed
 		IDisposable Start(TimeSpan waitForStarted);
 
 		IDisposable Start(IConsoleLineHandler writer, TimeSpan waitForStarted);
+
+		/// <summary>
+		/// Whether known proxies were detected as running during startup
+		/// </summary>
+		DetectedProxySoftware DetectedProxy { get; }
 	}
 
 
@@ -75,7 +82,17 @@ namespace Elastic.Elasticsearch.Managed
 				node.NodeConfiguration.InitialMasterNodes(initialMasterNodes);
 
 			Nodes = new ReadOnlyCollection<ElasticsearchNode>(nodes);
+
+			if (Process.GetProcessesByName("fiddler").Any()) DetectedProxy = Fiddler;
+			else if (Process.GetProcessesByName("mitmproxy").Any()) DetectedProxy = MitmProxy;
+			else DetectedProxy = None;
 		}
+
+		/// <summary>
+		/// Whether known proxies were detected as running during startup
+		/// </summary>
+		public DetectedProxySoftware DetectedProxy { get; }
+
 
 		/// <summary>
 		///     A short name to identify the cluster defaults to the <see cref="ClusterBase" /> subclass name with Cluster

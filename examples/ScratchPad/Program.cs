@@ -39,7 +39,7 @@ namespace ScratchPad
 			var features = Security | XPack | SSL;
 			var config = new EphemeralClusterConfiguration(version, features, plugins, 1)
 			{
-				HttpFiddlerAware = true,
+				AutoWireKnownProxies = true,
 				ShowElasticsearchOutputAfterStarted = true,
 				CacheEsHomeInstallation = false,
 				TrialMode = XPackTrialMode.Trial,
