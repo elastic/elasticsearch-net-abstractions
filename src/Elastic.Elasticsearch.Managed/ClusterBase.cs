@@ -17,14 +17,32 @@ using static Elastic.Elasticsearch.Managed.DetectedProxySoftware;
 
 namespace Elastic.Elasticsearch.Managed
 {
-	public interface ICluster<out TConfiguration> : IDisposable
+	public interface ICluster
+	{
+		/// <summary>
+		/// Whether known proxies were detected as running during startup
+		/// </summary>
+		DetectedProxySoftware DetectedProxy { get; }
+
+		/// <summary> A friendly name for this cluster, derived from the implementation name</summary>
+		string ClusterMoniker { get; }
+
+		/// <inheritdoc cref="INodeFileSystem"/>
+		INodeFileSystem FileSystem { get; }
+
+		/// <summary> Indicating if this cluster was started correctly </summary>
+		bool Started { get; }
+
+		/// <summary>
+		/// The collection of <see cref="ElasticsearchNode"/>'s that make up the cluster
+		/// </summary>
+		ReadOnlyCollection<ElasticsearchNode> Nodes { get; }
+	}
+
+	public interface ICluster<out TConfiguration> : ICluster,IDisposable
 		where TConfiguration : IClusterConfiguration<NodeFileSystem>
 	{
-		string ClusterMoniker { get; }
 		TConfiguration ClusterConfiguration { get; }
-		INodeFileSystem FileSystem { get; }
-		bool Started { get; }
-		ReadOnlyCollection<ElasticsearchNode> Nodes { get; }
 		IConsoleLineHandler Writer { get; }
 
 		IDisposable Start();
@@ -32,11 +50,6 @@ namespace Elastic.Elasticsearch.Managed
 		IDisposable Start(TimeSpan waitForStarted);
 
 		IDisposable Start(IConsoleLineHandler writer, TimeSpan waitForStarted);
-
-		/// <summary>
-		/// Whether known proxies were detected as running during startup
-		/// </summary>
-		DetectedProxySoftware DetectedProxy { get; }
 	}
 
 

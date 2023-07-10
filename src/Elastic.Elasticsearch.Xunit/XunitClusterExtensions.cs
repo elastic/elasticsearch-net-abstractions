@@ -13,8 +13,7 @@ namespace Elastic.Elasticsearch.Xunit
 	/// </summary>
 	public static class XunitClusterExtensions
 	{
-		private static readonly ConcurrentDictionary<IEphemeralCluster, object> Clients =
-			new ConcurrentDictionary<IEphemeralCluster, object>();
+		private static readonly ConcurrentDictionary<IEphemeralCluster, object> Clients = new();
 
 		/// <summary>
 		///     Gets a client for the cluster if one exists, or creates a new client if one doesn't.
