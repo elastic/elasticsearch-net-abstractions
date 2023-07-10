@@ -50,7 +50,7 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.InstallationTasks
 			cluster.Writer?.WriteDiagnostic(
 				$"{{{nameof(PrintConfiguration)}}} {{{nameof(c.SkipBuiltInAfterStartTasks)}}} [{c.SkipBuiltInAfterStartTasks}]");
 			cluster.Writer?.WriteDiagnostic(
-				$"{{{nameof(PrintConfiguration)}}} {{{nameof(c.HttpFiddlerAware)}}} [{c.HttpFiddlerAware}]");
+				$"{{{nameof(PrintConfiguration)}}} {{{nameof(c.AutoWireKnownProxies)}}} [{c.AutoWireKnownProxies}]");
 			cluster.Writer?.WriteDiagnostic(
 				$"{{{nameof(PrintConfiguration)}}} {{{nameof(c.NoCleanupAfterNodeStopped)}}} [{c.NoCleanupAfterNodeStopped}]");
 		}

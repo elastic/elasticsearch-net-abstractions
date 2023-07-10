@@ -37,9 +37,13 @@ namespace Elastic.Elasticsearch.Ephemeral
 
 		public virtual ICollection<Uri> NodesUris(string hostName = null)
 		{
-			hostName = hostName ?? (ClusterConfiguration.HttpFiddlerAware && Process.GetProcessesByName("fiddler").Any()
-				? "ipv4.fiddler"
-				: "localhost");
+			hostName ??= "localhost";
+			if (hostName == "localhost" && ClusterConfiguration.AutoWireKnownProxies)
+			{
+				if (DetectedProxy == DetectedProxySoftware.Fiddler)
+					hostName = "ipv4.fiddler"; //magic reverse proxy address for fiddler
+			}
+
 			var ssl = ClusterConfiguration.EnableSsl ? "s" : "";
 			return Nodes
 				.Select(n => $"http{ssl}://{hostName}:{n.Port ?? 9200}")

@@ -16,6 +16,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Elastic.Elasticsearch.Managed;
 using Elastic.Elasticsearch.Managed.ConsoleWriters;
 using ICSharpCode.SharpZipLib.GZip;
 using ICSharpCode.SharpZipLib.Tar;
@@ -87,6 +88,9 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 				AutomaticDecompression =
 					DecompressionMethods.Deflate | DecompressionMethods.GZip | DecompressionMethods.None,
 			};
+			if (cluster.DetectedProxy != DetectedProxySoftware.None)
+				handler.Proxy = new WebProxy { Address = new Uri("http://localhost:8080") };
+
 			cluster.Writer.WriteDiagnostic(
 				$"{{{nameof(Call)}}} [{statusUrl}] SSL: {cluster.ClusterConfiguration.EnableSsl} Security: {cluster.ClusterConfiguration.EnableSecurity}");
 			if (cluster.ClusterConfiguration.EnableSsl)
@@ -98,39 +102,37 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 #endif
 			}
 
-			using (var client = new HttpClient(handler) {Timeout = TimeSpan.FromSeconds(20)})
+			using var client = new HttpClient(handler) {Timeout = TimeSpan.FromSeconds(20)};
+			if (cluster.ClusterConfiguration.EnableSecurity)
 			{
-				if (cluster.ClusterConfiguration.EnableSecurity)
-				{
-					var byteArray =
-						Encoding.ASCII.GetBytes(
-							$"{ClusterAuthentication.Admin.Username}:{ClusterAuthentication.Admin.Password}");
-					client.DefaultRequestHeaders.Authorization =
-						new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-				}
+				var byteArray =
+					Encoding.ASCII.GetBytes(
+						$"{ClusterAuthentication.Admin.Username}:{ClusterAuthentication.Admin.Password}");
+				client.DefaultRequestHeaders.Authorization =
+					new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+			}
 
-				try
-				{
-					var response = verb(client, statusUrl, tokenSource.Token).ConfigureAwait(false).GetAwaiter()
-						.GetResult();
-					if (response.StatusCode == HttpStatusCode.OK) return response;
-					cluster.Writer.WriteDiagnostic(
-						$"{{{nameof(Call)}}} [{statusUrl}] Bad status code: [{(int) response.StatusCode}]");
-					var body = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-					foreach (var l in (body ?? string.Empty).Split('\n', '\r'))
-						cluster.Writer.WriteDiagnostic($"{{{nameof(Call)}}} [{statusUrl}] returned [{l}]");
-				}
-				catch (Exception e)
-				{
-					cluster.Writer.WriteError($"{{{nameof(Call)}}} [{statusUrl}] exception: {e}");
-					// ignored
-				}
-				finally
-				{
+			try
+			{
+				var response = verb(client, statusUrl, tokenSource.Token).ConfigureAwait(false).GetAwaiter()
+					.GetResult();
+				if (response.StatusCode == HttpStatusCode.OK) return response;
+				cluster.Writer.WriteDiagnostic(
+					$"{{{nameof(Call)}}} [{statusUrl}] Bad status code: [{(int) response.StatusCode}]");
+				var body = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+				foreach (var l in (body ?? string.Empty).Split('\n', '\r'))
+					cluster.Writer.WriteDiagnostic($"{{{nameof(Call)}}} [{statusUrl}] returned [{l}]");
+			}
+			catch (Exception e)
+			{
+				cluster.Writer.WriteError($"{{{nameof(Call)}}} [{statusUrl}] exception: {e}");
+				// ignored
+			}
+			finally
+			{
 #if !NETSTANDARD
 				ServicePointManager.ServerCertificateValidationCallback -= ServerCertificateValidationCallback;
 #endif
-				}
 			}
 
 			return null;

@@ -9,7 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Elastic.Elasticsearch.Ephemeral\Elastic.Elasticsearch.Ephemeral.csproj"/>
+    <ProjectReference Include="..\..\src\Elastic.Elasticsearch.Ephemeral\Elastic.Elasticsearch.Ephemeral.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Elastic.Transport" Version="0.4.12" />
   </ItemGroup>
 
 </Project>
