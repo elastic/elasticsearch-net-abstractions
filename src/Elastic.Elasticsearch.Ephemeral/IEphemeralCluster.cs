@@ -8,7 +8,7 @@ using Elastic.Elasticsearch.Managed;
 
 namespace Elastic.Elasticsearch.Ephemeral
 {
-	public interface IEphemeralCluster
+	public interface IEphemeralCluster : ICluster
 	{
 		ICollection<Uri> NodesUris(string hostName = null);
 		string GetCacheFolderName();
