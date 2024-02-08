@@ -5,7 +5,6 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.ExceptionServices;
 
 namespace Elastic.Xunit;
 
@@ -26,7 +25,7 @@ public class PartitioningConfigurationAttribute : Attribute
 	/// </param>
 	public PartitioningConfigurationAttribute(Type type) => _type = type;
 
-	private TOptions? GetOptions<TOptions>() where TOptions : PartitioningRunOptions, new()
+	private TOptions GetOptions<TOptions>() where TOptions : PartitioningRunOptions, new()
 	{
 		 var options = Activator.CreateInstance(_type) as TOptions;
 		 return options ?? new TOptions();

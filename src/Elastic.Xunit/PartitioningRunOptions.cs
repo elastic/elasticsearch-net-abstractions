@@ -13,7 +13,7 @@ namespace Elastic.Xunit;
 /// <summary>
 ///     The Xunit test runner options
 /// </summary>
-public class PartitioningRunOptions : IRunOptions
+public class PartitioningRunOptions
 {
 	/// <summary>
 	///     A global test filter that can be used to only run certain tests.
@@ -26,11 +26,11 @@ public class PartitioningRunOptions : IRunOptions
 	/// <summary>
 	///     Called when the tests have finished running successfully
 	/// </summary>
-	/// <param name="runnerClusterTotals">Per cluster timings of the total test time, including starting Elasticsearch</param>
-	/// <param name="runnerFailedCollections">All collection of failed cluster, failed tests tuples</param>
+	/// <param name="partitionTimings">Per cluster timings of the total test time, including starting Elasticsearch</param>
+	/// <param name="failedPartitionTests">All collection of failed cluster, failed tests tuples</param>
 	public virtual void OnTestsFinished(
-		Dictionary<string, Stopwatch>? runnerClusterTotals,
-		ConcurrentBag<Tuple<string, string>>? runnerFailedCollections)
+		Dictionary<string, Stopwatch> partitionTimings,
+		ConcurrentBag<Tuple<string, string>> failedPartitionTests)
 	{
 	}
 
@@ -46,7 +46,6 @@ public class PartitioningRunOptions : IRunOptions
 	{
 		discoveryOptions.SetValue(nameof(GroupFilter), GroupFilter);
 		discoveryOptions.SetValue(nameof(TestFilter), TestFilter);
-
 	}
 
 	public virtual void SetOptions(ITestFrameworkExecutionOptions executionOptions)
@@ -55,9 +54,4 @@ public class PartitioningRunOptions : IRunOptions
 		executionOptions.SetValue(nameof(GroupFilter), TestFilter);
 
 	}
-}
-
-public interface IRunOptions
-{
-	public void SetOptions(ITestFrameworkDiscoveryOptions discoveryOptions);
 }

@@ -43,7 +43,6 @@ namespace Elastic.Xunit
 			base.RunAll(executionMessageSink, discoveryOptions, executionOptions);
 		}
 
-
 		public override void RunTests(
 			IEnumerable<ITestCase> testCases,
 			IMessageSink executionMessageSink,
@@ -64,11 +63,8 @@ namespace Elastic.Xunit
 				using var runner = RunnerFactory.Create(TestAssembly, testCases, DiagnosticMessageSink, sink, options);
 				Options.OnBeforeTestsRun();
 				await runner.RunAsync().ConfigureAwait(false);
-				var r = runner as PartitioningTestAssemblyRunner;
-				Options.OnTestsFinished(
-					r?.ClusterTotals,
-					r?.FailedCollections
-				);
+				if (runner is PartitioningTestAssemblyRunner a)
+					Options.OnTestsFinished(a.ClusterTotals, a.FailedCollections);
 			}
 			catch (Exception e)
 			{

@@ -8,11 +8,20 @@ using Xunit.Sdk;
 
 namespace Elastic.Xunit;
 
-public class PartitioningTestFramework<TOptions, TRunnerFactory> : XunitTestFramework
+// ReSharper disable once UnusedType.Global
+/// <summary>
+///
+/// </summary>
+public class PartitioningTestFramework : PartitioningTestFramework<PartitioningRunOptions, PartitioningTestRunnerFactory>
+{
+	public PartitioningTestFramework(IMessageSink messageSink) : base(messageSink) { }
+}
+
+public abstract class PartitioningTestFramework<TOptions, TRunnerFactory> : XunitTestFramework
 	where TOptions : PartitioningRunOptions, new()
 	where TRunnerFactory : ITestAssemblyRunnerFactory, new()
 {
-	public PartitioningTestFramework(IMessageSink messageSink) : base(messageSink) { }
+	protected PartitioningTestFramework(IMessageSink messageSink) : base(messageSink) { }
 
 	protected override ITestFrameworkDiscoverer CreateDiscoverer(IAssemblyInfo assemblyInfo) =>
 		new PartitioningTestFrameworkDiscoverer<TOptions>(assemblyInfo, SourceInformationProvider, DiagnosticMessageSink);

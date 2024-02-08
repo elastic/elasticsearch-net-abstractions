@@ -49,14 +49,14 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 		private bool IntegrationTestsMayUseAlreadyRunningNode { get; }
 		private bool RunUnitTests { get; }
 
-		protected override async Task<RunSummary> RunTestCollectionsAsync(IMessageBus messageBus,
+		protected override async Task<RunSummary> RunTestCollectionsAsync(IMessageBus bus,
 			CancellationTokenSource cancellationTokenSource)
 		{
 			if (RunUnitTests && !RunIntegrationTests)
-				return await RunAllWithoutPartitionFixture(messageBus, cancellationTokenSource)
+				return await RunAllWithoutPartitionFixture(bus, cancellationTokenSource)
 					.ConfigureAwait(false);
 
-			return await RunAllTests(messageBus, cancellationTokenSource)
+			return await RunAllTests(bus, cancellationTokenSource)
 				.ConfigureAwait(false);
 		}
 

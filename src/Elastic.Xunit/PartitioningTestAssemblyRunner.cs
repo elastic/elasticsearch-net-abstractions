@@ -41,9 +41,7 @@ namespace Elastic.Xunit
 	}
 
 	// ReSharper disable once UnusedTypeParameter
-	public interface IPartitionFixture<out TPartition> where TPartition : ITestPartition
-	{
-	}
+	public interface IPartitionFixture<out TPartition> where TPartition : ITestPartition { }
 
 	public class PartitioningTestAssemblyRunner : PartitioningTestAssemblyRunner<ITestPartition>
 	{
@@ -84,7 +82,7 @@ namespace Elastic.Xunit
 		where TState : class
 	{
 		private readonly Type _fixtureType;
-		private readonly Dictionary<Type, TState> _assemblyFixtureMappings = new();
+		private readonly Dictionary<Type, TState> _partitionFixtureInstances = new();
 
 		protected Dictionary<TestType, IEnumerable<TestPartitionGrouping>> Partionings { get; }
 
@@ -127,21 +125,21 @@ namespace Elastic.Xunit
 
 				var state = CreatePartitionStateInstance(partitionType);
 				if (state != null)
-					_assemblyFixtureMappings[partitionType] = state;
+					_partitionFixtureInstances[partitionType] = state;
 			}
 		}
 
 		//threading guess
 		private static int DefaultConcurrency => Environment.ProcessorCount * 4;
 
-		public ConcurrentBag<RunSummary> Summaries { get; } = new();
-
+		private ConcurrentBag<RunSummary> Summaries { get; } = new();
 		public ConcurrentBag<Tuple<string, string>> FailedCollections { get; } = new();
-
 		public Dictionary<string, Stopwatch> ClusterTotals { get; } = new();
 
 		private string GroupFilter { get; }
 		private string TestFilter { get; }
+
+		protected abstract Task UseStateAndRun(TState state, Func<int?, Task> runGroup);
 
 		protected override Task<RunSummary> RunTestCollectionAsync(
 			IMessageBus b,
@@ -150,39 +148,14 @@ namespace Elastic.Xunit
 		{
 			var aggregator = new ExceptionAggregator(Aggregator);
 			var fixtureObjects = new Dictionary<Type, object>();
-			foreach (var kv in _assemblyFixtureMappings)
+			foreach (var kv in _partitionFixtureInstances)
 				fixtureObjects.Add(kv.Key, kv.Value);
-			return new TestCollectionRunner(fixtureObjects, c, t, DiagnosticMessageSink, b, TestCaseOrderer, aggregator,
-					s)
-				.RunAsync();
+			var runner = new TestCollectionRunner(fixtureObjects, c, t, DiagnosticMessageSink, b, TestCaseOrderer, aggregator, s);
+			return runner.RunAsync();
 		}
 
-		protected override async Task<RunSummary> RunTestCollectionsAsync(IMessageBus messageBus,
-			CancellationTokenSource cancellationTokenSource) =>
-			await RunAllTests(messageBus, cancellationTokenSource)
-				.ConfigureAwait(false);
-
-		protected async Task RunGroupedTestCollections(
-			IEnumerable<TestPartitionGrouping> source,
-			int? concurrency,
-			IMessageBus messageBus, string[] testFilters, CancellationTokenSource ctx) =>
-			await source
-				.ForEachAsync(Math.Max(concurrency ?? 0, DefaultConcurrency),
-					async g =>
-					{
-						await RunTestCollections(messageBus, ctx, g, testFilters).ConfigureAwait(false);
-					})
-				.ConfigureAwait(false);
-
-
-		protected abstract Task UseStateAndRun(TState state, Func<int?, Task> runGroup);
-
-		protected async Task<RunSummary> RunAllWithoutPartitionFixture(
-			IMessageBus messageBus,
-			CancellationTokenSource ctx
-		) =>
-			await RunWithoutPartitionFixture(Partionings.SelectMany(g => g.Value), messageBus, ctx)
-				.ConfigureAwait(false);
+		protected async Task<RunSummary> RunAllWithoutPartitionFixture(IMessageBus bus, CancellationTokenSource ctx) =>
+			await RunWithoutPartitionFixture(Partionings.SelectMany(g => g.Value), bus, ctx).ConfigureAwait(false);
 
 		protected async Task<RunSummary> RunWithoutPartitionFixture(
 			IEnumerable<TestPartitionGrouping> partitionTests,
@@ -190,7 +163,7 @@ namespace Elastic.Xunit
 		{
 			var testFilters = CreateTestFilters(TestFilter);
 
-			await RunGroupedTestCollections(
+			await RunPartitionGroupConcurrently(
 					partitionTests, DefaultConcurrency, messageBus,
 					testFilters, ctx)
 				.ConfigureAwait(false);
@@ -202,6 +175,9 @@ namespace Elastic.Xunit
 				Skipped = Summaries.Sum(s => s.Skipped)
 			};
 		}
+
+		protected override async Task<RunSummary> RunTestCollectionsAsync(IMessageBus bus, CancellationTokenSource ctx) =>
+			await RunAllTests(bus, ctx).ConfigureAwait(false);
 
 		protected async Task<RunSummary> RunAllTests(IMessageBus messageBus, CancellationTokenSource ctx)
 		{
@@ -239,10 +215,9 @@ namespace Elastic.Xunit
 
 				await UseStateAndRun(state, async (concurrency) =>
 				{
-					await RunGroupedTestCollections(partitioning.Value, concurrency, messageBus, testFilters, ctx)
+					await RunPartitionGroupConcurrently(partitioning.Value, concurrency, messageBus, testFilters, ctx)
 						.ConfigureAwait(false);
 				}).ConfigureAwait(false);
-
 
 				ClusterTotals[partitionName].Stop();
 			}
@@ -255,7 +230,17 @@ namespace Elastic.Xunit
 			};
 		}
 
-		private async Task RunTestCollections(
+		private async Task RunPartitionGroupConcurrently(
+			IEnumerable<TestPartitionGrouping> source,
+			int? concurrency,
+			IMessageBus bus, string[] testFilters, CancellationTokenSource ctx) =>
+			await source
+				.ForEachAsync(Math.Max(concurrency ?? 0, DefaultConcurrency),
+					async g => await ExecutePartitionGrouping(bus, ctx, g, testFilters).ConfigureAwait(false)
+				)
+				.ConfigureAwait(false);
+
+		private async Task ExecutePartitionGrouping(
 			IMessageBus messageBus,
 			CancellationTokenSource ctx,
 			TestPartitionGrouping g,
@@ -264,8 +249,6 @@ namespace Elastic.Xunit
 		{
 			var test = g.Collection.DisplayName.Replace("Test collection for", string.Empty).Trim();
 			if (!MatchesATestFilter(test, testFilters)) return;
-			if (testFilters.Length > 0) Console.WriteLine(" -> " + test);
-
 			try
 			{
 				var summary = await RunTestCollectionAsync(messageBus, g.Collection, g.TestCases, ctx)
@@ -282,7 +265,7 @@ namespace Elastic.Xunit
 			}
 		}
 
-		private static string[] CreateTestFilters(string testFilters) =>
+		private static string[] CreateTestFilters(string? testFilters) =>
 			testFilters?.Split(',').Select(s => s.Trim()).Where(s => !string.IsNullOrWhiteSpace(s)).ToArray()
 			?? new string[] { };
 
@@ -304,17 +287,17 @@ namespace Elastic.Xunit
 
 		private TState? CreatePartitionStateInstance(Type partitionType)
 		{
-			if (_assemblyFixtureMappings.TryGetValue(partitionType, out var partition)) return partition;
+			if (_partitionFixtureInstances.TryGetValue(partitionType, out var partition)) return partition;
 			Aggregator.Run(() =>
 			{
 				var o = Activator.CreateInstance(partitionType);
 				partition = o as TState;
 			});
-			_assemblyFixtureMappings.Add(partitionType, partition);
+			_partitionFixtureInstances.Add(partitionType, partition);
 			return partition;
 		}
 
-		protected Type? GetPartitionFixtureType(ITypeInfo testClass) =>
+		private Type? GetPartitionFixtureType(ITypeInfo testClass) =>
 			GetPartitionFixtureType(testClass, _fixtureType);
 
 		protected static Type? GetPartitionFixtureType(ITypeInfo testClass, Type openGenericState) =>
