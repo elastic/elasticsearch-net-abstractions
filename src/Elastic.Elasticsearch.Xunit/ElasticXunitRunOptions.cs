@@ -8,13 +8,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Elastic.Elasticsearch.Xunit.XunitPlumbing;
 using Elastic.Stack.ArtifactsApi;
+using Elastic.Xunit;
+using Xunit.Abstractions;
 
 namespace Elastic.Elasticsearch.Xunit
 {
 	/// <summary>
 	///     The Xunit test runner options
 	/// </summary>
-	public class ElasticXunitRunOptions
+	public class ElasticXunitRunOptions : PartitioningRunOptions
 	{
 		/// <summary>
 		///     Informs the runner whether we expect to run integration tests. Defaults to <c>true</c>
@@ -35,16 +37,10 @@ namespace Elastic.Elasticsearch.Xunit
 		public bool RunUnitTests { get; set; }
 
 		/// <summary>
-		///     A global test filter that can be used to only run certain tests.
-		///     Accepts a comma separated list of filters
-		/// </summary>
-		public string TestFilter { get; set; }
-
-		/// <summary>
 		///     A global cluster filter that can be used to only run certain cluster's tests.
 		///     Accepts a comma separated list of filters
 		/// </summary>
-		public string ClusterFilter { get; set; }
+		public string ClusterFilter { get => GroupFilter; set => GroupFilter = value;  }
 
 		/// <summary>
 		///     Informs the runner what version of Elasticsearch is under test. Required for
@@ -52,22 +48,34 @@ namespace Elastic.Elasticsearch.Xunit
 		/// </summary>
 		public ElasticVersion Version { get; set; }
 
-		/// <summary>
-		///     Called when the tests have finished running successfully
-		/// </summary>
-		/// <param name="runnerClusterTotals">Per cluster timings of the total test time, including starting Elasticsearch</param>
-		/// <param name="runnerFailedCollections">All collection of failed cluster, failed tests tuples</param>
-		public virtual void OnTestsFinished(Dictionary<string, Stopwatch> runnerClusterTotals,
-			ConcurrentBag<Tuple<string, string>> runnerFailedCollections)
+		public override void SetOptions(ITestFrameworkDiscoveryOptions discoveryOptions)
 		{
+			base.SetOptions(discoveryOptions);
+			discoveryOptions.SetValue(nameof(Version), Version);
+			discoveryOptions.SetValue(nameof(RunIntegrationTests), RunIntegrationTests);
+			discoveryOptions.SetValue(
+				nameof(IntegrationTestsMayUseAlreadyRunningNode),
+				IntegrationTestsMayUseAlreadyRunningNode
+			);
+			discoveryOptions.SetValue(nameof(RunUnitTests), RunUnitTests);
+			discoveryOptions.SetValue(nameof(TestFilter), TestFilter);
+			discoveryOptions.SetValue(nameof(ClusterFilter), ClusterFilter);
 		}
 
-		/// <summary>
-		///     Called before tests run. An ideal place to perform actions such as writing information to
-		///     <see cref="Console" />.
-		/// </summary>
-		public virtual void OnBeforeTestsRun()
+		public override void SetOptions(ITestFrameworkExecutionOptions executionOptions)
 		{
+
+			base.SetOptions(executionOptions);
+			executionOptions.SetValue(nameof(Version), Version);
+			executionOptions.SetValue(nameof(RunIntegrationTests), RunIntegrationTests);
+			executionOptions.SetValue(
+				nameof(IntegrationTestsMayUseAlreadyRunningNode),
+				IntegrationTestsMayUseAlreadyRunningNode
+			);
+			executionOptions.SetValue(nameof(RunUnitTests), RunUnitTests);
+			executionOptions.SetValue(nameof(TestFilter), TestFilter);
+			executionOptions.SetValue(nameof(ClusterFilter), ClusterFilter);
+
 		}
 	}
 }

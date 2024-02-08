@@ -5,28 +5,12 @@
 using System.Reflection;
 using Xunit.Abstractions;
 using Xunit.Sdk;
+using Elastic.Xunit;
 
 namespace Elastic.Elasticsearch.Xunit.Sdk
 {
-	public class ElasticTestFramework : XunitTestFramework
+	public class ElasticTestFramework : PartitioningTestFramework<ElasticXunitRunOptions, TestAssemblyRunnerFactory>
 	{
-		public ElasticTestFramework(IMessageSink messageSink) : base(messageSink)
-		{
-		}
-
-		protected override ITestFrameworkDiscoverer CreateDiscoverer(IAssemblyInfo assemblyInfo) =>
-			new ElasticTestFrameworkDiscoverer(assemblyInfo, SourceInformationProvider, DiagnosticMessageSink);
-
-		protected override ITestFrameworkExecutor CreateExecutor(AssemblyName assemblyName)
-		{
-			var assembly = Assembly.Load(assemblyName);
-			var options = assembly.GetCustomAttribute<ElasticXunitConfigurationAttribute>()?.Options ??
-			              new ElasticXunitRunOptions();
-
-			return new TestFrameworkExecutor(assemblyName, SourceInformationProvider, DiagnosticMessageSink)
-			{
-				Options = options
-			};
-		}
+		public ElasticTestFramework(IMessageSink messageSink) : base(messageSink) { }
 	}
 }

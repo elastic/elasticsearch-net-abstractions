@@ -10,5 +10,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Elastic.Elasticsearch.Ephemeral\Elastic.Elasticsearch.Ephemeral.csproj" />
+    <ProjectReference Include="..\Elastic.Xunit\Elastic.Xunit.csproj" />
   </ItemGroup>
 </Project>
