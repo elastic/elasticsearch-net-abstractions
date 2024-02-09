@@ -6,10 +6,10 @@
     <PackageTags>elastic,elasticsearch,xunit,cluster,integration,test,ephemeral</PackageTags>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Nullean.Xunit.Partitions" Version="0.4.1" />
     <PackageReference Include="xunit" Version="2.4.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Elastic.Elasticsearch.Ephemeral\Elastic.Elasticsearch.Ephemeral.csproj" />
-    <ProjectReference Include="..\Elastic.Xunit\Elastic.Xunit.csproj" />
   </ItemGroup>
 </Project>

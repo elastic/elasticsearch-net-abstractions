@@ -3,20 +3,19 @@
 // See the LICENSE file in the project root for more information
 
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
 using Elastic.Elasticsearch.Xunit.XunitPlumbing;
 using Elastic.Stack.ArtifactsApi;
-using Elastic.Xunit;
+using Nullean.Xunit.Partitions;
 using Xunit.Abstractions;
+using static System.StringSplitOptions;
 
 namespace Elastic.Elasticsearch.Xunit
 {
 	/// <summary>
 	///     The Xunit test runner options
 	/// </summary>
-	public class ElasticXunitRunOptions : PartitioningRunOptions
+	public class ElasticXunitRunOptions : PartitionOptions
 	{
 		/// <summary>
 		///     Informs the runner whether we expect to run integration tests. Defaults to <c>true</c>
@@ -40,7 +39,41 @@ namespace Elastic.Elasticsearch.Xunit
 		///     A global cluster filter that can be used to only run certain cluster's tests.
 		///     Accepts a comma separated list of filters
 		/// </summary>
-		public string ClusterFilter { get => GroupFilter; set => GroupFilter = value;  }
+		[Obsolete("Use PartitionFilterRegex instead", false)]
+		public string ClusterFilter
+		{
+			get => PartitionFilterRegex;
+			set
+			{
+				if (string.IsNullOrWhiteSpace(value)) PartitionFilterRegex = value;
+				else
+				{
+					//attempt at being backwards compatible with old way of filtering
+					var re = string.Join("|", value.Split(new[] { ','}, RemoveEmptyEntries).Select(s => s.Trim()));
+					PartitionFilterRegex = re;
+				}
+			}
+		}
+
+		/// <summary>
+		///     A global test filter that can be used to only run certain cluster's tests.
+		///     Accepts a comma separated list of filters
+		/// </summary>
+		[Obsolete("Use ParitionFilterRegex instead", false)]
+		public string TestFilter
+		{
+			get => TestFilterRegex;
+			set
+			{
+				if (string.IsNullOrWhiteSpace(value)) TestFilterRegex = value;
+				else
+				{
+					//attempt at being backwards compatible with old way of filtering
+					var re = string.Join("|", value.Split(new[] { ','}, RemoveEmptyEntries).Select(s => s.Trim()));
+					TestFilterRegex = re;
+				}
+			}
+		}
 
 		/// <summary>
 		///     Informs the runner what version of Elasticsearch is under test. Required for
@@ -58,8 +91,10 @@ namespace Elastic.Elasticsearch.Xunit
 				IntegrationTestsMayUseAlreadyRunningNode
 			);
 			discoveryOptions.SetValue(nameof(RunUnitTests), RunUnitTests);
+#pragma warning disable CS0618 // Type or member is obsolete
 			discoveryOptions.SetValue(nameof(TestFilter), TestFilter);
 			discoveryOptions.SetValue(nameof(ClusterFilter), ClusterFilter);
+#pragma warning restore CS0618 // Type or member is obsolete
 		}
 
 		public override void SetOptions(ITestFrameworkExecutionOptions executionOptions)
@@ -73,8 +108,10 @@ namespace Elastic.Elasticsearch.Xunit
 				IntegrationTestsMayUseAlreadyRunningNode
 			);
 			executionOptions.SetValue(nameof(RunUnitTests), RunUnitTests);
+#pragma warning disable CS0618 // Type or member is obsolete
 			executionOptions.SetValue(nameof(TestFilter), TestFilter);
 			executionOptions.SetValue(nameof(ClusterFilter), ClusterFilter);
+#pragma warning restore CS0618 // Type or member is obsolete
 
 		}
 	}

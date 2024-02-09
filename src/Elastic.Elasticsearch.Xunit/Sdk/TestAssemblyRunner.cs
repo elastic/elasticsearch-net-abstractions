@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using Elastic.Elasticsearch.Ephemeral;
 using Elastic.Elasticsearch.Ephemeral.Tasks.ValidationTasks;
 using Elastic.Elasticsearch.Xunit.XunitPlumbing;
-using Elastic.Xunit;
+using Nullean.Xunit.Partitions.Sdk;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
@@ -28,8 +28,7 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 			new TestAssemblyRunner(testAssembly, testCases, diagnosticMessageSink, executionMessageSink,
 				executionOptions);
 	}
-	internal class TestAssemblyRunner
-		: PartitioningTestAssemblyRunner<IEphemeralCluster<XunitClusterConfiguration>>
+	internal class TestAssemblyRunner : PartitionTestAssemblyRunner<IEphemeralCluster<XunitClusterConfiguration>>
 	{
 		public TestAssemblyRunner(ITestAssembly testAssembly,
 			IEnumerable<IXunitTestCase> testCases,

@@ -3,7 +3,7 @@
 // See the LICENSE file in the project root for more information
 
 using System;
-using Elastic.Xunit;
+using Nullean.Xunit.Partitions;
 
 namespace Elastic.Elasticsearch.Xunit;
 
@@ -12,7 +12,7 @@ namespace Elastic.Elasticsearch.Xunit;
 ///     for Xunit tests within the assembly.
 /// </summary>
 [AttributeUsage(AttributeTargets.Assembly)]
-public class ElasticXunitConfigurationAttribute : PartitioningConfigurationAttribute
+public class ElasticXunitConfigurationAttribute : PartitionOptionsAttribute
 {
 	/// <summary>Creates a new instance of <see cref="ElasticXunitConfigurationAttribute" />.</summary>
 	/// <param name="type">

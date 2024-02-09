@@ -19,7 +19,6 @@ namespace Elastic.Xunit.ExampleComplex
 	{
 		public MyRunOptions()
 		{
-			ClusterFilter = "";
 			RunUnitTests = true;
 			RunIntegrationTests = true;
 			IntegrationTestsMayUseAlreadyRunningNode = true;
