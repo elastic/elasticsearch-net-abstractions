@@ -12,12 +12,12 @@ using Nullean.Xunit.Partitions.Sdk;
 namespace Elastic.Elasticsearch.Xunit.Sdk;
 
 // ReSharper disable once UnusedType.Global
-public class ElasticTestFramework : PartitionTestFramework<ElasticXunitRunOptions, TestAssemblyRunnerFactory, TestFrameworkDiscovererFactory>
+public class ElasticTestFramework : PartitionTestFramework<ElasticXunitRunOptions, TestAssemblyRunnerFactory, ElasticTestFrameworkDiscovererFactory>
 {
 	public ElasticTestFramework(IMessageSink messageSink) : base(messageSink) { }
 }
 
-public class TestFrameworkDiscovererFactory : ITestFrameworkDiscovererFactory
+public class ElasticTestFrameworkDiscovererFactory : ITestFrameworkDiscovererFactory
 {
 	public XunitTestFrameworkDiscoverer Create<TOptions>(
 		IAssemblyInfo assemblyInfo, ISourceInformationProvider sourceProvider, IMessageSink diagnosticMessageSink

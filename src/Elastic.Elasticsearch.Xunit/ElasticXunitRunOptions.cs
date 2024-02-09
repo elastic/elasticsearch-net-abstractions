@@ -4,6 +4,7 @@
 
 using System;
 using System.Linq;
+using System.Runtime.Serialization;
 using Elastic.Elasticsearch.Xunit.XunitPlumbing;
 using Elastic.Stack.ArtifactsApi;
 using Nullean.Xunit.Partitions;
@@ -40,6 +41,7 @@ namespace Elastic.Elasticsearch.Xunit
 		///     Accepts a comma separated list of filters
 		/// </summary>
 		[Obsolete("Use PartitionFilterRegex instead", false)]
+		[IgnoreDataMember]
 		public string ClusterFilter
 		{
 			get => PartitionFilterRegex;
@@ -60,6 +62,7 @@ namespace Elastic.Elasticsearch.Xunit
 		///     Accepts a comma separated list of filters
 		/// </summary>
 		[Obsolete("Use ParitionFilterRegex instead", false)]
+		[IgnoreDataMember]
 		public string TestFilter
 		{
 			get => TestFilterRegex;
