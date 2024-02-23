@@ -19,13 +19,12 @@ namespace Elastic.Xunit.ExampleComplex
 	{
 		public MyRunOptions()
 		{
-			ClusterFilter = "";
-			RunUnitTests = false;
+			RunUnitTests = true;
 			RunIntegrationTests = true;
 			IntegrationTestsMayUseAlreadyRunningNode = true;
 			Version = TestVersion;
 		}
 
-		public static ElasticVersion TestVersion { get; } = "8.0.0-SNAPSHOT";
+		public static ElasticVersion TestVersion { get; } = "latest-8";
 	}
 }

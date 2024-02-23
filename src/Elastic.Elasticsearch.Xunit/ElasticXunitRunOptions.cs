@@ -3,18 +3,20 @@
 // See the LICENSE file in the project root for more information
 
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
+using System.Runtime.Serialization;
 using Elastic.Elasticsearch.Xunit.XunitPlumbing;
 using Elastic.Stack.ArtifactsApi;
+using Nullean.Xunit.Partitions;
+using Xunit.Abstractions;
+using static System.StringSplitOptions;
 
 namespace Elastic.Elasticsearch.Xunit
 {
 	/// <summary>
 	///     The Xunit test runner options
 	/// </summary>
-	public class ElasticXunitRunOptions
+	public class ElasticXunitRunOptions : PartitionOptions
 	{
 		/// <summary>
 		///     Informs the runner whether we expect to run integration tests. Defaults to <c>true</c>
@@ -35,16 +37,46 @@ namespace Elastic.Elasticsearch.Xunit
 		public bool RunUnitTests { get; set; }
 
 		/// <summary>
-		///     A global test filter that can be used to only run certain tests.
-		///     Accepts a comma separated list of filters
-		/// </summary>
-		public string TestFilter { get; set; }
-
-		/// <summary>
 		///     A global cluster filter that can be used to only run certain cluster's tests.
 		///     Accepts a comma separated list of filters
 		/// </summary>
-		public string ClusterFilter { get; set; }
+		[Obsolete("Use PartitionFilterRegex instead", false)]
+		[IgnoreDataMember]
+		public string ClusterFilter
+		{
+			get => PartitionFilterRegex;
+			set
+			{
+				if (string.IsNullOrWhiteSpace(value)) PartitionFilterRegex = value;
+				else
+				{
+					//attempt at being backwards compatible with old way of filtering
+					var re = string.Join("|", value.Split(new[] { ','}, RemoveEmptyEntries).Select(s => s.Trim()));
+					PartitionFilterRegex = re;
+				}
+			}
+		}
+
+		/// <summary>
+		///     A global test filter that can be used to only run certain cluster's tests.
+		///     Accepts a comma separated list of filters
+		/// </summary>
+		[Obsolete("Use ParitionFilterRegex instead", false)]
+		[IgnoreDataMember]
+		public string TestFilter
+		{
+			get => TestFilterRegex;
+			set
+			{
+				if (string.IsNullOrWhiteSpace(value)) TestFilterRegex = value;
+				else
+				{
+					//attempt at being backwards compatible with old way of filtering
+					var re = string.Join("|", value.Split(new[] { ','}, RemoveEmptyEntries).Select(s => s.Trim()));
+					TestFilterRegex = re;
+				}
+			}
+		}
 
 		/// <summary>
 		///     Informs the runner what version of Elasticsearch is under test. Required for
@@ -52,22 +84,38 @@ namespace Elastic.Elasticsearch.Xunit
 		/// </summary>
 		public ElasticVersion Version { get; set; }
 
-		/// <summary>
-		///     Called when the tests have finished running successfully
-		/// </summary>
-		/// <param name="runnerClusterTotals">Per cluster timings of the total test time, including starting Elasticsearch</param>
-		/// <param name="runnerFailedCollections">All collection of failed cluster, failed tests tuples</param>
-		public virtual void OnTestsFinished(Dictionary<string, Stopwatch> runnerClusterTotals,
-			ConcurrentBag<Tuple<string, string>> runnerFailedCollections)
+		public override void SetOptions(ITestFrameworkDiscoveryOptions discoveryOptions)
 		{
+			base.SetOptions(discoveryOptions);
+			discoveryOptions.SetValue(nameof(Version), Version);
+			discoveryOptions.SetValue(nameof(RunIntegrationTests), RunIntegrationTests);
+			discoveryOptions.SetValue(
+				nameof(IntegrationTestsMayUseAlreadyRunningNode),
+				IntegrationTestsMayUseAlreadyRunningNode
+			);
+			discoveryOptions.SetValue(nameof(RunUnitTests), RunUnitTests);
+#pragma warning disable CS0618 // Type or member is obsolete
+			discoveryOptions.SetValue(nameof(TestFilter), TestFilter);
+			discoveryOptions.SetValue(nameof(ClusterFilter), ClusterFilter);
+#pragma warning restore CS0618 // Type or member is obsolete
 		}
 
-		/// <summary>
-		///     Called before tests run. An ideal place to perform actions such as writing information to
-		///     <see cref="Console" />.
-		/// </summary>
-		public virtual void OnBeforeTestsRun()
+		public override void SetOptions(ITestFrameworkExecutionOptions executionOptions)
 		{
+
+			base.SetOptions(executionOptions);
+			executionOptions.SetValue(nameof(Version), Version);
+			executionOptions.SetValue(nameof(RunIntegrationTests), RunIntegrationTests);
+			executionOptions.SetValue(
+				nameof(IntegrationTestsMayUseAlreadyRunningNode),
+				IntegrationTestsMayUseAlreadyRunningNode
+			);
+			executionOptions.SetValue(nameof(RunUnitTests), RunUnitTests);
+#pragma warning disable CS0618 // Type or member is obsolete
+			executionOptions.SetValue(nameof(TestFilter), TestFilter);
+			executionOptions.SetValue(nameof(ClusterFilter), ClusterFilter);
+#pragma warning restore CS0618 // Type or member is obsolete
+
 		}
 	}
 }

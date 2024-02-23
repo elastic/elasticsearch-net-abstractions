@@ -34,11 +34,11 @@ namespace Elastic.Elasticsearch.Xunit.XunitPlumbing
 	/// <summary>
 	///     An Xunit integration test
 	/// </summary>
-	[XunitTestCaseDiscoverer("Elastic.Elasticsearch.Xunit.XunitPlumbing.IntegrationTestDiscoverer",
-		"Elastic.Elasticsearch.Xunit")]
-	public class I : FactAttribute
-	{
-	}
+	[XunitTestCaseDiscoverer(
+		"Elastic.Elasticsearch.Xunit.XunitPlumbing.IntegrationTestDiscoverer",
+		"Elastic.Elasticsearch.Xunit"
+	)]
+	public class I : FactAttribute { }
 
 	/// <summary>
 	///     A test discoverer used to discover integration tests cases attached
@@ -51,19 +51,22 @@ namespace Elastic.Elasticsearch.Xunit.XunitPlumbing
 		}
 
 		/// <inheritdoc />
-		protected override bool SkipMethod(ITestFrameworkDiscoveryOptions discoveryOptions, ITestMethod testMethod,
-			out string skipReason)
+		protected override bool SkipMethod(
+			ITestFrameworkDiscoveryOptions discoveryOptions,
+			ITestMethod testMethod,
+			out string skipReason
+		)
 		{
 			skipReason = null;
 			var runIntegrationTests =
 				discoveryOptions.GetValue<bool>(nameof(ElasticXunitRunOptions.RunIntegrationTests));
 			if (!runIntegrationTests) return true;
 
-			var cluster = TestAssemblyRunner.GetClusterForClass(testMethod.TestClass.Class);
+			var cluster = TestAssemblyRunner.GetClusterFixtureType(testMethod.TestClass.Class);
 			if (cluster == null)
 			{
 				skipReason +=
-					$"{testMethod.TestClass.Class.Name} does not define a cluster through IClusterFixture or {nameof(IntegrationTestClusterAttribute)}";
+					$"{testMethod.TestClass.Class.Name} does not define a cluster through IClusterFixture";
 				return true;
 			}
 
@@ -71,7 +74,7 @@ namespace Elastic.Elasticsearch.Xunit.XunitPlumbing
 				discoveryOptions.GetValue<ElasticVersion>(nameof(ElasticXunitRunOptions.Version));
 
 			// Skip if the version we are testing against is attributed to be skipped do not run the test nameof(SkipVersionAttribute.Ranges)
-			var skipVersionAttribute = Enumerable.FirstOrDefault(GetAttributes<SkipVersionAttribute>(testMethod));
+			var skipVersionAttribute = GetAttributes<SkipVersionAttribute>(testMethod).FirstOrDefault();
 			if (skipVersionAttribute != null)
 			{
 				var skipVersionRanges =

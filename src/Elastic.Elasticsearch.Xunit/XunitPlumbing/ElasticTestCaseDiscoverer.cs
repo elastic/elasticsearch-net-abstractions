@@ -22,8 +22,11 @@ namespace Elastic.Elasticsearch.Xunit.XunitPlumbing
 			DiagnosticMessageSink = diagnosticMessageSink;
 
 		/// <inheritdoc />
-		public IEnumerable<IXunitTestCase> Discover(ITestFrameworkDiscoveryOptions discoveryOptions,
-			ITestMethod testMethod, IAttributeInfo factAttribute) =>
+		public IEnumerable<IXunitTestCase> Discover(
+			ITestFrameworkDiscoveryOptions discoveryOptions,
+			ITestMethod testMethod,
+			IAttributeInfo factAttribute
+		) =>
 			SkipMethod(discoveryOptions, testMethod, out var skipReason)
 				? string.IsNullOrEmpty(skipReason)
 					? new IXunitTestCase[] { }
@@ -47,17 +50,6 @@ namespace Elastic.Elasticsearch.Xunit.XunitPlumbing
 			return false;
 		}
 
-		protected static TValue GetAttribute<TAttribute, TValue>(ITestMethod testMethod, string propertyName)
-			where TAttribute : Attribute
-		{
-			var classAttributes = testMethod.TestClass.Class.GetCustomAttributes(typeof(TAttribute)) ??
-			                      Enumerable.Empty<IAttributeInfo>();
-			var methodAttributes = testMethod.Method.GetCustomAttributes(typeof(TAttribute)) ??
-			                       Enumerable.Empty<IAttributeInfo>();
-			var attribute = classAttributes.Concat(methodAttributes).FirstOrDefault();
-			return attribute == null ? default(TValue) : attribute.GetNamedArgument<TValue>(propertyName);
-		}
-
 		protected static IList<IAttributeInfo> GetAttributes<TAttribute>(ITestMethod testMethod)
 			where TAttribute : Attribute
 		{
@@ -66,17 +58,6 @@ namespace Elastic.Elasticsearch.Xunit.XunitPlumbing
 			var methodAttributes = testMethod.Method.GetCustomAttributes(typeof(TAttribute)) ??
 			                       Enumerable.Empty<IAttributeInfo>();
 			return classAttributes.Concat(methodAttributes).ToList();
-		}
-
-		protected static IEnumerable<TValue> GetAttributes<TAttribute, TValue>(ITestMethod testMethod,
-			string propertyName)
-			where TAttribute : Attribute
-		{
-			var classAttributes = testMethod.TestClass.Class.GetCustomAttributes(typeof(TAttribute));
-			var methodAttributes = testMethod.Method.GetCustomAttributes(typeof(TAttribute));
-			return classAttributes
-				.Concat(methodAttributes)
-				.Select(a => a.GetNamedArgument<TValue>(propertyName));
 		}
 	}
 }

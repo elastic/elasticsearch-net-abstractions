@@ -12,8 +12,10 @@ namespace Elastic.Elasticsearch.Xunit.XunitPlumbing
 	/// <summary>
 	///     An Xunit unit test
 	/// </summary>
-	[XunitTestCaseDiscoverer("Elastic.Elasticsearch.Xunit.XunitPlumbing.UnitTestDiscoverer",
-		"Elastic.Elasticsearch.Xunit")]
+	[XunitTestCaseDiscoverer(
+		"Elastic.Elasticsearch.Xunit.XunitPlumbing.UnitTestDiscoverer",
+		"Elastic.Elasticsearch.Xunit"
+	)]
 	public class U : FactAttribute
 	{
 	}
@@ -29,7 +31,9 @@ namespace Elastic.Elasticsearch.Xunit.XunitPlumbing
 		}
 
 		/// <inheritdoc />
-		protected override bool SkipMethod(ITestFrameworkDiscoveryOptions discoveryOptions, ITestMethod testMethod,
+		protected override bool SkipMethod(
+			ITestFrameworkDiscoveryOptions discoveryOptions,
+			ITestMethod testMethod,
 			out string skipReason)
 		{
 			skipReason = null;
