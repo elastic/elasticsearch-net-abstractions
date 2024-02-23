@@ -59,17 +59,33 @@ namespace Elastic.Elasticsearch.Xunit.Sdk
 				.ConfigureAwait(false);
 		}
 
-		protected override async Task UseStateAndRun(IEphemeralCluster<XunitClusterConfiguration> cluster, Func<int?, Task> runGroup)
+		protected override async Task UseStateAndRun(
+			IEphemeralCluster<XunitClusterConfiguration> cluster,
+			Func<int?, Task> runGroup,
+			Func<Exception, string, Task> failAll
+		)
 		{
 			using (cluster)
 			{
 				ElasticXunitRunner.CurrentCluster = cluster;
 				var clusterConfiguration = cluster.ClusterConfiguration;
 				var timeout = clusterConfiguration?.Timeout ?? TimeSpan.FromMinutes(2);
-				if (!IntegrationTestsMayUseAlreadyRunningNode || !ValidateRunningVersion(cluster))
-					cluster.Start(timeout);
 
-				await runGroup(clusterConfiguration?.MaxConcurrency).ConfigureAwait(false);
+				var started = false;
+				try
+				{
+					if (!IntegrationTestsMayUseAlreadyRunningNode || !ValidateRunningVersion(cluster))
+						 cluster.Start(timeout);
+
+					started = true;
+				}
+				catch (Exception e)
+				{
+					await failAll(e, $"Further logs might be available at: {cluster.ClusterConfiguration?.FileSystem?.LogsPath}")
+						.ConfigureAwait(false);
+				}
+				if (started)
+					await runGroup(clusterConfiguration?.MaxConcurrency).ConfigureAwait(false);
 			}
 		}
 
