@@ -29,7 +29,7 @@ var transportConfig = new TransportConfiguration(pool, productRegistration: Elas
 if (cluster.DetectedProxy != DetectedProxySoftware.None)
 	transportConfig = transportConfig.Proxy(new Uri("http://localhost:8080"), null!, null!);
 
-var transport = new DefaultHttpTransport(transportConfig);
+var transport = new DistributedTransport(transportConfig);
 
 var response = await transport.RequestAsync<StringResponse>(HttpMethod.GET, "/");
 Console.WriteLine(response);
