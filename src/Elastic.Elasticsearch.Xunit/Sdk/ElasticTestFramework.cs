@@ -3,30 +3,25 @@
 // See the LICENSE file in the project root for more information
 
 using System.Reflection;
+using Elastic.Elasticsearch.Xunit.XunitPlumbing;
 using Xunit.Abstractions;
 using Xunit.Sdk;
+using Nullean.Xunit.Partitions;
+using Nullean.Xunit.Partitions.Sdk;
 
-namespace Elastic.Elasticsearch.Xunit.Sdk
+namespace Elastic.Elasticsearch.Xunit.Sdk;
+
+// ReSharper disable once UnusedType.Global
+public class ElasticTestFramework : PartitionTestFramework<ElasticXunitRunOptions, TestAssemblyRunnerFactory, ElasticTestFrameworkDiscovererFactory>
 {
-	public class ElasticTestFramework : XunitTestFramework
-	{
-		public ElasticTestFramework(IMessageSink messageSink) : base(messageSink)
-		{
-		}
+	public ElasticTestFramework(IMessageSink messageSink) : base(messageSink) { }
+}
 
-		protected override ITestFrameworkDiscoverer CreateDiscoverer(IAssemblyInfo assemblyInfo) =>
-			new ElasticTestFrameworkDiscoverer(assemblyInfo, SourceInformationProvider, DiagnosticMessageSink);
-
-		protected override ITestFrameworkExecutor CreateExecutor(AssemblyName assemblyName)
-		{
-			var assembly = Assembly.Load(assemblyName);
-			var options = assembly.GetCustomAttribute<ElasticXunitConfigurationAttribute>()?.Options ??
-			              new ElasticXunitRunOptions();
-
-			return new TestFrameworkExecutor(assemblyName, SourceInformationProvider, DiagnosticMessageSink)
-			{
-				Options = options
-			};
-		}
-	}
+public class ElasticTestFrameworkDiscovererFactory : ITestFrameworkDiscovererFactory
+{
+	public XunitTestFrameworkDiscoverer Create<TOptions>(
+		IAssemblyInfo assemblyInfo, ISourceInformationProvider sourceProvider, IMessageSink diagnosticMessageSink
+	)
+		where TOptions : PartitionOptions, new() =>
+		new PartitionTestFrameworkDiscoverer<TOptions>(assemblyInfo, sourceProvider, diagnosticMessageSink, typeof(IClusterFixture<>));
 }

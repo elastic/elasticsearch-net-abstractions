@@ -8,7 +8,6 @@ using FluentAssertions;
 
 namespace Elastic.Xunit.ExampleComplex
 {
-	[IntegrationTestCluster(typeof(TestCluster))]
 	[SkipVersion("<6.3.0", "")]
 	public class TestWithoutClusterFixture
 	{

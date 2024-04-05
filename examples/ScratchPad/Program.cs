@@ -24,8 +24,8 @@ namespace ScratchPad
 
 		public static int Main()
 		{
-			//ResolveVersions();
-			ManualConfigRun();
+			ResolveVersions();
+			//ManualConfigRun();
 			//ValidateCombinations.Run();
 			return 0;
 		}
@@ -87,8 +87,8 @@ namespace ScratchPad
 		{
 			var versions = new[]
 			{
-				"8.0.0-SNAPSHOT", "7.0.0-beta1", "6.6.1", "latest-7", "latest", "7.0.0", "7.4.0-SNAPSHOT",
-				"957e3089:7.2.0", "latest-6"
+				"latest-8", "7.0.0-beta1", "6.6.1", "latest-7", "latest", "7.0.0", "7.4.0-SNAPSHOT",
+				"957e3089:7.2.0"
 			};
 			//versions = new[] {"latest-7"};
 			var products = new Product[]
