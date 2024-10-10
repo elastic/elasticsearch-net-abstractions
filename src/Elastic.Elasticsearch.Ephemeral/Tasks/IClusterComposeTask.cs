@@ -148,14 +148,10 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 
 		protected static void ExecuteBinary(EphemeralClusterConfiguration config, IConsoleLineHandler writer,
 			string binary, string description, params string[] arguments) =>
-			ExecuteBinaryInternal(config, writer, binary, description, null, arguments);
-
-		protected static void ExecuteBinary(EphemeralClusterConfiguration config, IConsoleLineHandler writer,
-			string binary, string description, StartedHandler startedHandler, params string[] arguments) =>
-			ExecuteBinaryInternal(config, writer, binary, description, startedHandler, arguments);
+			ExecuteBinaryInternal(config, writer, binary, description, arguments);
 
 		private static void ExecuteBinaryInternal(EphemeralClusterConfiguration config, IConsoleLineHandler writer,
-			string binary, string description, StartedHandler startedHandler, params string[] arguments)
+			string binary, string description, params string[] arguments)
 		{
 			var command = $"{{{binary}}} {{{string.Join(" ", arguments)}}}";
 			writer?.WriteDiagnostic($"{{{nameof(ExecuteBinary)}}} starting process [{description}] {command}");
@@ -170,9 +166,7 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 				}
 			};
 
-			var result = startedHandler != null
-				? Proc.Start(processStartArguments, timeout, new ConsoleOutColorWriter(), startedHandler)
-				: Proc.Start(processStartArguments, timeout, new ConsoleOutColorWriter());
+			var result = Proc.Start(processStartArguments, timeout, new ConsoleOutColorWriter());
 
 			if (!result.Completed)
 				throw new Exception($"Timeout while executing {description} exceeded {timeout}");
