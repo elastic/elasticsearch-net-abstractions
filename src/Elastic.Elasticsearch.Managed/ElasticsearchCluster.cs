@@ -4,12 +4,7 @@
 
 using Elastic.Elasticsearch.Managed.Configuration;
 
-namespace Elastic.Elasticsearch.Managed
-{
-	public class ElasticsearchCluster : ClusterBase
-	{
-		public ElasticsearchCluster(ClusterConfiguration clusterConfiguration) : base(clusterConfiguration)
-		{
-		}
-	}
-}
+namespace Elastic.Elasticsearch.Managed;
+
+public class ElasticsearchCluster(ClusterConfiguration clusterConfiguration)
+	: ClusterBase(clusterConfiguration);
