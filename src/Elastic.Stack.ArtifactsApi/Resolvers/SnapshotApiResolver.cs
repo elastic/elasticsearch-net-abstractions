@@ -18,8 +18,8 @@ namespace Elastic.Stack.ArtifactsApi.Resolvers
 {
 	public static class SnapshotApiResolver
 	{
-		public static readonly System.Lazy<IReadOnlyCollection<Version>> AvailableVersions =
-			new System.Lazy<IReadOnlyCollection<Version>>(LoadVersions, LazyThreadSafetyMode.ExecutionAndPublication);
+		public static readonly Lazy<IReadOnlyCollection<Version>> AvailableVersions =
+			new(LoadVersions, LazyThreadSafetyMode.ExecutionAndPublication);
 
 		private static Regex PackageProductRegex { get; } =
 			new Regex(@"(.*?)-(\d+\.\d+\.\d+(?:-(?:SNAPSHOT|alpha\d+|beta\d+|rc\d+))?)");

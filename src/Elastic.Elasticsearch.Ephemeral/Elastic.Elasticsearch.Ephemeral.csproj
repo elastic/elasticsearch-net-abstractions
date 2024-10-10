@@ -7,9 +7,12 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="SharpZipLib.NETStandard" Version="1.0.7" />
-    <PackageReference Condition="'$(TargetFramework)' == 'net461'" Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Elastic.Elasticsearch.Managed\Elastic.Elasticsearch.Managed.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
+    <Reference Include="System.Net.Http" />
   </ItemGroup>
 </Project>

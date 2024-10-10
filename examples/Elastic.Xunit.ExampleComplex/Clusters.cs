@@ -12,11 +12,10 @@ namespace Elastic.Xunit.ExampleComplex
 {
 	internal static class EphemeralClusterExtensions
 	{
-		private static readonly ConcurrentDictionary<IEphemeralCluster, IElasticClient> Clients =
-			new ConcurrentDictionary<IEphemeralCluster, IElasticClient>();
+		private static readonly ConcurrentDictionary<IEphemeralCluster, IElasticClient> Clients = new();
 
 		public static IElasticClient GetOrAddClient(this IEphemeralCluster cluster) =>
-			Clients.GetOrAdd(cluster, (c) =>
+			Clients.GetOrAdd(cluster, c =>
 			{
 				var connectionPool = new StaticConnectionPool(c.NodesUris());
 				var settings = new ConnectionSettings(connectionPool);
@@ -30,15 +29,11 @@ namespace Elastic.Xunit.ExampleComplex
 		IElasticClient Client { get; }
 	}
 
-	public abstract class MyClusterBase : XunitClusterBase, IMyCluster
+	public abstract class MyClusterBase() : XunitClusterBase(new XunitClusterConfiguration(MyRunOptions.TestVersion)
 	{
-		protected MyClusterBase() : base(new XunitClusterConfiguration(MyRunOptions.TestVersion)
-		{
-			ShowElasticsearchOutputAfterStarted = false,
-		})
-		{
-		}
-
+		ShowElasticsearchOutputAfterStarted = false,
+	}), IMyCluster
+	{
 		public IElasticClient Client => this.GetOrAddClient();
 	}
 

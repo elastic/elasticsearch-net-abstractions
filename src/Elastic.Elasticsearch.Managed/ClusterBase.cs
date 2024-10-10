@@ -53,12 +53,8 @@ namespace Elastic.Elasticsearch.Managed
 	}
 
 
-	public abstract class ClusterBase : ClusterBase<ClusterConfiguration>
-	{
-		protected ClusterBase(ClusterConfiguration clusterConfiguration) : base(clusterConfiguration)
-		{
-		}
-	}
+	public abstract class ClusterBase(ClusterConfiguration clusterConfiguration)
+		: ClusterBase<ClusterConfiguration>(clusterConfiguration);
 
 	public abstract class ClusterBase<TConfiguration> : ICluster<TConfiguration>
 		where TConfiguration : IClusterConfiguration<NodeFileSystem>
