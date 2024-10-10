@@ -11,7 +11,6 @@ using static Elastic.Elasticsearch.Ephemeral.ClusterFeatures;
 using HttpMethod = Elastic.Transport.HttpMethod;
 
 
-//var config = new EphemeralClusterConfiguration("8.15.0", XPack | Security | SSL);
 var config = new EphemeralClusterConfiguration("8.15.0");
 using var cluster = new EphemeralCluster(config);
 
