@@ -33,7 +33,7 @@ jobs:
       env:
         NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
         
-    - run: ./build.sh build -s true
+    - run: ./build.sh test
       name: Build
     - run: ./build.sh generatepackages -s true
       name: Generate local nuget packages

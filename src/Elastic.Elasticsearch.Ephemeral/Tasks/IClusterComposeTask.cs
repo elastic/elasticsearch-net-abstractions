@@ -168,6 +168,8 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 				ConsoleOutWriter = new ConsoleOutColorWriter(),
 			};
 
+			writer.WriteDiagnostic($"{binary} {string.Join(" ", arguments)}");
+
 			var result = Proc.Start(processStartArguments);
 
 			if (!result.Completed)

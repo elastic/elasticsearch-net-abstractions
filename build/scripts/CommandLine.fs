@@ -10,7 +10,8 @@ open Microsoft.FSharp.Reflection
 type Arguments =
     | [<CliPrefix(CliPrefix.None);SubCommand>] Clean
     | [<CliPrefix(CliPrefix.None);SubCommand>] Build
-    
+    | [<CliPrefix(CliPrefix.None);SubCommand>] Test
+
     | [<CliPrefix(CliPrefix.None);Hidden;SubCommand>] PristineCheck 
     | [<CliPrefix(CliPrefix.None);Hidden;SubCommand>] GeneratePackages
     | [<CliPrefix(CliPrefix.None);Hidden;SubCommand>] ValidatePackages 
@@ -28,7 +29,8 @@ with
         member this.Usage =
             match this with
             | Clean -> "clean known output locations"
-            | Build -> "Run build and tests"
+            | Build -> "Run build"
+            | Test -> "Run build and tests"
             | Release -> "runs build, and create an validates the packages shy of publishing them"
             | Publish -> "Runs the full release"
             

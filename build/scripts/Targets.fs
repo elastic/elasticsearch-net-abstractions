@@ -37,6 +37,8 @@ let private clean (arguments:ParseResults<Arguments>) =
     
 let private build (arguments:ParseResults<Arguments>) = exec "dotnet" ["build"; "-c"; "Release"] |> ignore
 
+let private test (arguments:ParseResults<Arguments>) = exec "dotnet" ["test"; "-c"; "Release"] |> ignore
+
 let private pristineCheck (arguments:ParseResults<Arguments>) =
     match Information.isCleanWorkingCopy "." with
     | true  -> printfn "The checkout folder does not have pending changes, proceeding"
@@ -141,7 +143,8 @@ let Setup (parsed:ParseResults<Arguments>) (subCommand:Arguments) =
         
     step Clean.Name clean
     cmd Build.Name None (Some [Clean.Name]) <| fun _ -> build parsed
-    
+    cmd Test.Name None (Some [Build.Name]) <| fun _ -> test parsed
+
     step PristineCheck.Name pristineCheck
     step GeneratePackages.Name generatePackages 
     step ValidatePackages.Name validatePackages 
