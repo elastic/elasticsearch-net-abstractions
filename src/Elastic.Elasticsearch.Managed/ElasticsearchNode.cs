@@ -119,9 +119,11 @@ namespace Elastic.Elasticsearch.Managed
 
 			var envVarName = NodeConfiguration.Version.InRange("<7.12.0") ? "JAVA_HOME" : "ES_JAVA_HOME";
 			var javaHome = Environment.GetEnvironmentVariable(envVarName);
-			writer?.WriteDiagnostic($"{envVarName}: {{{javaHome}}}", node);
-			Process.StartInfo.Environment[envVarName] = javaHome;
-
+			if (!string.IsNullOrWhiteSpace(javaHome))
+			{
+				writer?.WriteDiagnostic($"{envVarName}: {{{javaHome}}}", node);
+				Process.StartInfo.Environment[envVarName] = javaHome;
+			}
 			return SubscribeLines(
 				l =>
 				{

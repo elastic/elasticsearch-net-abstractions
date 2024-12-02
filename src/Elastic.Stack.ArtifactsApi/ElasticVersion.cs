@@ -34,7 +34,7 @@ namespace Elastic.Stack.ArtifactsApi
 		public Artifact Artifact(Product product)
 		{
 			var cacheKey = product.ToString();
-			if (_resolved.TryGetValue(cacheKey, out var artifact))
+			if (_resolved.TryGetValue(cacheKey, out var artifact) && artifact != null)
 				return artifact;
 			switch (ArtifactBuildState)
 			{
