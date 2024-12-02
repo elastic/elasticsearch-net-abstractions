@@ -21,7 +21,7 @@ namespace Elastic.Xunit.ExampleMinimal
 		///     We pass our configuration instance to the base class.
 		///     We only configure it to run version 6.2.3 here but lots of additional options are available.
 		/// </summary>
-		public MyTestCluster() : base(new XunitClusterConfiguration("8.16.0")
+		public MyTestCluster() : base(new XunitClusterConfiguration("8.14.0")
 			{ PrintYamlFilesInConfigFolder = true, NoCleanupAfterNodeStopped = true })
 		{
 		}
