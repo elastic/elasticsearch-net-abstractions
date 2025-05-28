@@ -27,7 +27,7 @@ jobs:
         git tag --list
           
     # Install .NET version as mandated by global.json
-    - uses: actions/setup-dotnet@v3
+    - uses: actions/setup-dotnet@v4.1.0
       with:
           global-json-file: global.json
           dotnet-version: |
@@ -35,7 +35,7 @@ jobs:
       env:
         NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
         
-    - run: ./build.sh build -s true
+    - run: ./build.sh test
       name: Build
     - run: ./build.sh generatepackages -s true
       name: Generate local nuget packages

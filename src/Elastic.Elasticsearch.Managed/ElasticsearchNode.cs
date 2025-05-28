@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using Elastic.Elasticsearch.Managed.Configuration;
 using Elastic.Elasticsearch.Managed.ConsoleWriters;
@@ -116,12 +117,17 @@ namespace Elastic.Elasticsearch.Managed
 			var node = NodeConfiguration.DesiredNodeName;
 			writer?.WriteDiagnostic($"Elasticsearch location: [{Binary}]", node);
 			writer?.WriteDiagnostic($"Settings: {{{string.Join(" ", NodeConfiguration.CommandLineArguments)}}}", node);
+			writer?.WriteDiagnostic($"Environment: {{{string.Join(" ", StartArguments.Environment)}}}", node);
+			var envArgs = string.Join(" ", StartArguments.Environment.Select(kv => $"{kv.Key}={kv.Value}"));
+			writer?.WriteDiagnostic($"Full CMD: env {envArgs} {Binary} {string.Join(" ", NodeConfiguration.CommandLineArguments)} ", node);
 
 			var envVarName = NodeConfiguration.Version.InRange("<7.12.0") ? "JAVA_HOME" : "ES_JAVA_HOME";
 			var javaHome = Environment.GetEnvironmentVariable(envVarName);
-			writer?.WriteDiagnostic($"{envVarName}: {{{javaHome}}}", node);
-			Process.StartInfo.Environment[envVarName] = javaHome;
-
+			if (!string.IsNullOrWhiteSpace(javaHome))
+			{
+				writer?.WriteDiagnostic($"{envVarName}: {{{javaHome}}}", node);
+				Process.StartInfo.Environment[envVarName] = javaHome;
+			}
 			return SubscribeLines(
 				l =>
 				{

@@ -11,9 +11,6 @@ namespace Elastic.Elasticsearch.Managed.Configuration
 {
 	public class NodeSettings : List<NodeSetting>
 	{
-		private static readonly ElasticVersion
-			LastVersionWithoutPrefixForSettings = ElasticVersion.From("5.0.0-alpha2");
-
 		public NodeSettings()
 		{
 		}
@@ -37,8 +34,7 @@ namespace Elastic.Elasticsearch.Managed.Configuration
 
 		public string[] ToCommandLineArguments(ElasticVersion version)
 		{
-			var settingsPrefix = version > LastVersionWithoutPrefixForSettings ? "" : "es.";
-			var settingArgument = version.Major >= 5 ? "-E " : "-D";
+			var settingArgument = "-E";
 			return this
 				//if a node setting is only applicable for a certain version make sure its filtered out
 				.Where(s => string.IsNullOrEmpty(s.VersionRange) || version.InRange(s.VersionRange))
@@ -47,7 +43,9 @@ namespace Elastic.Elasticsearch.Managed.Configuration
 				//on the command with the latter taking precedence
 				.GroupBy(setting => setting.Key)
 				.Select(g => g.Last())
-				.Select(s => s.Key.StartsWith(settingArgument) ? s.ToString() : $"{settingArgument}{settingsPrefix}{s}")
+				.SelectMany<NodeSetting, string>(
+					s => [settingArgument, $"{s}"]
+				)
 				.ToArray();
 		}
 	}

@@ -56,8 +56,9 @@ namespace Elastic.Elasticsearch.Ephemeral
 
 		protected static string EphemeralHome(ElasticVersion version, string clusterName)
 		{
-			var temp = Path.Combine(Path.GetTempPath(), SubFolder,
-				version.Artifact(Product.Elasticsearch).LocalFolderName, clusterName);
+			var artifact = version.Artifact(Product.Elasticsearch);
+			var localFolder = artifact.LocalFolderName;
+			var temp = Path.Combine(Path.GetTempPath(), SubFolder, localFolder, clusterName);
 			return Path.Combine(temp, "home");
 		}
 	}

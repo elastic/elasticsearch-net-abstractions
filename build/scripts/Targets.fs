@@ -14,9 +14,8 @@ open ProcNet
 
     
 let exec binary args =
-    let r = Proc.Exec (binary, args |> List.map (fun a -> sprintf "\"%s\"" a) |> List.toArray)
-    match r.HasValue with | true -> r.Value | false -> failwithf "invocation of `%s` timed out" binary
-    
+    Proc.Exec (binary, args |> List.toArray)
+
 let private restoreTools = lazy(exec "dotnet" ["tool"; "restore"])
 let private currentVersion =
     lazy(
@@ -37,6 +36,8 @@ let private clean (arguments:ParseResults<Arguments>) =
     exec "dotnet" ["clean"] |> ignore
     
 let private build (arguments:ParseResults<Arguments>) = exec "dotnet" ["build"; "-c"; "Release"] |> ignore
+
+let private test (arguments:ParseResults<Arguments>) = ignore()
 
 let private pristineCheck (arguments:ParseResults<Arguments>) =
     match Information.isCleanWorkingCopy "." with
@@ -142,7 +143,8 @@ let Setup (parsed:ParseResults<Arguments>) (subCommand:Arguments) =
         
     step Clean.Name clean
     cmd Build.Name None (Some [Clean.Name]) <| fun _ -> build parsed
-    
+    cmd Test.Name None (Some [Build.Name]) <| fun _ -> test parsed
+
     step PristineCheck.Name pristineCheck
     step GeneratePackages.Name generatePackages 
     step ValidatePackages.Name validatePackages 
