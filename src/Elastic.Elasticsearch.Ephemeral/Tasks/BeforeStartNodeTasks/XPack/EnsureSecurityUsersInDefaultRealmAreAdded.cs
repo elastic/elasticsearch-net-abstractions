@@ -49,8 +49,10 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks.BeforeStartNodeTasks.XPack
 				var pluginBat = Path.Combine(pluginFolder, binary) + BinarySuffix;
 
 				foreach (var cred in ClusterAuthentication.AllUsers)
+				{
 					ExecuteBinary(cluster.ClusterConfiguration, cluster.Writer, pluginBat,
-						$"adding user {cred.Username}", $"useradd {cred.Username} -p {cred.Password} -r {cred.Role}");
+						$"adding user {cred.Username}", "useradd", cred.Username, "-p", cred.Password, "-r", cred.Role);
+				}
 
 				if (!Directory.Exists(xpackConfigFolderCached)) Directory.CreateDirectory(xpackConfigFolderCached);
 

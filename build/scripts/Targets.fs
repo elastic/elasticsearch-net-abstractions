@@ -37,7 +37,6 @@ let private clean (arguments:ParseResults<Arguments>) =
     
 let private build (arguments:ParseResults<Arguments>) = exec "dotnet" ["build"; "-c"; "Release"] |> ignore
 
-//let private test (arguments:ParseResults<Arguments>) = exec "dotnet" ["test"; "-c"; "Release"; "-f"; "net6.0"] |> ignore
 let private test (arguments:ParseResults<Arguments>) = ignore()
 
 let private pristineCheck (arguments:ParseResults<Arguments>) =
