@@ -227,21 +227,23 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 
 		private static void ExtractTar(string file, string toFolder)
 		{
-			using (var inStream = File.OpenRead(file))
-			using (var tarArchive = TarArchive.CreateInputTarArchive(inStream))
-				tarArchive.ExtractContents(toFolder);
+			using var inStream = File.OpenRead(file);
+			using var tarArchive = TarArchive.CreateInputTarArchive(inStream);
+			tarArchive.ExtractContents(toFolder);
 		}
 
 		private static void ExtractTarGz(string file, string toFolder)
 		{
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-				using (var inStream = File.OpenRead(file))
-				using (var gzipStream = new GZipInputStream(inStream))
-				using (var tarArchive = TarArchive.CreateInputTarArchive(gzipStream))
-					tarArchive.ExtractContents(toFolder);
+			{
+				using var inStream = File.OpenRead(file);
+				using var gzipStream = new GZipInputStream(inStream);
+				using var tarArchive = TarArchive.CreateInputTarArchive(gzipStream);
+				tarArchive.ExtractContents(toFolder);
+			}
 			else
 				//SharpZipLib loses permissions when untarring
-				Proc.Exec("tar", "-xvf", file, "-C", toFolder);
+				Proc.Exec("tar", "-zxvf", file, "-C", toFolder);
 		}
 
 		private static void ExtractZip(string file, string toFolder) =>
