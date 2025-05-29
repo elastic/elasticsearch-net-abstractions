@@ -3,30 +3,30 @@
 // See the LICENSE file in the project root for more information
 
 using System.Collections.Concurrent;
+using Elastic.Clients.Elasticsearch;
 using Elastic.Elasticsearch.Ephemeral;
 using Elastic.Elasticsearch.Xunit;
-using Elasticsearch.Net;
-using Nest;
+using Elastic.Transport;
 
 namespace Elastic.Xunit.ExampleComplex
 {
 	internal static class EphemeralClusterExtensions
 	{
-		private static readonly ConcurrentDictionary<IEphemeralCluster, IElasticClient> Clients = new();
+		private static readonly ConcurrentDictionary<IEphemeralCluster, ElasticsearchClient> Clients = new();
 
-		public static IElasticClient GetOrAddClient(this IEphemeralCluster cluster) =>
+		public static ElasticsearchClient GetOrAddClient(this IEphemeralCluster cluster) =>
 			Clients.GetOrAdd(cluster, c =>
 			{
-				var connectionPool = new StaticConnectionPool(c.NodesUris());
-				var settings = new ConnectionSettings(connectionPool);
-				var client = new ElasticClient(settings);
+				var connectionPool = new StaticNodePool(c.NodesUris());
+				var settings = new ElasticsearchClientSettings(connectionPool);
+				var client = new ElasticsearchClient(settings);
 				return client;
 			});
 	}
 
 	public interface IMyCluster
 	{
-		IElasticClient Client { get; }
+		ElasticsearchClient Client { get; }
 	}
 
 	public abstract class MyClusterBase() : XunitClusterBase(new XunitClusterConfiguration(MyRunOptions.TestVersion)
@@ -34,14 +34,14 @@ namespace Elastic.Xunit.ExampleComplex
 		ShowElasticsearchOutputAfterStarted = false,
 	}), IMyCluster
 	{
-		public IElasticClient Client => this.GetOrAddClient();
+		public ElasticsearchClient Client => this.GetOrAddClient();
 	}
 
 	public class TestCluster : MyClusterBase
 	{
 		protected override void SeedCluster()
 		{
-			var pluginsResponse = Client.CatPlugins();
+			var response = Client.Info();
 		}
 	}
 
@@ -51,11 +51,11 @@ namespace Elastic.Xunit.ExampleComplex
 		{
 		}
 
-		public IElasticClient Client => this.GetOrAddClient();
+		public ElasticsearchClient Client => this.GetOrAddClient();
 
 		protected override void SeedCluster()
 		{
-			var aliasesResponse = Client.CatAliases();
+			var response = Client.Info();
 		}
 	}
 }

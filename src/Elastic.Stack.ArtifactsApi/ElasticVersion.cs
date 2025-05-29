@@ -7,7 +7,6 @@ using System.Collections.Concurrent;
 using Elastic.Stack.ArtifactsApi.Platform;
 using Elastic.Stack.ArtifactsApi.Products;
 using Elastic.Stack.ArtifactsApi.Resolvers;
-using SemVer;
 using Version = SemVer.Version;
 
 namespace Elastic.Stack.ArtifactsApi
@@ -118,11 +117,11 @@ namespace Elastic.Stack.ArtifactsApi
 
 		public bool InRange(string range)
 		{
-			var versionRange = new Range(range);
+			var versionRange = new SemVer.Range(range);
 			return InRange(versionRange);
 		}
 
-		public bool InRange(Range versionRange)
+		public bool InRange(SemVer.Range versionRange)
 		{
 			var satisfied = versionRange.IsSatisfied(this);
 			if (satisfied)

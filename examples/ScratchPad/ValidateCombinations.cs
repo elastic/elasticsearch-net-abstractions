@@ -3,11 +3,11 @@
 // See the LICENSE file in the project root for more information
 
 using System;
+using Elastic.Clients.Elasticsearch;
 using Elastic.Elasticsearch.Ephemeral;
 using Elastic.Elasticsearch.Ephemeral.Plugins;
 using Elastic.Stack.ArtifactsApi.Products;
-using Elasticsearch.Net;
-using Nest;
+using Elastic.Transport;
 
 namespace ScratchPad
 {
@@ -40,35 +40,38 @@ namespace ScratchPad
 				Console.ForegroundColor = reset;
 				var config = new EphemeralClusterConfiguration(v, f, plugins, 1) {AutoWireKnownProxies = true,};
 
-				using (var cluster = new EphemeralCluster(config))
-					try
+				using var cluster = new EphemeralCluster(config);
+				try
+				{
+					cluster.Start();
+
+					var nodes = cluster.NodesUris();
+					var connectionPool = new StaticNodePool(nodes);
+					var settings = new ElasticsearchClientSettings(connectionPool).EnableDebugMode();
+					if (config.EnableSecurity)
 					{
-						cluster.Start();
-
-						var nodes = cluster.NodesUris();
-						var connectionPool = new StaticConnectionPool(nodes);
-						var settings = new ConnectionSettings(connectionPool).EnableDebugMode();
-						if (config.EnableSecurity)
-							settings = settings.BasicAuthentication(ClusterAuthentication.Admin.Username,
-								ClusterAuthentication.Admin.Password);
-						if (config.EnableSsl)
-							settings = settings.ServerCertificateValidationCallback(CertificateValidations.AllowAll);
-
-						var client = new ElasticClient(settings);
-						Console.WriteLine(client.RootNodeInfo().Version.Number);
-						cluster.Dispose();
-						cluster.WaitForExit(TimeSpan.FromMinutes(1));
+						settings = settings.Authentication(
+							new BasicAuthentication(ClusterAuthentication.Admin.Username, ClusterAuthentication.Admin.Password)
+						);
 					}
-					catch (Exception e)
-					{
-						Console.WriteLine(e);
-						Console.ForegroundColor = ConsoleColor.Cyan;
-						Console.WriteLine($"{v} {f}");
+					if (config.EnableSsl)
+						settings = settings.ServerCertificateValidationCallback(CertificateValidations.AllowAll);
 
-						Console.ForegroundColor = reset;
+					var client = new ElasticsearchClient(settings);
+					Console.WriteLine(client.Info().Version.Number);
+					cluster.Dispose();
+					cluster.WaitForExit(TimeSpan.FromMinutes(1));
+				}
+				catch (Exception e)
+				{
+					Console.WriteLine(e);
+					Console.ForegroundColor = ConsoleColor.Cyan;
+					Console.WriteLine($"{v} {f}");
 
-						throw;
-					}
+					Console.ForegroundColor = reset;
+
+					throw;
+				}
 			}
 
 			Console.WriteLine("Done!");

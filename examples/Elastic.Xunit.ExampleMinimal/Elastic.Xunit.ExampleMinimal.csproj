@@ -4,14 +4,14 @@
     <IsPackable>False</IsPackable>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Elastic.Clients.Elasticsearch" Version="9.0.4" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />    
-    <PackageReference Include="NEST" Version="6.0.1" />
-    <PackageReference Include="FluentAssertions" Version="5.1.2" />
+    <PackageReference Include="FluentAssertions" Version="7.2.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Elastic.Elasticsearch.Xunit\Elastic.Elasticsearch.Xunit.csproj" />

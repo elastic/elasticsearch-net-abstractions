@@ -3,31 +3,25 @@
 // See the LICENSE file in the project root for more information
 
 using Elastic.Elasticsearch.Xunit.XunitPlumbing;
-using Elasticsearch.Net;
 using FluentAssertions;
 
 namespace Elastic.Xunit.ExampleComplex
 {
-	public class MyTestClass : ClusterTestClassBase<TestCluster>
+	public class MyTestClass(TestCluster cluster)
+		: ClusterTestClassBase<TestCluster>(cluster)
 	{
-		public MyTestClass(TestCluster cluster) : base(cluster) { }
-
 		[I]
 		public void SomeTest()
 		{
-			var info = Client.RootNodeInfo();
+			var info = Client.Info();
 
-			info.IsValid.Should().BeTrue();
-
-			Client.CreateIndex("INASda");
-			Client.LowLevel.Search<StringResponse>(PostData.Serializable(new {query = new {query_string = 1}}));
+			info.IsValidResponse.Should().BeTrue();
 		}
 	}
 
-	public class Tests1 : ClusterTestClassBase<TestCluster>
+	public class Tests1(TestCluster cluster)
+		: ClusterTestClassBase<TestCluster>(cluster)
 	{
-		public Tests1(TestCluster cluster) : base(cluster) { }
-
 		[U] public void Unit1Test() => (1 + 1).Should().Be(2);
 		[U] public void Unit1Test1() => (1 + 1).Should().Be(2);
 		[U] public void Unit1Test2() => (1 + 1).Should().Be(2);
@@ -67,9 +61,9 @@ namespace Elastic.Xunit.ExampleComplex
 
 		[I] public void SomeTest()
 		{
-			var info = Client.RootNodeInfo();
+			var info = Client.Info();
 
-			info.IsValid.Should().BeTrue();
+			info.IsValidResponse.Should().BeTrue();
 		}
 		[U] public void MyGenericUnitTest() => (1 + 1).Should().Be(2);
 		[U] public void MyGenericUnitTest1() => (1 + 1).Should().Be(2);
@@ -81,16 +75,15 @@ namespace Elastic.Xunit.ExampleComplex
 	}
 
 	[SkipVersion("<6.2.0", "")]
-	public class SkipTestClass : ClusterTestClassBase<TestGenericCluster>
+	public class SkipTestClass(TestGenericCluster cluster)
+		: ClusterTestClassBase<TestGenericCluster>(cluster)
 	{
-		public SkipTestClass(TestGenericCluster cluster) : base(cluster) { }
-
 		[I]
 		public void SomeTest()
 		{
-			var info = Client.RootNodeInfo();
+			var info = Client.Info();
 
-			info.IsValid.Should().BeTrue();
+			info.IsValidResponse.Should().BeTrue();
 		}
 
 		[U]
@@ -99,7 +92,7 @@ namespace Elastic.Xunit.ExampleComplex
 
 	public class DirectInterfaceTests : IClusterFixture<TestGenericCluster>
 	{
-		public DirectInterfaceTests(TestGenericCluster cluster) { }
+		public DirectInterfaceTests(TestGenericCluster _) { }
 
 		[U]
 		public void DirectUnitTest() => (1 + 1).Should().Be(2);

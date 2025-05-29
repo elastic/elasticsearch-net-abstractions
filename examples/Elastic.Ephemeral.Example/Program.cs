@@ -24,10 +24,13 @@ using var started = cluster.Start();
 
 var pool = new StaticNodePool(cluster.NodesUris());
 var transportConfig = new TransportConfiguration(pool, productRegistration: ElasticsearchProductRegistration.Default)
-	.Authentication(new BasicAuthentication(Admin.Username, Admin.Password))
-	.ServerCertificateValidationCallback(CertificateValidations.AllowAll);
-if (cluster.DetectedProxy != DetectedProxySoftware.None)
-	transportConfig = transportConfig.Proxy(new Uri("http://localhost:8080"), null!, null!);
+{
+	Authentication = new BasicAuthentication(Admin.Username, Admin.Password),
+	ServerCertificateValidationCallback = CertificateValidations.AllowAll,
+	ProxyAddress = cluster.DetectedProxy == DetectedProxySoftware.None
+		? null
+		: "http://localhost:8080"
+};
 
 var transport = new DistributedTransport(transportConfig);
 

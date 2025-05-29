@@ -25,7 +25,7 @@ from core but you can also use a full framework project.
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
     
     <!-- Optional, use a decent assertions library :)  -->
-    <PackageReference Include="FluentAssertions" Version="5.1.2" />
+    <PackageReference Include="FluentAssertions" Version="7.2.0" />
   </ItemGroup>
 </Project>
 ```

@@ -11,7 +11,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using Elastic.Stack.ArtifactsApi.Platform;
 using Elastic.Stack.ArtifactsApi.Products;
-using SemVer;
 using Version = SemVer.Version;
 
 namespace Elastic.Stack.ArtifactsApi.Resolvers
@@ -90,7 +89,7 @@ namespace Elastic.Stack.ArtifactsApi.Resolvers
 
 		public static Version LatestSnapshotForMajor(int major)
 		{
-			var range = new Range($"~{major}");
+			var range = new SemVer.Range($"~{major}");
 			return AvailableVersions.Value
 				.Reverse()
 				.FirstOrDefault(v =>
@@ -99,7 +98,7 @@ namespace Elastic.Stack.ArtifactsApi.Resolvers
 
 		public static Version LatestReleaseOrSnapshotForMajor(int major)
 		{
-			var range = new Range($"~{major}");
+			var range = new SemVer.Range($"~{major}");
 			return AvailableVersions.Value
 				.Reverse()
 				.FirstOrDefault(v => range.IsSatisfied(v.ToString().Replace("-SNAPSHOT", "")));

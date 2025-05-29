@@ -15,7 +15,7 @@ namespace Elastic.Xunit.ExampleComplex
 		public void Test()
 		{
 			(1 + 1).Should().Be(2);
-			var info = ElasticXunitRunner.CurrentCluster.GetOrAddClient().RootNodeInfo();
+			var info = ElasticXunitRunner.CurrentCluster.GetOrAddClient().Info();
 			info.Name.Should().NotBeNullOrWhiteSpace();
 		}
 	}
