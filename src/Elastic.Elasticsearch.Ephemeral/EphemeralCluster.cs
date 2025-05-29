@@ -107,7 +107,11 @@ namespace Elastic.Elasticsearch.Ephemeral
 		public static string CalculateSha1(string text, Encoding enc)
 		{
 			var buffer = enc.GetBytes(text);
+#if NET8_0_OR_GREATER
+			var cryptoTransformSha1 = SHA1.Create();
+#else
 			var cryptoTransformSha1 = new SHA1CryptoServiceProvider();
+#endif
 			return BitConverter.ToString(cryptoTransformSha1.ComputeHash(buffer))
 				.Replace("-", "").ToLowerInvariant().Substring(0, 12);
 		}

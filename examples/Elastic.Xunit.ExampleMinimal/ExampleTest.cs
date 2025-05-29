@@ -2,11 +2,11 @@
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
+using Elastic.Clients.Elasticsearch;
 using Elastic.Elasticsearch.Xunit;
 using Elastic.Elasticsearch.Xunit.XunitPlumbing;
-using Elasticsearch.Net;
+using Elastic.Transport;
 using FluentAssertions;
-using Nest;
 using Xunit;
 
 // we need to put this assembly attribute in place for xunit to use our custom test execution pipeline
@@ -21,7 +21,7 @@ namespace Elastic.Xunit.ExampleMinimal
 		///     We pass our configuration instance to the base class.
 		///     We only configure it to run version 6.2.3 here but lots of additional options are available.
 		/// </summary>
-		public MyTestCluster() : base(new XunitClusterConfiguration("latest-8"))
+		public MyTestCluster() : base(new XunitClusterConfiguration("latest-9"))
 		{
 		}
 	}
@@ -40,19 +40,19 @@ namespace Elastic.Xunit.ExampleMinimal
 			Client = cluster.GetOrAddClient(c =>
 			{
 				var nodes = cluster.NodesUris();
-				var connectionPool = new StaticConnectionPool(nodes);
-				var settings = new ConnectionSettings(connectionPool)
+				var connectionPool = new StaticNodePool(nodes);
+				var settings = new ElasticsearchClientSettings(connectionPool)
 					.EnableDebugMode();
-				return new ElasticClient(settings);
+				return new ElasticsearchClient(settings);
 			});
 
-		private ElasticClient Client { get; }
+		private ElasticsearchClient Client { get; }
 
 		/// <summary> [I] marks an integration test (like [Fact] would for plain Xunit) </summary>
 		[I]
 		public void SomeTest()
 		{
-			var rootNodeInfo = Client.RootNodeInfo();
+			var rootNodeInfo = Client.Info();
 
 			rootNodeInfo.Name.Should().NotBeNullOrEmpty();
 		}

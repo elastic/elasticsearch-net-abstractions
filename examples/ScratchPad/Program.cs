@@ -6,13 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using Elastic.Clients.Elasticsearch;
 using Elastic.Elasticsearch.Ephemeral;
 using Elastic.Elasticsearch.Ephemeral.Plugins;
 using Elastic.Stack.ArtifactsApi;
 using Elastic.Stack.ArtifactsApi.Products;
 using Elastic.Stack.ArtifactsApi.Resolvers;
-using Elasticsearch.Net;
-using Nest;
+using Elastic.Transport;
 using static Elastic.Elasticsearch.Ephemeral.ClusterFeatures;
 using HttpMethod = System.Net.Http.HttpMethod;
 
@@ -51,15 +51,19 @@ namespace ScratchPad
 				cluster.Start();
 
 				var nodes = cluster.NodesUris();
-				var connectionPool = new StaticConnectionPool(nodes);
-				var settings = new ConnectionSettings(connectionPool).EnableDebugMode();
+				var connectionPool = new StaticNodePool(nodes);
+				var settings = new ElasticsearchClientSettings(connectionPool).EnableDebugMode();
 				if (config.EnableSecurity)
-					settings = settings.BasicAuthentication(ClusterAuthentication.Admin.Username,
-						ClusterAuthentication.Admin.Password);
+				{
+					settings = settings.Authentication(
+						new BasicAuthentication(ClusterAuthentication.Admin.Username, ClusterAuthentication.Admin.Password)
+					);
+				}
+
 				if (config.EnableSsl)
 					settings = settings.ServerCertificateValidationCallback(CertificateValidations.AllowAll);
 
-				var client = new ElasticClient(settings);
+				var client = new ElasticsearchClient(settings);
 
 				var clusterConfiguration = new Dictionary<string, object>()
 				{
@@ -68,13 +72,7 @@ namespace ScratchPad
 				};
 
 
-				var putSettingsResponse = client.ClusterPutSettings(new ClusterPutSettingsRequest
-				{
-					Transient = clusterConfiguration
-				});
-
-
-				Console.Write(client.XPackInfo().DebugInformation);
+				Console.Write(client.Xpack.Info().DebugInformation);
 				Console.WriteLine("Press any key to exit");
 				Console.ReadKey();
 				Console.WriteLine("Exitting..");
@@ -107,7 +105,7 @@ namespace ScratchPad
 				Console.ForegroundColor = ConsoleColor.Yellow;
 				Console.Write($"\t{p.Moniker}");
 				Console.ForegroundColor = ConsoleColor.Cyan;
-				Console.Write($"\t\t{r.ArtifactBuildState.GetStringValue()}");
+				Console.Write($"\t\t{r.ArtifactBuildState}");
 				Console.ForegroundColor = ConsoleColor.White;
 				Console.WriteLine($"\t{a?.BuildHash}");
 				Console.ForegroundColor = ConsoleColor.Blue;
