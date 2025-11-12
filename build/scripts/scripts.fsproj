@@ -7,8 +7,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Argu" Version="6.0.0" />
-    <PackageReference Include="Bullseye" Version="3.3.0" />
-    <PackageReference Include="Proc" Version="0.9.1" />
+    <PackageReference Include="Bullseye" Version="6.0.0" />
+    <PackageReference Include="Proc" Version="0.11.0" />
     <PackageReference Include="Fake.Tools.Git" Version="5.15.0" />
   </ItemGroup>
 

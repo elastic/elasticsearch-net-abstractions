@@ -6,7 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Elastic.Clients.Elasticsearch" Version="9.2.1" />
-    <PackageReference Include="Proc" Version="0.9.1" />
+    <PackageReference Include="Proc" Version="0.11.0" />
     <!--<ProjectReference Include="..\..\..\..\..\proc\src\Proc\Proc.csproj" />-->
   </ItemGroup>
   <ItemGroup>
