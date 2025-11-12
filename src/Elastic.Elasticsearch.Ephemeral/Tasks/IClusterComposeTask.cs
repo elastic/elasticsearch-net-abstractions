@@ -95,7 +95,7 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 				$"{{{nameof(Call)}}} [{statusUrl}] SSL: {cluster.ClusterConfiguration.EnableSsl} Security: {cluster.ClusterConfiguration.EnableSecurity}");
 			if (cluster.ClusterConfiguration.EnableSsl)
 			{
-#if !NETSTANDARD
+#if !NETSTANDARD && !NET8_0_OR_GREATER
 				ServicePointManager.ServerCertificateValidationCallback += ServerCertificateValidationCallback;
 #else
 				handler.ServerCertificateCustomValidationCallback += (m, c, cn, p) => true;
@@ -130,7 +130,7 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 			}
 			finally
 			{
-#if !NETSTANDARD
+#if !NETSTANDARD && !NET8_0_OR_GREATER
 				ServicePointManager.ServerCertificateValidationCallback -= ServerCertificateValidationCallback;
 #endif
 			}
