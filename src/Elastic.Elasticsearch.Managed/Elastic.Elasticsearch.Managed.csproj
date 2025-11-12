@@ -3,14 +3,13 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1;net462;net8.0;net10.0</TargetFrameworks>
     <Description>
-      Provides an observable ElasticsearchNode abstraction that can be used to wrap an elasticsearch process. 
+      Provides an observable ElasticsearchNode abstraction that can be used to wrap an elasticsearch process.
       Also ships with an cluster abstraction that can start one or more ElasticsearchNode's
     </Description>
     <PackageTags>elastic,elasticsearch,cluster,observable,rx</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Elastic.Stack.ArtifactsApi\Elastic.Stack.ArtifactsApi.csproj" />
-    <PackageReference Include="Proc" Version="0.11.0" />
-    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="8.0.0" />
+    <ProjectReference Include="..\Elastic.Stack.ArtifactsApi\Elastic.Stack.ArtifactsApi.csproj"/>
+    <PackageReference Include="Proc" Version="0.11.0"/>
   </ItemGroup>
 </Project>
