@@ -45,7 +45,7 @@ namespace Elastic.Stack.ArtifactsApi.Resolvers
 			{
 				var json = ApiResolver.FetchJson($"search/{version}/{query}");
 				// if packages is empty it turns into an array[] otherwise its a dictionary :/
-				packages = JsonSerializer.Deserialize<ArtifactsSearchResponse>(json).Packages;
+				packages = JsonSerializer.Deserialize(json, ApiResolverSerializerContext.Default.ArtifactsSearchResponse).Packages;
 			}
 			catch
 			{
@@ -82,7 +82,7 @@ namespace Elastic.Stack.ArtifactsApi.Resolvers
 		private static IReadOnlyCollection<Version> LoadVersions()
 		{
 			var json = ApiResolver.FetchJson("versions");
-			var versions = JsonSerializer.Deserialize<ArtifactsVersionsResponse>(json).Versions;
+			var versions = JsonSerializer.Deserialize(json, ApiResolverSerializerContext.Default.ArtifactsVersionsResponse).Versions;
 
 			return new List<Version>(versions.Select(v => new Version(v)));
 		}
