@@ -74,7 +74,7 @@ namespace Elastic.Stack.ArtifactsApi.Resolvers
 			try
 			{
 				// if packages is empty it turns into an array[] otherwise its a dictionary :/
-				var packages = JsonSerializer.Deserialize<ArtifactsSearchResponse>(json).Packages;
+				var packages = JsonSerializer.Deserialize(json, ApiResolverSerializerContext.Default.ArtifactsSearchResponse).Packages;
 				if (packages.Count == 0)
 					throw new Exception("Can not get build hash for: " + version);
 				return GetBuildHash(packages.First().Value.DownloadUrl);
@@ -123,4 +123,8 @@ namespace Elastic.Stack.ArtifactsApi.Resolvers
 		[JsonPropertyName("os")] public string[] OperatingSystem { get; set; }
 		[JsonPropertyName("classifier")] public string Classifier { get; set; }
 	}
+
+	[JsonSerializable(typeof(ArtifactsVersionsResponse))]
+	[JsonSerializable(typeof(ArtifactsSearchResponse))]
+	internal sealed partial class ApiResolverSerializerContext : JsonSerializerContext;
 }
