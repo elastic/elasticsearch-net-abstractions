@@ -166,7 +166,15 @@ public class RequiresLinuxAttribute : SkipTestAttribute
 public async Task LinuxOnlyTest() { }
 ```
 
-### Parallel limiting
+### Concurrency
+
+**Cluster startup is serialized.** Only one cluster starts at a time across the entire test run,
+regardless of how many cluster types exist. Elasticsearch is resource-intensive, so startups are
+gated by an internal semaphore to avoid overwhelming the machine.
+
+**Tests run with unlimited parallelism by default.** Once a cluster is up, TUnit runs all tests
+against it concurrently with no limit. For integration tests that hit Elasticsearch this can be
+too aggressive — use `[ParallelLimiter<T>]` to cap concurrency:
 
 ```csharp
 [ParallelLimiter<ElasticsearchParallelLimit>]
