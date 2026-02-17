@@ -1,0 +1,51 @@
+// Licensed to Elasticsearch B.V under one or more agreements.
+// Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
+// See the LICENSE file in the project root for more information
+
+using Elastic.Clients.Elasticsearch;
+using Elastic.Stack.ArtifactsApi;
+using Elastic.TUnit.Elasticsearch.Core;
+using Elastic.Transport;
+
+namespace Elastic.TUnit.Elasticsearch;
+
+/// <summary>
+///     A convenience non-generic Elasticsearch cluster base class.
+///     Use with a primary constructor for one-liner cluster definitions:
+///     <code>public class MyCluster() : ElasticsearchCluster("latest-9");</code>
+///     <para>
+///         Provides a default <see cref="Client" /> that connects to the cluster
+///         with debug mode enabled and per-request diagnostics routed to the
+///         current TUnit test's output. Override to customize.
+///     </para>
+/// </summary>
+public class ElasticsearchCluster : ElasticsearchCluster<ElasticsearchConfiguration>
+{
+	public ElasticsearchCluster(string version)
+		: base(new ElasticsearchConfiguration(version))
+	{
+	}
+
+	public ElasticsearchCluster(ElasticVersion version)
+		: base(new ElasticsearchConfiguration(version))
+	{
+	}
+
+	public ElasticsearchCluster(ElasticsearchConfiguration configuration)
+		: base(configuration)
+	{
+	}
+
+	/// <summary>
+	///     A default <see cref="ElasticsearchClient" /> configured with debug mode
+	///     and per-request diagnostics routed to the current TUnit test's output.
+	///     The client is cached for the cluster's lifetime.
+	///     Override to customize connection settings, authentication, serialization, etc.
+	/// </summary>
+	public virtual ElasticsearchClient Client => this.GetOrAddClient((c, output) =>
+	{
+		var settings = new ElasticsearchClientSettings(new StaticNodePool(c.NodesUris()))
+			.WireTUnitOutput(output);
+		return new ElasticsearchClient(settings);
+	});
+}
