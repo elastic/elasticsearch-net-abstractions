@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TUnit.Core;
 
-namespace Elastic.Elasticsearch.TUnit;
+namespace Elastic.TUnit.Elasticsearch.Core;
 
 /// <summary>
 ///     A <see cref="TextWriter" /> that dynamically routes output to the current

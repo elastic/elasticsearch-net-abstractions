@@ -5,7 +5,7 @@
 using System;
 using TUnit.Core.Interfaces;
 
-namespace Elastic.Elasticsearch.TUnit;
+namespace Elastic.TUnit.Elasticsearch.Core;
 
 /// <summary>
 ///     Default parallel limit for Elasticsearch integration tests.

@@ -3,7 +3,7 @@
 // See the LICENSE file in the project root for more information
 
 using System.Threading.Tasks;
-using Elastic.Elasticsearch.TUnit;
+using Elastic.TUnit.Elasticsearch;
 using TUnit.Assertions;
 using TUnit.Assertions.Extensions;
 using TUnit.Core;

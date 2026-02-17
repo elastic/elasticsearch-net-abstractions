@@ -9,7 +9,7 @@ using System.Linq;
 using Elastic.Elasticsearch.Managed.ConsoleWriters;
 using ProcNet.Std;
 
-namespace Elastic.Elasticsearch.TUnit;
+namespace Elastic.TUnit.Elasticsearch.Core;
 
 /// <summary>
 ///     A console line handler that writes colorized output using ANSI escape codes

@@ -8,7 +8,7 @@ using System.IO;
 using System.Threading;
 using ProcNet.Std;
 
-namespace Elastic.Elasticsearch.TUnit;
+namespace Elastic.TUnit.Elasticsearch.Core;
 
 /// <summary>
 ///     A console line handler that emits periodic progress heartbeats during cluster

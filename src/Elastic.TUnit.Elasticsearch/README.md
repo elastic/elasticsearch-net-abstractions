@@ -1,9 +1,11 @@
-# Elastic.Elasticsearch.TUnit
+# Elastic.TUnit.Elasticsearch
 
-Write integration tests against Elasticsearch using [TUnit](https://tunit.dev).
-Leverages TUnit's native primitives (`ClassDataSource<T>`, `IAsyncInitializer`, `[BeforeEvery(Test)]`) so there is
-no custom test framework, no marker interfaces, and no special test discoverers -- just well-named base classes
-and attributes.
+Write integration tests against Elasticsearch using [TUnit](https://tunit.dev) and
+[`Elastic.Clients.Elasticsearch`](https://www.nuget.org/packages/Elastic.Clients.Elasticsearch/).
+
+This is the recommended package for most users — it builds on
+[`Elastic.TUnit`](https://www.nuget.org/packages/Elastic.TUnit/) and adds a convenience
+`ElasticsearchCluster` base class with a pre-configured `ElasticsearchClient`.
 
 ## Getting started
 
@@ -16,12 +18,12 @@ and attributes.
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TUnit" Version="1.15.0" />
-    <PackageReference Include="Elastic.Elasticsearch.TUnit" Version="<latest>" />
+    <PackageReference Include="Elastic.TUnit.Elasticsearch" Version="<latest>" />
   </ItemGroup>
 </Project>
 ```
 
-`Elastic.Clients.Elasticsearch` is included as a transitive dependency.
+`Elastic.Clients.Elasticsearch` and `Elastic.TUnit` are included as transitive dependencies.
 
 ### Define a cluster
 
@@ -75,13 +77,15 @@ public class MyTestCluster() : ElasticsearchCluster("latest-9")
     {
         var pool = new StaticNodePool(c.NodesUris());
         var settings = new ElasticsearchClientSettings(pool)
-            .EnableDebugMode()
-            .Authentication(new BasicAuthentication("user", "pass"))
-            .OnRequestCompleted(call => output.WriteLine(call.DebugInformation));
+            .WireTUnitOutput(output)
+            .Authentication(new BasicAuthentication("user", "pass"));
         return new ElasticsearchClient(settings);
     });
 }
 ```
+
+The `.WireTUnitOutput(output)` extension enables debug mode and routes per-request diagnostics
+to the current test's output.
 
 For multiple clusters that share the same client setup, use a base class:
 
@@ -192,10 +196,8 @@ public class SecurityCluster : ElasticsearchCluster<ElasticsearchConfiguration>
 
     public ElasticsearchClient Client => this.GetOrAddClient((c, output) =>
     {
-        var pool = new StaticNodePool(c.NodesUris());
-        var settings = new ElasticsearchClientSettings(pool)
-            .EnableDebugMode()
-            .OnRequestCompleted(call => output.WriteLine(call.DebugInformation));
+        var settings = new ElasticsearchClientSettings(new StaticNodePool(c.NodesUris()))
+            .WireTUnitOutput(output);
         return new ElasticsearchClient(settings);
     });
 

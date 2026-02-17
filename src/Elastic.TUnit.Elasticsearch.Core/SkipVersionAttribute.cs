@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Elastic.Elasticsearch.TUnit;
+namespace Elastic.TUnit.Elasticsearch.Core;
 
 /// <summary>
 ///     An attribute that marks a test or test class to be skipped for given Elasticsearch versions.

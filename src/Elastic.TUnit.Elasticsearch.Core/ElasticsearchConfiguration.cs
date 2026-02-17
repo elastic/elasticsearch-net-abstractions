@@ -7,7 +7,7 @@ using Elastic.Elasticsearch.Ephemeral;
 using Elastic.Elasticsearch.Ephemeral.Plugins;
 using Elastic.Stack.ArtifactsApi;
 
-namespace Elastic.Elasticsearch.TUnit;
+namespace Elastic.TUnit.Elasticsearch.Core;
 
 internal enum BootstrapDiagnosticsMode
 {

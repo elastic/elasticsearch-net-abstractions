@@ -15,7 +15,7 @@ using ProcNet.Std;
 using TUnit.Core;
 using TUnit.Core.Interfaces;
 
-namespace Elastic.Elasticsearch.TUnit;
+namespace Elastic.TUnit.Elasticsearch.Core;
 
 /// <summary>
 ///     Base class for an Elasticsearch cluster that integrates with TUnit's lifecycle.

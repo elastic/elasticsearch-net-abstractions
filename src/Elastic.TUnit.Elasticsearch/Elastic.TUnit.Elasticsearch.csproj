@@ -3,18 +3,17 @@
     <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
     <IsPackable>True</IsPackable>
     <IsTestProject>False</IsTestProject>
-    <Description>Provides TUnit integration for running integration tests against local ephemeral Elasticsearch clusters</Description>
-    <PackageTags>elastic,elasticsearch,tunit,cluster,integration,test,ephemeral</PackageTags>
+    <Description>TUnit integration for Elasticsearch — ephemeral clusters with a pre-configured ElasticsearchClient. This is the recommended package for most users.</Description>
+    <PackageTags>elastic,elasticsearch,tunit,cluster,integration,test,ephemeral,client</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="TUnit.Core" Version="1.15.0" />
     <PackageReference Include="Elastic.Clients.Elasticsearch" Version="9.2.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Elastic.Elasticsearch.Ephemeral\Elastic.Elasticsearch.Ephemeral.csproj" />
+    <ProjectReference Include="..\Elastic.TUnit.Elasticsearch.Core\Elastic.TUnit.Elasticsearch.Core.csproj" />
   </ItemGroup>
 </Project>

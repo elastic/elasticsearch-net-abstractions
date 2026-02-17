@@ -7,7 +7,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using Elastic.Elasticsearch.Ephemeral;
 
-namespace Elastic.Elasticsearch.TUnit;
+namespace Elastic.TUnit.Elasticsearch.Core;
 
 /// <summary>
 ///     Extension methods for <see cref="IEphemeralCluster" />.

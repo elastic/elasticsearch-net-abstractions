@@ -8,7 +8,7 @@ using System.Linq;
 using Elastic.Stack.ArtifactsApi;
 using TUnit.Core;
 
-namespace Elastic.Elasticsearch.TUnit;
+namespace Elastic.TUnit.Elasticsearch.Core;
 
 /// <summary>
 ///     A global TUnit hook that evaluates <see cref="SkipVersionAttribute" /> and

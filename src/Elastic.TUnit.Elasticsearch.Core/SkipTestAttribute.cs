@@ -4,7 +4,7 @@
 
 using System;
 
-namespace Elastic.Elasticsearch.TUnit;
+namespace Elastic.TUnit.Elasticsearch.Core;
 
 /// <summary>
 ///     Abstract base for custom skip conditions. Subclass this to implement

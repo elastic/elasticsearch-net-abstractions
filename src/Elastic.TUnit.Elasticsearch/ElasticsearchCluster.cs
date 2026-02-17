@@ -4,9 +4,10 @@
 
 using Elastic.Clients.Elasticsearch;
 using Elastic.Stack.ArtifactsApi;
+using Elastic.TUnit.Elasticsearch.Core;
 using Elastic.Transport;
 
-namespace Elastic.Elasticsearch.TUnit;
+namespace Elastic.TUnit.Elasticsearch;
 
 /// <summary>
 ///     A convenience non-generic Elasticsearch cluster base class.
@@ -43,10 +44,8 @@ public class ElasticsearchCluster : ElasticsearchCluster<ElasticsearchConfigurat
 	/// </summary>
 	public virtual ElasticsearchClient Client => this.GetOrAddClient((c, output) =>
 	{
-		var pool = new StaticNodePool(c.NodesUris());
-		var settings = new ElasticsearchClientSettings(pool)
-			.EnableDebugMode()
-			.OnRequestCompleted(call => output.WriteLine(call.DebugInformation));
+		var settings = new ElasticsearchClientSettings(new StaticNodePool(c.NodesUris()))
+			.WireTUnitOutput(output);
 		return new ElasticsearchClient(settings);
 	});
 }

@@ -3,7 +3,8 @@
 // See the LICENSE file in the project root for more information
 
 using Elastic.Clients.Elasticsearch;
-using Elastic.Elasticsearch.TUnit;
+using Elastic.TUnit.Elasticsearch;
+using Elastic.TUnit.Elasticsearch.Core;
 using Elastic.Transport;
 
 namespace Elastic.TUnit.ExampleComplex;

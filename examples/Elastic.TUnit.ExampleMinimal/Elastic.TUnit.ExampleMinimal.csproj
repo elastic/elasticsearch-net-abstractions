@@ -7,6 +7,6 @@
     <PackageReference Include="TUnit" Version="1.15.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Elastic.Elasticsearch.TUnit\Elastic.Elasticsearch.TUnit.csproj" />
+    <ProjectReference Include="..\..\src\Elastic.TUnit.Elasticsearch\Elastic.TUnit.Elasticsearch.csproj" />
   </ItemGroup>
 </Project>

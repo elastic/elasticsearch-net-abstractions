@@ -8,7 +8,7 @@ using Elastic.Elasticsearch.Ephemeral.Tasks;
 using Elastic.Elasticsearch.Managed.ConsoleWriters;
 using TUnit.Core;
 
-namespace Elastic.Elasticsearch.TUnit;
+namespace Elastic.TUnit.Elasticsearch.Core;
 
 /// <summary>
 ///     A task that writes a diagnostic message after the cluster has started.

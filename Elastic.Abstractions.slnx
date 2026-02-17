@@ -24,7 +24,8 @@
     <File Path="src/Directory.Build.props" />
     <Project Path="src/Elastic.Elasticsearch.Ephemeral/Elastic.Elasticsearch.Ephemeral.csproj" />
     <Project Path="src/Elastic.Elasticsearch.Managed/Elastic.Elasticsearch.Managed.csproj" />
-    <Project Path="src/Elastic.Elasticsearch.TUnit/Elastic.Elasticsearch.TUnit.csproj" />
+    <Project Path="src/Elastic.TUnit.Elasticsearch.Core/Elastic.TUnit.Elasticsearch.Core.csproj" />
+    <Project Path="src/Elastic.TUnit.Elasticsearch/Elastic.TUnit.Elasticsearch.csproj" />
     <Project Path="src/Elastic.Elasticsearch.Xunit/Elastic.Elasticsearch.Xunit.csproj" />
     <Project Path="src/Elastic.Stack.ArtifactsApi/Elastic.Stack.ArtifactsApi.csproj" />
   </Folder>

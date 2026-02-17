@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <IsPackable>True</IsPackable>
+    <IsTestProject>False</IsTestProject>
+    <Description>Core TUnit integration for ephemeral Elasticsearch clusters — no Elastic.Clients.Elasticsearch dependency. Most users should depend on Elastic.TUnit.Elasticsearch instead.</Description>
+    <PackageTags>elastic,elasticsearch,tunit,cluster,integration,test,ephemeral,core</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="TUnit.Core" Version="1.15.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Elastic.Elasticsearch.Ephemeral\Elastic.Elasticsearch.Ephemeral.csproj" />
+  </ItemGroup>
+</Project>
