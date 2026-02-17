@@ -24,38 +24,41 @@ and attributes.
 
 ### Define a cluster
 
-```csharp
-using Elastic.Elasticsearch.TUnit;
-
-public class MyTestCluster() : ElasticsearchCluster("latest-9");
-```
-
-That single line gives you a one-node ephemeral cluster running the latest Elasticsearch 9.x.
-The cluster downloads, installs, starts, and tears down automatically.
-
-### Write tests
+Define the cluster and expose a `Client` property. The client is cached per-cluster and
+per-request diagnostics are routed to whichever TUnit test is currently executing:
 
 ```csharp
 using Elastic.Clients.Elasticsearch;
 using Elastic.Elasticsearch.TUnit;
 using Elastic.Transport;
 
+public class MyTestCluster() : ElasticsearchCluster("latest-9")
+{
+    public ElasticsearchClient Client => this.GetOrAddClient((c, output) =>
+    {
+        var pool = new StaticNodePool(c.NodesUris());
+        var settings = new ElasticsearchClientSettings(pool)
+            .EnableDebugMode()
+            .OnRequestCompleted(call => output.WriteLine(call.DebugInformation));
+        return new ElasticsearchClient(settings);
+    });
+}
+```
+
+The cluster downloads, installs, starts, and tears down Elasticsearch automatically.
+
+### Write tests
+
+Tests receive the cluster via constructor injection. Access the client directly:
+
+```csharp
 [ClassDataSource<MyTestCluster>(Shared = SharedType.Keyed, Key = nameof(MyTestCluster))]
 public class MyTests(MyTestCluster cluster)
 {
     [Test]
     public async Task InfoReturnsNodeName()
     {
-        var client = cluster.GetOrAddClient((c, output) =>
-        {
-            var pool = new StaticNodePool(c.NodesUris());
-            var settings = new ElasticsearchClientSettings(pool)
-                .EnableDebugMode()
-                .OnRequestCompleted(call => output.WriteLine(call.DebugInformation));
-            return new ElasticsearchClient(settings);
-        });
-
-        var info = client.Info();
+        var info = cluster.Client.Info();
 
         await Assert.That(info.Name).IsNotNull();
     }
@@ -63,8 +66,7 @@ public class MyTests(MyTestCluster cluster)
 ```
 
 `SharedType.Keyed` ensures the cluster is created once and shared across all test classes that
-reference the same key. The `output` `TextWriter` dynamically routes per-request diagnostics to
-whichever TUnit test is currently executing.
+reference the same key.
 
 ### Run
 
@@ -99,20 +101,53 @@ public class MyCluster : ElasticsearchCluster(new ElasticsearchConfiguration("la
 On failure, node-level diagnostics (started status, port, version, last exception) are written
 to both the terminal and TUnit's test output.
 
-### Client caching with per-test output
+### Per-test client diagnostics
 
-`GetOrAddClient` caches one client per cluster lifetime. The overload that accepts a
-`TextWriter` provides a writer backed by `TestContext.Current` -- the client is created once, but
-each test's request/response diagnostics appear in that test's output:
+The `GetOrAddClient` overload that accepts a `TextWriter` provides a writer backed by
+`TestContext.Current` -- the client is created once, but each test's request/response
+diagnostics appear in that test's output. The recommended pattern is to expose this as a
+`Client` property on your cluster class:
 
 ```csharp
-var client = cluster.GetOrAddClient((c, output) =>
+public class MyTestCluster() : ElasticsearchCluster("latest-9")
 {
-    var settings = new ElasticsearchClientSettings(new StaticNodePool(c.NodesUris()))
-        .EnableDebugMode()
-        .OnRequestCompleted(call => output.WriteLine(call.DebugInformation));
-    return new ElasticsearchClient(settings);
-});
+    public ElasticsearchClient Client => this.GetOrAddClient((c, output) =>
+    {
+        var pool = new StaticNodePool(c.NodesUris());
+        var settings = new ElasticsearchClientSettings(pool)
+            .EnableDebugMode()
+            .OnRequestCompleted(call => output.WriteLine(call.DebugInformation));
+        return new ElasticsearchClient(settings);
+    });
+}
+```
+
+For multiple clusters that share the same client setup, use a base class:
+
+```csharp
+public abstract class MyClusterBase : ElasticsearchCluster
+{
+    protected MyClusterBase() : base(new ElasticsearchConfiguration("latest-9")) { }
+
+    public ElasticsearchClient Client => this.GetOrAddClient((c, output) =>
+    {
+        var pool = new StaticNodePool(c.NodesUris());
+        var settings = new ElasticsearchClientSettings(pool)
+            .EnableDebugMode()
+            .OnRequestCompleted(call => output.WriteLine(call.DebugInformation));
+        return new ElasticsearchClient(settings);
+    });
+}
+
+public class ClusterA : MyClusterBase { }
+public class ClusterB : MyClusterBase
+{
+    protected override void SeedCluster()
+    {
+        // Seed data after the cluster is healthy
+        Client.Indices.Create("my-index");
+    }
+}
 ```
 
 ### Version-based skip
@@ -166,6 +201,15 @@ public class SecurityCluster : ElasticsearchCluster<ElasticsearchConfiguration>
         StartTimeout = TimeSpan.FromMinutes(4),
     }) { }
 
+    public ElasticsearchClient Client => this.GetOrAddClient((c, output) =>
+    {
+        var pool = new StaticNodePool(c.NodesUris());
+        var settings = new ElasticsearchClientSettings(pool)
+            .EnableDebugMode()
+            .OnRequestCompleted(call => output.WriteLine(call.DebugInformation));
+        return new ElasticsearchClient(settings);
+    });
+
     protected override void SeedCluster()
     {
         // Called after the cluster is healthy -- create indices, seed data, etc.
@@ -182,5 +226,6 @@ public class SecurityCluster : ElasticsearchCluster<ElasticsearchConfiguration>
 | Integration test marker | `[I]` | `[Test]` |
 | Unit test marker | `[U]` | `[Test]` |
 | Current cluster access | `ElasticXunitRunner.CurrentCluster` | Constructor injection |
+| Client access | `cluster.GetOrAddClient(...)` in test | `cluster.Client` property on cluster |
 | Parallel control | `ElasticXunitRunOptions.MaxConcurrency` | `[ParallelLimiter<T>]` |
 | Cluster partitioning | `Nullean.Xunit.Partitions` | `SharedType.Keyed` |

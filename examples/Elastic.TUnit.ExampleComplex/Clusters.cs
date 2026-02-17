@@ -3,35 +3,16 @@
 // See the LICENSE file in the project root for more information
 
 using Elastic.Clients.Elasticsearch;
-using Elastic.Elasticsearch.Ephemeral;
 using Elastic.Elasticsearch.TUnit;
 using Elastic.Transport;
 
 namespace Elastic.TUnit.ExampleComplex;
 
-internal static class EphemeralClusterExtensions
-{
-	/// <summary>
-	///     Gets or creates an <see cref="ElasticsearchClient" /> for the cluster with
-	///     per-request diagnostics routed to the current TUnit test's output.
-	/// </summary>
-	public static ElasticsearchClient GetOrAddClient(this IEphemeralCluster cluster) =>
-		ElasticsearchClusterExtensions.GetOrAddClient(cluster, (c, output) =>
-		{
-			var connectionPool = new StaticNodePool(c.NodesUris());
-			var settings = new ElasticsearchClientSettings(connectionPool)
-				.EnableDebugMode()
-				.OnRequestCompleted(call => output.WriteLine(call.DebugInformation));
-			return new ElasticsearchClient(settings);
-		});
-}
-
-public interface IMyCluster
-{
-	ElasticsearchClient Client { get; }
-}
-
-public abstract class MyClusterBase : ElasticsearchCluster, IMyCluster
+/// <summary>
+///     Shared base that configures the cluster and exposes a typed client.
+///     All clusters in this project inherit from here.
+/// </summary>
+public abstract class MyClusterBase : ElasticsearchCluster
 {
 	protected MyClusterBase() : base(new ElasticsearchConfiguration("latest-9")
 	{
@@ -40,7 +21,14 @@ public abstract class MyClusterBase : ElasticsearchCluster, IMyCluster
 	{
 	}
 
-	public ElasticsearchClient Client => this.GetOrAddClient();
+	public ElasticsearchClient Client => this.GetOrAddClient((c, output) =>
+	{
+		var pool = new StaticNodePool(c.NodesUris());
+		var settings = new ElasticsearchClientSettings(pool)
+			.EnableDebugMode()
+			.OnRequestCompleted(call => output.WriteLine(call.DebugInformation));
+		return new ElasticsearchClient(settings);
+	});
 }
 
 public class TestCluster : MyClusterBase
@@ -51,13 +39,20 @@ public class TestCluster : MyClusterBase
 	}
 }
 
-public class TestGenericCluster : ElasticsearchCluster<ElasticsearchConfiguration>, IMyCluster
+public class TestGenericCluster : ElasticsearchCluster<ElasticsearchConfiguration>
 {
 	public TestGenericCluster() : base(new ElasticsearchConfiguration("latest-9"))
 	{
 	}
 
-	public ElasticsearchClient Client => this.GetOrAddClient();
+	public ElasticsearchClient Client => this.GetOrAddClient((c, output) =>
+	{
+		var pool = new StaticNodePool(c.NodesUris());
+		var settings = new ElasticsearchClientSettings(pool)
+			.EnableDebugMode()
+			.OnRequestCompleted(call => output.WriteLine(call.DebugInformation));
+		return new ElasticsearchClient(settings);
+	});
 
 	protected override void SeedCluster()
 	{

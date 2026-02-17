@@ -2,14 +2,12 @@
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
-using Elastic.Clients.Elasticsearch;
 using Elastic.Elasticsearch.TUnit;
 
 namespace Elastic.TUnit.ExampleComplex;
 
 public abstract class ClusterTestClassBase<TCluster>(TCluster cluster)
-	where TCluster : ElasticsearchCluster<ElasticsearchConfiguration>, IMyCluster
+	where TCluster : ElasticsearchCluster<ElasticsearchConfiguration>
 {
-	public TCluster Cluster { get; } = cluster;
-	public ElasticsearchClient Client => Cluster.Client;
+	protected TCluster Cluster { get; } = cluster;
 }

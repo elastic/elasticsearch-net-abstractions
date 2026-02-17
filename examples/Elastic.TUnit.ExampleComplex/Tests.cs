@@ -18,7 +18,7 @@ public class MyTestClass(TestCluster cluster)
 	[Test]
 	public async Task SomeTest()
 	{
-		var info = Client.Info();
+		var info = Cluster.Client.Info();
 
 		await Assert.That(info.IsValidResponse).IsTrue();
 	}
@@ -76,7 +76,7 @@ public class MyGenericTestClass(TestGenericCluster cluster)
 	[Test]
 	public async Task SomeTest()
 	{
-		var info = Client.Info();
+		var info = Cluster.Client.Info();
 
 		await Assert.That(info.IsValidResponse).IsTrue();
 	}
@@ -100,7 +100,7 @@ public class SkipTestClass(TestGenericCluster cluster)
 	[Test]
 	public async Task SomeTest()
 	{
-		var info = Client.Info();
+		var info = await Cluster.Client.InfoAsync();
 
 		await Assert.That(info.IsValidResponse).IsTrue();
 	}
