@@ -6,6 +6,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using Elastic.Elasticsearch.Managed.ConsoleWriters;
 using ProcNet.Std;
 
 namespace Elastic.TUnit.Elasticsearch.Core;
@@ -89,7 +90,21 @@ internal sealed class BootstrapProgressWriter : IConsoleLineHandler
 		_out.Write(Color("\x1b[33m")); // Yellow
 		_out.Write($" [{seconds}s] ");
 		_out.Write(Color("\x1b[37m")); // White
-		_out.WriteLine(Truncate(last, 120));
+		_out.WriteLine();
+		_out.WriteLine();
+		var line = Truncate(last, 120);
+		var parsed = LineOutParser.TryParse(last,
+			out var date, out var level, out var section, out var node, out var message, out _);
+
+		if (parsed)
+			AnsiConsoleLineWriter.WriteParsed(_out, date, level, section, node, message);
+		else if (ExceptionLineParser.TryParseCause(line, out var cause, out var causeMessage))
+			AnsiConsoleLineWriter.WriteCausedBy(_out, cause, causeMessage);
+		else if (ExceptionLineParser.TryParseStackTrace(line, out var at, out var method,
+			         out var file, out var jar))
+			AnsiConsoleLineWriter.WriteStackTrace(_out, at, method, file, jar);
+		else
+			AnsiConsoleLineWriter.WriteRaw(_out, false, line);
 		_out.WriteLine();
 		_out.WriteLine();
 	}

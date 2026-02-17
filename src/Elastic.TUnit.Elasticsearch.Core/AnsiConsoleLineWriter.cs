@@ -104,6 +104,12 @@ internal class AnsiConsoleLineWriter : IConsoleLineHandler
 
 	private void WriteParsedLine(TextWriter w, string date, string level, string section, string node, string message)
 	{
+		var nodeColor = _nodeColors.TryGetValue(node, out var nc) ? nc : "\x1b[32m";
+		WriteParsed(w, date, level, section, node, message, nodeColor);
+	}
+
+	internal static void WriteParsed(TextWriter w, string date, string level, string section, string node, string message, string nodeColor = "\x1b[32m")
+	{
 		WriteBlock(w, "\x1b[90m", date);        // Dark Gray
 		WriteBlock(w, LevelColor(level), level, 5);
 
@@ -113,7 +119,6 @@ internal class AnsiConsoleLineWriter : IConsoleLineHandler
 			w.Write(' ');
 		}
 
-		var nodeColor = _nodeColors.TryGetValue(node, out var nc) ? nc : "\x1b[32m";
 		WriteBlock(w, nodeColor, node);
 		w.Write(' ');
 
@@ -123,7 +128,7 @@ internal class AnsiConsoleLineWriter : IConsoleLineHandler
 		w.Write(Reset);
 	}
 
-	private static void WriteCausedBy(TextWriter w, string cause, string message)
+	internal static void WriteCausedBy(TextWriter w, string cause, string message)
 	{
 		w.Write(Color("\x1b[31m")); // Red
 		w.Write(cause);
@@ -134,7 +139,7 @@ internal class AnsiConsoleLineWriter : IConsoleLineHandler
 		w.Write(Reset);
 	}
 
-	private static void WriteStackTrace(TextWriter w, string at, string method, string file, string jar)
+	internal static void WriteStackTrace(TextWriter w, string at, string method, string file, string jar)
 	{
 		w.Write(Color("\x1b[90m")); // Dark Gray
 		w.Write(at);
@@ -152,7 +157,7 @@ internal class AnsiConsoleLineWriter : IConsoleLineHandler
 		w.Write(Reset);
 	}
 
-	private static void WriteRaw(TextWriter w, bool error, string line)
+	internal static void WriteRaw(TextWriter w, bool error, string line)
 	{
 		w.Write(Color(error ? "\x1b[31m" : "\x1b[37m"));
 		w.WriteLine(line);
