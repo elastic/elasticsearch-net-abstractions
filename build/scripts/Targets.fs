@@ -69,18 +69,20 @@ let private generateApiChanges (arguments:ParseResults<Arguments>) =
         |> Seq.map (fun p -> Path.GetFileNameWithoutExtension(Paths.RootRelative p.FullName).Replace("." + currentVersion, ""))
     nugetPackages
     |> Seq.iter(fun p ->
-        let outputFile =
-            let f = sprintf "breaking-changes-%s.md" p
-            Path.Combine(output, f)
-        let args =
-            [
-                "assembly-differ"
-                (sprintf "previous-nuget|%s|%s|%s" p currentVersion Paths.MainTFM);
-                (sprintf "directory|src/%s/bin/Release/%s" p Paths.MainTFM);
-                "-a"; "true"; "--target"; p; "-f"; "github-comment"; "--output"; outputFile
-            ]
-        
-        exec "dotnet" args |> ignore
+        let sourceDir = sprintf "src/%s/bin/Release/%s" p Paths.MainTFM
+        if Directory.Exists(Path.Combine(Paths.Root.FullName, sourceDir)) then
+            let outputFile =
+                let f = sprintf "breaking-changes-%s.md" p
+                Path.Combine(output, f)
+            let args =
+                [
+                    "assembly-differ"
+                    (sprintf "previous-nuget|%s|%s|%s" p currentVersion Paths.MainTFM);
+                    (sprintf "directory|%s" sourceDir);
+                    "-a"; "true"; "--target"; p; "-f"; "github-comment"; "--output"; outputFile
+                ]
+
+            exec "dotnet" args |> ignore
     )
     
 let private generateReleaseNotes (arguments:ParseResults<Arguments>) =
