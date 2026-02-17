@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <IsPackable>True</IsPackable>
+    <IsTestProject>False</IsTestProject>
+    <Description>Provides TUnit integration for running integration tests against local ephemeral Elasticsearch clusters</Description>
+    <PackageTags>elastic,elasticsearch,tunit,cluster,integration,test,ephemeral</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="TUnit.Core" Version="1.15.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Elastic.Elasticsearch.Ephemeral\Elastic.Elasticsearch.Ephemeral.csproj" />
+  </ItemGroup>
+</Project>
