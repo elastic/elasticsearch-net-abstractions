@@ -9,8 +9,7 @@ using Elastic.Transport;
 namespace Elastic.TUnit.ExampleComplex;
 
 /// <summary>
-///     Shared base that configures the cluster and exposes a typed client.
-///     All clusters in this project inherit from here.
+///     Shared base — inherits the default Client from <see cref="ElasticsearchCluster" />.
 /// </summary>
 public abstract class MyClusterBase : ElasticsearchCluster
 {
@@ -20,15 +19,6 @@ public abstract class MyClusterBase : ElasticsearchCluster
 	})
 	{
 	}
-
-	public ElasticsearchClient Client => this.GetOrAddClient((c, output) =>
-	{
-		var pool = new StaticNodePool(c.NodesUris());
-		var settings = new ElasticsearchClientSettings(pool)
-			.EnableDebugMode()
-			.OnRequestCompleted(call => output.WriteLine(call.DebugInformation));
-		return new ElasticsearchClient(settings);
-	});
 }
 
 public class TestCluster : MyClusterBase
@@ -39,6 +29,10 @@ public class TestCluster : MyClusterBase
 	}
 }
 
+/// <summary>
+///     Uses the generic base directly — needs its own Client property since
+///     <see cref="ElasticsearchCluster{TConfiguration}" /> does not provide one.
+/// </summary>
 public class TestGenericCluster : ElasticsearchCluster<ElasticsearchConfiguration>
 {
 	public TestGenericCluster() : base(new ElasticsearchConfiguration("latest-9"))

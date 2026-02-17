@@ -17,32 +17,19 @@ and attributes.
   <ItemGroup>
     <PackageReference Include="TUnit" Version="1.15.0" />
     <PackageReference Include="Elastic.Elasticsearch.TUnit" Version="<latest>" />
-    <PackageReference Include="Elastic.Clients.Elasticsearch" Version="9.2.1" />
   </ItemGroup>
 </Project>
 ```
 
+`Elastic.Clients.Elasticsearch` is included as a transitive dependency.
+
 ### Define a cluster
 
-Define the cluster and expose a `Client` property. The client is cached per-cluster and
-per-request diagnostics are routed to whichever TUnit test is currently executing:
+A one-liner is all you need. The base class provides a default `Client` with debug mode enabled
+and per-request diagnostics routed to whichever TUnit test is currently executing:
 
 ```csharp
-using Elastic.Clients.Elasticsearch;
-using Elastic.Elasticsearch.TUnit;
-using Elastic.Transport;
-
-public class MyTestCluster() : ElasticsearchCluster("latest-9")
-{
-    public ElasticsearchClient Client => this.GetOrAddClient((c, output) =>
-    {
-        var pool = new StaticNodePool(c.NodesUris());
-        var settings = new ElasticsearchClientSettings(pool)
-            .EnableDebugMode()
-            .OnRequestCompleted(call => output.WriteLine(call.DebugInformation));
-        return new ElasticsearchClient(settings);
-    });
-}
+public class MyTestCluster() : ElasticsearchCluster("latest-9");
 ```
 
 The cluster downloads, installs, starts, and tears down Elasticsearch automatically.
@@ -58,7 +45,7 @@ public class MyTests(MyTestCluster cluster)
     [Test]
     public async Task InfoReturnsNodeName()
     {
-        var info = cluster.Client.Info();
+        var info = await cluster.Client.InfoAsync();
 
         await Assert.That(info.Name).IsNotNull();
     }
@@ -75,6 +62,49 @@ dotnet run --project MyTests/
 ```
 
 ## Features
+
+### Custom client configuration
+
+Override the `Client` property when you need custom connection settings, authentication,
+or serialization:
+
+```csharp
+public class MyTestCluster() : ElasticsearchCluster("latest-9")
+{
+    public override ElasticsearchClient Client => this.GetOrAddClient((c, output) =>
+    {
+        var pool = new StaticNodePool(c.NodesUris());
+        var settings = new ElasticsearchClientSettings(pool)
+            .EnableDebugMode()
+            .Authentication(new BasicAuthentication("user", "pass"))
+            .OnRequestCompleted(call => output.WriteLine(call.DebugInformation));
+        return new ElasticsearchClient(settings);
+    });
+}
+```
+
+For multiple clusters that share the same client setup, use a base class:
+
+```csharp
+public abstract class MyClusterBase : ElasticsearchCluster
+{
+    protected MyClusterBase() : base(new ElasticsearchConfiguration("latest-9")
+    {
+        ShowElasticsearchOutputAfterStarted = false,
+    }) { }
+}
+
+public class ClusterA : MyClusterBase { }
+public class ClusterB : MyClusterBase
+{
+    protected override void SeedCluster()
+    {
+        Client.Indices.Create("my-index");
+    }
+}
+```
+
+Both `ClusterA` and `ClusterB` inherit the default `Client` from `ElasticsearchCluster`.
 
 ### Bootstrap diagnostics
 
@@ -103,52 +133,9 @@ to both the terminal and TUnit's test output.
 
 ### Per-test client diagnostics
 
-The `GetOrAddClient` overload that accepts a `TextWriter` provides a writer backed by
-`TestContext.Current` -- the client is created once, but each test's request/response
-diagnostics appear in that test's output. The recommended pattern is to expose this as a
-`Client` property on your cluster class:
-
-```csharp
-public class MyTestCluster() : ElasticsearchCluster("latest-9")
-{
-    public ElasticsearchClient Client => this.GetOrAddClient((c, output) =>
-    {
-        var pool = new StaticNodePool(c.NodesUris());
-        var settings = new ElasticsearchClientSettings(pool)
-            .EnableDebugMode()
-            .OnRequestCompleted(call => output.WriteLine(call.DebugInformation));
-        return new ElasticsearchClient(settings);
-    });
-}
-```
-
-For multiple clusters that share the same client setup, use a base class:
-
-```csharp
-public abstract class MyClusterBase : ElasticsearchCluster
-{
-    protected MyClusterBase() : base(new ElasticsearchConfiguration("latest-9")) { }
-
-    public ElasticsearchClient Client => this.GetOrAddClient((c, output) =>
-    {
-        var pool = new StaticNodePool(c.NodesUris());
-        var settings = new ElasticsearchClientSettings(pool)
-            .EnableDebugMode()
-            .OnRequestCompleted(call => output.WriteLine(call.DebugInformation));
-        return new ElasticsearchClient(settings);
-    });
-}
-
-public class ClusterA : MyClusterBase { }
-public class ClusterB : MyClusterBase
-{
-    protected override void SeedCluster()
-    {
-        // Seed data after the cluster is healthy
-        Client.Indices.Create("my-index");
-    }
-}
-```
+The default `Client` on `ElasticsearchCluster` routes per-request diagnostics to TUnit's
+test output. The client is created once, but each test's request/response diagnostics appear
+in that test's output via `TestContext.Current`.
 
 ### Version-based skip
 
@@ -188,7 +175,9 @@ public class HeavyTests(MyTestCluster cluster) { }
 
 ### Full configuration
 
-For multi-node clusters, plugins, or XPack features use `ElasticsearchConfiguration` directly:
+For multi-node clusters, plugins, or XPack features use `ElasticsearchConfiguration` directly.
+When extending the generic `ElasticsearchCluster<TConfiguration>`, define your own `Client`
+property since the default is only on the non-generic base:
 
 ```csharp
 public class SecurityCluster : ElasticsearchCluster<ElasticsearchConfiguration>
@@ -226,6 +215,6 @@ public class SecurityCluster : ElasticsearchCluster<ElasticsearchConfiguration>
 | Integration test marker | `[I]` | `[Test]` |
 | Unit test marker | `[U]` | `[Test]` |
 | Current cluster access | `ElasticXunitRunner.CurrentCluster` | Constructor injection |
-| Client access | `cluster.GetOrAddClient(...)` in test | `cluster.Client` property on cluster |
+| Client access | `cluster.GetOrAddClient(...)` in test | `cluster.Client` on cluster |
 | Parallel control | `ElasticXunitRunOptions.MaxConcurrency` | `[ParallelLimiter<T>]` |
 | Cluster partitioning | `Nullean.Xunit.Partitions` | `SharedType.Keyed` |

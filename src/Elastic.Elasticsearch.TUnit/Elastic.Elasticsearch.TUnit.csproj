@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="TUnit.Core" Version="1.15.0" />
+    <PackageReference Include="Elastic.Clients.Elasticsearch" Version="9.2.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Elastic.Elasticsearch.Ephemeral\Elastic.Elasticsearch.Ephemeral.csproj" />
