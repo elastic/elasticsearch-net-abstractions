@@ -4,7 +4,7 @@ Write integration tests against Elasticsearch using [TUnit](https://tunit.dev) a
 [`Elastic.Clients.Elasticsearch`](https://www.nuget.org/packages/Elastic.Clients.Elasticsearch/).
 
 This is the recommended package for most users — it builds on
-[`Elastic.TUnit`](https://www.nuget.org/packages/Elastic.TUnit/) and adds a convenience
+[`Elastic.TUnit.Elasticsearch.Core`](https://www.nuget.org/packages/Elastic.TUnit.Elasticsearch.Core/) and adds a convenience
 `ElasticsearchCluster` base class with a pre-configured `ElasticsearchClient`.
 
 ## Getting started
@@ -23,7 +23,7 @@ This is the recommended package for most users — it builds on
 </Project>
 ```
 
-`Elastic.Clients.Elasticsearch` and `Elastic.TUnit` are included as transitive dependencies.
+`Elastic.Clients.Elasticsearch` and `Elastic.TUnit.Elasticsearch.Core` are included as transitive dependencies.
 
 ### Define a cluster
 
@@ -63,6 +63,75 @@ reference the same key.
 dotnet run --project MyTests/
 ```
 
+## Using an external cluster
+
+When developing integration tests, waiting for an ephemeral cluster to start on every run
+can be slow. You can point tests at an already-running Elasticsearch instance instead.
+
+### Environment variables (zero code changes)
+
+Set `TEST_ELASTICSEARCH_URL` and optionally `TEST_ELASTICSEARCH_API_KEY`:
+
+```bash
+# Basic — no authentication
+TEST_ELASTICSEARCH_URL=https://localhost:9200 dotnet run --project MyTests/
+
+# With API key authentication
+TEST_ELASTICSEARCH_URL=https://localhost:9200 \
+TEST_ELASTICSEARCH_API_KEY=your-api-key-here \
+dotnet run --project MyTests/
+```
+
+When `TEST_ELASTICSEARCH_URL` is set, the cluster validates connectivity (GET `/`)
+and skips ephemeral startup entirely. The default `Client` on `ElasticsearchCluster`
+automatically picks up the API key.
+
+### Programmatic hook
+
+Override `TryUseExternalCluster()` for custom logic — service discovery, config files,
+conditional per-developer overrides, etc.:
+
+```csharp
+public class MyTestCluster : ElasticsearchCluster
+{
+    public MyTestCluster() : base(new ElasticsearchConfiguration("latest-9")) { }
+
+    protected override ExternalClusterConfiguration TryUseExternalCluster()
+    {
+        var url = Environment.GetEnvironmentVariable("MY_DEV_CLUSTER_URL");
+        if (string.IsNullOrEmpty(url))
+            return null; // fall through to ephemeral startup
+
+        return new ExternalClusterConfiguration(
+            new Uri(url),
+            Environment.GetEnvironmentVariable("MY_DEV_CLUSTER_KEY")
+        );
+    }
+}
+```
+
+The resolution order is:
+
+1. `TryUseExternalCluster()` override (programmatic hook)
+2. `TEST_ELASTICSEARCH_URL` environment variable
+3. Start an ephemeral cluster
+
+### Inspecting external cluster state
+
+The cluster exposes `IsExternal` and `ExternalApiKey` properties:
+
+```csharp
+[Test]
+public async Task SomeTest()
+{
+    if (cluster.IsExternal)
+        TestContext.Current.Output.WriteLine("Running against external cluster");
+
+    var info = await cluster.Client.InfoAsync();
+    await Assert.That(info.IsValidResponse).IsTrue();
+}
+```
+
 ## Features
 
 ### Custom client configuration
@@ -86,6 +155,22 @@ public class MyTestCluster() : ElasticsearchCluster("latest-9")
 
 The `.WireTUnitOutput(output)` extension enables debug mode and routes per-request diagnostics
 to the current test's output.
+
+When overriding `Client` and using external clusters, check `ExternalApiKey` to wire
+authentication:
+
+```csharp
+public override ElasticsearchClient Client => this.GetOrAddClient((c, output) =>
+{
+    var settings = new ElasticsearchClientSettings(new StaticNodePool(c.NodesUris()))
+        .WireTUnitOutput(output);
+
+    if (ExternalApiKey != null)
+        settings = settings.Authentication(new ApiKey(ExternalApiKey));
+
+    return new ElasticsearchClient(settings);
+});
+```
 
 For multiple clusters that share the same client setup, use a base class:
 
@@ -228,3 +313,4 @@ public class SecurityCluster : ElasticsearchCluster<ElasticsearchConfiguration>
 | Client access | `cluster.GetOrAddClient(...)` in test | `cluster.Client` on cluster |
 | Parallel control | `ElasticXunitRunOptions.MaxConcurrency` | `[ParallelLimiter<T>]` |
 | Cluster partitioning | `Nullean.Xunit.Partitions` | `SharedType.Keyed` |
+| External cluster | `IntegrationTestsMayUseAlreadyRunningNode` | `TEST_ELASTICSEARCH_URL` env var or `TryUseExternalCluster()` override |
