@@ -25,12 +25,35 @@ It depends on this package transitively and adds:
 
 - `ElasticsearchCluster<TConfiguration>` — generic cluster base with TUnit lifecycle integration
 - `ElasticsearchConfiguration` — cluster configuration with bootstrap diagnostics settings
+- `ExternalClusterConfiguration` — connection details for remote Elasticsearch clusters
 - `ElasticsearchClusterExtensions` — `GetOrAddClient` helpers for caching any client type
 - `ElasticsearchTestHooks` — global `[BeforeEvery(Test)]` hook for skip evaluation
 - `ElasticsearchTestBase<TCluster>` — optional convenience base class
 - `ElasticsearchParallelLimit` — default parallel limiter
 - `SkipVersionAttribute` / `SkipTestAttribute` — version-based and custom skip conditions
 - Bootstrap diagnostics writers (ANSI console, progress heartbeat)
+
+## External cluster support
+
+`ElasticsearchCluster<TConfiguration>` supports skipping ephemeral cluster startup when a
+remote Elasticsearch instance is already available. This significantly speeds up development
+feedback loops since you don't need to wait for Elasticsearch to bootstrap on every test run.
+
+The resolution order during `InitializeAsync()` is:
+
+1. **Programmatic hook** — override `TryUseExternalCluster()` to return an
+   `ExternalClusterConfiguration`, or `null` to fall through
+2. **Environment variables** — set `TEST_ELASTICSEARCH_URL` (and optionally
+   `TEST_ELASTICSEARCH_API_KEY`)
+3. **Ephemeral startup** — download, install, and start Elasticsearch locally
+
+When using an external cluster:
+
+- `NodesUris()` returns the external URI
+- `IsExternal` is `true`
+- `ExternalApiKey` contains the API key (if provided)
+- `Dispose()` is a no-op (the remote cluster is not managed)
+- Connectivity is validated with a GET `/` before tests run
 
 ## Dependencies
 

@@ -18,6 +18,11 @@ namespace Elastic.TUnit.Elasticsearch;
 ///         with debug mode enabled and per-request diagnostics routed to the
 ///         current TUnit test's output. Override to customize.
 ///     </para>
+///     <para>
+///         When connected to an external cluster (via <c>TEST_ELASTICSEARCH_URL</c> or
+///         <see cref="ElasticsearchCluster{TConfiguration}.TryUseExternalCluster" />),
+///         the client is automatically configured with the external API key if provided.
+///     </para>
 /// </summary>
 public class ElasticsearchCluster : ElasticsearchCluster<ElasticsearchConfiguration>
 {
@@ -40,12 +45,18 @@ public class ElasticsearchCluster : ElasticsearchCluster<ElasticsearchConfigurat
 	///     A default <see cref="ElasticsearchClient" /> configured with debug mode
 	///     and per-request diagnostics routed to the current TUnit test's output.
 	///     The client is cached for the cluster's lifetime.
+	///     When using an external cluster with an API key, authentication is
+	///     configured automatically.
 	///     Override to customize connection settings, authentication, serialization, etc.
 	/// </summary>
 	public virtual ElasticsearchClient Client => this.GetOrAddClient((c, output) =>
 	{
 		var settings = new ElasticsearchClientSettings(new StaticNodePool(c.NodesUris()))
 			.WireTUnitOutput(output);
+
+		if (ExternalApiKey != null)
+			settings = settings.Authentication(new ApiKey(ExternalApiKey));
+
 		return new ElasticsearchClient(settings);
 	});
 }

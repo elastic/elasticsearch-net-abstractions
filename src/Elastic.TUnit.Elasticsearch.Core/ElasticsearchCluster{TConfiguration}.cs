@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -21,6 +22,20 @@ namespace Elastic.TUnit.Elasticsearch.Core;
 ///     Base class for an Elasticsearch cluster that integrates with TUnit's lifecycle.
 ///     Implements <see cref="IAsyncInitializer" /> to start the cluster and
 ///     <see cref="IAsyncDisposable" /> to tear it down.
+///     <para>
+///         Supports skipping ephemeral cluster startup when an external cluster is
+///         available. The resolution order in <see cref="InitializeAsync" /> is:
+///         <list type="number">
+///             <item>
+///                 <see cref="TryUseExternalCluster" /> — override for programmatic control
+///             </item>
+///             <item>
+///                 <c>TEST_ELASTICSEARCH_URL</c> environment variable (with optional
+///                 <c>TEST_ELASTICSEARCH_API_KEY</c>)
+///             </item>
+///             <item>Start an ephemeral cluster as usual</item>
+///         </list>
+///     </para>
 /// </summary>
 public abstract class ElasticsearchCluster<TConfiguration> : EphemeralCluster<TConfiguration>,
 	IAsyncInitializer, IAsyncDisposable
@@ -35,13 +50,45 @@ public abstract class ElasticsearchCluster<TConfiguration> : EphemeralCluster<TC
 	/// </summary>
 	internal static ConcurrentDictionary<Type, ElasticVersion> ClusterVersions { get; } = new();
 
+	private ExternalClusterConfiguration _externalCluster;
+
 	protected ElasticsearchCluster(TConfiguration configuration) : base(configuration)
 	{
 	}
 
 	/// <summary>
+	///     Whether this cluster is backed by an external (remote) Elasticsearch instance
+	///     rather than a locally managed ephemeral process.
+	/// </summary>
+	public bool IsExternal => _externalCluster != null;
+
+	/// <summary>
+	///     The API key for the external cluster, or <c>null</c> if not applicable.
+	/// </summary>
+	public string ExternalApiKey => _externalCluster?.ApiKey;
+
+	/// <summary>
+	///     Override to programmatically provide an external Elasticsearch cluster,
+	///     skipping ephemeral cluster startup entirely. Return <c>null</c> to fall
+	///     through to environment variable detection and then ephemeral startup.
+	/// </summary>
+	protected virtual ExternalClusterConfiguration TryUseExternalCluster() => null;
+
+	/// <summary>
+	///     Returns the node URIs for this cluster. When connected to an external cluster,
+	///     returns the external URI; otherwise delegates to the ephemeral cluster's nodes.
+	/// </summary>
+	public override ICollection<Uri> NodesUris(string hostName = null) =>
+		_externalCluster != null ? [_externalCluster.Uri] : base.NodesUris(hostName);
+
+	/// <summary>
 	///     Starts the Elasticsearch cluster. Cluster startups are serialized via a
 	///     semaphore since Elasticsearch is resource-intensive.
+	///     <para>
+	///         Before starting an ephemeral cluster, checks for an external cluster
+	///         via <see cref="TryUseExternalCluster" /> and then the
+	///         <c>TEST_ELASTICSEARCH_URL</c> environment variable.
+	///     </para>
 	///     <para>
 	///         Bootstrap output mode is determined by
 	///         <see cref="ElasticsearchConfiguration.ShowBootstrapDiagnostics" />:
@@ -57,6 +104,16 @@ public abstract class ElasticsearchCluster<TConfiguration> : EphemeralCluster<TC
 	/// </summary>
 	public async Task InitializeAsync()
 	{
+		var external = ResolveExternalCluster();
+		if (external != null)
+		{
+			await external.ValidateAsync().ConfigureAwait(false);
+			_externalCluster = external;
+			ClusterVersions[GetType()] = ClusterConfiguration.Version;
+			WriteExternalClusterInfo(external);
+			return;
+		}
+
 		await StartupSemaphore.WaitAsync().ConfigureAwait(false);
 		try
 		{
@@ -87,11 +144,12 @@ public abstract class ElasticsearchCluster<TConfiguration> : EphemeralCluster<TC
 	}
 
 	/// <summary>
-	///     Disposes the Elasticsearch cluster.
+	///     Disposes the Elasticsearch cluster. No-op when using an external cluster.
 	/// </summary>
 	public ValueTask DisposeAsync()
 	{
-		Dispose();
+		if (_externalCluster == null)
+			Dispose();
 		return default;
 	}
 
@@ -109,6 +167,35 @@ public abstract class ElasticsearchCluster<TConfiguration> : EphemeralCluster<TC
 					ClusterConfiguration.ProgressInterval),
 			_ => null
 		};
+	}
+
+	private ExternalClusterConfiguration ResolveExternalCluster()
+	{
+		var programmatic = TryUseExternalCluster();
+		if (programmatic != null)
+			return programmatic;
+
+		var url = Environment.GetEnvironmentVariable("TEST_ELASTICSEARCH_URL");
+		if (string.IsNullOrWhiteSpace(url))
+			return null;
+
+		if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
+			throw new InvalidOperationException(
+				$"TEST_ELASTICSEARCH_URL is set but is not a valid URI: {url}");
+
+		var apiKey = Environment.GetEnvironmentVariable("TEST_ELASTICSEARCH_API_KEY");
+		return new ExternalClusterConfiguration(uri, string.IsNullOrWhiteSpace(apiKey) ? null : apiKey);
+	}
+
+	private void WriteExternalClusterInfo(ExternalClusterConfiguration external)
+	{
+		var name = GetType().Name;
+		var auth = string.IsNullOrEmpty(external.ApiKey) ? "no auth" : "API key";
+		var message = $"[{name}] using external cluster at {external.Uri} ({auth}) — skipping ephemeral startup";
+
+		using var stdout = new System.IO.StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
+		stdout.WriteLine(message);
+		TestContext.Current?.Output.WriteLine(message);
 	}
 
 	private void WriteBootstrapFailure(Exception ex)
