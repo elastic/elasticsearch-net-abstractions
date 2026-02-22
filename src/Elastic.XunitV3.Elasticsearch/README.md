@@ -67,13 +67,24 @@ That's it. The framework will:
 4. Run all tests within the cluster concurrently
 5. Shut down the cluster after its tests complete
 
-## How it works
+## Why partitions?
+
+While a single machine can run multiple Elasticsearch instances, reasoning about concurrent cluster
+startups becomes difficult — especially on CI where resources vary. Most test suites only need one
+or two cluster configurations but have hundreds or thousands of tests. It makes more sense to
+achieve parallelism over **tests** (many) rather than **clusters** (few).
 
 This package uses the **partition** model from `Nullean.Xunit.Partitions.V3`:
 
-- Each cluster type is a **partition**. Partitions run serially so clusters don't compete for resources.
-- Tests within a partition run **concurrently** (unlike xUnit collection fixtures which are a concurrency barrier).
-- Cluster startup (`InitializeAsync`) and teardown (`DisposeAsync`) are managed by the partition framework — no manual lifecycle code needed.
+- Each cluster type is a **partition**. Partitions run **serially** — only one cluster starts at
+  a time, keeping startup predictable and easy to debug.
+- Tests **within** a partition run **concurrently**. Once a cluster is up, all test classes that
+  share it execute in parallel with no artificial concurrency barrier.
+- This is fundamentally different from xUnit's built-in **collection fixtures**, which group tests
+  into a collection but then run that collection's tests *sequentially*. With partitions you get
+  shared state **without** sacrificing test parallelism.
+- Cluster startup (`InitializeAsync`) and teardown (`DisposeAsync`) are managed by the partition
+  framework — no manual lifecycle code needed.
 
 ## Customising the cluster
 
