@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <IsPackable>True</IsPackable>
+    <IsTestProject>False</IsTestProject>
+    <Description>xUnit v3 integration for Elasticsearch — ephemeral clusters with a pre-configured ElasticsearchClient. This is the recommended package for most users.</Description>
+    <PackageTags>elastic,elasticsearch,xunit,xunitv3,cluster,integration,test,ephemeral,client</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Elastic.Clients.Elasticsearch" Version="9.2.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Elastic.Xunitv3.Elasticsearch.Core\Elastic.Xunitv3.Elasticsearch.Core.csproj" />
+  </ItemGroup>
+</Project>
