@@ -241,7 +241,7 @@ namespace Elastic.Elasticsearch.Ephemeral.Tasks
 			}
 			else
 				//SharpZipLib loses permissions when untarring
-				Proc.Exec("tar", "-zxvf", file, "-C", toFolder);
+				Proc.Exec("tar", "-zxf", file, "-C", toFolder);
 		}
 
 		private static void ExtractZip(string file, string toFolder) =>

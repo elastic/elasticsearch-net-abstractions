@@ -18,6 +18,8 @@
     <Project Path="examples/Elastic.Xunit.ExampleMinimal/Elastic.Xunit.ExampleMinimal.csproj" />
     <Project Path="examples/Elastic.TUnit.ExampleMinimal/Elastic.TUnit.ExampleMinimal.csproj" />
     <Project Path="examples/Elastic.TUnit.ExampleComplex/Elastic.TUnit.ExampleComplex.csproj" />
+    <Project Path="examples/Elastic.XunitV3.ExampleMinimal/Elastic.XunitV3.ExampleMinimal.csproj" />
+    <Project Path="examples/Elastic.XunitV3.ExampleComplex/Elastic.XunitV3.ExampleComplex.csproj" />
     <Project Path="examples/ScratchPad/ScratchPad.csproj" />
   </Folder>
   <Folder Name="/src/">
@@ -27,6 +29,8 @@
     <Project Path="src/Elastic.TUnit.Elasticsearch.Core/Elastic.TUnit.Elasticsearch.Core.csproj" />
     <Project Path="src/Elastic.TUnit.Elasticsearch/Elastic.TUnit.Elasticsearch.csproj" />
     <Project Path="src/Elastic.Elasticsearch.Xunit/Elastic.Elasticsearch.Xunit.csproj" />
+    <Project Path="src/Elastic.XunitV3.Elasticsearch.Core/Elastic.XunitV3.Elasticsearch.Core.csproj" />
+    <Project Path="src/Elastic.XunitV3.Elasticsearch/Elastic.XunitV3.Elasticsearch.csproj" />
     <Project Path="src/Elastic.Stack.ArtifactsApi/Elastic.Stack.ArtifactsApi.csproj" />
   </Folder>
 </Solution>

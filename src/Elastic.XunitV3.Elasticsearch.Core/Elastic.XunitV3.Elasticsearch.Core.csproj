@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <IsPackable>True</IsPackable>
+    <IsTestProject>False</IsTestProject>
+    <Description>Core xUnit v3 integration for ephemeral Elasticsearch clusters — no Elastic.Clients.Elasticsearch dependency. Most users should depend on Elastic.XunitV3.Elasticsearch instead.</Description>
+    <PackageTags>elastic,elasticsearch,xunit,xunitv3,cluster,integration,test,ephemeral,core</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Nullean.Xunit.Partitions.v3" Version="0.12.0" />
+    <PackageReference Include="xunit.v3.assert" Version="3.2.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Elastic.Elasticsearch.Ephemeral\Elastic.Elasticsearch.Ephemeral.csproj" />
+  </ItemGroup>
+</Project>
